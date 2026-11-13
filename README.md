@@ -15,10 +15,18 @@ npm run example
 
 `npm test`はビルド後にテストを実行します。`npm run example`は、入力と厳密な結果を`artifacts/intersection.json`に、表示用のSVGを`artifacts/intersection.svg`に保存します。実行時の外部ライブラリ・WASM・ネイティブアドオンはありません。TypeScriptとNodeの型定義は開発用依存です。
 
+## インストール
+
+```sh
+npm install cadme
+```
+
+ES ModulesとBigIntを利用します。Node.jsは24以上をサポートします。
+
 ## API
 
 ```ts
-import { point2, segment2, intersectSegments } from './dist/index.js';
+import { point2, segment2, intersectSegments } from 'cadme';
 
 const a = segment2(point2('0', '0'), point2('1', '1'));
 const b = segment2(point2('0', '1'), point2('2', '0'));
@@ -77,3 +85,7 @@ npm run example -- artifacts/intersection.json artifacts/replay
 4. 平面多面体の位相構造と3D演算。
 
 曲面、3Dソリッド、CAD形式の読み書き、GUIはまだ含みません。
+
+## ライセンス
+
+MIT。詳細は[LICENSE](./LICENSE)を参照してください。
