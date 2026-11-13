@@ -1,5 +1,5 @@
 {
-  "name": "@yukiharada1228/cadme",
+  "name": "cadme",
   "version": "0.1.0",
   "type": "module",
   "exports": {
