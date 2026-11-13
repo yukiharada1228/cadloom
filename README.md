@@ -1,4 +1,4 @@
-# cadme
+# cadloom
 
 ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による厳密な2D閉線分の交差** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
 
@@ -18,7 +18,7 @@ npm run example
 ## インストール
 
 ```sh
-npm install cadme
+npm install cadloom
 ```
 
 ES ModulesとBigIntを利用します。Node.jsは24以上をサポートします。
@@ -26,7 +26,7 @@ ES ModulesとBigIntを利用します。Node.jsは24以上をサポートしま�
 ## API
 
 ```ts
-import { point2, segment2, intersectSegments } from 'cadme';
+import { point2, segment2, intersectSegments } from 'cadloom';
 
 const a = segment2(point2('0', '0'), point2('1', '1'));
 const b = segment2(point2('0', '1'), point2('2', '0'));
