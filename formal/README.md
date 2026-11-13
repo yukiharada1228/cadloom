@@ -11,15 +11,16 @@ cd formal
 MATHLIB_NO_CACHE_ON_UPDATE=1 lake update
 lake exe cache get Mathlib.Data.Rat.Lemmas Mathlib.Data.Finset.Sort Mathlib.Tactic.FieldSimp Mathlib.Tactic.Ring Mathlib.Tactic.Linarith Mathlib.Tactic.LinearCombination
 cd ..
-node formal/scripts/verify.mjs
+node formal/scripts/verify.mjs --partial
 ```
 
 `verify.mjs`はelanの標準インストール先`~/.elan/bin`を子プロセスのPATHに追加します。ソースの棚卸しとハッシュ、式の抽出結果、Leanビルド、各定理の公理依存を確認します。ハッシュ一致そのものは正しさの証明ではなく、レビュー対象の変更を検知するためのものです。
 
-完全検証を要求するゲートは、未検証の義務が残る現在の状態では**終了コード2で失敗**します。
+既定のコマンドは全体検証を要求し、未検証の義務が残る現在の状態では**終了コード2で失敗**します。部分的なLean補題の検査だけを行う場合は`--partial`を明示します。
 
 ```sh
-node formal/scripts/verify.mjs --require-full
+node formal/scripts/verify.mjs
+# --require-full を指定しても同じ動作です
 ```
 
 ## ファイルと証明対象
@@ -27,6 +28,7 @@ node formal/scripts/verify.mjs --require-full
 | ファイル | 内容 |
 |---|---|
 | `Cadloom.lean` | 有理数演算の公式、自然数版Euclidループ、非平行交差の必要十分性、一般の全順序上の区間・隣接辺の定理 |
+| `SegmentMembership.lean` | 座標範囲・辞書順の線分所属判定とパラメーターによる線分定義の同値性。垂直・退化線分を含む |
 | `SourceArithmetic.lean` | TypeScriptの構文木から抽出した交点式とLeanモデルとの一致、および非平行分岐の交点の健全性 |
 | `Audit.lean` | 公開した各証明の`#print axioms`による依存公理の監査 |
 | `verification-status.json` | 検査対象、ソースの基準ハッシュ、未解決の証明義務 |

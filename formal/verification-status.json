@@ -31,7 +31,17 @@
     "Cadloom.sourceT_eq",
     "Cadloom.sourceU_eq",
     "Cadloom.sourcePoint_eq",
-    "Cadloom.sourcePoint_sound"
+    "Cadloom.sourcePoint_sound",
+    "Cadloom.scalar_lerp_between",
+    "Cadloom.scalar_parameter_in_unit",
+    "Cadloom.containsPoint_iff_onSegment",
+    "Cadloom.lexLE_total",
+    "Cadloom.lexLE_antisymm",
+    "Cadloom.lerp_reverse",
+    "Cadloom.onSegment_reverse",
+    "Cadloom.lerp_lex_bounds",
+    "Cadloom.collinear_lex_bounds_onSegment",
+    "Cadloom.lexContains_iff_onSegment"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
   "unverifiedObligations": [

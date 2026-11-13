@@ -1,6 +1,6 @@
 name = "cadloomProofs"
 version = "0.1.0"
-defaultTargets = ["Cadloom", "SourceArithmetic"]
+defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership"]
 
 [[require]]
 name = "mathlib"
@@ -12,3 +12,6 @@ name = "Cadloom"
 
 [[lean_lib]]
 name = "SourceArithmetic"
+
+[[lean_lib]]
+name = "SegmentMembership"

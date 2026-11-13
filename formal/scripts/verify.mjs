@@ -8,6 +8,11 @@ import { delimiter, join } from 'node:path';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const formal = join(root, 'formal');
 const status = JSON.parse(readFileSync(join(formal, 'verification-status.json'), 'utf8'));
+const options = process.argv.slice(2);
+if (options.some(option => !['--partial', '--require-full'].includes(option)) ||
+    options.includes('--partial') && options.includes('--require-full')) {
+  throw Error('Usage: node formal/scripts/verify.mjs [--partial | --require-full]');
+}
 function sources(directory) {
   return readdirSync(directory, {withFileTypes: true}).flatMap(entry => {
     const path = join(directory, entry.name);
@@ -49,7 +54,7 @@ for (const name of status.checkedTheorems) {
 console.log(`Lean kernel checked ${status.checkedTheorems.length} declared theorems; axiom audit passed.`);
 console.log('FULL TYPESCRIPT VERIFICATION: NOT COMPLETE');
 for (const obligation of status.unverifiedObligations) console.log(`- ${obligation}`);
-if (process.argv.includes('--require-full')) {
+if (!options.includes('--partial')) {
   console.error('Full verification gate rejected: unresolved refinement obligations remain.');
   process.exitCode = 2;
 }

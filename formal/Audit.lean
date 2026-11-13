@@ -1,4 +1,5 @@
 import SourceArithmetic
+import SegmentMembership
 
 #print axioms Cadloom.gcdLoop_correct
 #print axioms Cadloom.fraction_add
@@ -22,3 +23,14 @@ import SourceArithmetic
 #print axioms Cadloom.sourceU_eq
 #print axioms Cadloom.sourcePoint_eq
 #print axioms Cadloom.sourcePoint_sound
+
+#print axioms Cadloom.scalar_lerp_between
+#print axioms Cadloom.scalar_parameter_in_unit
+#print axioms Cadloom.containsPoint_iff_onSegment
+#print axioms Cadloom.lexLE_total
+#print axioms Cadloom.lexLE_antisymm
+#print axioms Cadloom.lerp_reverse
+#print axioms Cadloom.onSegment_reverse
+#print axioms Cadloom.lerp_lex_bounds
+#print axioms Cadloom.collinear_lex_bounds_onSegment
+#print axioms Cadloom.lexContains_iff_onSegment
