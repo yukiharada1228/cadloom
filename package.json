@@ -1,5 +1,5 @@
 {
-  "name": "cadme",
+  "name": "cadloom",
   "version": "0.1.0",
   "type": "module",
   "exports": {
@@ -33,11 +33,11 @@
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yukiharada1228/cadme.git"
+    "url": "git+https://github.com/yukiharada1228/cadloom.git"
   },
-  "homepage": "https://github.com/yukiharada1228/cadme#readme",
+  "homepage": "https://github.com/yukiharada1228/cadloom#readme",
   "bugs": {
-    "url": "https://github.com/yukiharada1228/cadme/issues"
+    "url": "https://github.com/yukiharada1228/cadloom/issues"
   },
   "keywords": [
     "cad",
