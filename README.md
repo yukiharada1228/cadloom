@@ -1,6 +1,6 @@
 # cadloom
 
-ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による厳密な2D閉線分の交差** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
+ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による厳密な2D閉線分の交差と、線分群の交点分割・重複統合** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
 
 ## 実行
 
@@ -50,6 +50,45 @@ console.log(JSON.stringify(result));
 
 線分は両端を含みます。長さゼロの線分は点として扱います。重複区間の端点はx、次いでyの辞書順で正規化されるため、入力の順序や向きを変えても同じ結果になります。`pointOnSegment`も同じ閉線分の意味を持ちます。
 
+## 線分群の分割（開発版）
+
+`splitSegments`は入力端点、交点、重複区間の端点ですべての線分を分割し、同一座標の頂点と同一の辺を統合します。このAPIは次回リリース向けの開発版で、npmの`0.1.0`には含まれません。
+
+```ts
+import { point2, segment2, splitSegments } from 'cadloom';
+
+const result = splitSegments([
+  segment2(point2('-1', '0'), point2('1', '0')),
+  segment2(point2('0', '-1'), point2('0', '1')),
+]);
+// result.vertices.length === 5
+// result.edges.length === 4
+// 中央の頂点: { point: (0,0), sources: [0,1] }
+```
+
+- `vertices`：`{ point, sources }`の配列。座標のx、次いでyの厳密な辞書順です。
+- `edges`：`{ start, end, sources }`の配列。`start`と`end`は`vertices`へのインデックスで、`start < end`です。配列全体も`start`、次いで`end`で整列します。
+- `sources`：入力線分配列の0始まりのインデックス。頂点ではその点を含む全入力、辺ではその辺全体を覆う全入力を、重複なし・昇順で記録します。
+- 同じ入力集合を並べ替えたり端点を反転しても、頂点・辺の座標とインデックスは変わりません。`sources`は新しい入力順序に対応して変わります。
+- 長さゼロの入力は頂点として保持し、その点を通る線分も分割します。長さゼロの辺は生成しません。
+- 出力の辺同士は共有端点以外では交差・重複せず、出力頂点が辺の内部に残ることもありません。
+- 出力は深くfreezeされ、入力オブジェクトから独立しています。面・半稜線・接続順序の情報はまだ生成しません。
+
+総当たりで全線分ペアを調べます。入力数をn、辺を切る点の総数をkとすると、ペア検査はO(n²)、点の整列はO(k log k)以内、作業メモリはO(n+k)です。BigIntのビット長による演算コストは別途増大します。大規模データ向けの高速化は未実装です。
+
+ソースをビルド後、図とJSONを生成できます。
+
+```sh
+npm run build
+node examples/arrangement-to-svg.ts
+```
+
+`artifacts/arrangement.json`に正確な入力・結果を、`artifacts/arrangement.svg`に頂点・辺の番号付きの図を保存します。保存したJSONまたは`{ "segments": [[["0","0"],["1","1"]]] }`形式のファイルを再実行できます。
+
+```sh
+node examples/arrangement-to-svg.ts artifacts/arrangement.json artifacts/arrangement-replay
+```
+
 ## 保存した入力の再実行
 
 次のJSONを`case.json`に保存します。JSON数値ではなく文字列を使います。
@@ -79,10 +118,9 @@ npm run example -- artifacts/intersection.json artifacts/replay
 
 ## 次の段階
 
-1. 線分群の交点と分割。
-2. 平面上の接続構造と領域の復元。
-3. 穴を持つ2D領域の和・差・積。
-4. 平面多面体の位相構造と3D演算。
+1. 平面上の接続順序・半稜線構造と領域の復元。
+2. 穴を持つ2D領域の和・差・積。
+3. 平面多面体の位相構造と3D演算。
 
 曲面、3Dソリッド、CAD形式の読み書き、GUIはまだ含みません。
 
