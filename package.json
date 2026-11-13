@@ -1,0 +1,53 @@
+{
+  "name": "cadme",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test tests/*.test.ts",
+    "example": "npm run build && node examples/intersection-to-svg.ts",
+    "prepack": "npm run build"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "@types/node": "^24.0.0"
+  },
+  "description": "Pure TypeScript exact rational 2D geometry foundations for a CAD kernel",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yukiharada1228/cadme.git"
+  },
+  "homepage": "https://github.com/yukiharada1228/cadme#readme",
+  "bugs": {
+    "url": "https://github.com/yukiharada1228/cadme/issues"
+  },
+  "keywords": [
+    "cad",
+    "geometry",
+    "typescript",
+    "rational",
+    "exact-arithmetic"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}
