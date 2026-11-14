@@ -47,3 +47,5 @@ export type { AlgebraicPoint2, AlgebraicCoordinates2 } from './geometry/algebrai
 export { circle2, circleThroughPoints2, line2, classifyPointToCircle2, classifyAlgebraicPointToCircle2, intersectLineCircle2, intersectSegmentCircle2, intersectCircles2 } from './geometry/circle2.js';
 export type { Circle2, Line2, LineCircleHit2, CircleCircleIntersection2 } from './geometry/circle2.js';
 export { polynomialResultant } from './numeric/resultant.js';
+export { circularArc2, fullCircleArc2, reverseCircularArc2, comparePointsAroundCircle2, locatePointOnArc2, pointOnArc2, comparePointsOnArc2, splitCircularArc2, intersectLineArc2, intersectSegmentArc2, intersectArcs2 } from './geometry/circular-arc2.js';
+export type { ArcDirection2, CircularPointInput2, CircularArcOptions2, CircularArc2, ArcPointLocation2, ArcIntersection2 } from './geometry/circular-arc2.js';

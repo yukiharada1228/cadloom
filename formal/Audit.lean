@@ -131,3 +131,5 @@ import SortedAdjacency
 #print axioms Cadloom.circle_equation_difference
 #print axioms Cadloom.radical_axis_circle_iff
 #print axioms Cadloom.circumcenter_linear_equations
+
+#print axioms Cadloom.circle_same_x_half_unique

@@ -29,8 +29,11 @@ distance minus squared radius. `orientAlgebraicPoint2(a,b,p)` handles two ration
 points and one such algebraic point. `compareAlgebraicPoints2` compares coordinates
 lexicographically, including across different parameterizations.
 
-Structural point objects must respect the factory's representation invariant,
-just as structural rational geometry objects must respect their advertised types.
+Circle classification now accepts general algebraic coordinates, using an internal
+factory registry for the correlated fast path and exact field arithmetic otherwise.
+Unrelated extra fields do not override coordinate values. Structural affine points
+passed to the specialized `orientAlgebraicPoint2` still require the advertised
+origin/direction/parameter invariant.
 
 ## Rational affine images of root certificates
 
@@ -121,7 +124,8 @@ TypeScript control flow, factories or the complete intersection routines. The
 previous real-root limitations remain in [real-roots.md](real-roots.md). Runtime
 and normal tests have no external CAS or native/Wasm dependency.
 
-This API does not yet provide circular arcs, curved arrangements/Booleans,
-arbitrary algebraic circle centers, curved 3D
+Circular arcs are provided by the separate [arc layer](circular-arcs.md). This
+intersection API does not provide curved arrangements/Booleans, arbitrary algebraic
+circle centers, curved 3D
 BRep, rational splines/NURBS or tolerance-based CAD imports. It returns exact
 algebraic intersection data without claiming a complete circular CAD kernel.
