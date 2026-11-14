@@ -38,3 +38,5 @@ export { prepareSolid3 } from './geometry/solid3.js';
 export type { PreparedSolid3, SolidShell3 } from './geometry/solid3.js';
 export { partitionTriangleByPlanes3 } from './geometry/triangle-plane-arrangement.js';
 export type { TrianglePlaneCell3 } from './geometry/triangle-plane-arrangement.js';
+export { booleanSolids3 } from './geometry/solid-boolean3.js';
+export type { SolidBooleanResult3, SolidBooleanOperand3 } from './geometry/solid-boolean3.js';
