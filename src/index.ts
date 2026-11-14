@@ -99,3 +99,7 @@ export { intersectEllipses3 } from './geometry/ellipse3.js';
 export type { EllipseEllipseIntersection3 } from './geometry/ellipse3.js';
 export { intersectAlgebraicSegmentEllipse3 } from './geometry/ellipse3.js';
 export { intersectPlanarCylinderFaces3 } from './geometry/planar-cylinder-intersection3.js';
+export { splitCylinderFaceByPlane3 } from './geometry/cylinder-plane-split3.js';
+export type { SplitCylinderRegion3, CylinderPlaneSplit3 } from './geometry/cylinder-plane-split3.js';
+export { intersectAlgebraicSegmentPlane3 } from './geometry/algebraic-segment-plane3.js';
+export type { AlgebraicSegmentPlaneIntersection3 } from './geometry/algebraic-segment-plane3.js';
