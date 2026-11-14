@@ -59,3 +59,7 @@ export { buildCurveFaces2 } from './geometry/curve-faces2.js';
 export type { CurveFace2, CurveFaceLocation2, CurveFaceArrangement2 } from './geometry/curve-faces2.js';
 export { booleanCurveRegions2 } from './geometry/curve-boolean2.js';
 export type { CurveBoundary2, CurveRegion2, CurveRegionLocation2, CurveBooleanResult2 } from './geometry/curve-boolean2.js';
+export { algebraicCoordinates3, algebraicPoint3, compareAlgebraicPoints3 } from './geometry/algebraic-point3.js';
+export type { AlgebraicCoordinates3, AlgebraicPoint3 } from './geometry/algebraic-point3.js';
+export { line3, cylinder3, evaluateCylinder3, classifyPointToSurface3, normalToSurface3, intersectLineSurface3, intersectSegmentSurface3, surfacesCoincide3 } from './geometry/surface3.js';
+export type { Line3, Cylinder3, Surface3, LineSurfaceHit3, LineSurfaceIntersection3, SegmentSurfaceIntersection3 } from './geometry/surface3.js';

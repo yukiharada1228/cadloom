@@ -516,3 +516,28 @@ console.log(lens.locate(point2('1/2', 0n))); // inside
 npm run build
 node examples/curve-booleans.ts
 ```
+
+
+## 3Dの解析的支持面：平面・円柱面
+
+`Surface3`は`{ kind: 'plane', plane }`または`{ kind: 'cylinder', cylinder }`です。円柱は有理数の軸と正の半径の二乗で表し、軸を単位ベクトルへ近似しません。
+
+```ts
+const surface: Surface3 = {
+  kind: 'cylinder',
+  cylinder: cylinder3(line3(point3(0n, 0n, 0n), vector3(1n, 1n, 1n)), 1n),
+};
+const hit = intersectLineSurface3(
+  line3(point3(0n, 0n, 0n), vector3(1n, -1n, 0n)), surface,
+);
+// kind: 'points'（代数的な交点とパラメータ）・'contained'・'none'
+```
+
+`intersectSegmentSurface3`は端点を含む線分との交差を扱います。`classifyPointToSurface3`は平面の向きに対する符号、または円柱の内側（-1）・面上（0）・外側（1）を返します。座標は有理数でも、`algebraicCoordinates3`で作った独立した代数的実数でも構いません。`normalToSurface3`は面上で厳密な非単位法線を返し、`surfacesCoincide3`は軸の原点・スケールや平面の向きを無視して支持面の一致を判定します。
+
+このAPIは無限に広がる支持面の層です。境界付きの面・辺・シェルを持つB-repや、その立体検証はこれから構築します。[円柱の式・交差・法線の証明と検証範囲](docs/proofs/analytic-surfaces3.md)を参照してください。
+
+```sh
+npm run build
+node examples/analytic-surfaces3.ts
+```

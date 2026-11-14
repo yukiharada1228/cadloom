@@ -1,3 +1,4 @@
+import SurfaceGeometry
 import CircleGeometry
 import CoplanarProjection
 import TriangleGeometry
@@ -138,3 +139,10 @@ import SortedAdjacency
 
 #print axioms Cadloom.circle_tangent_cross_linear
 #print axioms Cadloom.circle_germ_normal_offset
+
+#print axioms Cadloom.cylinder_projection_identity
+#print axioms Cadloom.cylinder_axis_shift
+#print axioms Cadloom.cylinder_axis_scale
+#print axioms Cadloom.line_cylinder_polynomial
+#print axioms Cadloom.cylinder_normal_perpendicular
+#print axioms Cadloom.cylinder_normal_squared
