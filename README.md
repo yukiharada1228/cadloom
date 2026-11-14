@@ -741,3 +741,23 @@ const section = intersectPlaneCylinderFace3(plane3(1n, 0n, -1n), face);
 npm run build
 node examples/planar-cylinder-intersection3.ts
 ```
+
+## 円柱面を平面で分割する
+
+`splitCylinderFaceByPlane3(face, plane)`は有限の円柱面を平面の負側・正側へ正則化して分割します。`negative`・`positive`には所属判定と境界の辺参照、`edges`には共通の辺テーブル、`sharedEdges`には両側が逆向きに使う切断辺のIDを保持します。接するだけの母線は新しい分割境界にしません。
+
+```ts
+const split = splitCylinderFaceByPlane3(face, plane3(1n, 0n, -1n));
+split.negative.locate(point); // inside / boundary / outside
+split.negative.loops;        // 閉じた境界ループ。接続が一意でない頂点があればnull
+split.sharedEdges;          // 両領域で同じ辺IDを逆向きに参照
+```
+
+各側は複数の連結成分を含む場合があります。境界が接する頂点では任意のループ接続を作らず、辺参照のグラフを保持して`loops: null`を返します。両側のループが一意なら`topology`にB-repの接続を構築しますが、連結した面や閉じた立体の認定ではありません。
+
+`intersectAlgebraicSegmentPlane3`は代数的な端点の線分と平面を交差させ、共有パラメータを持つ点や有理数の変位を保って計算します。[正則化・向き・接続・検証範囲](docs/proofs/cylinder-plane-split3.md)を参照してください。
+
+```sh
+npm run build
+node examples/cylinder-plane-split3.ts
+```

@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {AlgebraicReal,point3,vector3,plane3,segment3,algebraicSegment3,algebraicCoordinates3,algebraicPoint3,intersectSegmentPlane,intersectAlgebraicSegmentPlane3,classifyPointToSurface3,compareAlgebraicPoints3,pointOnAlgebraicSegment3,translateAlgebraicPoint3} from '../dist/index.js';
+test('algebraic segment/plane API agrees with independent rational segment fixtures',()=>{
+ let seed=71n;const integer=()=>{seed=(seed*48271n)%2147483647n;return seed%9n-4n;};
+ for(let i=0;i<140;i++){const a=point3(integer(),integer(),integer()),b=point3(integer(),integer(),integer()),n=vector3(integer(),integer(),integer());if(n.x.sign()===0&&n.y.sign()===0&&n.z.sign()===0)continue;const p=plane3(n.x,n.y,n.z,integer()),expected=intersectSegmentPlane(segment3(a,b),p),actual=intersectAlgebraicSegmentPlane3(algebraicSegment3(a,b),p);assert.equal(actual.kind,expected.kind);if(expected.kind==='point'&&actual.kind==='point'){assert.equal(actual.parameter.compare(AlgebraicReal.fromRational(expected.parameter)),0);assert.equal(compareAlgebraicPoints3(actual.point,algebraicCoordinates3(expected.point.x,expected.point.y,expected.point.z)),0);}}
+});
+test('correlated irrational generators retain exact low-degree intersections and endpoints',()=>{
+ const h=AlgebraicReal.fromRational('1/2').sqrt(),start=algebraicPoint3(point3(0n,0n,-2n),vector3(1n,1n,0n),h),end=translateAlgebraicPoint3(start,vector3(0n,0n,4n)),p=plane3(1n,0n,-1n),result=intersectAlgebraicSegmentPlane3(algebraicSegment3(start,end),p);assert.equal(result.kind,'point');if(result.kind!=='point')return;assert.equal(compareAlgebraicPoints3(result.point,algebraicCoordinates3(h,h,h)),0);for(const coordinate of [result.point.x,result.point.y,result.point.z])assert.ok(coordinate.polynomial.degree<=2);assert.ok(pointOnAlgebraicSegment3(result.point,algebraicSegment3(start,end)));assert.equal(classifyPointToSurface3(result.point,{kind:'plane',plane:p}),0);
+ for(const z of [-2n,2n]){const hit=intersectAlgebraicSegmentPlane3(algebraicSegment3(start,end),plane3(0n,0n,1n,-z));assert.equal(hit.kind,'point');if(hit.kind==='point')assert.equal(hit.parameter.compare(AlgebraicReal.fromRational(z===-2n?0n:1n)),0);}
+});
+test('independent algebraic endpoints, coplanar intervals and collapsed points are distinguished',()=>{
+ const a=AlgebraicReal.fromRational(2n).sqrt(),b=AlgebraicReal.fromRational(3n).sqrt(),s=algebraicSegment3(algebraicCoordinates3(a,0n,0n),algebraicCoordinates3(b.neg(),1n,0n)),hit=intersectAlgebraicSegmentPlane3(s,plane3(1n,0n,0n));assert.equal(hit.kind,'point');if(hit.kind==='point'){assert.equal(hit.point.x.sign(),0);assert.equal(hit.parameter.compare(a.div(a.add(b))),0);assert.ok(pointOnAlgebraicSegment3(hit.point,s));}
+ assert.equal(intersectAlgebraicSegmentPlane3(s,plane3(0n,0n,1n)).kind,'coplanar');assert.equal(intersectAlgebraicSegmentPlane3(s,plane3(0n,0n,1n,1n)).kind,'none');assert.equal(intersectAlgebraicSegmentPlane3(algebraicSegment3(s.start,s.start),plane3(0n,0n,1n)).kind,'point');
+});

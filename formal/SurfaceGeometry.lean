@@ -145,4 +145,12 @@ theorem ellipse_elimination_identity {K : Type*} [CommRing K] (L M R y : K) :
     (L*y+M)*(M-L*y)+L^2*(y^2-R) = M^2-L^2*R := by
   ring
 
+/-- The plane sign increases in the inward surface direction exactly when
+    the boundary tangent opposes N×n. This fixes the two shared-edge uses. -/
+theorem cut_boundary_orientation {K : Type*} [CommRing K]
+    (nx ny nz Nx Ny Nz tx ty tz : K) :
+    nx*(Ny*tz-Nz*ty)+ny*(Nz*tx-Nx*tz)+nz*(Nx*ty-Ny*tx) =
+      -(tx*(Ny*nz-Nz*ny)+ty*(Nz*nx-Nx*nz)+tz*(Nx*ny-Ny*nx)) := by
+  ring
+
 end Cadloom

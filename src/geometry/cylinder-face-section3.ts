@@ -3,9 +3,10 @@ import {AlgebraicReal} from '../numeric/real-roots.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {dot3} from './point3.js';
-import {snapshotExactPoint3,compareAlgebraicPoints3,algebraicCoordinates3} from './algebraic-point3.js';
+import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3} from './algebraic-segment3.js';
+import {intersectAlgebraicSegmentPlane3} from './algebraic-segment-plane3.js';
 import {algebraicLinePoint3} from './algebraic-line3.js';
 import {intersectPlaneCylinder3} from './plane-cylinder3.js';
 import {intersectCirclePlane3,pointOnArc3} from './circle3.js';
@@ -29,7 +30,6 @@ export interface CylinderFaceSection3 {
 export function intersectPlaneCylinderFace3(inputPlane:Plane3,inputFace:PreparedCylinderFace3):CylinderFaceSection3 {
   const p=plane3(inputPlane.normal.x,inputPlane.normal.y,inputPlane.normal.z,inputPlane.offset),face=prepareCylinderFace3(inputFace.surface,inputFace.lower,inputFace.upper,{angular:inputFace.angular,sense:inputFace.sense});
   const hit=intersectPlaneCylinder3(p,face.surface),curves:{curve:Curve3;multiplicity:1|2}[]=[],contacts:AlgebraicCoordinates3[]=[];
-  const value=(v:AlgebraicCoordinates3)=>v.x.affine(p.normal.x,p.offset).add(v.y.affine(p.normal.y)).add(v.z.affine(p.normal.z));
   if(hit.kind==='lines'){
     const d=face.surface.axis.direction,o=face.surface.axis.origin,D=dot3(d,d);
     for(const item of hit.lines){
@@ -46,13 +46,9 @@ export function intersectPlaneCylinderFace3(inputPlane:Plane3,inputFace:Prepared
         const cross=intersectCirclePlane3(boundary.arc.circle,p);
         if(cross.kind==='points')for(const q of cross.points)if(pointOnArc3(q,boundary.arc))contacts.push(q);
       }else if(boundary.kind==='algebraic-segment'){
-        const s=boundary.segment,a=value(s.start),b=value(s.end);
-        if(a.sign()===0)contacts.push(s.start);if(b.sign()===0)contacts.push(s.end);
-        if(a.sign()*b.sign()<0){
-          const t=a.div(a.sub(b)); // coordinate arithmetic permits independent algebraic endpoints
-          const coordinate=(k:'x'|'y'|'z')=>s.start[k].add(s.end[k].sub(s.start[k]).mul(t));
-          contacts.push(algebraicCoordinates3(coordinate('x'),coordinate('y'),coordinate('z')));
-        }
+        const cross=intersectAlgebraicSegmentPlane3(boundary.segment,p);
+        if(cross.kind==='point')contacts.push(cross.point);
+        else if(cross.kind==='coplanar')contacts.push(cross.segment.start,cross.segment.end);
       }else throw new Error('Unexpected cylinder domain boundary representation');
     }
     const cuts=contacts.filter((q,i,all)=>all.findIndex(r=>compareAlgebraicPoints3(q,r)===0)===i);
