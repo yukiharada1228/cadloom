@@ -1,0 +1,1958 @@
+{
+  "oracle": "SymPy 1.14.0",
+  "seed": 491857,
+  "fixtures": [
+    {
+      "coefficients": [
+        "4",
+        "2",
+        "3",
+        "-1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "2",
+          "upper": "8/3",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "1/3",
+          "count": 0
+        },
+        {
+          "lower": "-3/2",
+          "upper": "3/5",
+          "count": 0
+        },
+        {
+          "lower": "-1",
+          "upper": "3",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "4/5",
+          "count": 0
+        },
+        {
+          "lower": "3/2",
+          "upper": "8/5",
+          "count": 0
+        },
+        {
+          "lower": "-9/4",
+          "upper": "9/5",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "1/2",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "23211/6104",
+          "upper": "1175/309"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "7",
+        "-1",
+        "6",
+        "2",
+        "5",
+        "1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "1",
+          "upper": "3",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "4",
+          "count": 0
+        },
+        {
+          "lower": "-8",
+          "upper": "10/3",
+          "count": 1
+        },
+        {
+          "lower": "3",
+          "upper": "12",
+          "count": 0
+        },
+        {
+          "lower": "-1",
+          "upper": "5/4",
+          "count": 0
+        },
+        {
+          "lower": "-1/2",
+          "upper": "8",
+          "count": 0
+        },
+        {
+          "lower": "-5/2",
+          "upper": "3/4",
+          "count": 0
+        },
+        {
+          "lower": "-6",
+          "upper": "-2",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-79642/16375",
+          "upper": "-79535/16353"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "3",
+        "-7",
+        "0",
+        "-7",
+        "2",
+        "7"
+      ],
+      "total": 3,
+      "intervals": [
+        {
+          "lower": "-1",
+          "upper": "5/2",
+          "count": 2
+        },
+        {
+          "lower": "-8/5",
+          "upper": "10",
+          "count": 3
+        },
+        {
+          "lower": "-5/4",
+          "upper": "1",
+          "count": 1
+        },
+        {
+          "lower": "-2",
+          "upper": "-1",
+          "count": 1
+        },
+        {
+          "lower": "-7",
+          "upper": "8",
+          "count": 3
+        },
+        {
+          "lower": "-2",
+          "upper": "-1",
+          "count": 1
+        },
+        {
+          "lower": "2/5",
+          "upper": "7/5",
+          "count": 1
+        },
+        {
+          "lower": "-12",
+          "upper": "1",
+          "count": 2
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1843/1289",
+          "upper": "-2179/1524"
+        },
+        {
+          "lower": "567/1469",
+          "upper": "545/1412"
+        },
+        {
+          "lower": "5105/4668",
+          "upper": "257/235"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-3",
+        "5",
+        "-1",
+        "4",
+        "4",
+        "3"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "0",
+          "upper": "1",
+          "count": 1
+        },
+        {
+          "lower": "-12",
+          "upper": "1/4",
+          "count": 0
+        },
+        {
+          "lower": "3/5",
+          "upper": "4",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "-1",
+          "count": 0
+        },
+        {
+          "lower": "1",
+          "upper": "7/3",
+          "count": 0
+        },
+        {
+          "lower": "-11/2",
+          "upper": "11/4",
+          "count": 1
+        },
+        {
+          "lower": "-2/3",
+          "upper": "2",
+          "count": 1
+        },
+        {
+          "lower": "-7/2",
+          "upper": "0",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "1102/2247",
+          "upper": "897/1829"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "0",
+        "3",
+        "2",
+        "1",
+        "2",
+        "1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "-11/2",
+          "upper": "-3",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "5/2",
+          "count": 1
+        },
+        {
+          "lower": "-8",
+          "upper": "-7/2",
+          "count": 0
+        },
+        {
+          "lower": "-11/4",
+          "upper": "2",
+          "count": 1
+        },
+        {
+          "lower": "-1/3",
+          "upper": "7/4",
+          "count": 1
+        },
+        {
+          "lower": "-2/5",
+          "upper": "3/2",
+          "count": 1
+        },
+        {
+          "lower": "-10",
+          "upper": "3/2",
+          "count": 1
+        },
+        {
+          "lower": "1/2",
+          "upper": "3",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "0",
+          "upper": "0"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "5",
+        "4",
+        "-1",
+        "-7",
+        "-7",
+        "-3",
+        "-5"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-1",
+          "upper": "1/2",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "2/3",
+          "count": 1
+        },
+        {
+          "lower": "-7/5",
+          "upper": "1",
+          "count": 2
+        },
+        {
+          "lower": "1/2",
+          "upper": "2/3",
+          "count": 0
+        },
+        {
+          "lower": "-2/5",
+          "upper": "3/2",
+          "count": 1
+        },
+        {
+          "lower": "-10/3",
+          "upper": "1",
+          "count": 2
+        },
+        {
+          "lower": "-8/5",
+          "upper": "3/4",
+          "count": 1
+        },
+        {
+          "lower": "-9/4",
+          "upper": "0",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-322/353",
+          "upper": "-3355/3678"
+        },
+        {
+          "lower": "1998/2597",
+          "upper": "497/646"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-5",
+        "1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "1",
+          "upper": "3",
+          "count": 0
+        },
+        {
+          "lower": "3/4",
+          "upper": "11/5",
+          "count": 0
+        },
+        {
+          "lower": "-11",
+          "upper": "-2",
+          "count": 0
+        },
+        {
+          "lower": "-11/2",
+          "upper": "-7/4",
+          "count": 0
+        },
+        {
+          "lower": "1/3",
+          "upper": "10/3",
+          "count": 0
+        },
+        {
+          "lower": "8/5",
+          "upper": "2",
+          "count": 0
+        },
+        {
+          "lower": "-9",
+          "upper": "-2",
+          "count": 0
+        },
+        {
+          "lower": "-1/4",
+          "upper": "2",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "5",
+          "upper": "5"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-2",
+        "-1",
+        "2",
+        "-5",
+        "-1"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "2",
+          "upper": "5/2",
+          "count": 0
+        },
+        {
+          "lower": "-6/5",
+          "upper": "-3/5",
+          "count": 0
+        },
+        {
+          "lower": "3/2",
+          "upper": "7/4",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "0",
+          "count": 1
+        },
+        {
+          "lower": "-1",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-11/3",
+          "upper": "1",
+          "count": 1
+        },
+        {
+          "lower": "-7/3",
+          "upper": "11/5",
+          "count": 1
+        },
+        {
+          "lower": "-7",
+          "upper": "2",
+          "count": 2
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-11389/2112",
+          "upper": "-10812/2005"
+        },
+        {
+          "lower": "-1417/2510",
+          "upper": "-363/643"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-3",
+        "-3",
+        "4",
+        "7"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "2/5",
+          "upper": "6",
+          "count": 1
+        },
+        {
+          "lower": "-4/5",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-11/2",
+          "upper": "-1",
+          "count": 0
+        },
+        {
+          "lower": "-4",
+          "upper": "8/5",
+          "count": 1
+        },
+        {
+          "lower": "-4",
+          "upper": "-11/5",
+          "count": 0
+        },
+        {
+          "lower": "9/5",
+          "upper": "11",
+          "count": 0
+        },
+        {
+          "lower": "-7/4",
+          "upper": "5",
+          "count": 1
+        },
+        {
+          "lower": "-9/2",
+          "upper": "12",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "717/952",
+          "upper": "1135/1507"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-5",
+        "-4",
+        "1",
+        "1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "-5",
+          "upper": "3/4",
+          "count": 0
+        },
+        {
+          "lower": "4",
+          "upper": "9",
+          "count": 0
+        },
+        {
+          "lower": "-10/3",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-11/5",
+          "upper": "10",
+          "count": 1
+        },
+        {
+          "lower": "-9",
+          "upper": "-10/3",
+          "count": 0
+        },
+        {
+          "lower": "-3/5",
+          "upper": "5",
+          "count": 1
+        },
+        {
+          "lower": "-1/2",
+          "upper": "5/3",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "0",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "1437/691",
+          "upper": "3292/1583"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-1",
+        "-5",
+        "5",
+        "2",
+        "-6",
+        "-4",
+        "-5"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-4",
+          "upper": "9/4",
+          "count": 2
+        },
+        {
+          "lower": "11/5",
+          "upper": "5/2",
+          "count": 0
+        },
+        {
+          "lower": "-1",
+          "upper": "7/2",
+          "count": 1
+        },
+        {
+          "lower": "4/3",
+          "upper": "2",
+          "count": 0
+        },
+        {
+          "lower": "-11",
+          "upper": "-4",
+          "count": 0
+        },
+        {
+          "lower": "-10",
+          "upper": "-9/4",
+          "count": 0
+        },
+        {
+          "lower": "-6",
+          "upper": "-3",
+          "count": 0
+        },
+        {
+          "lower": "4/3",
+          "upper": "3",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1",
+          "upper": "-1"
+        },
+        {
+          "lower": "-202/1167",
+          "upper": "-211/1219"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-7",
+        "2",
+        "4",
+        "-3",
+        "7"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-7/2",
+          "upper": "8",
+          "count": 2
+        },
+        {
+          "lower": "-1/2",
+          "upper": "6/5",
+          "count": 1
+        },
+        {
+          "lower": "9/2",
+          "upper": "8",
+          "count": 0
+        },
+        {
+          "lower": "-5",
+          "upper": "-4",
+          "count": 0
+        },
+        {
+          "lower": "-9/4",
+          "upper": "1",
+          "count": 2
+        },
+        {
+          "lower": "-7/3",
+          "upper": "6",
+          "count": 2
+        },
+        {
+          "lower": "-5/2",
+          "upper": "-4/5",
+          "count": 1
+        },
+        {
+          "lower": "-1",
+          "upper": "7/5",
+          "count": 2
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1701/1976",
+          "upper": "-934/1085"
+        },
+        {
+          "lower": "1547/1759",
+          "upper": "1817/2066"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-6",
+        "-6",
+        "-3",
+        "1",
+        "5",
+        "7"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "-1/3",
+          "upper": "9/5",
+          "count": 1
+        },
+        {
+          "lower": "5/4",
+          "upper": "7/4",
+          "count": 0
+        },
+        {
+          "lower": "-11/4",
+          "upper": "2/5",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "4",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "11/4",
+          "count": 1
+        },
+        {
+          "lower": "2",
+          "upper": "5/2",
+          "count": 0
+        },
+        {
+          "lower": "-8",
+          "upper": "-1/3",
+          "count": 0
+        },
+        {
+          "lower": "1",
+          "upper": "11/2",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "1903/1830",
+          "upper": "1147/1103"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-1",
+        "7",
+        "-5",
+        "0",
+        "5",
+        "-1",
+        "3"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "4/5",
+          "upper": "3/2",
+          "count": 0
+        },
+        {
+          "lower": "-2/5",
+          "upper": "12",
+          "count": 1
+        },
+        {
+          "lower": "1",
+          "upper": "11/4",
+          "count": 0
+        },
+        {
+          "lower": "3",
+          "upper": "11/3",
+          "count": 0
+        },
+        {
+          "lower": "-9",
+          "upper": "8",
+          "count": 2
+        },
+        {
+          "lower": "-2",
+          "upper": "11/2",
+          "count": 2
+        },
+        {
+          "lower": "-9/2",
+          "upper": "8/3",
+          "count": 2
+        },
+        {
+          "lower": "2",
+          "upper": "3",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-4036/3633",
+          "upper": "-671/604"
+        },
+        {
+          "lower": "273/1697",
+          "upper": "236/1467"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "1",
+        "7",
+        "-5",
+        "-4",
+        "-5"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-7",
+          "upper": "9/4",
+          "count": 2
+        },
+        {
+          "lower": "2",
+          "upper": "3",
+          "count": 0
+        },
+        {
+          "lower": "-2/3",
+          "upper": "4/5",
+          "count": 2
+        },
+        {
+          "lower": "-3/2",
+          "upper": "-2/5",
+          "count": 0
+        },
+        {
+          "lower": "-11/3",
+          "upper": "-10/3",
+          "count": 0
+        },
+        {
+          "lower": "-5/4",
+          "upper": "0",
+          "count": 1
+        },
+        {
+          "lower": "0",
+          "upper": "1",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "-1",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-5/38",
+          "upper": "-3863/29359"
+        },
+        {
+          "lower": "1867/2455",
+          "upper": "435/572"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-3",
+        "0",
+        "7"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-1/3",
+          "upper": "0",
+          "count": 0
+        },
+        {
+          "lower": "0",
+          "upper": "7/3",
+          "count": 1
+        },
+        {
+          "lower": "-6",
+          "upper": "1",
+          "count": 2
+        },
+        {
+          "lower": "5/2",
+          "upper": "4",
+          "count": 0
+        },
+        {
+          "lower": "-4",
+          "upper": "5/4",
+          "count": 2
+        },
+        {
+          "lower": "-11/5",
+          "upper": "1/2",
+          "count": 1
+        },
+        {
+          "lower": "11/2",
+          "upper": "7",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "5/2",
+          "count": 2
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-2089/3191",
+          "upper": "-1871/2858"
+        },
+        {
+          "lower": "1871/2858",
+          "upper": "2089/3191"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-6",
+        "3"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "11/2",
+          "upper": "9",
+          "count": 0
+        },
+        {
+          "lower": "-5/2",
+          "upper": "-4/3",
+          "count": 0
+        },
+        {
+          "lower": "3/2",
+          "upper": "11/4",
+          "count": 1
+        },
+        {
+          "lower": "-7/5",
+          "upper": "1",
+          "count": 0
+        },
+        {
+          "lower": "-1/3",
+          "upper": "3/4",
+          "count": 0
+        },
+        {
+          "lower": "10/3",
+          "upper": "9/2",
+          "count": 0
+        },
+        {
+          "lower": "-9",
+          "upper": "-7/3",
+          "count": 0
+        },
+        {
+          "lower": "-7/4",
+          "upper": "1",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "2",
+          "upper": "2"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-7",
+        "-6",
+        "7",
+        "-4",
+        "1",
+        "3"
+      ],
+      "total": 3,
+      "intervals": [
+        {
+          "lower": "-4",
+          "upper": "-3",
+          "count": 0
+        },
+        {
+          "lower": "-8",
+          "upper": "-4",
+          "count": 0
+        },
+        {
+          "lower": "-7/2",
+          "upper": "11/5",
+          "count": 3
+        },
+        {
+          "lower": "-2/3",
+          "upper": "1",
+          "count": 1
+        },
+        {
+          "lower": "1",
+          "upper": "8/5",
+          "count": 1
+        },
+        {
+          "lower": "-6",
+          "upper": "-8/5",
+          "count": 1
+        },
+        {
+          "lower": "-5/3",
+          "upper": "4",
+          "count": 2
+        },
+        {
+          "lower": "5",
+          "upper": "7",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-3034/1639",
+          "upper": "-1231/665"
+        },
+        {
+          "lower": "-2711/4468",
+          "upper": "-395/651"
+        },
+        {
+          "lower": "2738/2201",
+          "upper": "775/623"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "1",
+        "-1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "-3",
+          "upper": "0",
+          "count": 0
+        },
+        {
+          "lower": "10/3",
+          "upper": "9/2",
+          "count": 0
+        },
+        {
+          "lower": "-7/2",
+          "upper": "6/5",
+          "count": 1
+        },
+        {
+          "lower": "-3/4",
+          "upper": "1",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "-6/5",
+          "count": 0
+        },
+        {
+          "lower": "-9/2",
+          "upper": "-4/3",
+          "count": 0
+        },
+        {
+          "lower": "-1",
+          "upper": "-3/5",
+          "count": 0
+        },
+        {
+          "lower": "-5/2",
+          "upper": "-2",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "1",
+          "upper": "1"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "7",
+        "6",
+        "-2"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-11/5",
+          "upper": "1",
+          "count": 1
+        },
+        {
+          "lower": "-4",
+          "upper": "-7/4",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "5",
+          "count": 2
+        },
+        {
+          "lower": "-5",
+          "upper": "9/4",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "2/5",
+          "count": 1
+        },
+        {
+          "lower": "3",
+          "upper": "4",
+          "count": 1
+        },
+        {
+          "lower": "-11/3",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-11/3",
+          "upper": "2/5",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-2111/2351",
+          "upper": "-1680/1871"
+        },
+        {
+          "lower": "7293/1871",
+          "upper": "9164/2351"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-2",
+        "-3",
+        "-1",
+        "4",
+        "3"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-7/5",
+          "upper": "2",
+          "count": 2
+        },
+        {
+          "lower": "0",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "-4/3",
+          "count": 0
+        },
+        {
+          "lower": "-8/5",
+          "upper": "1/4",
+          "count": 1
+        },
+        {
+          "lower": "-11",
+          "upper": "1/3",
+          "count": 1
+        },
+        {
+          "lower": "-3",
+          "upper": "8/3",
+          "count": 2
+        },
+        {
+          "lower": "-2",
+          "upper": "6",
+          "count": 2
+        },
+        {
+          "lower": "1/2",
+          "upper": "7",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-3229/2481",
+          "upper": "-2793/2146"
+        },
+        {
+          "lower": "2900/3077",
+          "upper": "3113/3303"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "3",
+        "-5",
+        "-2",
+        "-1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "7/5",
+          "upper": "4",
+          "count": 0
+        },
+        {
+          "lower": "-12/5",
+          "upper": "-2",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "-6/5",
+          "count": 0
+        },
+        {
+          "lower": "1",
+          "upper": "7/2",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "9/5",
+          "count": 1
+        },
+        {
+          "lower": "-10/3",
+          "upper": "-5/2",
+          "count": 0
+        },
+        {
+          "lower": "1/5",
+          "upper": "11/2",
+          "count": 1
+        },
+        {
+          "lower": "-8/3",
+          "upper": "-4/3",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "789/1631",
+          "upper": "923/1908"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "1",
+        "3"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "-8/3",
+          "upper": "-5/2",
+          "count": 0
+        },
+        {
+          "lower": "-8",
+          "upper": "4",
+          "count": 1
+        },
+        {
+          "lower": "-11",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "7/3",
+          "upper": "5",
+          "count": 0
+        },
+        {
+          "lower": "8/5",
+          "upper": "7/4",
+          "count": 0
+        },
+        {
+          "lower": "-2/5",
+          "upper": "2",
+          "count": 1
+        },
+        {
+          "lower": "1/5",
+          "upper": "1",
+          "count": 0
+        },
+        {
+          "lower": "-3/2",
+          "upper": "7/5",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1/3",
+          "upper": "-1/3"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "7",
+        "7",
+        "-2",
+        "-5",
+        "7"
+      ],
+      "total": 0,
+      "intervals": [
+        {
+          "lower": "-12/5",
+          "upper": "3/5",
+          "count": 0
+        },
+        {
+          "lower": "-5/2",
+          "upper": "-1/2",
+          "count": 0
+        },
+        {
+          "lower": "-3/2",
+          "upper": "-2/5",
+          "count": 0
+        },
+        {
+          "lower": "12/5",
+          "upper": "5/2",
+          "count": 0
+        },
+        {
+          "lower": "1/5",
+          "upper": "8/5",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "3",
+          "count": 0
+        },
+        {
+          "lower": "-1/4",
+          "upper": "11",
+          "count": 0
+        },
+        {
+          "lower": "0",
+          "upper": "1/5",
+          "count": 0
+        }
+      ],
+      "isolators": []
+    },
+    {
+      "coefficients": [
+        "1",
+        "-1",
+        "0",
+        "0",
+        "0",
+        "1"
+      ],
+      "total": 1,
+      "intervals": [
+        {
+          "lower": "-1",
+          "upper": "4",
+          "count": 0
+        },
+        {
+          "lower": "9/4",
+          "upper": "11/4",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "4",
+          "count": 1
+        },
+        {
+          "lower": "-6/5",
+          "upper": "9/4",
+          "count": 1
+        },
+        {
+          "lower": "11/5",
+          "upper": "3",
+          "count": 0
+        },
+        {
+          "lower": "-10/3",
+          "upper": "-11/4",
+          "count": 0
+        },
+        {
+          "lower": "-12",
+          "upper": "5",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "-1/3",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1221/1046",
+          "upper": "-1528/1309"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "2",
+        "0",
+        "0",
+        "0",
+        "-3",
+        "0",
+        "1"
+      ],
+      "total": 4,
+      "intervals": [
+        {
+          "lower": "-11/2",
+          "upper": "-2",
+          "count": 0
+        },
+        {
+          "lower": "7/3",
+          "upper": "5/2",
+          "count": 0
+        },
+        {
+          "lower": "-1/2",
+          "upper": "7/2",
+          "count": 2
+        },
+        {
+          "lower": "-11/2",
+          "upper": "-8/3",
+          "count": 0
+        },
+        {
+          "lower": "8/5",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-8/3",
+          "upper": "-2",
+          "count": 0
+        },
+        {
+          "lower": "12/5",
+          "upper": "8",
+          "count": 0
+        },
+        {
+          "lower": "-10/3",
+          "upper": "11/4",
+          "count": 4
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-200/121",
+          "upper": "-14519/8784"
+        },
+        {
+          "lower": "-1",
+          "upper": "-1"
+        },
+        {
+          "lower": "1",
+          "upper": "1"
+        },
+        {
+          "lower": "14519/8784",
+          "upper": "200/121"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "8",
+        "-20",
+        "6",
+        "17",
+        "-8",
+        "-6",
+        "2",
+        "1"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "3/2",
+          "upper": "9/5",
+          "count": 0
+        },
+        {
+          "lower": "-10/3",
+          "upper": "2",
+          "count": 2
+        },
+        {
+          "lower": "-5/2",
+          "upper": "-7/3",
+          "count": 0
+        },
+        {
+          "lower": "5/4",
+          "upper": "11/2",
+          "count": 0
+        },
+        {
+          "lower": "-2",
+          "upper": "-1/2",
+          "count": 0
+        },
+        {
+          "lower": "1/2",
+          "upper": "5",
+          "count": 1
+        },
+        {
+          "lower": "1/2",
+          "upper": "12",
+          "count": 1
+        },
+        {
+          "lower": "-7/3",
+          "upper": "-5/4",
+          "count": 1
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-2",
+          "upper": "-2"
+        },
+        {
+          "lower": "1",
+          "upper": "1"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "1",
+        "-4",
+        "-2",
+        "14",
+        "-3",
+        "18"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-5",
+          "upper": "1",
+          "count": 2
+        },
+        {
+          "lower": "-11/2",
+          "upper": "7/3",
+          "count": 2
+        },
+        {
+          "lower": "-2",
+          "upper": "2",
+          "count": 2
+        },
+        {
+          "lower": "-3",
+          "upper": "-7/3",
+          "count": 0
+        },
+        {
+          "lower": "0",
+          "upper": "7/2",
+          "count": 1
+        },
+        {
+          "lower": "-5",
+          "upper": "-2",
+          "count": 0
+        },
+        {
+          "lower": "-3",
+          "upper": "-1/2",
+          "count": 0
+        },
+        {
+          "lower": "-7",
+          "upper": "-2/3",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1/2",
+          "upper": "-1/2"
+        },
+        {
+          "lower": "1/3",
+          "upper": "1/3"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1"
+      ],
+      "total": 2,
+      "intervals": [
+        {
+          "lower": "-7",
+          "upper": "1/3",
+          "count": 1
+        },
+        {
+          "lower": "-7/3",
+          "upper": "-7/4",
+          "count": 0
+        },
+        {
+          "lower": "-11/4",
+          "upper": "11",
+          "count": 2
+        },
+        {
+          "lower": "0",
+          "upper": "9",
+          "count": 1
+        },
+        {
+          "lower": "-11/2",
+          "upper": "0",
+          "count": 1
+        },
+        {
+          "lower": "-10",
+          "upper": "3/5",
+          "count": 1
+        },
+        {
+          "lower": "-11/2",
+          "upper": "2",
+          "count": 2
+        },
+        {
+          "lower": "-5/2",
+          "upper": "7/4",
+          "count": 2
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1",
+          "upper": "-1"
+        },
+        {
+          "lower": "1",
+          "upper": "1"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "0",
+        "-1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1"
+      ],
+      "total": 3,
+      "intervals": [
+        {
+          "lower": "-12/5",
+          "upper": "3/5",
+          "count": 2
+        },
+        {
+          "lower": "-4",
+          "upper": "11/3",
+          "count": 3
+        },
+        {
+          "lower": "-11/5",
+          "upper": "4/5",
+          "count": 2
+        },
+        {
+          "lower": "2",
+          "upper": "12",
+          "count": 0
+        },
+        {
+          "lower": "1/2",
+          "upper": "3",
+          "count": 1
+        },
+        {
+          "lower": "-7",
+          "upper": "-9/4",
+          "count": 0
+        },
+        {
+          "lower": "-6/5",
+          "upper": "1",
+          "count": 2
+        },
+        {
+          "lower": "3/5",
+          "upper": "1",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1",
+          "upper": "-1"
+        },
+        {
+          "lower": "0",
+          "upper": "0"
+        },
+        {
+          "lower": "1",
+          "upper": "1"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "-12",
+        "0",
+        "16",
+        "0",
+        "-7",
+        "0",
+        "1"
+      ],
+      "total": 4,
+      "intervals": [
+        {
+          "lower": "11/4",
+          "upper": "12",
+          "count": 0
+        },
+        {
+          "lower": "0",
+          "upper": "2",
+          "count": 2
+        },
+        {
+          "lower": "0",
+          "upper": "3",
+          "count": 2
+        },
+        {
+          "lower": "-9",
+          "upper": "-4/5",
+          "count": 2
+        },
+        {
+          "lower": "-3",
+          "upper": "4/5",
+          "count": 2
+        },
+        {
+          "lower": "1",
+          "upper": "9/2",
+          "count": 2
+        },
+        {
+          "lower": "-7/3",
+          "upper": "1/4",
+          "count": 2
+        },
+        {
+          "lower": "-2/3",
+          "upper": "1",
+          "count": 0
+        }
+      ],
+      "isolators": [
+        {
+          "lower": "-1351/780",
+          "upper": "-2340/1351"
+        },
+        {
+          "lower": "-1970/1393",
+          "upper": "-1393/985"
+        },
+        {
+          "lower": "1393/985",
+          "upper": "1970/1393"
+        },
+        {
+          "lower": "2340/1351",
+          "upper": "1351/780"
+        }
+      ]
+    },
+    {
+      "coefficients": [
+        "1",
+        "0",
+        "3",
+        "0",
+        "3",
+        "0",
+        "1"
+      ],
+      "total": 0,
+      "intervals": [
+        {
+          "lower": "0",
+          "upper": "5",
+          "count": 0
+        },
+        {
+          "lower": "-5/3",
+          "upper": "-3/2",
+          "count": 0
+        },
+        {
+          "lower": "-5/4",
+          "upper": "-1/2",
+          "count": 0
+        },
+        {
+          "lower": "-6",
+          "upper": "5/3",
+          "count": 0
+        },
+        {
+          "lower": "-6",
+          "upper": "-5",
+          "count": 0
+        },
+        {
+          "lower": "-3/5",
+          "upper": "7/3",
+          "count": 0
+        },
+        {
+          "lower": "-8/3",
+          "upper": "8",
+          "count": 0
+        },
+        {
+          "lower": "-9",
+          "upper": "10",
+          "count": 0
+        }
+      ],
+      "isolators": []
+    }
+  ]
+}
