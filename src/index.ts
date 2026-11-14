@@ -36,3 +36,5 @@ export { intersectTriangles3, inspectTriangleEmbedding } from "./geometry/triang
 export type { TriangleTriangleIntersection, TriangleEmbeddingInspection, TriangleEmbeddingIssue } from "./geometry/triangle-intersection3.js";
 export { prepareSolid3 } from './geometry/solid3.js';
 export type { PreparedSolid3, SolidShell3 } from './geometry/solid3.js';
+export { partitionTriangleByPlanes3 } from './geometry/triangle-plane-arrangement.js';
+export type { TrianglePlaneCell3 } from './geometry/triangle-plane-arrangement.js';
