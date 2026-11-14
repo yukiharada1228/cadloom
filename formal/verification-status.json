@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "1c791f7c708de92e90d0ad23c4c5ab42e5b7d299768418c7256fa13be587c83c",
+    "src/index.ts": "23075649e4349d63c4aa278582ea28a2c894761c589e8e3b46e2b3fc660d4c6c",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -39,7 +39,8 @@
     "src/geometry/curve-boolean2.ts": "158d75129dd99ea56f005496effac4e52c8d81590e141955e55d67ae977ae5be",
     "src/geometry/algebraic-point3.ts": "226ffbe98987060263f1c31cb06bc266d3518e9198f79af7f8ed89c4604f0ae0",
     "src/geometry/surface3.ts": "6481781cc6ec8b591145b2eb3d8e89a8cec25183afc9cf04426f8161c87b6c54",
-    "src/geometry/curve3.ts": "9142352ff80840bb1c12de6865d7f666148311539319b917234b30d1cfaa6bce"
+    "src/geometry/curve3.ts": "481c10f0d3bf28091ce878f0aabf1f2c86e10d766e0e580c7c3ec652903cee6a",
+    "src/geometry/circle3.ts": "5c76735c5e3408d3cce1fd405ec81588b5d9b057787072e1f982e2a126532f84"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -160,10 +161,13 @@
     "Cadloom.cylinder_axis_scale",
     "Cadloom.line_cylinder_polynomial",
     "Cadloom.cylinder_normal_perpendicular",
-    "Cadloom.cylinder_normal_squared"
+    "Cadloom.cylinder_normal_squared",
+    "Cadloom.line_sphere_polynomial",
+    "Cadloom.plane_gram_intersection",
+    "Cadloom.circle_basis_orientation"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations. Uniqueness of same-x circle points in a common closed vertical half over ordered fields. Canonical nonvertical line-frame identity over fields. Linear cancellation of shared-point circle tangent cross products and exact small-circle normal offset for circular germs. Circular cylinder projection, axis shift/scale, line-substitution polynomial and non-unit normal identities over commutative rings.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations. Uniqueness of same-x circle points in a common closed vertical half over ordered fields. Canonical nonvertical line-frame identity over fields. Linear cancellation of shared-point circle tangent cross products and exact small-circle normal offset for circular germs. Circular cylinder projection, axis shift/scale, line-substitution polynomial and non-unit normal identities over commutative rings. Spatial sphere line-substitution, two-plane Gram intersection coefficients and circle-basis orientation identities.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
@@ -183,6 +187,7 @@
     "Curved face grouping by exact vertical visibility, vertical-only component attachment, algebraic point location and principal algebraic square roots use construction arguments and differential tests, not machine-verified TypeScript execution.",
     "Curved region winding propagation, regularized Boolean face selection, boundary reconstruction and filled-region location use construction arguments and independent tests, not machine-verified TypeScript execution.",
     "3D algebraic coordinates, trusted factory correlation, plane/cylinder predicates, finite/contained line and segment intersections and supporting-surface coincidence are independently tested and supported by arithmetic identities, not whole-program machine verification; bounded BRep faces and shell certification are not provided by the surface API.",
-    "Rational plane-chart mapping/inversion, bounded algebraic line trims, affine images of circular arcs, whole-curve surface membership and connected surface loops use construction arguments and independent tests, not machine-verified TypeScript execution; a validated loop is not a certified BRep face or shell."
+    "Rational plane-chart mapping/inversion, bounded algebraic line trims, affine images of circular arcs, whole-curve surface membership and connected surface loops use construction arguments and independent tests, not machine-verified TypeScript execution; a validated loop is not a certified BRep face or shell.",
+    "Spatial rational-center/normal circles, oriented arcs, line/plane/circle intersections, cyclic arc overlap/subdivision and whole-circle supporting-surface membership use construction arguments and independent tests, not whole-program machine verification. BRep face/shell certification and general conic intersections remain outside this layer."
   ]
 }

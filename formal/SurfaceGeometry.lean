@@ -58,4 +58,29 @@ theorem cylinder_normal_squared {K : Type*} [CommRing K] (dx dy dz x y z r : K)
   dsimp
   linear_combination (dx^2+dy^2+dz^2)*h
 
+/-- Spatial line substitution into a rational squared-radius sphere. -/
+theorem line_sphere_polynomial {K : Type*} [CommRing K]
+    (x y z vx vy vz r t : K) :
+    (x+t*vx)^2+(y+t*vy)^2+(z+t*vz)^2-r =
+      (vx^2+vy^2+vz^2)*t^2+2*(x*vx+y*vy+z*vz)*t+(x^2+y^2+z^2-r) := by
+  ring
+
+/-- Coefficients producing a point on two nonparallel rational planes. -/
+theorem plane_gram_intersection {K : Type*} [Field K] (A B C k l : K)
+    (h : A*B-C^2 ≠ 0) :
+    let alpha := (k*B-l*C)/(A*B-C^2)
+    let beta := (l*A-k*C)/(A*B-C^2)
+    A*alpha+C*beta=k ∧ C*alpha+B*beta=l := by
+  dsimp
+  generalize hd : A*B-C^2 = determinant at *
+  constructor <;> field_simp [h] <;> rw [← hd] <;> ring
+
+/-- The basis u, n×u is positively oriented about n when n·u=0 and both are nonzero. -/
+theorem circle_basis_orientation {K : Type*} [CommRing K] (nx ny nz ux uy uz : K) :
+    nx*(uy*(nx*uy-ny*ux)-uz*(nz*ux-nx*uz))+
+    ny*(uz*(ny*uz-nz*uy)-ux*(nx*uy-ny*ux))+
+    nz*(ux*(nz*ux-nx*uz)-uy*(ny*uz-nz*uy)) =
+      (nx^2+ny^2+nz^2)*(ux^2+uy^2+uz^2)-(nx*ux+ny*uy+nz*uz)^2 := by
+  ring
+
 end Cadloom

@@ -31,8 +31,9 @@ the cylinder X²+Y²=1 and the plane Z-Y=0. This is a representation of affine-c
 conics, not a general conic intersection solver. Rational affine-circle charts do
 not represent every spatial circle: a perpendicular section of an axis with
 direction (1,1,1), for example, needs a more general circle/conic representation
-or algebraic chart vectors. This API does not reject that cylinder; its complete
-bounded cross-section representation remains subsequent work. Local CCW/CW traversal refers to
+or algebraic chart vectors. Those arbitrary-normal circular sections are now
+represented separately by [spatial circles](spatial-circles3.md), integrated as
+`Curve3` circular arcs. General conic intersection remains subsequent work. Local CCW/CW traversal refers to
 the chart, not a globally chosen world normal. Full-circle seams are retained.
 
 `LineInterval3` stores a rational parametric line and real algebraic start/end
