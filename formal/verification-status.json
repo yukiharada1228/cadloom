@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "80b2cadd01ce7d1a1d00fb7aa5aa645a0babc3fb3aadeac0e4332daaf217469d",
+    "src/index.ts": "7f038fe163edfe503af4369d9710dae05635f902d86d21fe264b104322b0901c",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -19,7 +19,8 @@
     "src/geometry/point3.ts": "62cfafa52e290864c686872c6c7b8e40dfc2ff459329d01db0fad350544ddd54",
     "src/geometry/orient3d.ts": "a7e9f78f87ec3ef6b39a5ad028dcf506e5bcc15cc8e0f76c28605351102380e4",
     "src/geometry/plane3.ts": "f3d5d4e808f1a30ea22eee087504a157d457e091122bbebdedd3e701f1528e97",
-    "src/geometry/triangle3.ts": "132a510e1e4f531e37f4bbf439919806159e0f402d2ee072aa723382cbcb2d20"
+    "src/geometry/triangle3.ts": "132a510e1e4f531e37f4bbf439919806159e0f402d2ee072aa723382cbcb2d20",
+    "src/geometry/triangle-topology.ts": "5759949482660522b5438ba2dccf1b657904012b92d06cfc2b81d021905b82f4"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -129,6 +130,7 @@
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
-    "Source arithmetic extraction and its interpretation of Rational methods remain trusted."
+    "Source arithmetic extraction and its interpretation of Rational methods remain trusted.",
+    "Triangle topology welding, incidence/link diagnostics, shell traversal and boundary loops are tested and documented with hand invariants, not machine-verified."
   ]
 }

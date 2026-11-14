@@ -285,3 +285,21 @@ const result = splitTriangleByPlane(face, plane3(1n,0n,0n,-1n)); // x=1
 npm run build
 node examples/triangle-plane-split.ts
 ```
+
+## 三角形の共有位相構造
+
+`buildTriangleTopology(triangles)`は同じ有理数座標だけを共有頂点へ統合し、共有辺・半辺・面・シェルを構築します。面IDは入力三角形の位置を保持します。
+
+- `halfEdges`の`next`・`previous`で面を巡回し、整合した共有辺では`twin`で反対側の面へ進めます。
+- `shells`は辺を介した面の連結成分です。点だけの接触は別シェルとして残し、全体の頂点リンク診断で検出します。
+- `issues`で開境界・非多様体辺・向き不整合・非多様体頂点・重複面を区別します。
+- `boundaryLoops`は向き付き境界半辺のループです。境界が枝分かれ・不整合ならnull、境界がなければ空配列です。
+- `closedManifold`は閉鎖・向き・リンク・重複の条件です。幾何学的な自己交差や外向きを保証するソリッド認定ではありません。
+
+開いたシェルや不整合なシェルの`signedVolume`はnullです。閉じた整合シェルでも内向きなら負になります。ずれの補正やT字接続の自動分割、シェルの包含・空洞分類はまだ行いません。[不変条件の証明と検査範囲](docs/proofs/triangle-topology.md)を参照してください。
+
+```sh
+npm run build
+node examples/triangle-topology.ts
+# 閉じた押し出しと、平面で分割して境界が開いた面集合の接続を比較
+```
