@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "3bd2c007da29f842f54676962a84803e5e96e8ebbaf3ffb61d8d154cc7318908",
+    "src/index.ts": "ccd5c742f727f8bfd082f81b2e57b80b0af132192c66b5d11f26719dc2b0e4e1",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -27,9 +27,10 @@
     "src/geometry/surface-location3.ts": "367745afeff743741bfa3851d54455723bdff32f4dd1271744bba8d4ac1e0094",
     "src/geometry/solid-boolean3.ts": "2354a04904c94c4003bfb6621659666ec5cc9fcc543f84bca447507d0454b2f1",
     "src/numeric/polynomial.ts": "54a4d89dff48a4ebd4e2825cd80532616a433cb7c010dd5635c83ab7dbb51650",
-    "src/numeric/real-roots.ts": "0953a2c957c24843c05cf84db7afe1690558f7d8f2a4309d96aab8516f56958e",
-    "src/geometry/algebraic-point2.ts": "103388c72a88662fe3834c0bf4b2db900de748b3a304984d01a85c7f8aa2ffce",
-    "src/geometry/circle2.ts": "74e480c0f1f49f4489c923969a3ace8275f42e0df77161a3a62f1559494d9005"
+    "src/numeric/real-roots.ts": "13093a15d0cccefec94ecb155d96b2a26f738a4c7c440d0f56d5dfa9f415a5d6",
+    "src/geometry/algebraic-point2.ts": "d7028b2657749076f3aa8a6f993c2e50faad6b13e3bda58de2756eb5aa632ea0",
+    "src/geometry/circle2.ts": "74e480c0f1f49f4489c923969a3ace8275f42e0df77161a3a62f1559494d9005",
+    "src/numeric/resultant.ts": "f3756924c33ec134fcca49f722fd47a79292df6fb827133f7e4c6df702961545"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -155,6 +156,7 @@
     "Polyhedral Boolean plane grouping, coverage, two-sided sampling, boundary sewing, contact complexes and result provenance use documented construction arguments and independent tests, not whole-program machine verification.",
     "Solid locator plane grouping, cached data structures and strict coordinate-bound rejection are justified by arithmetic lemmas, geometric arguments and independent tests; the full cached query execution is not machine-verified.",
     "Rational polynomial arithmetic, square-free reduction, Sturm counting/isolation and algebraic root predicates are documented and checked with independent integer/factor/CAS oracles, not machine-verified.",
-    "Algebraic root affine composition, correlated algebraic point construction, line/segment/circle intersections and circle predicates are tested with independent integer oracles and documented reductions; complete TypeScript execution is not machine-verified."
+    "Algebraic root affine composition, correlated algebraic point construction, line/segment/circle intersections and circle predicates are tested with independent integer oracles and documented reductions; complete TypeScript execution is not machine-verified.",
+    "Resultants over rational polynomial coefficients, Bareiss elimination, algebraic field arithmetic with interval branch selection, reciprocals and general algebraic-coordinate predicates are independently tested and documented, not machine-verified."
   ]
 }

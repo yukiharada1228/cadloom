@@ -1,7 +1,7 @@
 # Rational polynomials and exact real-root certificates
 
-This layer prepares for nonrational curve intersections. It does not add curved
-faces or a complete real-algebraic field to the polyhedral kernel.
+This layer provides root certificates for nonrational geometry. It does not add
+curved faces. [Field arithmetic](algebraic-field.md) builds on these certificates.
 
 ## API and representation
 
@@ -26,8 +26,9 @@ rational point, preserving immutable inputs. `AlgebraicReal.fromRational` create
 an exact rational point directly. The `rational` getter is null for interval
 certificates; null **does not prove irrationality**. Rational affine images are available through `affine(scale,offset)`, using exact
 polynomial substitution and mapped isolating intervals. General rational-root detection,
-root multiplicities, algebraic addition/multiplication/inversion and curve topology
-are not provided in this first representation.
+root multiplicities and curve topology remain outside this root-isolation API.
+Algebraic addition/multiplication/inversion are provided by the separate
+[field arithmetic layer](algebraic-field.md).
 
 `signOf(q)` determines the exact sign of q evaluated at a root, including zero.
 This supports predicates for future algebraic curve coordinates without converting

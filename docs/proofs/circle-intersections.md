@@ -40,7 +40,9 @@ monic normalization leaves its roots unchanged. Invertible substitution preserve
 square-freeness. Mapping the isolating interval, reversing endpoint order when s<0,
 therefore gives exactly one root with nonroot endpoints. For s=0 or a known rational
 t, return the exact rational point directly. This is `AlgebraicReal.affine`.
-No general arithmetic between independently defined algebraic numbers is introduced.
+The affine helper itself needs no general arithmetic between independently
+defined algebraic numbers; such arithmetic is now available in the separate
+[field layer](algebraic-field.md).
 
 ## Line/circle reduction and completeness
 
@@ -120,6 +122,6 @@ previous real-root limitations remain in [real-roots.md](real-roots.md). Runtime
 and normal tests have no external CAS or native/Wasm dependency.
 
 This API does not yet provide circular arcs, curved arrangements/Booleans,
-three-algebraic-point orientation, arbitrary algebraic circle centers, curved 3D
+arbitrary algebraic circle centers, curved 3D
 BRep, rational splines/NURBS or tolerance-based CAD imports. It returns exact
 algebraic intersection data without claiming a complete circular CAD kernel.

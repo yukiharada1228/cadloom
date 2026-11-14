@@ -2,6 +2,7 @@ import { Rational } from './rational.js';
 import type { Sign } from './rational.js';
 import type { ExactInput } from '../geometry/point2.js';
 import { Polynomial, exactRational } from './polynomial.js';
+import {sumElimination,productElimination} from './resultant.js';
 
 /** Sturm sequence of the monic square-free part. Zero has infinitely many roots. */
 export function sturmSequence(input:Polynomial):readonly Polynomial[] {
@@ -55,7 +56,7 @@ function intervalValue(p:Polynomial,lo:Rational,hi:Rational):readonly [Rational,
 /** An exact real algebraic number, specified by a square-free polynomial and its
  * unique real root in a rational open interval, or by an exact rational point.
  * Refinement never mutates existing certificates. No floating-point approximation
- * or general field arithmetic is provided by this initial root representation.
+ * is used. Arithmetic uses exact polynomial elimination and interval branch selection.
  */
 export class AlgebraicReal {
   private constructor(readonly polynomial:Polynomial,readonly lower:Rational,readonly upper:Rational){Object.freeze(this);}
@@ -112,6 +113,53 @@ export class AlgebraicReal {
     for(let i=this.polynomial.degree;i>=0;i--)polynomial=polynomial.mul(substitute).add(new Polynomial([this.polynomial.coefficients[i]!]));
     const a=map(this.lower),b=map(this.upper);
     return scale.sign()>0?new AlgebraicReal(polynomial.monic(),a,b):new AlgebraicReal(polynomial.monic(),b,a);
+  }
+  sign():Sign{return this.signOf(new Polynomial([0n,1n]));}
+  equals(other:AlgebraicReal):boolean{return this.compare(other)===0;}
+  neg():AlgebraicReal{return this.affine(-1n);}
+  add(other:AlgebraicReal):AlgebraicReal{return this.combine(other,'sum');}
+  sub(other:AlgebraicReal):AlgebraicReal {
+    return this===other?AlgebraicReal.fromRational(0n):this.add(other.neg());
+  }
+  mul(other:AlgebraicReal):AlgebraicReal{return this.combine(other,'product');}
+  div(other:AlgebraicReal):AlgebraicReal{return this.mul(other.reciprocal());}
+  reciprocal():AlgebraicReal {
+    if(this.signOf(new Polynomial([0n,1n]))===0)throw new RangeError('Algebraic division by zero');
+    let root:AlgebraicReal=this;
+    const one=new Rational(1n);
+    while(root.lower.sign()*root.upper.sign()<=0)root=root.refine();
+    if(root.rational!==null)return AlgebraicReal.fromRational(one.div(root.rational));
+    const polynomial=new Polynomial([...root.polynomial.coefficients].reverse()).monic();
+    if(polynomial.degree===1)return AlgebraicReal.fromRational(polynomial.coefficient(0).neg().div(polynomial.coefficient(1)));
+    return new AlgebraicReal(polynomial,one.div(root.upper),one.div(root.lower));
+  }
+  private combine(other:AlgebraicReal,operation:'sum'|'product'):AlgebraicReal {
+    let a:AlgebraicReal=this,b=other;
+    const rationalCase=():AlgebraicReal|null=>{
+      if(a.rational!==null)return operation==='sum'?b.affine(1n,a.rational):b.affine(a.rational);
+      if(b.rational!==null)return operation==='sum'?a.affine(1n,b.rational):a.affine(b.rational);
+      return null;
+    };
+    const simple=rationalCase();if(simple!==null)return simple;
+    const polynomial=(operation==='sum'?sumElimination(a.polynomial,b.polynomial):productElimination(a.polynomial,b.polynomial)).squareFree();
+    if(polynomial.degree<=0)throw new Error('Algebraic operation has no defining polynomial');
+    let candidates=[...AlgebraicReal.isolate(polynomial)];
+    while(true){
+      const exact=rationalCase();if(exact!==null)return exact;
+      let lower:Rational,upper:Rational;
+      if(operation==='sum'){lower=a.lower.add(b.lower);upper=a.upper.add(b.upper);}
+      else {
+        const products=[a.lower.mul(b.lower),a.lower.mul(b.upper),a.upper.mul(b.lower),a.upper.mul(b.upper)].sort((x,y)=>x.compare(y));
+        lower=products[0]!;upper=products[3]!;
+      }
+      // Keep every candidate whose certificate may contain a value in the image
+      // interval. The actual result is never discarded; refine until unique.
+      candidates=candidates.filter(c=>c.lower.compare(upper)<=0&&c.upper.compare(lower)>=0);
+      if(candidates.length===0)throw new Error('Algebraic image interval lost all candidate roots');
+      if(candidates.length===1)return candidates[0]!;
+      candidates=candidates.map(c=>c.refine());
+      if(a.upper.sub(a.lower).compare(b.upper.sub(b.lower))>=0)a=a.refine();else b=b.refine();
+    }
   }
   /** Exact sign of another polynomial evaluated at this root, including equality. */
   signOf(input:Polynomial):Sign {

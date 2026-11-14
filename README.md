@@ -367,7 +367,7 @@ sqrt2.signOf(new Polynomial([-3n, 0n, 1n]));     // -1
 const refined = sqrt2.refine();                // 厳密な区間を狭めた新しい証明用データ
 ```
 
-重根は1回だけ返し、`countRealRoots(p, a, b)`は両端を除く開区間の根を数えます。区間表現の`rational === null`は、無理数であることの証明ではありません。現段階では代数的数どうしの一般的な四則演算や一般曲線・曲面の交差計算は未実装です。円との交差は後述の専用APIで扱います。[構成の根拠・独立比較テスト・未検証範囲](docs/proofs/real-roots.md)を参照してください。
+重根は1回だけ返し、`countRealRoots(p, a, b)`は両端を除く開区間の根を数えます。区間表現の`rational === null`は、無理数であることの証明ではありません。代数的数どうしの四則演算は後述のAPIで扱います。一般曲線・曲面の交差計算は未実装です。円との交差は後述の専用APIで扱います。[構成の根拠・独立比較テスト・未検証範囲](docs/proofs/real-roots.md)を参照してください。
 
 ```sh
 npm run build
@@ -393,4 +393,23 @@ classifyAlgebraicPointToCircle2(hits[1]!.point, circle);     // 0（円上）
 ```sh
 npm run build
 node examples/circle-intersections.ts
+```
+
+
+## 実代数的な数の四則演算
+
+`AlgebraicReal`の`add`・`sub`・`mul`・`div`・`neg`・`reciprocal`で、異なる多項式から得た実数の根どうしを厳密に計算できます。`sign`・`equals`・`compare`も値として判定し、区間表現に隠れたゼロでの除算も拒否します。
+
+```ts
+const sqrt2 = isolateRealRoots(new Polynomial([-2n, 0n, 1n]))[1]!;
+const sqrt3 = isolateRealRoots(new Polynomial([-3n, 0n, 1n]))[1]!;
+const value = sqrt2.add(sqrt3).mul(sqrt2.sub(sqrt3));
+value.equals(AlgebraicReal.fromRational(-1n)); // true
+```
+
+`algebraicCoordinates2`と`orientAlgebraicPoints2`で、独立した代数的な座標を持つ3点の向き・共線性も扱えます。`polynomialResultant`は有理係数の終結式を返します。結果の多項式は最小多項式とは限らず、演算を重ねると次数や係数が大きくなるため、性能改善は残っています。[構成の根拠・比較テスト・検証範囲](docs/proofs/algebraic-field.md)を参照してください。
+
+```sh
+npm run build
+node examples/algebraic-field.ts
 ```
