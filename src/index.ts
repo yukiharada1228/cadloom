@@ -91,3 +91,7 @@ export { intersectPlanes3 } from './geometry/plane3.js';
 export type { PlanePlaneIntersection3 } from './geometry/plane3.js';
 export { intersectEllipsePlane3 } from './geometry/ellipse3.js';
 export type { EllipsePlaneIntersection3 } from './geometry/ellipse3.js';
+
+export { interiorPointOnEllipticArc3 } from './geometry/ellipse3.js';
+export { intersectPlaneCylinderFace3 } from './geometry/cylinder-face-section3.js';
+export type { CylinderFaceSection3 } from './geometry/cylinder-face-section3.js';

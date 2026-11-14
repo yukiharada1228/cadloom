@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "f69e7b496519afe627f196f049138dd70e256b2de3e159a805e6799ca58cfb9e",
+    "src/index.ts": "513df3345e269656eddfacd4ae236bc4b08f9b86cf2f2478528e9368b60c1529",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -49,7 +49,8 @@
     "src/geometry/plane-frame3.ts": "5a162e75dcdca6e81fef55e8cc3fdb1f6057e9cc6d3b200aae76a509ffbb8ab1",
     "src/geometry/plane-cylinder3.ts": "412516f87f5a3a710c35f93511910684d5d69727e3fa5f6ad7ddd3641557c13e",
     "src/geometry/algebraic-line3.ts": "871f5579828ba7b14b4e67bd77220330b1a172eafa334a834b2001c7b2efb39e",
-    "src/geometry/ellipse3.ts": "ca1461818a92c6e7428406965dc22d78cca94d63248d11db541741ce8aa5cd20"
+    "src/geometry/ellipse3.ts": "f5462489ad03e5d50bc59e4d766f0bd23b1d768aaad26fac1b5369a646b4abcd",
+    "src/geometry/cylinder-face-section3.ts": "cbc020e0f1a5d52619ce518a64a5d85d94cbb8b09c853610d1ddc57810fa47b1"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -206,6 +207,7 @@
     "Embedded chart/circular planar face construction, boundary source/degree/winding checks, physical loop orientation, point location and dyadic interior witnesses use documented arguments and independent tests, not complete TypeScript machine verification. This does not validate arbitrary existing BRep tables, cylindrical face domains or global solid embedding.",
     "Algebraic endpoint segments, correlated translation/subtraction, dyadic angular witnesses, embedded cylinder band/arc-product domains, exact location and oriented normals use documented arguments and independent tests, not full TypeScript machine verification. General cylinder trims and complete shell/solid certification remain outside this constructor.",
     "Algebraic rectangle faces, factory-owned planar face translation and analytic vertical extrusion BReps use documented product-embedding/orientation arguments and independent geometric/mesh oracles, not whole-program machine verification. Constructive extrusion certification does not validate arbitrary existing BRep tables or general surface intersections/3D Booleans.",
-    "Ellipses and elliptic arcs, plane/plane and complete supporting plane/cylinder intersections, algebraic generator lines and whole-arc support predicates use documented geometric reductions and independent tests, not whole-program verification. Bounded face trimming, general conic/conic intersections and curved BRep Booleans are not supplied by these APIs."
+    "Ellipses and elliptic arcs, plane/plane and complete supporting plane/cylinder intersections, algebraic generator lines and whole-arc support predicates use documented geometric reductions and independent tests, not whole-program verification. Bounded face trimming, general conic/conic intersections and curved BRep Booleans are not supplied by these APIs.",
+    "Finite plane/cylinder-band or angular-patch intersection, boundary-cut completeness, isolated contact retention and elliptic-arc rational-ray interior witnesses use documented construction arguments and independent exact point-set tests, not machine-verified TypeScript. Face splitting/sewing, bounded face/face intersection and curved BRep Booleans are outside this API."
   ]
 }

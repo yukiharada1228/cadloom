@@ -132,3 +132,37 @@ export function intersectEllipsePlane3(inputEllipse:Ellipse3,inputPlane:Plane3):
   if(hit.kind==='none')return Object.freeze({kind:'none'});if(hit.kind==='coincident')return Object.freeze({kind:'coincident',ellipse:e});
   const points=intersectLineEllipse3(hit.line,e).map(h=>h.point).sort(compareAlgebraicPoints3);return points.length?Object.freeze({kind:'points',points:Object.freeze(points)}):Object.freeze({kind:'none'});
 }
+
+/** Exact open-arc witness from a rational ray in one chart quadrant. */
+export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordinates3 {
+  const a=snapshotArc(input);if(a.fullEllipse)return a.start;
+  if(same(a.start,a.end))throw new RangeError('A point arc has no open interior');
+  const e=a.ellipse,f=e.frame,one=new Rational(1n),two=new Rational(2n);
+  const onRay=(x:Rational,y:Rational)=>{
+    const norm=e.radiusVSquared.mul(x.mul(x)).add(e.radiusUSquared.mul(y.mul(y)));
+    const scale=AlgebraicReal.fromRational(e.radiusUSquared.mul(e.radiusVSquared).div(norm)).sqrt();
+    const d=vector3(f.u.x.mul(x).add(f.v.x.mul(y)),f.u.y.mul(x).add(f.v.y.mul(y)),f.u.z.mul(x).add(f.v.z.mul(y)));
+    return algebraicPoint3(f.origin,d,scale);
+  };
+  const zero=new Rational(0n),cardinals=[onRay(one,zero),onRay(zero,one),onRay(one.neg(),zero),onRay(zero,one.neg())];
+  const piece=splitEllipticArc3(a,cardinals.filter(p=>pointOnEllipticArc3(p,a)))[0]!;
+  const s=pointInPlaneFrame3(f,piece.start)!,t=pointInPlaneFrame3(f,piece.end)!;
+  for(const [sx,sy] of [[1n,1n],[-1n,1n],[-1n,-1n],[1n,-1n]] as const){
+    if([s,t].some(p=>p.x.sign()*Number(sx)<0||p.y.sign()*Number(sy)<0))continue;
+    const phase=(p:AlgebraicCoordinates2,q:Rational)=>{
+      const X=q.mul(new Rational(-sx)),Y=one.sub(q).mul(new Rational(sy)),data=getPointParameterization2(p);
+      if(data)return data.parameter.signOf(new Polynomial([data.origin.x.mul(X).add(data.origin.y.mul(Y)),data.direction.x.mul(X).add(data.direction.y.mul(Y))]));
+      return p.x.affine(X).add(p.y.affine(Y)).sign();
+    };
+    // Either endpoint may have the smaller phase, independently of traversal.
+    let lo=zero,hi=one;
+    while(true){
+      const q=lo.add(hi).div(two),S=phase(s,q),T=phase(t,q);
+      if(S>=0&&T>=0){lo=q;continue;}
+      if(S<=0&&T<=0){hi=q;continue;}
+      const result=onRay(one.sub(q).mul(new Rational(sx)),q.mul(new Rational(sy)));
+      if(locatePointOnEllipticArc3(result,a)!=='interior')throw new Error('Ellipse interior witness failed');return result;
+    }
+  }
+  throw new Error('Nonpoint elliptic arc has no quadrant cell');
+}
