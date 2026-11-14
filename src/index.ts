@@ -7,3 +7,5 @@ export { intersectSegments, pointOnSegment } from "./geometry/segment-intersecti
 export type { SegmentIntersection } from "./geometry/segment-intersection.js";
 export { splitSegments } from "./geometry/split-segments.js";
 export type { SplitVertex, SplitEdge, SegmentArrangement } from "./geometry/split-segments.js";
+export { buildHalfEdges, compareDirections } from "./geometry/half-edges.js";
+export type { HalfEdge, BoundaryWalk, HalfEdgeArrangement } from "./geometry/half-edges.js";

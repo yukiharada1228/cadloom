@@ -1,5 +1,11 @@
+import Cadloom
 import SourceArithmetic
 import SegmentMembership
+import IntersectionBranches
+import CollinearOverlap
+import PairLoop
+import CutCompleteness
+import SortedAdjacency
 
 #print axioms Cadloom.gcdLoop_correct
 #print axioms Cadloom.fraction_add
@@ -23,7 +29,6 @@ import SegmentMembership
 #print axioms Cadloom.sourceU_eq
 #print axioms Cadloom.sourcePoint_eq
 #print axioms Cadloom.sourcePoint_sound
-
 #print axioms Cadloom.scalar_lerp_between
 #print axioms Cadloom.scalar_parameter_in_unit
 #print axioms Cadloom.containsPoint_iff_onSegment
@@ -34,3 +39,52 @@ import SegmentMembership
 #print axioms Cadloom.lerp_lex_bounds
 #print axioms Cadloom.collinear_lex_bounds_onSegment
 #print axioms Cadloom.lexContains_iff_onSegment
+#print axioms Cadloom.ordered_point_membership
+#print axioms Cadloom.degenerateFirst_correct
+#print axioms Cadloom.degenerateSecond_correct
+#print axioms Cadloom.nonparallelBranch_correct
+#print axioms Cadloom.cross_lerp_identity
+#print axioms Cadloom.parallel_common_implies_collinear
+#print axioms Cadloom.parallel_noncollinear_correct
+#print axioms Cadloom.lexLE_refl
+#print axioms Cadloom.lexLE_trans
+#print axioms Cadloom.collinear_triple
+#print axioms Cadloom.shared_line_iff
+#print axioms Cadloom.ordered_members
+#print axioms Cadloom.lexLE_ordered
+#print axioms Cadloom.lexLE_max_iff
+#print axioms Cadloom.lexLE_min_iff
+#print axioms Cadloom.overlap_bounds_iff
+#print axioms Cadloom.orderedStart_property
+#print axioms Cadloom.orderedEnd_property
+#print axioms Cadloom.collinearBranch_correct
+#print axioms Cadloom.intersectModel_correct
+#print axioms Cadloom.resultVertices_sound
+#print axioms Cadloom.indexPairs_membership
+#print axioms Cadloom.cutStep_membership
+#print axioms Cadloom.pairLoop_membership
+#print axioms Cadloom.computedCuts_membership
+#print axioms Cadloom.computedCuts_sound
+#print axioms Cadloom.overlap_boundaries_endpoints
+#print axioms Cadloom.collinear_vertices_endpoints
+#print axioms Cadloom.segment_start_extreme
+#print axioms Cadloom.resultVertices_endpoint
+#print axioms Cadloom.resultVertices_nonparallel
+#print axioms Cadloom.determinant_swap
+#print axioms Cadloom.third_direction_nonparallel
+#print axioms Cadloom.intersection_vertex_classification
+#print axioms Cadloom.computedCuts_pair_recorded
+#print axioms Cadloom.endpoint_recorded
+#print axioms Cadloom.nonparallel_recorded
+#print axioms Cadloom.global_vertex_recorded_on_segment
+#print axioms Cadloom.computedCuts_complete
+#print axioms Cadloom.consecutiveEdges_sound
+#print axioms Cadloom.consecutiveEdges_complete
+#print axioms Cadloom.consecutiveEdges_iff
+#print axioms Cadloom.consecutiveEdges_cover
+#print axioms Cadloom.sourceEdges_iff_adjacent
+#print axioms Cadloom.onSegment_subsegment
+#print axioms Cadloom.sourceEdge_sound
+#print axioms Cadloom.sourceEdge_no_interior_global_vertex
+#print axioms Cadloom.sourceEdges_cover_segment
+#print axioms Cadloom.sourceEdge_provenance_complete

@@ -1,6 +1,6 @@
 name = "cadloomProofs"
 version = "0.1.0"
-defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership"]
+defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership", "IntersectionBranches", "CollinearOverlap", "PairLoop", "CutCompleteness", "SortedAdjacency"]
 
 [[require]]
 name = "mathlib"
@@ -15,3 +15,18 @@ name = "SourceArithmetic"
 
 [[lean_lib]]
 name = "SegmentMembership"
+
+[[lean_lib]]
+name = "IntersectionBranches"
+
+[[lean_lib]]
+name = "CollinearOverlap"
+
+[[lean_lib]]
+name = "PairLoop"
+
+[[lean_lib]]
+name = "CutCompleteness"
+
+[[lean_lib]]
+name = "SortedAdjacency"
