@@ -140,4 +140,9 @@ theorem cylinder_section_gram {K : Type*} [CommRing K]
   unfold cylinderForm3
   ring
 
+/-- Eliminating y from L*y+M=0 and y²=R introduces no missing solutions. -/
+theorem ellipse_elimination_identity {K : Type*} [CommRing K] (L M R y : K) :
+    (L*y+M)*(M-L*y)+L^2*(y^2-R) = M^2-L^2*R := by
+  ring
+
 end Cadloom

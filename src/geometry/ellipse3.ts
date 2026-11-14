@@ -166,3 +166,66 @@ export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordin
   }
   throw new Error('Nonpoint elliptic arc has no quadrant cell');
 }
+
+export type EllipseEllipseIntersection3=
+ | {readonly kind:'none'}
+ | {readonly kind:'coincident';readonly ellipse:Ellipse3}
+ | {readonly kind:'points';readonly points:readonly AlgebraicCoordinates3[]};
+/** Complete spatial ellipse intersection. Coplanar quadratics reduce to a
+ * quartic in one chart coordinate; zero linear recovery coefficients are
+ * handled separately, including two points sharing that coordinate.
+ */
+export function intersectEllipses3(inputA:Ellipse3,inputB:Ellipse3):EllipseEllipseIntersection3 {
+  const a=snapshot(inputA),b=snapshot(inputB),planes=intersectPlanes3(ellipsePlane3(a),ellipsePlane3(b));
+  if(planes.kind==='none')return Object.freeze({kind:'none'});
+  if(ellipsesCoincide3(a,b))return Object.freeze({kind:'coincident',ellipse:a});
+  let points:AlgebraicCoordinates3[]=[];
+  if(planes.kind==='line')points=intersectLineEllipse3(planes.line,a).filter(h=>pointOnEllipse3(h.point,b)).map(h=>h.point);
+  else {
+    const [u,v]=duals(b),offset=subtract3(a.frame.origin,b.frame.origin),U=a.frame.u,V=a.frame.v;
+    const alpha=dot3(u,U),beta=dot3(u,V),gamma=dot3(u,offset),delta=dot3(v,U),epsilon=dot3(v,V),zeta=dot3(v,offset),A=b.radiusVSquared,B=b.radiusUSquared,two=new Rational(2n);
+    // b in a's coordinates: xx*x²+xy*x*y+yy*y²+lx*x+ly*y+c.
+    const xx=A.mul(alpha.mul(alpha)).add(B.mul(delta.mul(delta))),xy=A.mul(alpha.mul(beta)).add(B.mul(delta.mul(epsilon))).mul(two),yy=A.mul(beta.mul(beta)).add(B.mul(epsilon.mul(epsilon))),lx=A.mul(alpha.mul(gamma)).add(B.mul(delta.mul(zeta))).mul(two),ly=A.mul(beta.mul(gamma)).add(B.mul(epsilon.mul(zeta))).mul(two),c=A.mul(gamma.mul(gamma)).add(B.mul(zeta.mul(zeta))).sub(A.mul(B));
+    const R=new Polynomial([a.radiusVSquared,0n,a.radiusVSquared.div(a.radiusUSquared).neg()]),L=new Polynomial([ly,xy]),M=new Polynomial([c,lx,xx]).add(R.scale(yy)),quartic=M.mul(M).sub(L.mul(L).mul(R));
+    if(quartic.degree<0)throw new Error('Distinct positive ellipses cannot have an identically zero elimination polynomial');
+    const X=new Polynomial([0n,1n]);
+    for(const x of isolateRealRoots(quartic)){
+      const radial=x.signOf(R);if(radial<0)continue;
+      if(x.signOf(L)!==0){
+        // Evaluate each world coordinate as one rational function of x;
+        // no independent conjugate Cartesian product is introduced.
+        const component=(k:'x'|'y'|'z')=>x.rationalFunction(L.scale(a.frame.origin[k]).add(X.mul(L).scale(a.frame.u[k])).sub(M.scale(a.frame.v[k])),L);
+        points.push(snapshotExactPoint3({x:component('x'),y:component('y'),z:component('z')}));
+      }else if(x.signOf(M)===0){
+        if(radial===0)points.push(algebraicPoint3(a.frame.origin,a.frame.u,x));
+        else {
+          const y=x.rationalFunction(R).sqrt();
+          for(const Y of [y.neg(),y]){
+            const component=(k:'x'|'y'|'z')=>x.affine(a.frame.u[k],a.frame.origin[k]).add(Y.affine(a.frame.v[k]));
+            points.push(snapshotExactPoint3({x:component('x'),y:component('y'),z:component('z')}));
+          }
+        }
+      }
+    }
+  }
+  points=points.filter((p,i,all)=>all.findIndex(q=>same(p,q))===i).sort(compareAlgebraicPoints3);
+  return points.length?Object.freeze({kind:'points',points:Object.freeze(points)}):Object.freeze({kind:'none'});
+}
+
+/** Finite intersection with a closed segment whose endpoints may be algebraic. */
+export function intersectAlgebraicSegmentEllipse3(input:import('./algebraic-segment3.js').AlgebraicSegment3,inputEllipse:Ellipse3):readonly AlgebraicCoordinates3[] {
+  const e=snapshot(inputEllipse),s=snapshotExactPoint3(input.start),t=snapshotExactPoint3(input.end),zero=AlgebraicReal.fromRational(0n),one=AlgebraicReal.fromRational(1n);
+  if(same(s,t))return Object.freeze(pointOnEllipse3(s,e)?[s]:[]);
+  const axes=['x','y','z'] as const;
+  if(axes.every(k=>s[k].rational!==null&&t[k].rational!==null))return Object.freeze(intersectSegmentEllipse3(segment3(point3(s.x.rational!,s.y.rational!,s.z.rational!),point3(t.x.rational!,t.y.rational!,t.z.rational!)),e).map(h=>h.point));
+  const plane=ellipsePlane3(e),value=(p:AlgebraicCoordinates3)=>p.x.affine(plane.normal.x,plane.offset).add(p.y.affine(plane.normal.y)).add(p.z.affine(plane.normal.z)),S=value(s),T=value(t);
+  const at=(r:AlgebraicReal)=>snapshotExactPoint3({x:s.x.add(t.x.sub(s.x).mul(r)),y:s.y.add(t.y.sub(s.y).mul(r)),z:s.z.add(t.z.sub(s.z).mul(r))});
+  if(S.sign()!==0||T.sign()!==0){
+    if(S.sign()*T.sign()>0)return Object.freeze([]);
+    const r=S.div(S.sub(T));if(r.compare(zero)<0||r.compare(one)>0)return Object.freeze([]);const p=at(r);return Object.freeze(pointOnEllipse3(p,e)?[p]:[]);
+  }
+  const a=pointInPlaneFrame3(e.frame,s)!,b=pointInPlaneFrame3(e.frame,t)!,dx=b.x.sub(a.x),dy=b.y.sub(a.y),A=dx.mul(dx).affine(e.radiusVSquared).add(dy.mul(dy).affine(e.radiusUSquared)),B=a.x.mul(dx).affine(e.radiusVSquared).add(a.y.mul(dy).affine(e.radiusUSquared)).affine(2n),C=a.x.mul(a.x).affine(e.radiusVSquared).add(a.y.mul(a.y).affine(e.radiusUSquared)).affine(1n,e.radiusUSquared.mul(e.radiusVSquared).neg()),disc=B.mul(B).sub(A.mul(C).affine(4n));
+  if(disc.sign()<0)return Object.freeze([]);
+  const root=disc.sqrt(),den=A.affine(2n),parameters=disc.sign()===0?[B.neg().div(den)]:[B.neg().sub(root).div(den),B.neg().add(root).div(den)];
+  return Object.freeze(parameters.filter(r=>r.compare(zero)>=0&&r.compare(one)<=0).map(at));
+}
