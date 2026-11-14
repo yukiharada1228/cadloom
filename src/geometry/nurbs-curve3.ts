@@ -88,9 +88,10 @@ export function selectNurbsSpan3(input:NurbsCurve3,t:AlgebraicReal,side:NurbsKno
 function image(t:AlgebraicReal,N:Polynomial,W:Polynomial):AlgebraicReal {
   return t.rational===null?t.rationalFunction(N,W):AlgebraicReal.fromRational(N.evaluate(t.rational).div(W.evaluate(t.rational)));
 }
-function spanPoint(s:NurbsSpan3,t:AlgebraicReal):AlgebraicCoordinates3 {return algebraicCoordinates3(image(t,s.x,s.weight),image(t,s.y,s.weight),image(t,s.z,s.weight));}
+/** Internal closed-span evaluation, including the left side of a jump. */
+export function evaluateNurbsSpanPoint3(s:NurbsSpan3,t:AlgebraicReal):AlgebraicCoordinates3 {return algebraicCoordinates3(image(t,s.x,s.weight),image(t,s.y,s.weight),image(t,s.z,s.weight));}
 export function evaluateNurbsCurve3(input:NurbsCurve3,parameter:AlgebraicReal|ExactInput,side:NurbsKnotSide3='right'):AlgebraicCoordinates3 {
-  const curve=snapshot(input),t=parameter instanceof AlgebraicReal?parameter:AlgebraicReal.fromRational(parameter);return spanPoint(selectNurbsSpan3(curve,t,side),t);
+  const curve=snapshot(input),t=parameter instanceof AlgebraicReal?parameter:AlgebraicReal.fromRational(parameter);return evaluateNurbsSpanPoint3(selectNurbsSpan3(curve,t,side),t);
 }
 /** Exact one-sided derivative with respect to the original parameter. */
 export function derivativeNurbsCurve3(input:NurbsCurve3,parameter:AlgebraicReal|ExactInput,side:NurbsKnotSide3='right'):AlgebraicCoordinates3 {
@@ -138,7 +139,7 @@ export function intersectNurbsPlane3(input:NurbsCurve3,inputPlane:Plane3):NurbsP
     for(const t of isolateRealRoots(F)){
       if(t.compare(AlgebraicReal.fromRational(s.startParameter))<0||t.compare(AlgebraicReal.fromRational(s.endParameter))>0)continue;
       let multiplicity=0;for(let f=F;f.degree>=0&&t.signOf(f)===0;f=f.derivative())multiplicity++;
-      events.push({parameter:t,point:spanPoint(s,t),span:s.index,multiplicity});
+      events.push({parameter:t,point:evaluateNurbsSpanPoint3(s,t),span:s.index,multiplicity});
     }
   }
   events.sort((a,b)=>a.parameter.compare(b.parameter)||compareAlgebraicPoints3(a.point,b.point)||a.span-b.span);

@@ -883,7 +883,7 @@ hit.points[0].branches[0].multiplicity; // 2: この曲線では接触
 
 ノットの最大重複度は次数+1です。不連続点では`'left'`／`'right'`で評価する側を選べます。
 交差結果はノットの両側の点と重複度、平面上に含まれる区間を保持します。
-自由曲線のB-rep接続、曲線同士の交差、商用CAD形式の入出力は今後の開発です。NURBS曲面の幾何APIは後述します。
+自由曲線のB-rep接続と商用CAD形式の入出力は今後の開発です。NURBS曲面と曲線同士の交差の幾何APIは後述します。
 現在の`Curve3`とは別のパラメトリック形状APIです。
 [計算法・検証範囲](docs/proofs/nurbs-curve3.md)を参照してください。
 
@@ -991,4 +991,26 @@ joined.components; // 同じパラメータで境界を接続した結果の成�
 ```sh
 npm run build
 node examples/nurbs-section-seams3.ts
+```
+
+## 空間NURBS曲線同士の交差と重なり
+
+`intersectNurbsCurves3`は3座標の一致条件を解き、両曲線のパラメータ対応を保持します。
+有限の交差イベントに加え、重なる部分の非線形な対応も暗黙曲線のグラフとして返します。
+
+```ts
+const intersection = intersectNurbsCurves3(firstCurve, secondCurve);
+intersection.points; // パラメータの組、空間位置、元の区間の対応
+intersection.relations; // uが第1曲線、vが第2曲線のパラメータ
+```
+
+自己交差では、同じ空間点に対応する異なるパラメータの組を残します。不連続ノットの片側も保持します。
+イベントは閉じた区間の組の中で孤立しているもので、別の区間の重なりに含まれる場合があります。
+定数曲線では、無数のパラメータの組が同じ一点を表すため、対応グラフの次元を空間の次元とは認定しません。
+区間間の対応の統合、交差の重複度、B-repへの接続は今後の開発です。
+[計算法・完全性・検証範囲](docs/proofs/nurbs-curve-intersection3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-curve-intersection3.ts
 ```

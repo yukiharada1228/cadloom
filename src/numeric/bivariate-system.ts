@@ -115,3 +115,18 @@ export function solveBivariateSystem(first:BivariatePolynomial,second:BivariateP
   }
   points.sort((a,b)=>a.u.compare(b.u)||a.v.compare(b.v));return Object.freeze({kind,commonFactor,points:Object.freeze(points)});
 }
+/** Simultaneous zero set of any finite list of rational bivariate equations.
+ * Keep the shared locus as well as finite points at every refinement step.
+ * An empty equation list imposes no constraint.
+ */
+export function solveBivariateEquations(equations:readonly BivariatePolynomial[]):BivariateSystemSolutions {
+  let commonFactor=new BivariatePolynomial(),points:BivariateRoot[]=[];
+  for(const equation of equations){
+    points=points.filter(p=>equation.evaluateAlgebraic(p.u,p.v).sign()===0);
+    if(commonFactor.degreeU===0&&commonFactor.degreeV===0)continue;
+    const next=solveBivariateSystem(commonFactor,equation);commonFactor=next.commonFactor;
+    for(const p of next.points)if(!points.some(q=>p.u.compare(q.u)===0&&p.v.compare(q.v)===0))points.push(p);
+  }
+  const kind=commonFactor.degreeU<0?'all' as const:commonFactor.degreeU>0||commonFactor.degreeV>0?'shared' as const:'finite' as const;
+  points.sort((a,b)=>a.u.compare(b.u)||a.v.compare(b.v));return Object.freeze({kind,commonFactor,points:Object.freeze(points)});
+}

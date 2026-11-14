@@ -135,3 +135,7 @@ export type { NurbsPlaneSection3 } from './geometry/nurbs-plane-section3.js';
 
 export { sewNurbsPlaneSection3, nurbsSectionComplexEdgePoint3 } from './geometry/nurbs-section-seams3.js';
 export type { NurbsSectionCell3, NurbsSectionSeam3, NurbsSectionVertexUse3, NurbsSectionComplexVertex3, NurbsSectionComplexEdge3, NurbsSectionComplex3 } from './geometry/nurbs-section-seams3.js';
+
+export { solveBivariateEquations } from './numeric/bivariate-system.js';
+export { intersectNurbsCurves3, evaluateNurbsCurveRelation3, nurbsCurveRelationEdgePoint3 } from './geometry/nurbs-curve-intersection3.js';
+export type { NurbsCurvePairPoint3, NurbsCurveIntersectionPoint3, NurbsCurveParameterRelation3, NurbsCurveIntersection3 } from './geometry/nurbs-curve-intersection3.js';

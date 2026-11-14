@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Rational,Polynomial,BivariatePolynomial,AlgebraicReal,divideBivariateExact,gcdBivariate,resultantBivariate,solveBivariateSystem} from '../dist/index.js';
+import {Rational,Polynomial,BivariatePolynomial,AlgebraicReal,divideBivariateExact,gcdBivariate,resultantBivariate,solveBivariateSystem,solveBivariateEquations} from '../dist/index.js';
 const q=(n:bigint,d=1n)=>new Rational(n,d),U=new BivariatePolynomial([[],[1n]]),V=new BivariatePolynomial([[0n,1n]]),one=new BivariatePolynomial([[1n]]),zero=new BivariatePolynomial(),real=(n:bigint|string)=>AlgebraicReal.fromRational(n);
 function certified(F:BivariatePolynomial,G:BivariatePolynomial){const result=solveBivariateSystem(F,G);assert.ok(Object.isFrozen(result)&&Object.isFrozen(result.points));for(const p of result.points){assert.ok(Object.isFrozen(p));assert.equal(F.evaluateAlgebraic(p.u,p.v).sign(),0);assert.equal(G.evaluateAlgebraic(p.u,p.v).sign(),0);assert.notEqual(result.commonFactor.evaluateAlgebraic(p.u,p.v).sign(),0);}return result;}
 function det(input:Rational[][]):Rational {const a=input.map(row=>[...row]);let result=q(1n);for(let k=0;k<a.length;k++){let r=k;while(r<a.length&&a[r]![k]!.sign()===0)r++;if(r===a.length)return q(0n);if(r!==k){[a[r],a[k]]=[a[k]!,a[r]!];result=result.neg();}const pivot=a[k]![k]!;result=result.mul(pivot);for(let i=k+1;i<a.length;i++){const factor=a[i]![k]!.div(pivot);for(let j=k+1;j<a.length;j++)a[i]![j]=a[i]![j]!.sub(factor.mul(a[k]![j]!));}}return result;}
@@ -62,4 +62,13 @@ test('zero and constant equations preserve empty, shared and whole-plane solutio
   assert.equal(solveBivariateSystem(zero,zero).kind,'all');assert.equal(solveBivariateSystem(zero,one).kind,'finite');assert.equal(solveBivariateSystem(zero,one).points.length,0);
   const shared=solveBivariateSystem(zero,U.mul(U).sub(one.scale(2n)));assert.equal(shared.kind,'shared');assert.ok(shared.commonFactor.equals(U.mul(U).sub(one.scale(2n))));assert.equal(shared.points.length,0);
   const same=solveBivariateSystem(U.add(V),U.add(V).scale(-7n));assert.equal(same.kind,'shared');assert.ok(same.commonFactor.equals(U.add(V)));assert.equal(same.points.length,0);
+});
+test('three equations retain intersections from pairwise shared factors instead of filtering only finite pair roots',()=>{
+  const C=U.add(V).sub(one),equations=[U.mul(V),U.mul(C),V.mul(C)];
+  for(const es of [equations,[...equations].reverse()]){const result=solveBivariateEquations(es);assert.equal(result.kind,'finite');assert.equal(result.points.length,3);for(const [x,y] of [[0n,0n],[0n,1n],[1n,0n]])assert.ok(result.points.some(p=>p.u.compare(real(x!))===0&&p.v.compare(real(y!))===0));}
+  const filtered=solveBivariateEquations([...equations,U.sub(one)]);assert.equal(filtered.points.length,1);assert.equal(filtered.points[0]!.u.compare(real(1n)),0);assert.equal(filtered.points[0]!.v.sign(),0);
+});
+test('arbitrary equation lists preserve shared loci, zero constraints and the unconstrained plane',()=>{
+  const D=U.add(V).add(one.scale(2n)),C=U.add(V).sub(one),result=solveBivariateEquations([D.mul(U).mul(V),D.mul(U).mul(C),D.mul(V).mul(C)]);assert.equal(result.kind,'shared');assert.ok(result.commonFactor.equals(D));assert.equal(result.points.length,3);
+  assert.equal(solveBivariateEquations([]).kind,'all');assert.equal(solveBivariateEquations([zero,zero]).kind,'all');assert.equal(solveBivariateEquations([zero,U,zero]).kind,'shared');assert.equal(solveBivariateEquations([zero,U,V,one]).points.length,0);
 });

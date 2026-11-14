@@ -89,3 +89,7 @@ separately by [curve topology](algebraic-curve-topology2.md). Arbitrary trim
 domains and global NURBS/BRep intersection assembly remain future work.
 
 Reference: [SymPy polynomial internals: primitive PRS and resultants](https://docs.sympy.org/latest/modules/polys/internals.html).
+
+`solveBivariateEquations` extends the decomposition to any finite equation
+list, refining both the common locus and prior isolated points at every
+step. Its induction argument is documented with [spatial NURBS intersections](nurbs-curve-intersection3.md).
