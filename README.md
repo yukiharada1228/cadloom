@@ -1125,3 +1125,25 @@ const event = evaluateNurbsTrimSingularEdge3(report, 0, 0, '1/3');
 npm run build
 node examples/nurbs-trim-regularity3.ts
 ```
+
+## トリム領域に残るパッチ境界の連続性
+
+`analyzeNurbsTrimSeams3(surface, domain)`は、ノット境界を外周・穴との交点と判定式の全実根で分割し、
+面に残る区間・接触点について位置の一致、C1、非退化で向きのそろった接平面の一致（G1）を検査します。
+
+```ts
+const seams = analyzeNurbsTrimSeams3(surface, domain);
+seams.continuous; // 残る全継ぎ目で位置が一致
+seams.c1; // 元の(u,v)で両側の偏微分が一致
+seams.g1; // 位置が一致し、非ゼロの法線が同じ向き
+seams.seams; // 区間と孤立接触点ごとの結果
+```
+
+穴の内部や外部にしかない継ぎ目は判定対象から除きます。境界上では隣接パッチの両側を検査します。
+これらは継ぎ目の条件であり、パッチ内部の正則性や面の自己重複を認定しません。
+[式・完全な区間分割・検証範囲](docs/proofs/nurbs-trim-seams3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-trim-seams3.ts
+```

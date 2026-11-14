@@ -46,7 +46,13 @@ function patchReport(p:NurbsSurfacePatch3):NurbsPatchRegularity3 {
  * plus exact whole-boundary positional continuity. Does not prove injectivity.
  */
 export function analyzeNurbsSurfaceRegularity3(input:NurbsSurface3):NurbsSurfaceRegularity3 {
-  const surface=nurbsSurface3(input.degreeU,input.degreeV,input.controlPoints,input.knotsU,input.knotsV,input.weights),raw=nurbsSurfacePatches3(surface),patches=Object.freeze(raw.map(patchReport)),seams:NurbsSurfaceSeam3[]=[];
+  const surface=nurbsSurface3(input.degreeU,input.degreeV,input.controlPoints,input.knotsU,input.knotsV,input.weights),raw=nurbsSurfacePatches3(surface),patches=Object.freeze(raw.map(patchReport)),seams=nurbsSurfaceSeams3(raw);
+  return Object.freeze({surface,patches,seams,continuous:seams.every(s=>s.continuous),everyPatchRegular:patches.every(p=>p.regular)});
+}
+
+/** Internal shared conforming-rectangle adjacency and positional seam identities. */
+export function nurbsSurfaceSeams3(raw:readonly NurbsSurfacePatch3[]):readonly NurbsSurfaceSeam3[] {
+  const seams:NurbsSurfaceSeam3[]=[];
   for(let i=0;i<raw.length;i++)for(let j=i+1;j<raw.length;j++){
     const a=raw[i]!,b=raw[j]!;let direction:'u'|'v'|null=null,parameter:Rational|null=null;
     if(a.endU.equals(b.startU)&&a.startV.equals(b.startV)&&a.endV.equals(b.endV)){direction='u';parameter=a.endU;}
@@ -55,5 +61,5 @@ export function analyzeNurbsSurfaceRegularity3(input:NurbsSurface3):NurbsSurface
     const restrict=(f:BivariatePolynomial)=>direction==='u'?f.specializeU(parameter!):f.specializeV(parameter!),A=restrict(a.weight),B=restrict(b.weight),continuous=keys.every(k=>restrict(a[k]).mul(B).equals(restrict(b[k]).mul(A)));
     seams.push(Object.freeze({firstPatch:i,secondPatch:j,direction,parameter,continuous}));
   }
-  return Object.freeze({surface,patches,seams:Object.freeze(seams),continuous:seams.every(s=>s.continuous),everyPatchRegular:patches.every(p=>p.regular)});
+  return Object.freeze(seams);
 }

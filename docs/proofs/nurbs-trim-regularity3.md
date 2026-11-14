@@ -82,7 +82,8 @@ report is regular. Conversely, continuity of the spatial image, C1/G1 seam
 matching, regularizability by a different chart, global injectivity, periodic
 seam quotients and spatial face/solid validity are not certified. A report may
 be rank-regular even when an unused or retained positional seam is discontinuous;
-use the separate support seam information and future trim seam checks.
+use the separate `analyzeNurbsTrimSeams3` report for trim-restricted seam checks
+([construction](nurbs-trim-seams3.md)).
 
 ## Evidence
 

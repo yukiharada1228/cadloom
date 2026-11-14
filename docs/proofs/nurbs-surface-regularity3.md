@@ -78,9 +78,10 @@ Further cases cover boundary singularities, refinement/reversal, interior seam
 gaps with matching endpoints, folded seams, and a regular noninjective cylinder.
 
 These documented arguments and tests do not constitute machine verification
-of TypeScript execution. Restricting singular loci to an arbitrary validated
-trim domain, identifying periodic seams, proving global injectivity or an
-appropriate quotient embedding, and constructing a valid spatial face remain
-separate tasks. Exact polynomial elimination can be expensive at high degree.
+of TypeScript execution. Trim restriction is supplied by `analyzeNurbsTrimRegularity3`
+([construction](nurbs-trim-regularity3.md)), and retained seam matching by
+`analyzeNurbsTrimSeams3` ([construction](nurbs-trim-seams3.md)). Identifying
+periodic seams, proving global injectivity or an appropriate quotient embedding,
+and constructing a valid spatial face remain separate tasks. Exact polynomial elimination can be expensive at high degree.
 In particular, a singularity outside a desired trim is still
 reported here and does not by itself invalidate that future trimmed face.
