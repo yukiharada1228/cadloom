@@ -698,3 +698,18 @@ solid.topology.closedOrientedIncidence; // true
 npm run build
 node examples/extruded-brep3.ts
 ```
+
+## 平面・円柱の交線と楕円弧
+
+`intersectPlaneCylinder3(plane, cylinder)`は支持面の交差を、楕円・2本の母線・接する1本の母線・空集合へ厳密に分類します。任意方向の有理数の軸・法線に対応し、母線の無理数の位置は`AlgebraicLine3`として保持します。`intersectPlanes3`は平面同士の交差です。
+
+`ellipse3(frame, radiusUSquared, radiusVSquared)`は独立した有理数の軸と正の有理数の座標半径の二乗で楕円を表します。軸の単位化・固有ベクトルの近似を使いません。`intersectLineEllipse3`・`intersectSegmentEllipse3`・`intersectEllipsePlane3`は有限交点または一致を返します。
+
+`ellipticArc3`・`fullEllipseArc3`で楕円弧を構築し、所属判定・厳密な巡回順序・分割ができます。`Curve3`の`elliptic-arc`として平行移動・反転・支持面への所属判定・B-repの周期辺に接続します。
+
+現段階は支持面の交線です。有限の面による交線の切り取り、楕円同士の一般の交差、楕円でトリムされた面の構築、曲面B-repのBoolean演算は今後の開発です。[計算式・構成・検証範囲](docs/proofs/plane-cylinder3.md)を参照してください。
+
+```sh
+npm run build
+node examples/plane-cylinder3.ts
+```

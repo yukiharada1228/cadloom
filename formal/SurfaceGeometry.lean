@@ -119,4 +119,25 @@ theorem cylinder_tangent_axis_cross {K : Type*} [CommRing K] (dx dy dz x y z : K
   · ring
   · constructor <;> ring
 
+/-- Weighted ellipse equation after substituting a rational supporting line. -/
+theorem line_ellipse_polynomial {K : Type*} [CommRing K]
+    (a b ox oy dx dy t : K) :
+    a*(ox+t*dx)^2+b*(oy+t*dy)^2-a*b =
+      (a*dx^2+b*dy^2)*t^2+2*(a*ox*dx+b*oy*dy)*t+
+      (a*ox^2+b*oy^2-a*b) := by
+  ring
+
+/-- Restricted cylinder quadratic loses rank precisely when the section plane
+contains the axis direction (over real ordered fields with nonzero vectors). -/
+theorem cylinder_section_gram {K : Type*} [CommRing K]
+    (dx dy dz ux uy uz vx vy vz : K) :
+    cylinderForm3 dx dy dz ux uy uz 0 * cylinderForm3 dx dy dz vx vy vz 0 -
+      ((dy*uz-dz*uy)*(dy*vz-dz*vy)+
+       (dz*ux-dx*uz)*(dz*vx-dx*vz)+
+       (dx*uy-dy*ux)*(dx*vy-dy*vx))^2 =
+      (dx^2+dy^2+dz^2)*
+        (dx*(uy*vz-uz*vy)+dy*(uz*vx-ux*vz)+dz*(ux*vy-uy*vx))^2 := by
+  unfold cylinderForm3
+  ring
+
 end Cadloom
