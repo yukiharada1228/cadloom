@@ -108,3 +108,7 @@ export type { CylinderHalfSpace3, TrimmedCylinderComponent3, PreparedTrimmedCyli
 export { prepareEllipseFace3 } from './geometry/planar-face3.js';
 export { prepareTrimmedPlanar3, splitTrimmedPlanarByPlane3 } from './geometry/trimmed-planar3.js';
 export type { PlanarHalfSpace3, TrimmedPlanarComponent3, PreparedTrimmedPlanar3, TrimmedPlanarSplit3 } from './geometry/trimmed-planar3.js';
+export { sewBRepFaces3 } from './geometry/sew-brep3.js';
+export type { SewBRepFace3, SewBRepOptions3, SewnBRep3 } from './geometry/sew-brep3.js';
+export { clipCylinderBRep3 } from './geometry/clipped-cylinder-brep3.js';
+export type { ClippedCylinderFace3, ClippedCylinderBRep3 } from './geometry/clipped-cylinder-brep3.js';
