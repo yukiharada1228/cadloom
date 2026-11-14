@@ -1,3 +1,4 @@
+import PrismVolume
 import AffineGeometry
 import FaceSampling
 import Cadloom
@@ -101,3 +102,5 @@ import SortedAdjacency
 #print axioms Cadloom.affine_lerp
 #print axioms Cadloom.affine_inverse_left
 #print axioms Cadloom.affine_segment_iff
+
+#print axioms Cadloom.prism_volume_eq_area_height

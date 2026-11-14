@@ -44,3 +44,5 @@ node formal/scripts/verify.mjs
 Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choice`・`Quot.sound`を信頼します。監査対象が` sorryAx `など許可外の公理に依存した場合は失敗します。
 
 `AffineGeometry.lean`では有理数アフィン変換による外積の倍率、線形補間との可換性、非特異変換の逆写像と線分所属の同値性を検査します。TypeScriptとの全体精緻化や平面位相全体は対象外です。
+
+`PrismVolume.lean`では三角柱の外向き8三角形の行列式寄与の和と底面積×高さの公式を検査します。メッシュ生成・接続検査全体の精緻化とは区別します。

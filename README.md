@@ -1,6 +1,8 @@
 # cadloom
 
-ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による厳密な2D閉線分の交差と、線分群の交点分割・重複統合** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
+ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による2D線分交差・領域の集合演算・三角形分割と、平面領域の3D押し出し** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
+
+このREADMEはソース版のAPIを対象とし、公開済みnpmパッケージに未収録の機能を含みます。
 
 ## 実行
 
@@ -218,3 +220,25 @@ npm run build
 node examples/triangulation-to-svg.ts
 # artifacts/triangulation.{json,svg} に穴と島を含むメッシュを生成
 ```
+
+## 2D領域の3D押し出し
+
+```ts
+import { extrudePolygon, inspectMesh } from "cadloom";
+const solid = extrudePolygon(region, "3/2", { baseZ: "-1/3" });
+console.log(solid.volume.toString()); // 正確な体積
+const report = inspectMesh(solid);
+// closed / consistentlyOriented / nondegenerate / manifoldVertices / signedVolume
+```
+
+穴・島・離れた複数成分を持つ領域から、外向きの閉じた三角形メッシュを作ります。`height`と`baseZ`はbigint・厳密な文字列・Rationalを受け付けます。負の高さにも対応し、`zMin`・`zMax`を返します。塗り規則は`fillRule`で指定します。高さ0と点接触による非多様体の境界は拒否します。空領域は体積0の空メッシュになります。
+
+`inspectMesh`は辺の接続と向き・頂点リンク・非退化・符号付き体積を調べます。任意のメッシュの空間的な自己交差を検出するものではなく、閉じた適切な向きの境界という前提なしに符号付き体積を幾何学的体積として使うことはできません。[正当性と検査範囲](docs/proofs/extrusion.md)を参照してください。
+
+```sh
+npm run build
+node examples/extrusion-viewer.ts
+open artifacts/extrusion.html
+```
+
+穴のある板を回転・拡大縮小できる単独HTMLと、厳密なJSONを生成します。WebGL対応ブラウザーが必要です。表示だけ浮動小数点を使い、カーネルの座標・体積は有理数のままです。曲面・3D集合演算・商用CAD互換はまだ対象外です。
