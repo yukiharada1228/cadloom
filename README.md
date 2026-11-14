@@ -448,9 +448,31 @@ const nodedAgain = splitCurves2(graph.edges); // 代数的な端点を持つ辺�
 
 `lineInterval2(line, startParameter, endParameter)`で代数的な端点を持つ閉直線区間を作れます。入力の`kind: 'line'`で渡し、`kind: 'point'`では孤立した有理点・代数点を渡せます。円弧は左右の極点でも分割し、円全体の任意のシームがグラフの形状に影響しないようにします。座標の多項式表現が異なっても、値が同じ点は同じ頂点になります。
 
-ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた辺の回転順序、半辺・面、曲線領域の集合演算は今後の段階です。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
+ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた回転順序と半辺は後述の`buildCurveHalfEdges2`で扱います。面の分類と曲線領域の集合演算は今後の段階です。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
 
 ```sh
 npm run build
 node examples/curved-arrangements.ts
+```
+
+## 曲線の回転順序と半辺構造
+
+`buildCurveHalfEdges2(curves)`は共有頂点・辺を作り、各辺の両方向の半辺、`twin`・`next`・`previous`、左側の境界巡回を構築します。
+
+```ts
+const topology = buildCurveHalfEdges2([
+  { kind: 'arc', arc: fullCircleArc2(circle2(point2(0n, 0n), 1n)) },
+  { kind: 'arc', arc: fullCircleArc2(circle2(point2(2n, 0n), 1n)) },
+]);
+// 外接点では接線が一致しても、符号付き曲率で異なる扇形を区別
+const walks = topology.boundaries.map(w => w.halfEdges);
+```
+
+`outgoing`は接線方向と符号付き曲率による反時計回りの巡回順序です。`germ`には非単位の厳密な接線と、曲率の符号・半径の二乗を保持します。接線の外積は一次式へ整理し、角度近似や不要な代数的乗算を避けています。
+
+境界巡回はまだ面へ分類していません。円弧の弦から面積を計算する代用値も返しません。[順序付けの根拠・接触時の左右・検証範囲](docs/proofs/curve-half-edges.md)を参照してください。
+
+```sh
+npm run build
+node examples/curve-half-edges.ts
 ```

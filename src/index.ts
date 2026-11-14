@@ -53,3 +53,5 @@ export { lineInterval2, pointOnLineInterval2, intersectLineIntervals2, intersect
 export type { LineInterval2, LineIntervalIntersection2 } from './geometry/line-interval2.js';
 export { splitCurves2 } from './geometry/split-curves2.js';
 export type { PlanarCurve2, CurveVertex2, CurveUse2, CurveEdge2, CurveArrangement2 } from './geometry/split-curves2.js';
+export { buildCurveHalfEdges2 } from './geometry/curve-half-edges2.js';
+export type { CurveGerm2, CurveHalfEdge2, CurveBoundaryWalk2, CurveHalfEdgeArrangement2 } from './geometry/curve-half-edges2.js';

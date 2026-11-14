@@ -133,7 +133,8 @@ independent comparisons, not a claim of complete formal program verification.
 
 Supporting circle centers/squared radii remain rational. Algebraic endpoints are
 supported. [Mixed curve noding](curved-arrangements.md) now connects these primitives
-into a vertex/edge graph. Tangent rotation systems/faces, filled curved Booleans,
+into a vertex/edge graph; [curve half-edges](curve-half-edges.md) add tangent rotation
+and boundary walks. Face grouping, filled curved Booleans,
 NURBS and curved 3D solids remain future kernel work. General algebraic
 coordinate predicates can be expensive; the same-circle order intentionally avoids
 unnecessary field multiplication.
