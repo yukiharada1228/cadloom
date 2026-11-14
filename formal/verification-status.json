@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "40f73df277991af6f2cbc1fb663d651f16096dff4d6c56a675a5da9743fe3678",
+    "src/index.ts": "a1e52949e64ccccde852dd64607da9c1ee7f220af38c8f7d4a020e440c641c7a",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -33,7 +33,8 @@
     "src/numeric/resultant.ts": "f3756924c33ec134fcca49f722fd47a79292df6fb827133f7e4c6df702961545",
     "src/geometry/circular-arc2.ts": "66fbe25de9d9cd41bd8e11cfd1c13033f6f36096b12cdd3ddcb858c9ed24aa97",
     "src/geometry/line-interval2.ts": "cd751dd63d8ba15b7817dd21df12bf0d6e4a862bc2318111835fb15d8cc02735",
-    "src/geometry/split-curves2.ts": "e8e5bda60a37dbde12b5bcd0613cea089105b332d334b4510ab3db08314720b9"
+    "src/geometry/split-curves2.ts": "e8e5bda60a37dbde12b5bcd0613cea089105b332d334b4510ab3db08314720b9",
+    "src/geometry/curve-half-edges2.ts": "520e7700826dccb029c59c52323b2f8ed89aba04713ebecd2f034768dca234e0"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -146,10 +147,12 @@
     "Cadloom.radical_axis_circle_iff",
     "Cadloom.circumcenter_linear_equations",
     "Cadloom.circle_same_x_half_unique",
-    "Cadloom.canonical_line_frame"
+    "Cadloom.canonical_line_frame",
+    "Cadloom.circle_tangent_cross_linear",
+    "Cadloom.circle_germ_normal_offset"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations. Uniqueness of same-x circle points in a common closed vertical half over ordered fields. Canonical nonvertical line-frame identity over fields.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations. Uniqueness of same-x circle points in a common closed vertical half over ordered fields. Canonical nonvertical line-frame identity over fields. Linear cancellation of shared-point circle tangent cross products and exact small-circle normal offset for circular germs.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
@@ -164,6 +167,7 @@
     "Algebraic root affine composition, correlated algebraic point construction, line/segment/circle intersections and circle predicates are tested with independent integer oracles and documented reductions; complete TypeScript execution is not machine-verified.",
     "Resultants over rational polynomial coefficients, Bareiss elimination, algebraic field arithmetic with interval branch selection, reciprocals and general algebraic-coordinate predicates are independently tested and documented, not machine-verified.",
     "Circular arc membership/order/subdivision, endpoint-cell intersection, general-coordinate circle classification and trusted correlated-point registry use construction arguments and independent cyclic-index tests, not full runtime machine verification.",
-    "Algebraic line trims and mixed line/arc noding, all-pairs cut completeness, semantic vertex welding, canonical edge merging and oriented source uses are documented and differentially tested, not full TypeScript machine verification."
+    "Algebraic line trims and mixed line/arc noding, all-pairs cut completeness, semantic vertex welding, canonical edge merging and oriented source uses are documented and differentially tested, not full TypeScript machine verification.",
+    "Curve tangent/curvature germ sorting, half-edge permutations and boundary walks use documented geometric arguments and independent planar/sector checks, not full TypeScript machine verification."
   ]
 }

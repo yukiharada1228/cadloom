@@ -52,4 +52,18 @@ theorem canonical_line_frame {K : Type*} [Field K] (ox oy dx dy t : K) (h : dx â
   field_simp
   ring
 
+/-- Quadratic terms cancel when comparing circle tangents at a shared point. -/
+theorem circle_tangent_cross_linear {K : Type*} [CommRing K] (x y ax ay bx bcy : K) :
+    (-(y-ay))*(x-bx)-(x-ax)*(-(y-bcy)) =
+      (ay-bcy)*x+(bx-ax)*y+ax*bcy-ay*bx := by
+  ring
+
+/-- A small circle about the contact fixes the signed normal displacement exactly. -/
+theorem circle_germ_normal_offset {K : Type*} [Field K] [CharZero K]
+    (s z r rho : K) (hr : r â‰  0)
+    (hc : s^2+(z-r)^2=r^2) (hs : s^2+z^2=rho^2) :
+    z=rho^2/(2*r) := by
+  apply (eq_div_iff (mul_ne_zero (by norm_num) hr)).mpr
+  linear_combination hs-hc
+
 end Cadloom

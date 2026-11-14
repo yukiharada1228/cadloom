@@ -135,6 +135,6 @@ complete TypeScript execution or the algebraic field implementation.
 This implementation uses all input pairs and exact algebraic comparisons; bit sizes,
 root separation and general coordinate predicates can make large models expensive.
 It supports rational line/circle data with algebraic trims, without arbitrary
-algebraic supporting coefficients or general splines. Tangent-germ ordering,
-half-edges/faces, curved-region Booleans, curved BRep and CAD import remain future
+algebraic supporting coefficients or general splines. [Tangent-germ rotation and half-edges](curve-half-edges.md) now build on this graph.
+Face grouping, curved-region Booleans, curved BRep and CAD import remain future
 kernel stages.

@@ -135,3 +135,6 @@ import SortedAdjacency
 #print axioms Cadloom.circle_same_x_half_unique
 
 #print axioms Cadloom.canonical_line_frame
+
+#print axioms Cadloom.circle_tangent_cross_linear
+#print axioms Cadloom.circle_germ_normal_offset
