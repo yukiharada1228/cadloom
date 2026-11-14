@@ -266,3 +266,22 @@ node examples/segment-plane-intersection.ts
 ```
 
 [数学的仕様・証明・比較テスト](docs/proofs/plane3.md)を参照してください。これは3Dカーネルの基礎であり、BRepや3Dソリッド集合演算はまだ未実装です。
+
+## 三角形面と平面の交差・分割
+
+```ts
+import { point3, triangle3, plane3, splitTriangleByPlane } from "cadloom";
+const face = triangle3(point3(0n,0n,0n), point3(2n,0n,0n), point3(0n,2n,0n));
+const result = splitTriangleByPlane(face, plane3(1n,0n,0n,-1n)); // x=1
+// positive: 1三角形、negative: 2三角形、coplanar: null
+// intersection: (1,0,0)→(1,1,0)の線分
+```
+
+`intersectTrianglePlane`は共通部分を`none`・`point`・`segment`・`coplanar`で返します。`pointOnTriangle3`は辺・頂点を含む三角形所属を判定します。三角形の重複・同一直線の頂点は拒否します。
+
+分割は元の向きを保ち、正側・負側には非零面積の三角形だけを返します。面全体が同一平面なら`coplanar`へ一度だけ返し、両側へ複製しません。点や線だけの接触は`intersection`で保持します。[仕様と証明](docs/proofs/triangle-plane-split.md)を参照してください。
+
+```sh
+npm run build
+node examples/triangle-plane-split.ts
+```
