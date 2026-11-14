@@ -99,6 +99,7 @@ has at most four zeros). Tiny offsets of 10^-30 remain distinguishable.
 These construction arguments and differential tests are not machine verification
 of chart inversion, whole-curve classification, loop validation or TypeScript
 execution. Existing Lean supporting-surface identities remain in scope; no new
-whole-program claim is made. General algebraic arithmetic can be expensive. BRep
-edge identity/noding, coedges, face domains, shell topology and embedding validation,
-and nonplanar space curves remain subsequent work.
+whole-program claim is made. General algebraic arithmetic can be expensive.
+Explicit shared-edge/coedge/shell incidence is implemented in
+[brep-topology3.md](brep-topology3.md). Automatic edge noding/identity, face domains,
+geometric shell embedding validation and nonplanar space curves remain subsequent work.
