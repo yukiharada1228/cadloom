@@ -6,14 +6,16 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "c95e887929112894b479f2d7862abea55436978c13763f7d62f6df85663d1dfa",
+    "src/index.ts": "2c92b3aff71b105cb553e52f09d19197d4b7b168043ca371c5574e74f070baac",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
     "src/geometry/polygon-boolean.ts": "5721cba9749706f0cb62a5607f62b98bf14ede096519198ed602d81208515707",
     "src/geometry/polygon-location.ts": "6777914ea68b7e5191044a886ebbc1396ceb012863400a026d2cbbd6e2dd3c37",
     "src/geometry/affine2.ts": "849da938a212d60dd2cfc7615a3a8aecfdf2455551d90ec7d1fd53ce0808895c",
-    "src/geometry/triangulate.ts": "16e442bdfcdfd59920692cad82c9b7678c351176b8234caf5893fe5b042dbc72"
+    "src/geometry/triangulate.ts": "16e442bdfcdfd59920692cad82c9b7678c351176b8234caf5893fe5b042dbc72",
+    "src/geometry/mesh3.ts": "e03cffbaa24f76071a0f6d10b8e249290c2af1a5ed2f993bb9cc16d3ee73103d",
+    "src/geometry/extrude.ts": "5412c387943c10a6a914690aa0c6569de9f59d48579d617ac29b20d6995402a0"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -105,10 +107,11 @@
     "Cadloom.affine_cross_scaled",
     "Cadloom.affine_lerp",
     "Cadloom.affine_inverse_left",
-    "Cadloom.affine_segment_iff"
+    "Cadloom.affine_segment_iff",
+    "Cadloom.prism_volume_eq_area_height"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",

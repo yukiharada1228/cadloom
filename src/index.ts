@@ -19,3 +19,7 @@ export { affine2, affineDeterminant, transformPoint, transformSegment, transform
 export type { Affine2 } from "./geometry/affine2.js";
 export { triangulatePolygon } from "./geometry/triangulate.js";
 export type { PolygonMesh } from "./geometry/triangulate.js";
+export { point3, inspectMesh } from "./geometry/mesh3.js";
+export type { Point3, TriangleIndices, TriangleMesh3, MeshInspection } from "./geometry/mesh3.js";
+export { extrudePolygon } from "./geometry/extrude.js";
+export type { ExtrudeOptions, ExtrudedMesh } from "./geometry/extrude.js";
