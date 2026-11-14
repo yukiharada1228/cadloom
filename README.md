@@ -713,3 +713,18 @@ node examples/extruded-brep3.ts
 npm run build
 node examples/plane-cylinder3.ts
 ```
+
+## 有限の円柱面と平面の交差
+
+`intersectPlaneCylinderFace3(plane, face)`は`prepareCylinderFace3`の有限の高さ・角度の範囲で交線を切り取ります。`curves`には閉じた楕円弧または代数的端点の線分と交差の重複度、`points`には曲線に含まれない孤立した接触点を返します。接する母線の重複度は2です。楕円の継ぎ目や境界で弧が分割されるため、隣接する弧が端点を共有する場合があります。
+
+```ts
+const face = prepareCylinderFace3(
+  cylinder3(line3(point3(0n, 0n, 0n), vector3(0n, 0n, 1n)), 1n),
+  '-1/2', '1/2',
+);
+const section = intersectPlaneCylinderFace3(plane3(1n, 0n, -1n), face);
+// x=zの楕円を高さ範囲で切り取り、閉じた楕円弧として返す
+```
+
+`interiorPointOnEllipticArc3`は非退化な楕円弧の内部点を厳密に求めます。有限の平面側の領域による切り取り、切断後の面の構築・接続、一般の曲面Boolean演算はまだ対象外です。[完全性の構成・検証範囲](docs/proofs/cylinder-face-section3.md)を参照してください。
