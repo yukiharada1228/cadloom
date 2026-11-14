@@ -63,6 +63,7 @@ incidence, boundary coverage and dual connectivity are checked.
 
 These are construction arguments and executable tests, not machine verification
 of the face algorithm, algebraic square-root implementation, union-find or
-TypeScript runtime. Curved filled-region Booleans, curved areas, splines and
-curved 3D BRep remain subsequent kernel work. Algebraic field degree growth and
+TypeScript runtime. Curved filled-region Booleans are built on this structure in
+[curve-booleans.md](curve-booleans.md). Curved areas, splines and curved 3D BRep
+remain subsequent kernel work. Algebraic field degree growth and
 all-pairs noding can be expensive; no production-scale performance claim is made.

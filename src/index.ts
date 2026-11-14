@@ -57,3 +57,5 @@ export { buildCurveHalfEdges2 } from './geometry/curve-half-edges2.js';
 export type { CurveGerm2, CurveHalfEdge2, CurveBoundaryWalk2, CurveHalfEdgeArrangement2 } from './geometry/curve-half-edges2.js';
 export { buildCurveFaces2 } from './geometry/curve-faces2.js';
 export type { CurveFace2, CurveFaceLocation2, CurveFaceArrangement2 } from './geometry/curve-faces2.js';
+export { booleanCurveRegions2 } from './geometry/curve-boolean2.js';
+export type { CurveBoundary2, CurveRegion2, CurveRegionLocation2, CurveBooleanResult2 } from './geometry/curve-boolean2.js';

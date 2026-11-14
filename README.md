@@ -427,7 +427,7 @@ const otherArc = circularArc2(unit, point2(0n, 1n), point2(-1n, 0n));
 const common = intersectArcs2(quarter, otherArc); // 共有端点を保持
 ```
 
-所属・巡回順序・分割・直線／線分との交差・円弧どうしの交差を、角度の小数近似なしで扱います。重なりは複数の円弧成分と孤立した接触点を区別して保持します。`classifyAlgebraicPointToCircle2`も独立した代数的座標を受け取れるようになりました。円弧を共有頂点・辺へ分割する処理は後述の`splitCurves2`で扱います。曲線領域の集合演算は今後の実装です。[規約・構成の証明・比較テスト](docs/proofs/circular-arcs.md)を参照してください。
+所属・巡回順序・分割・直線／線分との交差・円弧どうしの交差を、角度の小数近似なしで扱います。重なりは複数の円弧成分と孤立した接触点を区別して保持します。`classifyAlgebraicPointToCircle2`も独立した代数的座標を受け取れるようになりました。円弧を共有頂点・辺へ分割する処理は後述の`splitCurves2`で扱います。曲線領域の集合演算は後述の`booleanCurveRegions2`で扱います。[規約・構成の証明・比較テスト](docs/proofs/circular-arcs.md)を参照してください。
 
 ```sh
 npm run build
@@ -448,7 +448,7 @@ const nodedAgain = splitCurves2(graph.edges); // 代数的な端点を持つ辺�
 
 `lineInterval2(line, startParameter, endParameter)`で代数的な端点を持つ閉直線区間を作れます。入力の`kind: 'line'`で渡し、`kind: 'point'`では孤立した有理点・代数点を渡せます。円弧は左右の極点でも分割し、円全体の任意のシームがグラフの形状に影響しないようにします。座標の多項式表現が異なっても、値が同じ点は同じ頂点になります。
 
-ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた回転順序と半辺は後述の`buildCurveHalfEdges2`で扱います。面の分類は後述の`buildCurveFaces2`で扱います。曲線領域の集合演算は今後の段階です。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
+ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた回転順序と半辺は後述の`buildCurveHalfEdges2`で扱います。面の分類は後述の`buildCurveFaces2`で扱います。曲線領域の集合演算は後述の`booleanCurveRegions2`で扱います。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
 
 ```sh
 npm run build
@@ -492,4 +492,27 @@ const location = arrangement.locate(point2('3/2', 0n));
 // { kind: 'face', face: ... }; 境界上なら edge または vertex
 ```
 
-`boundaryFaces`と`halfEdgeFaces`は左側の面、`vertexFaces`は接する面の番号を返します。位置判定は代数的実数の座標にも対応します。分類は厳密な垂直断面と接線・曲率の順序で行い、円弧の面積近似は使いません。これは平面の分割であり、塗りつぶし規則や曲線領域の集合演算はまだ含みません。[構成の根拠と検証範囲](docs/proofs/curve-faces.md)を参照してください。
+`boundaryFaces`と`halfEdgeFaces`は左側の面、`vertexFaces`は接する面の番号を返します。位置判定は代数的実数の座標にも対応します。分類は厳密な垂直断面と接線・曲率の順序で行い、円弧の面積近似は使いません。この関数は平面の分割を返します。塗りつぶし規則や集合演算は`booleanCurveRegions2`で扱います。[構成の根拠と検証範囲](docs/proofs/curve-faces.md)を参照してください。
+
+
+## 円弧を含む領域の集合演算
+
+`booleanCurveRegions2(a, b, operation, fillRule)`は、線分・直線の代数的トリム・円弧で閉じた境界の和・積・差・排他的論理和を計算します。入力は`CurveRegion2`（閉じた巡回の配列）で、各巡回は`segment`・`line`・`arc`の配列です。単独の全円も巡回になります。始終点の接続を厳密に検査し、閉じていない入力は拒否します。
+
+```ts
+const disk = (x: bigint): CurveRegion2 => [[{
+  kind: 'arc', arc: fullCircleArc2(circle2(point2(x, 0n), 1n)),
+}]];
+const lens = booleanCurveRegions2(disk(0n), disk(1n), 'intersection');
+const crescent = booleanCurveRegions2(disk(0n), lens.rings, 'difference');
+console.log(lens.locate(point2('1/2', 0n))); // inside
+```
+
+`operation`は`union`・`intersection`・`difference`・`xor`、`fillRule`は`even-odd`（既定）・`nonzero`です。面の巻き数はBigInt整数で保持し、重複・逆向き・自己交差を扱います。出力の`rings`は選択領域を左側に持ち、代数的な端点を保ったまま次の演算に渡せます。接点や辺だけの交差は面として残さない正則化集合演算です。
+
+`locate`は`inside`・`boundary`・`outside`を返し、相殺された曲線や内部の共有辺を境界に数えません。`arrangement`・`selectedFaces`・`windings`で演算の元になった面と両入力の巻き数も参照できます。円弧の面積は近似して返しません。[構成の根拠・比較テスト・制限](docs/proofs/curve-booleans.md)を参照してください。
+
+```sh
+npm run build
+node examples/curve-booleans.ts
+```
