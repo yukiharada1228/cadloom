@@ -68,3 +68,5 @@ Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choi
 円弧を含む面の分類・垂直レイによる位置判定・代数的実数の非負平方根は、[構成の議論と比較テスト](../docs/proofs/curve-faces.md)で検証します。これらのアルゴリズム全体をLeanで機械検証したものではありません。
 
 円弧を含む領域の巻き数伝播・正則化集合演算・境界再構築・塗りつぶし領域の位置判定は、[構成の議論と独立テスト](../docs/proofs/curve-booleans.md)で検証します。アルゴリズム全体のLean検証は主張しません。
+
+`SurfaceGeometry.lean`は円柱の射影式・軸の移動とスケール・直線代入の二次式・法線の直交性と長さの6恒等式を検証します。[対応と制限](../docs/proofs/analytic-surfaces3.md)のとおり、交点列挙やB-rep全体の実行検証ではありません。
