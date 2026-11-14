@@ -303,3 +303,16 @@ npm run build
 node examples/triangle-topology.ts
 # 閉じた押し出しと、平面で分割して境界が開いた面集合の接続を比較
 ```
+
+## 三角形面どうしの交差・埋め込み検査
+
+`intersectTriangles3(a,b)`は閉三角形の共通部分を`none`・`point`・`segment`・`polygon`で返します。同一平面の面積重なりと、点・辺だけの接触を区別し、有理数の座標を保ちます。多角形は3〜6頂点で、法線の最大成分を落とした巡回座標の射影で反時計回り、xyz最小頂点から始まります。入力面の向きを保存する規約ではありません。
+
+`inspectTriangleEmbedding(triangles)`は全ての面ペアを調べ、共有する頂点・辺を超えた交差や重複面を、面インデックスと交差集合付きで返します。隣接面どうしの面積重複や未分割T字接続も検出します。
+
+`embedded`は閉じたソリッドの認定ではありません。閉鎖・向き・非多様体は位相構造で別に検査し、シェルの包含・空洞分類も今後必要です。現在はO(F²)の全ペア検査です。[仕様と証明](docs/proofs/triangle-intersection3.md)を参照してください。
+
+```sh
+npm run build
+node examples/triangle-intersection3.ts
+```

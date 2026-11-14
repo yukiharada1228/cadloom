@@ -1,3 +1,4 @@
+import CoplanarProjection
 import TriangleGeometry
 import PlaneGeometry
 import PrismVolume
@@ -118,3 +119,6 @@ import SortedAdjacency
 #print axioms Cadloom.triangle_plane_value
 #print axioms Cadloom.triangle_plane_bounds
 #print axioms Cadloom.triangle_fan_area_vector
+
+#print axioms Cadloom.plane_lift_satisfies
+#print axioms Cadloom.plane_lift_unique
