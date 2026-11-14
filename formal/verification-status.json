@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "7f038fe163edfe503af4369d9710dae05635f902d86d21fe264b104322b0901c",
+    "src/index.ts": "dcc627e6d5926efdb6703c65d61856b7a4f383032e160f0cc8489eaff16ebb6f",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -20,7 +20,8 @@
     "src/geometry/orient3d.ts": "a7e9f78f87ec3ef6b39a5ad028dcf506e5bcc15cc8e0f76c28605351102380e4",
     "src/geometry/plane3.ts": "f3d5d4e808f1a30ea22eee087504a157d457e091122bbebdedd3e701f1528e97",
     "src/geometry/triangle3.ts": "132a510e1e4f531e37f4bbf439919806159e0f402d2ee072aa723382cbcb2d20",
-    "src/geometry/triangle-topology.ts": "5759949482660522b5438ba2dccf1b657904012b92d06cfc2b81d021905b82f4"
+    "src/geometry/triangle-topology.ts": "5759949482660522b5438ba2dccf1b657904012b92d06cfc2b81d021905b82f4",
+    "src/geometry/triangle-intersection3.ts": "52870115744806b9c76b2af0a85c3622d31b7e6298839020c47cf4377b2da225"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -123,14 +124,17 @@
     "Cadloom.plane_segment_meets_iff",
     "Cadloom.triangle_plane_value",
     "Cadloom.triangle_plane_bounds",
-    "Cadloom.triangle_fan_area_vector"
+    "Cadloom.triangle_fan_area_vector",
+    "Cadloom.plane_lift_satisfies",
+    "Cadloom.plane_lift_unique"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
     "Source arithmetic extraction and its interpretation of Rational methods remain trusted.",
-    "Triangle topology welding, incidence/link diagnostics, shell traversal and boundary loops are tested and documented with hand invariants, not machine-verified."
+    "Triangle topology welding, incidence/link diagnostics, shell traversal and boundary loops are tested and documented with hand invariants, not machine-verified.",
+    "Triangle/triangle intersection candidate enumeration, convex hull construction and all-pairs embedding inspection are covered by independent tests and hand proofs, not whole-program machine verification."
   ]
 }
