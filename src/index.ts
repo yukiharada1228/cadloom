@@ -19,7 +19,12 @@ export { affine2, affineDeterminant, transformPoint, transformSegment, transform
 export type { Affine2 } from "./geometry/affine2.js";
 export { triangulatePolygon } from "./geometry/triangulate.js";
 export type { PolygonMesh } from "./geometry/triangulate.js";
-export { point3, inspectMesh } from "./geometry/mesh3.js";
-export type { Point3, TriangleIndices, TriangleMesh3, MeshInspection } from "./geometry/mesh3.js";
+export { inspectMesh } from "./geometry/mesh3.js";
+export type { TriangleIndices, TriangleMesh3, MeshInspection } from "./geometry/mesh3.js";
 export { extrudePolygon } from "./geometry/extrude.js";
 export type { ExtrudeOptions, ExtrudedMesh } from "./geometry/extrude.js";
+export { point3, vector3, segment3, pointsEqual3, subtract3, dot3, cross3 } from "./geometry/point3.js";
+export type { Point3, Vector3, Segment3 } from "./geometry/point3.js";
+export { orient3d } from "./geometry/orient3d.js";
+export { plane3, planeFromPoints, evaluatePlane3, classifyPointToPlane3, intersectSegmentPlane } from "./geometry/plane3.js";
+export type { Plane3, SegmentPlaneIntersection } from "./geometry/plane3.js";

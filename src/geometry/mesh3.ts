@@ -1,16 +1,13 @@
 import { Rational } from "../numeric/rational.js";
-import { point2 } from "./point2.js";
-import type { ExactInput } from "./point2.js";
+import { point3 } from "./point3.js";
+import type { Point3 } from "./point3.js";
+export { point3 } from "./point3.js";
+export type { Point3 } from "./point3.js";
 
-export interface Point3 { readonly x: Rational; readonly y: Rational; readonly z: Rational }
 export type TriangleIndices = readonly [number, number, number];
 export interface TriangleMesh3 {
   readonly vertices: readonly Point3[];
   readonly triangles: readonly TriangleIndices[];
-}
-export function point3(x: ExactInput, y: ExactInput, z: ExactInput = 0n): Point3 {
-  const xy = point2(x,y);
-  return Object.freeze({x:xy.x,y:xy.y,z:point2(z,0n).x});
 }
 
 function triple(a: Point3, b: Point3, c: Point3): Rational {

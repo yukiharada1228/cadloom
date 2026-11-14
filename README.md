@@ -242,3 +242,27 @@ open artifacts/extrusion.html
 ```
 
 穴のある板を回転・拡大縮小できる単独HTMLと、厳密なJSONを生成します。WebGL対応ブラウザーが必要です。表示だけ浮動小数点を使い、カーネルの座標・体積は有理数のままです。曲面・3D集合演算・商用CAD互換はまだ対象外です。
+
+## 厳密な3D向き判定と平面交差
+
+```ts
+import { point3, segment3, plane3, orient3d, intersectSegmentPlane } from "cadloom";
+const plane = plane3(1n, 1n, 1n, -1n); // x+y+z-1=0
+const result = intersectSegmentPlane(
+  segment3(point3(0n, 0n, 0n), point3(1n, 1n, 1n)), plane,
+);
+// {kind:"point", parameter:1/3, point:(1/3,1/3,1/3)} （各座標・パラメーターはRational）
+```
+
+`planeFromPoints(a,b,c)`は3点から平面を作り、重複・同一直線など法線が0になる入力は拒否します。`evaluatePlane3`は`normal·point+offset`、`classifyPointToPlane3`はその符号を返します。法線は単位化しないため、評価値は距離ではありません。
+
+`orient3d(a,b,c,d)`の規約は`((b-a)×(c-a))·(d-a)`の符号で、退化・同一平面では0です。ベクトルの`dot3`・`cross3`・`subtract3`も有理数で計算します。
+
+線分と平面の結果は`none`・`point`・`coplanar`です。端点接触と零長線分を扱い、平面上の非零長線分は共通部分全体を返します。返却点・線分は入力から独立した不変値です。
+
+```sh
+npm run build
+node examples/segment-plane-intersection.ts
+```
+
+[数学的仕様・証明・比較テスト](docs/proofs/plane3.md)を参照してください。これは3Dカーネルの基礎であり、BRepや3Dソリッド集合演算はまだ未実装です。
