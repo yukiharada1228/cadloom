@@ -640,9 +640,34 @@ face.locate(face.sample);            // inside（厳密な内部サンプル）
 
 両APIは`PreparedPlanarFace3`を返します。`boundary`は法線と整合する向きの3D境界、`normal`は非単位の厳密な法線、`topology`は1面のB-rep接続です。単独の面は境界を持つ開いた曲面なので、`topology.closed`はfalseで境界辺の診断があります。これは面の不正を意味しません。平面外の点は`locate`で`outside`になります。
 
-これらは指定した表現から平面の面を構築するAPIです。任意の既存B-repの面、円柱面の領域、面同士の交差・シェル全体の埋め込みや立体の妥当性はまだ検証しません。[領域と向きの根拠・検証範囲](docs/proofs/planar-face3.md)を参照してください。
+これらは指定した表現から平面の面を構築するAPIです。一定の軸方向上下限と円弧範囲を持つ円柱面は後述の`prepareCylinderFace3`で扱います。任意の既存B-repの面、一般の円柱面トリム、面同士の交差・シェル全体の埋め込みや立体の妥当性はまだ検証しません。[領域と向きの根拠・検証範囲](docs/proofs/planar-face3.md)を参照してください。
 
 ```sh
 npm run build
 node examples/planar-face3.ts
+```
+
+
+## 円柱面の領域・向き・位置判定
+
+`prepareCylinderFace3(cylinder, lower, upper, options)`は、有限の全周バンドまたは円弧範囲の円柱面を構築します。上下限は軸のパラメータの有理数で、単位長の軸に近似した距離ではありません。`options.angular`は軸の原点を中心とする参照円上の`CircularArc3`です。省略すると全周になります。`sense`は外向き（+1、既定）／内向き（-1）です。
+
+```ts
+const surface = cylinder3(
+  line3(point3(0n, 0n, 0n), vector3(1n, 1n, 1n)), 1n,
+);
+const face = prepareCylinderFace3(surface, 0n, '2/3');
+face.locate(face.sample); // inside
+face.normalAt(face.sample); // 厳密な非単位法線
+```
+
+全周の面は2つの円周境界を持つ環状面で、継ぎ目を境界に数えません。部分円柱は2円弧と2直線で閉じます。無理数の端点を持つ直線は`algebraicSegment3`で表し、`Curve3`の`algebraic-segment`として支持面への所属・反転・点の所属・B-rep接続に渡せます。
+
+`interiorPointOnArc3`は円弧内部の点を角度近似なしで求めます。代数的座標の平行移動・差には`translateAlgebraicPoint3`・`subtractAlgebraicPoints3`を使えます。円柱面の`locate`は無理数の高さの問い合わせにも対応し、`normalAt`は面の範囲外を拒否します。
+
+現在の領域は円弧と一定の軸方向上下限の積です。斜めの切断曲線や任意の穴を含む一般の円柱面トリム、任意の既存B-repの面、シェル全体の交差・埋め込み・立体の検証はまだ対象外です。[構成・向き・検証範囲](docs/proofs/cylinder-face3.md)を参照してください。
+
+```sh
+npm run build
+node examples/cylinder-face3.ts
 ```

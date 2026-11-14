@@ -119,5 +119,8 @@ The new Lean theorem verifies the strict squared-length equivalence. Domain
 noding, graph conditions, lifting, source provenance, location, witness search and
 TypeScript runtime behavior are not machine-verified as a complete program.
 General conic domains beyond the chart representation, automatic geometric
-validation of arbitrary existing BRep tables, cylindrical face domains, shell
+validation of arbitrary existing BRep tables, general cylindrical face trims, shell
 intersection/embedding/nesting and curved solid Booleans remain subsequent work.
+
+Cylinder bands/angular patches and their orientation/location are implemented in
+[cylinder-face3.md](cylinder-face3.md).
