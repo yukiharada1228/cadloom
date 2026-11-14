@@ -671,3 +671,30 @@ face.normalAt(face.sample); // 厳密な非単位法線
 npm run build
 node examples/cylinder-face3.ts
 ```
+
+
+## 閉じた解析的B-repの押し出し
+
+`extrudeCurveRegionBRep3(region, height, options)`は線分・円弧の2D領域を垂直に押し出し、平面・円柱面と厳密な共有辺を持つ閉じたB-repを構築します。円弧を三角形や弦へ近似しません。穴・離れた成分・穴の中の島に対応し、接点でつながる不正な境界は拒否します。
+
+```ts
+const region: CurveRegion2 = [[{
+  kind: 'arc', arc: fullCircleArc2(circle2(point2(0n, 0n), 1n)),
+}]];
+const solid = extrudeCurveRegionBRep3(region, 2n, { baseZ: '-1/2' });
+solid.locate(point3(0n, 0n, 0n)); // inside
+solid.topology.closedOrientedIncidence; // true
+```
+
+既定の塗り規則は`even-odd`で、`options.fillRule`に`nonzero`も指定できます。入力を正則化してから各連結領域を検証します。符号付き高さは`zMin`・`zMax`へ整理します。空の領域は面・シェル・内部サンプルを持たない空の立体になります。
+
+`faces`には各面の検証済み領域、`topology`には共有辺・コエッジ・面・シェル、`samples`には各成分の内部点を保持します。各面のローカル接続IDと、立体全体の共有IDは別です。円柱壁は円の極値などで複数面に分割される場合がありますが、円柱としての形状は厳密に保ちます。
+
+直線の側面には`prepareRectangleFace3`の代数的なトリム上下限を使います。`translateCurve3`は厳密な平行移動、`translatePlanarFace3`は同じモジュールのファクトリで構築した面の検証を保つ平行移動と向きの変更です。構造的にコピーしただけの面は検証済みとは見なさず拒否します。
+
+閉じた接続だけで立体を認定するのではなく、検証済み2D領域と高さ区間の直積として自己交差のない境界を構成します。任意の既存B-repの検証や一般の3D集合演算はまだ対象外です。円弧を含む一般の体積は代数的実数だけでは表せないため、近似体積は返しません。[構成の証明・共有辺・検証範囲](docs/proofs/extruded-brep3.md)を参照してください。
+
+```sh
+npm run build
+node examples/extruded-brep3.ts
+```

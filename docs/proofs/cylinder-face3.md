@@ -122,3 +122,7 @@ TypeScript verification. Algebraic operations, bisection, BRep incidence and the
 face constructor use documented arguments/tests. General cylinder trims, global
 shell intersection/embedding/nesting and curved solid Booleans remain subsequent
 kernel work; a valid individual face is not a complete solid certificate.
+
+Constructed planar and cylindrical domains are sewn into closed vertical product
+solids in [extruded-brep3.md](extruded-brep3.md), using a constructive embedding
+argument rather than a general shell-intersection validator.

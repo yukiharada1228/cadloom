@@ -80,3 +80,5 @@ B-repの共有辺・コエッジ・面・シェルと頂点リンクの接続検
 `Cadloom.strict_sum_squares_iff`は、非負の長さの厳密な三角不等式と平方値だけの判定の同値性を検証します。円形の穴の包含・分離に用います。[平面の面領域の構成と制限](../docs/proofs/planar-face3.md)のとおり、面構築全体の実行検証ではありません。
 
 `Cadloom.cylinder_tangent_axis_cross`は円柱の円周接線と軸方向の外積が外向き非単位法線になる恒等式を検証します。[円柱面の構成と検証範囲](../docs/proofs/cylinder-face3.md)のとおり、領域構築・二分探索・TypeScript全体の機械検証ではありません。
+
+解析的B-repの垂直押し出しは[直積による埋め込みの構成証明と独立テスト](../docs/proofs/extruded-brep3.md)で検証します。新たな全プログラムの機械検証や、任意のB-repの埋め込み検証は主張しません。既存のスコープ付きLean恒等式を引き続き確認します。

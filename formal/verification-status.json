@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "180d3a53af0f1b54922bf7a701feadc60959d723adcb306880b733ea401526e3",
+    "src/index.ts": "7787fa84928c74137d321b3305a793bb3ccb3a1fbe28aaee0ab8835bac1e3473",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -39,12 +39,13 @@
     "src/geometry/curve-boolean2.ts": "158d75129dd99ea56f005496effac4e52c8d81590e141955e55d67ae977ae5be",
     "src/geometry/algebraic-point3.ts": "a52286b22c44a27f4229ac53ec3c200b225795913176b865cdd39927aad4cbcd",
     "src/geometry/surface3.ts": "6481781cc6ec8b591145b2eb3d8e89a8cec25183afc9cf04426f8161c87b6c54",
-    "src/geometry/curve3.ts": "d97dca14c8028803556d731dbe779b0508aa23c0774ef43c0a2ea4898b96349b",
+    "src/geometry/curve3.ts": "7569f9476983b44ca4223f0c07e4b5e66fbec25ba0509b98d9f01e974c27363d",
     "src/geometry/circle3.ts": "44a5e98e12842c9e5cc1aaff737a4a0e6eb0b7b91cbe9d1e2d82834ae7d0722c",
     "src/geometry/brep-topology3.ts": "ecd43ac39ea9ee945a04600a1c9f728ef2dca4a378561f2157587929db48c86f",
-    "src/geometry/planar-face3.ts": "08f249bc9d5e83de880c63d957bef20dbf1fbe897c3dd5cec2310b013138bc15",
+    "src/geometry/planar-face3.ts": "7c096bc215e57ce3b147aef6edc372217c3756c68e8fbe064832d674533e52a2",
     "src/geometry/algebraic-segment3.ts": "d9f4028ff34ee949228eb095ef58fe12bd67ca6b3c2826f8771a5d5a003a93a1",
-    "src/geometry/cylinder-face3.ts": "db8458fb255f2ee49028b559ccfad88ae477616b2b51c10cb06e2e7aaf58e6b1"
+    "src/geometry/cylinder-face3.ts": "db8458fb255f2ee49028b559ccfad88ae477616b2b51c10cb06e2e7aaf58e6b1",
+    "src/geometry/extruded-brep3.ts": "37dc43aaa0109fce0a0131bc002426b8a433df0d5f095674d67d6d66ab989636"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -197,6 +198,7 @@
     "Spatial rational-center/normal circles, oriented arcs, line/plane/circle intersections, cyclic arc overlap/subdivision and whole-circle supporting-surface membership use construction arguments and independent tests, not whole-program machine verification. BRep face/shell certification and general conic intersections remain outside this layer.",
     "Explicit BRep coedge/loop/face/shell incidence, semantic algebraic endpoint welding and port-multigraph vertex links use documented graph invariants and independent tests, not machine-verified TypeScript execution. Closed oriented incidence does not certify face domains, geometric orientation, embedding, shell nesting or solid material.",
     "Embedded chart/circular planar face construction, boundary source/degree/winding checks, physical loop orientation, point location and dyadic interior witnesses use documented arguments and independent tests, not complete TypeScript machine verification. This does not validate arbitrary existing BRep tables, cylindrical face domains or global solid embedding.",
-    "Algebraic endpoint segments, correlated translation/subtraction, dyadic angular witnesses, embedded cylinder band/arc-product domains, exact location and oriented normals use documented arguments and independent tests, not full TypeScript machine verification. General cylinder trims and complete shell/solid certification remain outside this constructor."
+    "Algebraic endpoint segments, correlated translation/subtraction, dyadic angular witnesses, embedded cylinder band/arc-product domains, exact location and oriented normals use documented arguments and independent tests, not full TypeScript machine verification. General cylinder trims and complete shell/solid certification remain outside this constructor.",
+    "Algebraic rectangle faces, factory-owned planar face translation and analytic vertical extrusion BReps use documented product-embedding/orientation arguments and independent geometric/mesh oracles, not whole-program machine verification. Constructive extrusion certification does not validate arbitrary existing BRep tables or general surface intersections/3D Booleans."
   ]
 }

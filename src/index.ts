@@ -77,3 +77,7 @@ export type { AlgebraicSegment3 } from './geometry/algebraic-segment3.js';
 export { interiorPointOnArc3 } from './geometry/circle3.js';
 export { prepareCylinderFace3 } from './geometry/cylinder-face3.js';
 export type { CylinderFaceOptions3, PreparedCylinderFace3 } from './geometry/cylinder-face3.js';
+export { translateCurve3 } from './geometry/curve3.js';
+export { prepareRectangleFace3, translatePlanarFace3 } from './geometry/planar-face3.js';
+export { extrudeCurveRegionBRep3 } from './geometry/extruded-brep3.js';
+export type { ExtrudeBRepOptions3, ExtrudedBRepFace3, ExtrudedBRep3 } from './geometry/extruded-brep3.js';
