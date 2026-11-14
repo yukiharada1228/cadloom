@@ -1,14 +1,19 @@
 import {Rational} from '../numeric/rational.js';
+import {AlgebraicReal} from '../numeric/real-roots.js';
 import type {Sign} from '../numeric/rational.js';
 import {Polynomial} from '../numeric/polynomial.js';
 import type {Point3,Vector3} from './point3.js';
+import {point2} from './point2.js';
+import type {ExactInput} from './point2.js';
+import {algebraicCoordinates2,algebraicPoint2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {line3,classifyPointToSurface3} from './surface3.js';
-import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,translateAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
-import {planeFrame3,mapPlanePoint3,pointInPlaneFrame3,lineInterval3,planarArc3,reverseCurve3} from './curve3.js';
+import {planeFrame3,mapPlanePoint3,pointInPlaneFrame3,lineInterval3,planarArc3,reverseCurve3,translateCurve3} from './curve3.js';
+import {algebraicSegment3} from './algebraic-segment3.js';
 import type {PlaneFrame3,Curve3} from './curve3.js';
 import {circle3,circlePlane3,fullCircleArc3} from './circle3.js';
 import type {Circle3} from './circle3.js';
@@ -19,6 +24,7 @@ import type {BRepEdgeUse3,BRepTopology3} from './brep-topology3.js';
 
 export type PlanarFaceDomain3=
  | {readonly kind:'chart';readonly frame:PlaneFrame3;readonly region:CurveBooleanResult2}
+ | {readonly kind:'rectangle';readonly frame:PlaneFrame3;readonly uMin:AlgebraicReal;readonly uMax:AlgebraicReal;readonly vMin:AlgebraicReal;readonly vMax:AlgebraicReal}
  | {readonly kind:'circular';readonly outer:Circle3;readonly holes:readonly Circle3[]};
 /** Nonempty connected compact planar region with disjoint manifold boundary loops,
  * oriented relative to its support. Not a shell or embedded-solid certificate.
@@ -34,6 +40,7 @@ export interface PreparedPlanarFace3 {
   locate(point:Point3|AlgebraicCoordinates3):CurveRegionLocation2;
 }
 const zero=new Rational(0n),two=new Rational(2n),four=new Rational(4n);
+const ownedFaces=new WeakSet<PreparedPlanarFace3>();
 function assertSense(sense:1|-1):void {if(sense!==1&&sense!==-1)throw new RangeError('Face sense must be +1 or -1');}
 function assemble(domain:PlanarFaceDomain3,surface:Plane3,sense:1|-1,boundary:readonly (readonly Curve3[])[],sample:AlgebraicCoordinates3,locate:PreparedPlanarFace3['locate']):PreparedPlanarFace3 {
   const rings=Object.freeze(boundary.map(r=>Object.freeze([...r]))),edges:Curve3[]=[],loops:BRepEdgeUse3[][]=[];
@@ -41,7 +48,37 @@ function assemble(domain:PlanarFaceDomain3,surface:Plane3,sense:1|-1,boundary:re
   const topology=buildBRepTopology3(edges,[{surface:{kind:'plane',plane:surface},sense,loops}]);
   if(!topology.manifoldVertices)throw new Error('Certified planar domain has invalid boundary incidence');
   const n=surface.normal,normal=vector3(n.x.mul(new Rational(BigInt(sense))),n.y.mul(new Rational(BigInt(sense))),n.z.mul(new Rational(BigInt(sense))));
-  return Object.freeze({domain,surface,sense,normal,boundary:rings,topology,sample,locate});
+  const result=Object.freeze({domain,surface,sense,normal,boundary:rings,topology,sample,locate});
+  ownedFaces.add(result);return result;
+}
+/** Injective rational chart rectangle with exact algebraic coordinate bounds. */
+export function prepareRectangleFace3(inputFrame:PlaneFrame3,inputUMin:AlgebraicReal|ExactInput,inputUMax:AlgebraicReal|ExactInput,inputVMin:AlgebraicReal|ExactInput,inputVMax:AlgebraicReal|ExactInput,sense:1|-1=1):PreparedPlanarFace3 {
+  assertSense(sense);const frame=planeFrame3(inputFrame.origin,inputFrame.u,inputFrame.v),real=(x:AlgebraicReal|ExactInput)=>x instanceof AlgebraicReal?x:AlgebraicReal.fromRational(x),uMin=real(inputUMin),uMax=real(inputUMax),vMin=real(inputVMin),vMax=real(inputVMax);
+  if(uMin.compare(uMax)>=0||vMin.compare(vMax)>=0)throw new RangeError('Rectangle bounds must be strictly increasing');
+  const map=(u:AlgebraicReal,v:AlgebraicReal)=>mapPlanePoint3(frame,v.rational!==null?algebraicPoint2(point2(0n,v.rational),point2(1n,0n),u):u.rational!==null?algebraicPoint2(point2(u.rational,0n),point2(0n,1n),v):algebraicCoordinates2(u,v));
+  const points=[map(uMin,vMin),map(uMax,vMin),map(uMax,vMax),map(uMin,vMax)];
+  let boundary:Curve3[]=points.map((p,i)=>Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(p,points[(i+1)%4]!)}));
+  if(sense===-1)boundary=boundary.reverse().map(reverseCurve3);
+  const n=cross3(frame.u,frame.v),surface=plane3(n.x,n.y,n.z,dot3(n,frame.origin).neg()),sample=map(uMin.add(uMax).affine('1/2'),vMin.add(vMax).affine('1/2'));
+  const locate:PreparedPlanarFace3['locate']=p=>{
+    const local=pointInPlaneFrame3(frame,p);if(local===null)return 'outside';
+    const a=local.x.compare(uMin),b=local.x.compare(uMax),c=local.y.compare(vMin),d=local.y.compare(vMax);
+    return a<0||b>0||c<0||d>0?'outside':a===0||b===0||c===0||d===0?'boundary':'inside';
+  };
+  return assemble(Object.freeze({kind:'rectangle',frame,uMin,uMax,vMin,vMax}),surface,sense,[boundary],sample,locate);
+}
+/** Translates a factory-owned verified planar domain without re-noding its trims.
+ * Optional sense changes reverse the complete physical boundary orientation.
+ */
+export function translatePlanarFace3(input:PreparedPlanarFace3,translation:Vector3,sense:1|-1=input.sense):PreparedPlanarFace3 {
+  assertSense(sense);if(!ownedFaces.has(input))throw new RangeError('Face translation requires a factory-created planar face');
+  const v=vector3(translation.x,translation.y,translation.z),move=(p:Point3)=>point3(p.x.add(v.x),p.y.add(v.y),p.z.add(v.z)),domain=input.domain;
+  let next:PlanarFaceDomain3;
+  if(domain.kind==='circular')next=Object.freeze({kind:'circular',outer:circle3(move(domain.outer.center),domain.outer.normal,domain.outer.radiusSquared),holes:Object.freeze(domain.holes.map(c=>circle3(move(c.center),c.normal,c.radiusSquared)))});
+  else {const f=domain.frame,frame=planeFrame3(move(f.origin),f.u,f.v);next=domain.kind==='chart'?Object.freeze({kind:'chart',frame,region:domain.region}):Object.freeze({...domain,frame});}
+  let boundary=input.boundary.map(r=>r.map(c=>translateCurve3(c,v)));if(sense!==input.sense)boundary=boundary.map(r=>r.reverse().map(reverseCurve3));
+  const p=input.surface,surface=plane3(p.normal.x,p.normal.y,p.normal.z,p.offset.sub(dot3(p.normal,v))),sample=translateAlgebraicPoint3(input.sample,v),negative=vector3(v.x.neg(),v.y.neg(),v.z.neg());
+  return assemble(next,surface,sense,boundary,sample,point=>input.locate(translateAlgebraicPoint3(point,negative)));
 }
 function liftBoundary(frame:PlaneFrame3,curve:CurveBoundary2):Curve3 {
   if(curve.kind==='arc')return Object.freeze({kind:'planar-arc',arc:planarArc3(frame,curve.arc)});

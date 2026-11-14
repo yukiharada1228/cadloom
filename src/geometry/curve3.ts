@@ -7,11 +7,11 @@ import {algebraicCoordinates2,algebraicPoint2,snapshotExactPoint2,getPointParame
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3} from './point3.js';
 import type {Point3,Vector3} from './point3.js';
-import {algebraicCoordinates3,algebraicPoint3,compareAlgebraicPoints3,snapshotExactPoint3,getPointParameterization3} from './algebraic-point3.js';
+import {algebraicCoordinates3,algebraicPoint3,compareAlgebraicPoints3,snapshotExactPoint3,getPointParameterization3,translateAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {circularArc2,reverseCircularArc2,pointOnArc2} from './circular-arc2.js';
 import type {CircularArc2} from './circular-arc2.js';
-import {circularArc3,reverseCircularArc3,pointOnArc3,circlePlane3} from './circle3.js';
+import {circle3,circularArc3,reverseCircularArc3,pointOnArc3,circlePlane3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
 import {algebraicSegment3,pointOnAlgebraicSegment3,algebraicSegmentOnSurface3} from './algebraic-segment3.js';
 import type {AlgebraicSegment3} from './algebraic-segment3.js';
@@ -97,6 +97,15 @@ export function reverseCurve3(input:Curve3):Curve3 {
   if(c.kind==='line')return Object.freeze({kind:'line',interval:lineInterval3(c.interval.line,c.interval.endParameter,c.interval.startParameter)});
   if(c.kind==='circular-arc')return Object.freeze({kind:'circular-arc',arc:reverseCircularArc3(c.arc)});
   return Object.freeze({kind:'planar-arc',arc:planarArc3(c.arc.frame,reverseCircularArc2(c.arc.arc))});
+}
+/** Exact rational translation of bounded geometry, retaining traversal and seams. */
+export function translateCurve3(input:Curve3,translation:Vector3):Curve3 {
+  const c=snapshotCurve3(input),v=vector3(translation.x,translation.y,translation.z),move=(p:Point3)=>point3(p.x.add(v.x),p.y.add(v.y),p.z.add(v.z));
+  if(c.kind==='line')return Object.freeze({kind:'line',interval:lineInterval3(line3(move(c.interval.line.origin),c.interval.line.direction),c.interval.startParameter,c.interval.endParameter)});
+  if(c.kind==='algebraic-segment')return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(translateAlgebraicPoint3(c.segment.start,v),translateAlgebraicPoint3(c.segment.end,v))});
+  if(c.kind==='planar-arc')return Object.freeze({kind:'planar-arc',arc:planarArc3(planeFrame3(move(c.arc.frame.origin),c.arc.frame.u,c.arc.frame.v),c.arc.arc)});
+  const a=c.arc;
+  return Object.freeze({kind:'circular-arc',arc:circularArc3(circle3(move(a.circle.center),a.circle.normal,a.circle.radiusSquared),translateAlgebraicPoint3(a.start,v),translateAlgebraicPoint3(a.end,v),{direction:a.direction,fullCircle:a.fullCircle})});
 }
 export function pointOnCurve3(inputPoint:Point3|AlgebraicCoordinates3,input:Curve3):boolean {
   const curve=snapshotCurve3(input),p=snapshotExactPoint3(inputPoint);

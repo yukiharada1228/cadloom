@@ -124,3 +124,7 @@ intersection/embedding/nesting and curved solid Booleans remain subsequent work.
 
 Cylinder bands/angular patches and their orientation/location are implemented in
 [cylinder-face3.md](cylinder-face3.md).
+
+Algebraic chart rectangles and certificate-preserving translations are described
+in [extruded-brep3.md](extruded-brep3.md). These preserve constructed face domains
+without pretending to validate arbitrary existing BRep face tables.
