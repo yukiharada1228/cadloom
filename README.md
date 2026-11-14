@@ -620,3 +620,29 @@ const topology = buildBRepTopology3(edges, faces);
 npm run build
 node examples/brep-topology3.ts
 ```
+
+
+## 平面の面領域と境界の向き
+
+`preparePlanarFace3(frame, region, sense)`は、平面座標系と2Dの線分・円弧領域から、非空で内部が連結した平面の面を構築します。`sense`は座標系の`u×v`に対する法線の向き（+1／-1）です。入力の巻き数と向きを検査し、交差・接触・重複・相殺・内部の余分な辺・点だけの辺・非連結な領域を拒否します。境界を自動修復するAPIではありません。
+
+有理数の平面写像では表せない向きの空間円には、`prepareCircularFace3(outer, holes, sense)`を使えます。正の半径の外円板と、互いに接触・重複しない厳密に内部の円形の穴から面を構築します。
+
+```ts
+const center = point3(2n, 3n, 4n), normal = vector3(1n, 1n, 1n);
+const face = prepareCircularFace3(
+  circle3(center, normal, 4n), [circle3(center, normal, 1n)],
+);
+face.locate(center);                 // outside（穴の内部）
+face.locate(point3(3n, 2n, 4n));     // inside
+face.locate(face.sample);            // inside（厳密な内部サンプル）
+```
+
+両APIは`PreparedPlanarFace3`を返します。`boundary`は法線と整合する向きの3D境界、`normal`は非単位の厳密な法線、`topology`は1面のB-rep接続です。単独の面は境界を持つ開いた曲面なので、`topology.closed`はfalseで境界辺の診断があります。これは面の不正を意味しません。平面外の点は`locate`で`outside`になります。
+
+これらは指定した表現から平面の面を構築するAPIです。任意の既存B-repの面、円柱面の領域、面同士の交差・シェル全体の埋め込みや立体の妥当性はまだ検証しません。[領域と向きの根拠・検証範囲](docs/proofs/planar-face3.md)を参照してください。
+
+```sh
+npm run build
+node examples/planar-face3.ts
+```

@@ -76,3 +76,5 @@ Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choi
 空間円について`SurfaceGeometry.lean`に球への直線代入・二平面のGram連立式・円の基底の向きの3恒等式を追加しました。[空間円の構成と検証範囲](../docs/proofs/spatial-circles3.md)のとおり、円弧のセル列挙やTypeScript全体の機械検証ではありません。
 
 B-repの共有辺・コエッジ・面・シェルと頂点リンクの接続検査は、[グラフの不変条件と独立テスト](../docs/proofs/brep-topology3.md)で検証します。閉じた向き付き接続は、面の領域や幾何学的埋め込み、立体としての妥当性の証明ではありません。
+
+`Cadloom.strict_sum_squares_iff`は、非負の長さの厳密な三角不等式と平方値だけの判定の同値性を検証します。円形の穴の包含・分離に用います。[平面の面領域の構成と制限](../docs/proofs/planar-face3.md)のとおり、面構築全体の実行検証ではありません。

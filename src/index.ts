@@ -69,3 +69,5 @@ export { circle3, circleThroughPoints3, circlePlane3, pointOnCircle3, circlesCoi
 export type { Circle3, CirclePointInput3, LineCircleHit3, CirclePlaneIntersection3, CircleCircleIntersection3, ArcDirection3, CircularArcOptions3, CircularArc3, ArcPointLocation3, ArcIntersection3 } from './geometry/circle3.js';
 export { buildBRepTopology3 } from './geometry/brep-topology3.js';
 export type { BRepEdgeUse3, BRepFaceInput3, BRepEdge3, BRepCoedge3, BRepLoop3, BRepFace3, BRepVertexLink3, BRepShell3, BRepIssue3, BRepTopology3 } from './geometry/brep-topology3.js';
+export { preparePlanarFace3, prepareCircularFace3 } from './geometry/planar-face3.js';
+export type { PlanarFaceDomain3, PreparedPlanarFace3 } from './geometry/planar-face3.js';
