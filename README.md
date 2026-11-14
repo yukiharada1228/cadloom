@@ -1043,3 +1043,23 @@ edge.contains(point3('3/5', '4/5', 0n));
 npm run build
 node examples/nurbs-edge3.ts
 ```
+
+## NURBS曲面上の境界と3D曲線の対応
+
+`liftNurbsSurfaceBoundary3(surface, parameterCurve)`は、`x=u, y=v, z=0`のNURBS曲線を曲面へ厳密に写します。
+曲面ノットの全逆像で分割し、無理数の分割位置も代数的数として保持します。合成で次数が増えても近似しません。
+
+```ts
+const boundary = liftNurbsSurfaceBoundary3(surface, parameterCurve);
+const point = evaluateNurbsSurfaceBoundaryPiece3(boundary, 0, '1/3');
+const matches = nurbsSurfaceBoundaryMatchesCurve3(boundary, spatialCurve);
+```
+
+`matches`は同一パラメータでの全区間の一致を検査します。端点や形状の点集合が同じだけでは不十分です。
+不連続な継ぎ目の片側像を区別します。この段階では境界の単純性や面領域の成立は認定しません。
+[計算法と片側境界の意味](docs/proofs/nurbs-surface-boundary3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-surface-boundary3.ts
+```

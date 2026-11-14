@@ -144,3 +144,5 @@ export { analyzeNurbsCurve3 } from './geometry/nurbs-curve-analysis3.js';
 export type { NurbsStationary3, NurbsCurveJoin3, NurbsRepeatWitness3, NurbsCurveAnalysis3 } from './geometry/nurbs-curve-analysis3.js';
 export { prepareNurbsEdge3, reverseNurbsEdge3, buildNurbsBRepTopology3 } from './geometry/nurbs-edge3.js';
 export type { PreparedNurbsEdge3 } from './geometry/nurbs-edge3.js';
+export {liftNurbsSurfaceBoundary3,evaluateNurbsSurfaceBoundaryPiece3,nurbsSurfaceBoundaryMatchesCurve3} from './geometry/nurbs-surface-boundary3.js';
+export type {NurbsSurfaceBoundary3,NurbsSurfaceBoundaryPiece3} from './geometry/nurbs-surface-boundary3.js';
