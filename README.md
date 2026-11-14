@@ -761,3 +761,25 @@ split.sharedEdges;          // 両領域で同じ辺IDを逆向きに参照
 npm run build
 node examples/cylinder-plane-split3.ts
 ```
+
+## 再分割できる円柱トリム領域と連結成分
+
+`prepareTrimmedCylinder3(baseFace, halfspaces)`は有限の円柱面を複数の有理数の平面で切り取り、正則化した領域を構築します。`halfspaces`は`{ plane, side: -1 | 1 }`の配列です。`components`には連結した内部ごとのサンプル、境界辺参照、ループ、所属判定を持ちます。点や線だけが残る部分は2D領域として除きます。
+
+```ts
+const region = prepareTrimmedCylinder3(face, [
+  { plane: plane3(1n, 0n, 0n, '-1/2'), side: -1 },
+  { plane: plane3(-1n, 0n, 0n, '-1/2'), side: -1 },
+]); // 単位円柱なら2つの連結成分
+const component = extractTrimmedCylinderComponent3(region, 0);
+const split = splitTrimmedCylinderByPlane3(component, plane3(0n, 0n, 1n));
+```
+
+取り出した成分も分割後の`negative`・`positive`も、さらに分割できます。円周方向の区間と各角度で許される高さ範囲から連結成分を求めるため、境界ループの個数には依存しません。接点を共有する成分は内部を分けて保持します。1つの成分の境界が自己接触する場合は`loops: null`を返し、領域の所属判定と再分割は継続できます。
+
+再分割の`edges`・`negativeUses`・`positiveUses`・`sharedEdges`は共通の辺IDを持ちます。各成分のループが一意なら`topology`に成分ごとのB-rep接続を構築します。異なる成分が点で接する場合の非多様体性は接続診断で報告します。[連結性・再分割・検証範囲](docs/proofs/trimmed-cylinder3.md)を参照してください。
+
+```sh
+npm run build
+node examples/trimmed-cylinder3.ts
+```

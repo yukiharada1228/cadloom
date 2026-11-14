@@ -153,4 +153,12 @@ theorem cut_boundary_orientation {K : Type*} [CommRing K]
       -(tx*(Ny*nz-Nz*ny)+ty*(Nz*nx-Nx*nz)+tz*(Nx*ny-Ny*nx)) := by
   ring
 
+/-- A nonparallel halfspace supplies one strict upper fiber bound.
+The lower-bound case follows by negating the coefficient and plane. -/
+theorem positive_height_bound {K : Type*} [Field K] [LinearOrder K] [IsStrictOrderedRing K]
+    (a b t : K) (ha : 0 < a) :
+    a*t+b<0 ↔ t<(-b)/a := by
+  rw [lt_div_iff₀ ha]
+  constructor <;> intro h <;> nlinarith
+
 end Cadloom

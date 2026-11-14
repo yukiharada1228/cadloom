@@ -161,3 +161,5 @@ import SortedAdjacency
 #print axioms Cadloom.ellipse_elimination_identity
 
 #print axioms Cadloom.cut_boundary_orientation
+
+#print axioms Cadloom.positive_height_bound

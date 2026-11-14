@@ -126,8 +126,10 @@ irrational angular generators, shared-edge twins, closed loops, and explicit
 ambiguity at touching boundaries. Independent rational segment intersection
 fixtures and separate algebraic-coordinate cases check the segment helper.
 
-The output domains cannot yet be fed back as arbitrary trimmed-cylinder inputs
-for another split. Connected-component extraction, geometric germ pairing at
-singular contacts, arbitrary planar-face splitting, shell sewing and curved
-solid Boolean operations remain future work. Source hashes and these tests do
+Reusable rational-halfspace trimming and connected-component extraction are now
+available via [trimmed cylinder domains](trimmed-cylinder3.md). The side records
+of this older single-plane API are not themselves owned trimmed inputs; construct
+a trimmed domain from its base and selected halfspace. Geometric germ pairing
+at singular contacts within one component, arbitrary planar-face splitting, shell
+sewing and curved solid Boolean operations remain future work. Source hashes and these tests do
 not establish full TypeScript verification.
