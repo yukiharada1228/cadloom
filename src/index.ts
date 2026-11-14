@@ -112,3 +112,5 @@ export { sewBRepFaces3 } from './geometry/sew-brep3.js';
 export type { SewBRepFace3, SewBRepOptions3, SewnBRep3 } from './geometry/sew-brep3.js';
 export { clipCylinderBRep3 } from './geometry/clipped-cylinder-brep3.js';
 export type { ClippedCylinderFace3, ClippedCylinderBRep3 } from './geometry/clipped-cylinder-brep3.js';
+export { splitClippedCylinderByPlane3, rejoinClippedCylinderSplit3 } from './geometry/clipped-cylinder-split3.js';
+export type { CylinderSplitEdgeMap3, CylinderSplitInterface3, ClippedCylinderPlaneSplit3, RejoinedCylinderSplit3 } from './geometry/clipped-cylinder-split3.js';

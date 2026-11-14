@@ -185,4 +185,10 @@ theorem cylinder_radial_contraction {K : Type*} [CommRing K]
   unfold cylinderForm3
   ring
 
+/-- Weighted Cauchy identity for exact linear-functional extrema on an ellipse. -/
+theorem ellipse_support_identity {K : Type*} [CommRing K] (A B a b x y : K) :
+    (A*a^2+B*b^2)*(B*x^2+A*y^2)-A*B*(a*x+b*y)^2 =
+      (B*b*x-A*a*y)^2 := by
+  ring
+
 end Cadloom

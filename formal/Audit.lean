@@ -167,3 +167,5 @@ import SortedAdjacency
 #print axioms Cadloom.quadratic_roots_vieta
 
 #print axioms Cadloom.cylinder_radial_contraction
+
+#print axioms Cadloom.ellipse_support_identity

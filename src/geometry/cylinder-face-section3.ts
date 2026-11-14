@@ -3,7 +3,7 @@ import {AlgebraicReal} from '../numeric/real-roots.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {dot3} from './point3.js';
-import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3} from './algebraic-segment3.js';
 import {intersectAlgebraicSegmentPlane3} from './algebraic-segment-plane3.js';
@@ -51,7 +51,10 @@ export function intersectPlaneCylinderFace3(inputPlane:Plane3,inputFace:Prepared
         else if(cross.kind==='coplanar')contacts.push(cross.segment.start,cross.segment.end);
       }else throw new Error('Unexpected cylinder domain boundary representation');
     }
-    const cuts=contacts.filter((q,i,all)=>all.findIndex(r=>compareAlgebraicPoints3(q,r)===0)===i);
+    // Full-ellipse seams are not strict cell-interior witnesses when the only
+    // boundary contact is that seam. Extrema cuts keep every witness off it.
+    const e=hit.ellipse,ru=AlgebraicReal.fromRational(e.radiusUSquared).sqrt(),rv=AlgebraicReal.fromRational(e.radiusVSquared).sqrt(),extrema=[algebraicPoint3(e.frame.origin,e.frame.u,ru),algebraicPoint3(e.frame.origin,e.frame.u,ru.neg()),algebraicPoint3(e.frame.origin,e.frame.v,rv),algebraicPoint3(e.frame.origin,e.frame.v,rv.neg())];
+    const cuts=[...contacts,...extrema].filter((q,i,all)=>all.findIndex(r=>compareAlgebraicPoints3(q,r)===0)===i);
     for(const arc of splitEllipticArc3(fullEllipseArc3(hit.ellipse),cuts)){
       if(face.locate(interiorPointOnEllipticArc3(arc))!=='outside')curves.push({curve:{kind:'elliptic-arc',arc},multiplicity:1});
     }

@@ -33,3 +33,6 @@ test('generator touching a polygon corner is an isolated point and both face bou
  const diamondFrame=planeFrame3(O,vector3(0n,1n,1n),vector3(0n,1n,-1n)),diamond=prepareRectangleFace3(diamondFrame,0n,'1/2',0n,'1/2'),contact=intersectPlanarCylinderFaces3(diamond,wall);assert.equal(contact.curves.length,0);assert.equal(contact.points.length,1);assert.ok(covered(contact,point3(0n,1n,0n)));
  const rectangle=prepareRectangleFace3(f,'-1/2','1/2',-2n,2n),shortWall=prepareCylinderFace3(cylinder,0n,'1/4'),section=intersectPlanarCylinderFaces3(rectangle,shortWall);samples(section,x=>x.sign()>=0&&x.compare(new Rational(1n,4n))<=0);
 });
+test('a planar disk touching only the periodic section seam retains just the one contact',()=>{
+ const face=prepareCircularFace3(circle3(point3(0n,2n,0n),Z,1n)),r=intersectPlanarCylinderFaces3(face,wall);assert.equal(r.curves.length,0);assert.equal(r.points.length,1);assert.ok(covered(r,point3(0n,1n,0n)));
+});

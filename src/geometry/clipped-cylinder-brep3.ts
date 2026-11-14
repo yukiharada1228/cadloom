@@ -44,6 +44,9 @@ export interface ClippedCylinderBRep3 {
   /** Closed regularized convex solid; lower-dimensional-only results are empty. */
   locate(point:Point3|AlgebraicCoordinates3):CurveRegionLocation2;
 }
+const ownedSolids=new WeakSet<ClippedCylinderBRep3>();
+/** Internal ownership check for operations that preserve construction provenance. */
+export function assertOwnedClippedCylinder3(input:ClippedCylinderBRep3):void {if(!ownedSolids.has(input))throw new RangeError('Operation requires a factory-created clipped cylinder solid');}
 const axes=['x','y','z'] as const,one=new Rational(1n),two=new Rational(2n);
 function negate(p:Plane3):Plane3{return plane3(p.normal.x.neg(),p.normal.y.neg(),p.normal.z.neg(),p.offset.neg());}
 function normalize(p:Plane3):Plane3 {const q=plane3(p.normal.x,p.normal.y,p.normal.z,p.offset),pivot=axes.map(k=>q.normal[k]).find(x=>x.sign()!==0)!,s=one.div(pivot.sign()<0?pivot.neg():pivot);return plane3(q.normal.x.mul(s),q.normal.y.mul(s),q.normal.z.mul(s),q.offset.mul(s));}
@@ -118,5 +121,5 @@ export function clipCylinderBRep3(input:Cylinder3,inputLower:ExactInput,inputUpp
     if(empty)return 'outside';const p=snapshotExactPoint3(inputPoint),radial=classifyPointToSurface3(p,{kind:'cylinder',cylinder});if(radial>0)return 'outside';let boundary=radial===0;
     for(const plane of planes){const sign=evaluate(plane,p).sign();if(sign>0)return 'outside';if(sign===0)boundary=true;}return boundary?'boundary':'inside';
   };
-  return Object.freeze({cylinder,lower,upper,planes:Object.freeze(all),empty,faces:Object.freeze(faces),topology,sewing,interiorSample,locate});
+  const result=Object.freeze({cylinder,lower,upper,planes:Object.freeze(all),empty,faces:Object.freeze(faces),topology,sewing,interiorSample,locate});ownedSolids.add(result);return result;
 }
