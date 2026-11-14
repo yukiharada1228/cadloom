@@ -148,3 +148,5 @@ export {liftNurbsSurfaceBoundary3,evaluateNurbsSurfaceBoundaryPiece3,nurbsSurfac
 export type {NurbsSurfaceBoundary3,NurbsSurfaceBoundaryPiece3} from './geometry/nurbs-surface-boundary3.js';
 export {prepareNurbsParameterDomain2} from './geometry/nurbs-parameter-domain2.js';
 export type {PreparedNurbsParameterDomain2,NurbsDomainLocation2} from './geometry/nurbs-parameter-domain2.js';
+export {analyzeNurbsSurfaceRegularity3} from './geometry/nurbs-surface-regularity3.js';
+export type {NurbsSurfaceRegularity3,NurbsPatchRegularity3,NurbsSurfaceSingularPoint3,NurbsSurfaceSeam3} from './geometry/nurbs-surface-regularity3.js';

@@ -1083,3 +1083,24 @@ domain.sample; // 穴を避けた厳密な有理数の内部点 {u,v}
 npm run build
 node examples/nurbs-parameter-domain2.ts
 ```
+
+## NURBS曲面の特異点とパッチ境界
+
+`analyzeNurbsSurfaceRegularity3(surface)`は、各閉じたノット矩形で法線がゼロになるパラメータ集合を厳密に求めます。
+孤立点、暗黙的な曲線、パッチ全体の退化を区別し、無理数位置の特異点も保持します。
+
+```ts
+const report = analyzeNurbsSurfaceRegularity3(surface);
+report.patches; // 特異点、共有零点集合のグラフ、法線の多項式
+report.everyPatchRegular; // 各パッチの片側微分が境界も含めて非退化か
+report.continuous; // 全パッチ境界で位置が一致するか
+```
+
+位置の連続性は境界全体の恒等式で検査します。これらの結果だけでは、継ぎ目の滑らかさ、曲面の単射性、
+トリム面・立体の成立を認定しません。特異点はトリム前の全矩形に対する結果です。
+[微分・零点集合・検証範囲](docs/proofs/nurbs-surface-regularity3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-surface-regularity3.ts
+```

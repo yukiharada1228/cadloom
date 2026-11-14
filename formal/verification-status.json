@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "5b84b6f64f05bcd3d0e088fafcac0e1b1502d61ebcd3492c01a8874a8131262a",
+    "src/index.ts": "9f77fb5530e7e666230f9a462dca90b303c34ee4040ec42dbd1d8f7d470910e0",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -72,7 +72,8 @@
     "src/geometry/nurbs-curve-analysis3.ts": "0b5a12627ba62d849adb6d52a64fc133c5adfdfddd063e941b6844eff1af651d",
     "src/geometry/nurbs-edge3.ts": "46c1e85d8b7e562d02eef6be2097abfde8fde2d2d7d9d2544dab51627fef0c24",
     "src/geometry/nurbs-surface-boundary3.ts": "7e5d4212487fc4c18d3e8fcc391137851faaae310003a48669d552117ecc8aaf",
-    "src/geometry/nurbs-parameter-domain2.ts": "c33315979b6b7737126e57734e8d1ab41bf7b9e332e1483417fd145312f63045"
+    "src/geometry/nurbs-parameter-domain2.ts": "c33315979b6b7737126e57734e8d1ab41bf7b9e332e1483417fd145312f63045",
+    "src/geometry/nurbs-surface-regularity3.ts": "2dded158203d57f9a38a5105fccf8c6275493355d7dd0517490b8dd6d32fa111"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -252,6 +253,7 @@
     "Multiple bivariate constraints and closed-span spatial NURBS curve intersections, including shared-factor parameter relation graphs, constant curves, self-intersection events and one-sided discontinuities use documented induction/denominator arguments and independent analytic/source-evaluation tests. TypeScript execution is not formally verified; global spatial topology, chart welding, contact multiplicity and BRep integration remain outside scope.",
     "Exact NURBS continuity, stationary-jet parity, root-isolated strict-monotonicity certificates, diagonal-removed simplicity checks, rational-function point membership and whole plane/cylinder support use documented arguments and independent geometric fixtures. Prepared NURBS edges share the native incidence engine through a typed geometry bridge. This is not machine-verified TypeScript or a face/solid embedding certificate; inter-edge noding, NURBS face supports, geometric face orientation and mixed-family sewing remain outside scope.",
     "Exact NURBS curve-on-surface composition, complete surface-knot preimage partitioning, algebraic interval cuts and same-parameter whole-curve correspondence use documented arguments and independent fixtures, not new machine-verified TypeScript proofs. Closed one-sided images retain discontinuities; this does not certify boundary simplicity, trimmed face domains, surface embedding or solid validity.",
-    "Oriented NURBS parameter-domain Jordan boundary validation, exact algebraic ray winding, hole containment and dyadic strict material witnesses use documented arguments and independent location oracles, not machine verification of TypeScript. This certifies parameter-space domains only, not surface embedding, seam quotients, trimmed spatial faces or solids."
+    "Oriented NURBS parameter-domain Jordan boundary validation, exact algebraic ray winding, hole containment and dyadic strict material witnesses use documented arguments and independent location oracles, not machine verification of TypeScript. This certifies parameter-space domains only, not surface embedding, seam quotients, trimmed spatial faces or solids.",
+    "Complete one-sided NURBS patch normal-zero loci, isolated singular point lifting and whole-seam positional identities use documented arguments and independent differential fixtures, not machine verification of TypeScript. Patchwise regularity and positional continuity do not certify C1/G1 seams, global injectivity, trim-restricted regularity, face embedding or solid validity."
   ]
 }
