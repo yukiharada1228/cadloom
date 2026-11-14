@@ -1104,3 +1104,24 @@ report.continuous; // 全パッチ境界で位置が一致するか
 npm run build
 node examples/nurbs-surface-regularity3.ts
 ```
+
+## トリム領域内の特異点集合
+
+`analyzeNurbsTrimRegularity3(surface, domain)`は、検証済みパラメータ領域と各パッチの特異点集合の共通部分を求めます。
+外周と穴の境界で特異曲線を分割し、穴の内部を除きます。接する一点や境界と重なる区間も保持します。
+
+```ts
+const report = analyzeNurbsTrimRegularity3(surface, domain);
+report.regular; // 領域内の全ての片側パッチで微分が退化しないか
+report.patches; // 残った点、暗黙曲線の部分区間、全退化パッチとの共通領域
+const event = evaluateNurbsTrimSingularEdge3(report, 0, 0, '1/3');
+```
+
+全退化パッチとの共通部分は`region={domain,patch}`の厳密な条件として保持し、次元や連結成分数は推定しません。
+`regular`は位置の連続性や面の単射性を意味しません。ノット境界では接する全パッチの片側微分を対象とします。
+[境界分割・完全性・検証範囲](docs/proofs/nurbs-trim-regularity3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-trim-regularity3.ts
+```

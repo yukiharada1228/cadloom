@@ -150,3 +150,5 @@ export {prepareNurbsParameterDomain2} from './geometry/nurbs-parameter-domain2.j
 export type {PreparedNurbsParameterDomain2,NurbsDomainLocation2} from './geometry/nurbs-parameter-domain2.js';
 export {analyzeNurbsSurfaceRegularity3} from './geometry/nurbs-surface-regularity3.js';
 export type {NurbsSurfaceRegularity3,NurbsPatchRegularity3,NurbsSurfaceSingularPoint3,NurbsSurfaceSeam3} from './geometry/nurbs-surface-regularity3.js';
+export {analyzeNurbsTrimRegularity3,evaluateNurbsTrimSingularEdge3} from './geometry/nurbs-trim-regularity3.js';
+export type {NurbsTrimRegularity3,NurbsTrimPatchRegularity3,NurbsTrimSingularEdge3} from './geometry/nurbs-trim-regularity3.js';
