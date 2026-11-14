@@ -54,3 +54,19 @@ export function intersectSegmentPlane(segment: Segment3, plane: Plane3): Segment
   return Object.freeze({kind:"point",parameter,
     point:point3(interpolate(a.x,b.x),interpolate(a.y,b.y),interpolate(a.z,b.z))});
 }
+
+export type PlanePlaneIntersection3=
+ | {readonly kind:'none'}
+ | {readonly kind:'coincident';readonly plane:Plane3}
+ | {readonly kind:'line';readonly line:import('./surface3.js').Line3};
+/** Complete rational supporting-plane intersection; normal sign/scale is immaterial. */
+export function intersectPlanes3(inputA:Plane3,inputB:Plane3):PlanePlaneIntersection3 {
+  const a=plane3(inputA.normal.x,inputA.normal.y,inputA.normal.z,inputA.offset),b=plane3(inputB.normal.x,inputB.normal.y,inputB.normal.z,inputB.offset),d=cross3(a.normal,b.normal);
+  if(dot3(d,d).sign()===0){
+    const k=(['x','y','z'] as const).find(k=>a.normal[k].sign()!==0)!,scale=b.normal[k].div(a.normal[k]);
+    return a.offset.mul(scale).equals(b.offset)?Object.freeze({kind:'coincident',plane:a}):Object.freeze({kind:'none'});
+  }
+  const A=dot3(a.normal,a.normal),B=dot3(b.normal,b.normal),C=dot3(a.normal,b.normal),det=A.mul(B).sub(C.mul(C)),k=a.offset.neg(),l=b.offset.neg(),alpha=k.mul(B).sub(l.mul(C)).div(det),beta=l.mul(A).sub(k.mul(C)).div(det);
+  const component=(key:'x'|'y'|'z')=>a.normal[key].mul(alpha).add(b.normal[key].mul(beta));
+  const line=Object.freeze({origin:point3(component('x'),component('y'),component('z')),direction:d});return Object.freeze({kind:'line',line});
+}

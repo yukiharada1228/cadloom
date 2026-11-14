@@ -154,3 +154,6 @@ import SortedAdjacency
 #print axioms Cadloom.strict_sum_squares_iff
 
 #print axioms Cadloom.cylinder_tangent_axis_cross
+
+#print axioms Cadloom.line_ellipse_polynomial
+#print axioms Cadloom.cylinder_section_gram

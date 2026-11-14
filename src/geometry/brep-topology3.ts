@@ -80,7 +80,7 @@ function snapshotSurface(surface:Surface3):Surface3 {
 export function buildBRepTopology3(inputEdges:readonly Curve3[],inputFaces:readonly BRepFaceInput3[]):BRepTopology3 {
   const curves=inputEdges.map(snapshotCurve3),ends=curves.map(curveEndpoints3);
   curves.forEach((curve,i)=>{
-    const periodic=curve.kind==='circular-arc'?curve.arc.fullCircle:curve.kind==='planar-arc'&&curve.arc.arc.fullCircle;
+    const periodic=curve.kind==='circular-arc'?curve.arc.fullCircle:curve.kind==='elliptic-arc'?curve.arc.fullEllipse:curve.kind==='planar-arc'&&curve.arc.arc.fullCircle;
     if(!periodic&&compareAlgebraicPoints3(ends[i]![0],ends[i]![1])===0)throw new RangeError('BRep edge must have positive extent; periodic circles are allowed');
   });
   const records=ends.flatMap((points,e)=>points.map((point,end)=>({point,port:2*e+end}))).sort((a,b)=>compareAlgebraicPoints3(a.point,b.point)||a.port-b.port);
