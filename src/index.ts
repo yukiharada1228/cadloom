@@ -49,3 +49,7 @@ export type { Circle2, Line2, LineCircleHit2, CircleCircleIntersection2 } from '
 export { polynomialResultant } from './numeric/resultant.js';
 export { circularArc2, fullCircleArc2, reverseCircularArc2, comparePointsAroundCircle2, locatePointOnArc2, pointOnArc2, comparePointsOnArc2, splitCircularArc2, intersectLineArc2, intersectSegmentArc2, intersectArcs2 } from './geometry/circular-arc2.js';
 export type { ArcDirection2, CircularPointInput2, CircularArcOptions2, CircularArc2, ArcPointLocation2, ArcIntersection2 } from './geometry/circular-arc2.js';
+export { lineInterval2, pointOnLineInterval2, intersectLineIntervals2, intersectLineIntervalArc2 } from './geometry/line-interval2.js';
+export type { LineInterval2, LineIntervalIntersection2 } from './geometry/line-interval2.js';
+export { splitCurves2 } from './geometry/split-curves2.js';
+export type { PlanarCurve2, CurveVertex2, CurveUse2, CurveEdge2, CurveArrangement2 } from './geometry/split-curves2.js';

@@ -46,4 +46,10 @@ theorem circle_same_x_half_unique {K : Type*} [Field K] [LinearOrder K] [IsStric
   · linarith
   · rcases hh with ⟨ha,hb⟩ | ⟨ha,hb⟩ <;> linarith
 
+/-- A nonvertical rational line can use its x coordinate as an exact parameter. -/
+theorem canonical_line_frame {K : Type*} [Field K] (ox oy dx dy t : K) (h : dx ≠ 0) :
+    oy-dy*ox/dx+(ox+t*dx)*(dy/dx)=oy+t*dy := by
+  field_simp
+  ring
+
 end Cadloom
