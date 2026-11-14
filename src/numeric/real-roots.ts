@@ -101,6 +101,18 @@ export class AlgebraicReal {
     return value===this.polynomial.evaluate(this.lower).sign()?
       new AlgebraicReal(this.polynomial,mid,this.upper):new AlgebraicReal(this.polynomial,this.lower,mid);
   }
+  /** Exact rational affine image scale*this + offset, including zero/negative scale. */
+  affine(scaleInput:ExactInput,offsetInput:ExactInput=0n):AlgebraicReal {
+    const scale=exactRational(scaleInput),offset=exactRational(offsetInput);
+    if(scale.sign()===0)return AlgebraicReal.fromRational(offset);
+    const map=(x:Rational)=>scale.mul(x).add(offset);
+    if(this.rational!==null)return AlgebraicReal.fromRational(map(this.rational));
+    const substitute=new Polynomial([offset.neg().div(scale),new Rational(1n).div(scale)]);
+    let polynomial=new Polynomial();
+    for(let i=this.polynomial.degree;i>=0;i--)polynomial=polynomial.mul(substitute).add(new Polynomial([this.polynomial.coefficients[i]!]));
+    const a=map(this.lower),b=map(this.upper);
+    return scale.sign()>0?new AlgebraicReal(polynomial.monic(),a,b):new AlgebraicReal(polynomial.monic(),b,a);
+  }
   /** Exact sign of another polynomial evaluated at this root, including equality. */
   signOf(input:Polynomial):Sign {
     const reduced=input.divRem(this.polynomial).remainder;

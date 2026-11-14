@@ -1,6 +1,6 @@
 name = "cadloomProofs"
 version = "0.1.0"
-defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership", "IntersectionBranches", "CollinearOverlap", "PairLoop", "CutCompleteness", "SortedAdjacency", "FaceSampling", "AffineGeometry", "PrismVolume", "PlaneGeometry", "TriangleGeometry", "CoplanarProjection"]
+defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership", "IntersectionBranches", "CollinearOverlap", "PairLoop", "CutCompleteness", "SortedAdjacency", "FaceSampling", "AffineGeometry", "PrismVolume", "PlaneGeometry", "TriangleGeometry", "CoplanarProjection", "CircleGeometry"]
 
 [[require]]
 name = "mathlib"
@@ -48,3 +48,6 @@ name = "TriangleGeometry"
 
 [[lean_lib]]
 name = "CoplanarProjection"
+
+[[lean_lib]]
+name = "CircleGeometry"

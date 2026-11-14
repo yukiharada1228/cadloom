@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "9266d3da5206ecb9904a385c72dd08e9d87ee6ce61ceea42b42f9ac233e73839",
+    "src/index.ts": "3bd2c007da29f842f54676962a84803e5e96e8ebbaf3ffb61d8d154cc7318908",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -27,7 +27,9 @@
     "src/geometry/surface-location3.ts": "367745afeff743741bfa3851d54455723bdff32f4dd1271744bba8d4ac1e0094",
     "src/geometry/solid-boolean3.ts": "2354a04904c94c4003bfb6621659666ec5cc9fcc543f84bca447507d0454b2f1",
     "src/numeric/polynomial.ts": "54a4d89dff48a4ebd4e2825cd80532616a433cb7c010dd5635c83ab7dbb51650",
-    "src/numeric/real-roots.ts": "fe5d2701e2a83c661a9e5e8a19326b58f802f36c07ecb307b60f55095e1c4106"
+    "src/numeric/real-roots.ts": "0953a2c957c24843c05cf84db7afe1690558f7d8f2a4309d96aab8516f56958e",
+    "src/geometry/algebraic-point2.ts": "103388c72a88662fe3834c0bf4b2db900de748b3a304984d01a85c7f8aa2ffce",
+    "src/geometry/circle2.ts": "74e480c0f1f49f4489c923969a3ace8275f42e0df77161a3a62f1559494d9005"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -134,10 +136,14 @@
     "Cadloom.plane_lift_satisfies",
     "Cadloom.plane_lift_unique",
     "Cadloom.cached_edge_halfplane",
-    "Cadloom.ray_parameter_rescale"
+    "Cadloom.ray_parameter_rescale",
+    "Cadloom.line_circle_polynomial",
+    "Cadloom.circle_equation_difference",
+    "Cadloom.radical_axis_circle_iff",
+    "Cadloom.circumcenter_linear_equations"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
@@ -148,6 +154,7 @@
     "Incremental triangle/plane arrangement clipping and strict interior witnesses are tested with independent halfplane enumeration and documented inductive invariants, not machine-verified.",
     "Polyhedral Boolean plane grouping, coverage, two-sided sampling, boundary sewing, contact complexes and result provenance use documented construction arguments and independent tests, not whole-program machine verification.",
     "Solid locator plane grouping, cached data structures and strict coordinate-bound rejection are justified by arithmetic lemmas, geometric arguments and independent tests; the full cached query execution is not machine-verified.",
-    "Rational polynomial arithmetic, square-free reduction, Sturm counting/isolation and algebraic root predicates are documented and checked with independent integer/factor/CAS oracles, not machine-verified."
+    "Rational polynomial arithmetic, square-free reduction, Sturm counting/isolation and algebraic root predicates are documented and checked with independent integer/factor/CAS oracles, not machine-verified.",
+    "Algebraic root affine composition, correlated algebraic point construction, line/segment/circle intersections and circle predicates are tested with independent integer oracles and documented reductions; complete TypeScript execution is not machine-verified."
   ]
 }

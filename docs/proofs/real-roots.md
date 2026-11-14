@@ -24,7 +24,8 @@ can represent the same real number. `compare` gives exact value order/equality,
 not structural equality. `refine` returns a new certificate or the same exact
 rational point, preserving immutable inputs. `AlgebraicReal.fromRational` creates
 an exact rational point directly. The `rational` getter is null for interval
-certificates; null **does not prove irrationality**. General rational-root detection,
+certificates; null **does not prove irrationality**. Rational affine images are available through `affine(scale,offset)`, using exact
+polynomial substitution and mapped isolating intervals. General rational-root detection,
 root multiplicities, algebraic addition/multiplication/inversion and curve topology
 are not provided in this first representation.
 
@@ -132,4 +133,5 @@ source hashes record a reviewed baseline rather than proving semantic equivalenc
 Naive rational remainders can grow substantially, high degrees or very close roots
 can require expensive refinement, and no industrial complexity/performance claim
 is made. This layer describes finite real algebraic roots, not arbitrary exact
-transcendental values, and does not yet compute curved CAD intersections.
+transcendental values. This numerical layer does not itself construct curve
+intersections; the [circle API](circle-intersections.md) builds on it.

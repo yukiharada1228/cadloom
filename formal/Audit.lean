@@ -1,3 +1,4 @@
+import CircleGeometry
 import CoplanarProjection
 import TriangleGeometry
 import PlaneGeometry
@@ -125,3 +126,8 @@ import SortedAdjacency
 
 #print axioms Cadloom.cached_edge_halfplane
 #print axioms Cadloom.ray_parameter_rescale
+
+#print axioms Cadloom.line_circle_polynomial
+#print axioms Cadloom.circle_equation_difference
+#print axioms Cadloom.radical_axis_circle_iff
+#print axioms Cadloom.circumcenter_linear_equations

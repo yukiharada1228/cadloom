@@ -124,3 +124,11 @@ test('rational algebraic points are exact, frozen and stable under refinement',(
  assert.equal(value.compare(rational('7/3')),0);assert.equal(value.signOf(new Polynomial([-7n,3n])),0);
  assert.equal(value.signOf(new Polynomial([2n,1n])),1);
 });
+test('exact rational affine images preserve root identity, order and inverse images',()=>{
+ const sqrt2=isolateRealRoots(new Polynomial([-2n,0n,1n]))[1]!;
+ const image=sqrt2.affine(-2n,3n),expected=isolateRealRoots(new Polynomial([1n,-6n,1n]))[0]!;
+ assert.equal(image.compare(expected),0);certify(image);
+ assert.equal(image.affine('-1/2','3/2').compare(sqrt2),0);
+ assert.equal(sqrt2.affine(0n,'7/3').compare(AlgebraicReal.fromRational('7/3')),0);
+ assert.equal(AlgebraicReal.fromRational('2/3').affine(3n,-1n).rational!.toString(),'1');
+});
