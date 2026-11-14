@@ -783,3 +783,25 @@ const split = splitTrimmedCylinderByPlane3(component, plane3(0n, 0n, 1n));
 npm run build
 node examples/trimmed-cylinder3.ts
 ```
+
+## 平面トリム領域の分割と楕円の面
+
+`prepareEllipseFace3(ellipse, sense)`は楕円を塗りつぶした平面の面を構築します。`prepareTrimmedPlanar3(baseFace, halfspaces)`は、既存の長方形・円形と穴・線分と円弧のチャート領域・楕円の面を有理数の平面で切り取り、連結した内部ごとに`components`へ分けます。凹部や穴を含む面も対象です。
+
+```ts
+const region = prepareTrimmedPlanar3(face, [
+  { plane: plane3(1n, 0n, 0n), side: -1 },
+]);
+const split = splitTrimmedPlanarByPlane3(region, plane3(0n, 1n, 0n));
+if (split.kind === 'split') {
+  split.negative.components;
+  split.sharedEdges; // 両側で同じ辺IDを逆向きに使う
+}
+```
+
+両方の子領域をさらに分割できます。切断面が元の平面全体と一致する場合は`kind: 'coplanar'`を返します。点や線だけが残る部分は正則化して除き、成分の境界が点で接する場合は接続診断へ保持します。任意の曲線領域による追加の切り取りや、円柱壁と平面の面を縫い合わせる処理は今後の開発です。[構成・連結性・検証範囲](docs/proofs/trimmed-planar3.md)を参照してください。
+
+```sh
+npm run build
+node examples/trimmed-planar3.ts
+```

@@ -18,7 +18,7 @@ import type {CylinderFaceSection3} from './cylinder-face-section3.js';
 
 const axes=['x','y','z'] as const;
 const same=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>compareAlgebraicPoints3(p,q)===0;
-function support(c:Curve3):Ellipse3|null {
+export function support(c:Curve3):Ellipse3|null {
   if(c.kind==='elliptic-arc')return c.arc.ellipse;
   if(c.kind==='planar-arc'){
     const f=c.arc.frame,C=c.arc.arc.circle.center,r=c.arc.arc.circle.radiusSquared;
@@ -36,7 +36,7 @@ function ellipseBoundary(e:Ellipse3,b:Curve3):readonly AlgebraicCoordinates3[] {
   const hit=intersectEllipses3(e,support(b)!);
   return hit.kind==='points'?hit.points.filter(p=>pointOnCurve3(p,b)):hit.kind==='coincident'?curveEndpoints3(b):[];
 }
-function segmentCross(a:AlgebraicSegment3,b:AlgebraicSegment3):readonly AlgebraicCoordinates3[] {
+export function segmentCross(a:AlgebraicSegment3,b:AlgebraicSegment3):readonly AlgebraicCoordinates3[] {
   const A=subtractAlgebraicPoints3(a.end,a.start),B=subtractAlgebraicPoints3(b.end,b.start),q=subtractAlgebraicPoints3(b.start,a.start),pairs=[['x','y'],['y','z'],['z','x']] as const;
   for(const [i,j] of pairs){
     const det=A[i].mul(B[j]).sub(A[j].mul(B[i]));if(det.sign()===0)continue;

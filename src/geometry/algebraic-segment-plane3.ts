@@ -1,6 +1,7 @@
 import {Rational} from '../numeric/rational.js';
+import {Polynomial} from '../numeric/polynomial.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
-import {point3,vector3,dot3} from './point3.js';
+import {point3,vector3,dot3,pointsEqual3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {algebraicPoint3,algebraicCoordinates3,compareAlgebraicPoints3,getPointParameterization3,subtractAlgebraicPoints3} from './algebraic-point3.js';
@@ -27,6 +28,12 @@ export function intersectAlgebraicSegmentPlane3(input:AlgebraicSegment3,inputPla
   if(A===0)return Object.freeze({kind:'point',point:s.start,parameter:AlgebraicReal.fromRational(0n)});
   if(B===0)return Object.freeze({kind:'point',point:s.end,parameter:AlgebraicReal.fromRational(1n)});
   if(A===B)return Object.freeze({kind:'none'});
+  const left=getPointParameterization3(s.start),right=getPointParameterization3(s.end);
+  if(left&&right&&pointsEqual3(left.origin,right.origin)&&pointsEqual3(left.direction,right.direction)&&dot3(left.direction,left.direction).sign()!==0){
+    const slope=dot3(plane.normal,left.direction),parameterOnSupport=dot3(plane.normal,left.origin).add(plane.offset).neg().div(slope),source=AlgebraicReal.fromRational(parameterOnSupport),common=left.parameter.polynomial;
+    const conjugates=common.degree===2&&common.equals(right.parameter.polynomial)&&left.parameter.compare(right.parameter)!==0,sum=conjugates?common.coefficient(1).neg().div(common.coefficient(2)):null,parameter=sum!==null?left.parameter.rationalFunction(new Polynomial([parameterOnSupport,-1n]),new Polynomial([sum,-2n])):source.sub(left.parameter).div(right.parameter.sub(left.parameter));
+    return Object.freeze({kind:'point',parameter,point:algebraicPoint3(left.origin,left.direction,source)});
+  }
   const axes=['x','y','z'] as const,difference=subtractAlgebraicPoints3(s.end,s.start),data=getPointParameterization3(s.start);
   if(axes.every(k=>difference[k].rational!==null)){
     const d=vector3(difference.x.rational!,difference.y.rational!,difference.z.rational!),slope=dot3(plane.normal,d);
