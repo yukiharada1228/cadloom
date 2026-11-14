@@ -1,3 +1,4 @@
+import AffineGeometry
 import FaceSampling
 import Cadloom
 import SourceArithmetic
@@ -95,3 +96,8 @@ import SortedAdjacency
 #print axioms Cadloom.shortenStep_positive
 #print axioms Cadloom.shortenStep_before_hit
 #print axioms Cadloom.shortenStep_preserves_bound
+
+#print axioms Cadloom.affine_cross_scaled
+#print axioms Cadloom.affine_lerp
+#print axioms Cadloom.affine_inverse_left
+#print axioms Cadloom.affine_segment_iff
