@@ -85,8 +85,10 @@ Tests compare against raw integer quadratic/discriminant oracles, independent
 affine images of circles, cyclic-index arc models, surface membership,
 rescaling invariance and arbitrarily close parallel/tangent fixtures.
 
-This layer intersects supporting surfaces. It does not clip intersection
-curves to bounded faces, intersect arbitrary ellipses/conics, construct general
-elliptically trimmed face domains, or implement curved BRep Boolean operations.
+The supporting-surface API itself does not clip to bounded faces.
+Ellipse/ellipse intersection and finite planar/cylindrical face clipping are
+now supplied by the APIs documented in [bounded face intersections](planar-cylinder-intersection3.md).
+General non-elliptic conic intersections, elliptically trimmed face construction
+and curved BRep Boolean operations remain future work.
 The mathematical arguments above, source inventory hashes, tests and selected
 Lean identities do not verify the complete TypeScript or ECMAScript execution.

@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "513df3345e269656eddfacd4ae236bc4b08f9b86cf2f2478528e9368b60c1529",
+    "src/index.ts": "e17309a165fe5ee9b2200b471ea2629dbceccdfb5868b85352fb57417fcae5ea",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -27,7 +27,7 @@
     "src/geometry/surface-location3.ts": "367745afeff743741bfa3851d54455723bdff32f4dd1271744bba8d4ac1e0094",
     "src/geometry/solid-boolean3.ts": "2354a04904c94c4003bfb6621659666ec5cc9fcc543f84bca447507d0454b2f1",
     "src/numeric/polynomial.ts": "54a4d89dff48a4ebd4e2825cd80532616a433cb7c010dd5635c83ab7dbb51650",
-    "src/numeric/real-roots.ts": "4ccedb02aefab2dcc6566402307cde705f2bf6c77b3eb93724ae62e4dc854bd3",
+    "src/numeric/real-roots.ts": "08d077b194c44f2b7cdaf12f850504e820ca048271388692394f9b16cfa9b347",
     "src/geometry/algebraic-point2.ts": "f26fc55bd108af49edd944dad81cb8478bdd06826a4b1b7503f99885a1704dec",
     "src/geometry/circle2.ts": "29443ea2c7508f0011a8c1c37926b61bca7453fc853c519d7e4700bdcdf473b4",
     "src/numeric/resultant.ts": "f3756924c33ec134fcca49f722fd47a79292df6fb827133f7e4c6df702961545",
@@ -49,8 +49,9 @@
     "src/geometry/plane-frame3.ts": "5a162e75dcdca6e81fef55e8cc3fdb1f6057e9cc6d3b200aae76a509ffbb8ab1",
     "src/geometry/plane-cylinder3.ts": "412516f87f5a3a710c35f93511910684d5d69727e3fa5f6ad7ddd3641557c13e",
     "src/geometry/algebraic-line3.ts": "871f5579828ba7b14b4e67bd77220330b1a172eafa334a834b2001c7b2efb39e",
-    "src/geometry/ellipse3.ts": "f5462489ad03e5d50bc59e4d766f0bd23b1d768aaad26fac1b5369a646b4abcd",
-    "src/geometry/cylinder-face-section3.ts": "cbc020e0f1a5d52619ce518a64a5d85d94cbb8b09c853610d1ddc57810fa47b1"
+    "src/geometry/ellipse3.ts": "721195a5a5fcf52ff5ac0b71d52abdc3813a84e89433f8c610130c22391ee6b0",
+    "src/geometry/cylinder-face-section3.ts": "cbc020e0f1a5d52619ce518a64a5d85d94cbb8b09c853610d1ddc57810fa47b1",
+    "src/geometry/planar-cylinder-intersection3.ts": "50172ad44f2e805afd2da4ac26f941beb2dc57cdf5d7e34ea26e9ad983850d04"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -178,10 +179,11 @@
     "Cadloom.strict_sum_squares_iff",
     "Cadloom.cylinder_tangent_axis_cross",
     "Cadloom.line_ellipse_polynomial",
-    "Cadloom.cylinder_section_gram"
+    "Cadloom.cylinder_section_gram",
+    "Cadloom.ellipse_elimination_identity"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations. Uniqueness of same-x circle points in a common closed vertical half over ordered fields. Canonical nonvertical line-frame identity over fields. Linear cancellation of shared-point circle tangent cross products and exact small-circle normal offset for circular germs. Circular cylinder projection, axis shift/scale, line-substitution polynomial and non-unit normal identities over commutative rings. Spatial sphere line-substitution, two-plane Gram intersection coefficients and circle-basis orientation identities. Strict sum-of-nonnegative-lengths comparison via squared lengths, supporting circular hole containment/separation. Cylinder circular-tangent / axial-direction cross product equals its outward non-unit normal. Weighted ellipse line-substitution and restricted-cylinder Gram determinant identities over commutative rings.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling. Line/circle substitution and radical-axis identities/equivalence over commutative rings; rational circumcenter linear equations. Uniqueness of same-x circle points in a common closed vertical half over ordered fields. Canonical nonvertical line-frame identity over fields. Linear cancellation of shared-point circle tangent cross products and exact small-circle normal offset for circular germs. Circular cylinder projection, axis shift/scale, line-substitution polynomial and non-unit normal identities over commutative rings. Spatial sphere line-substitution, two-plane Gram intersection coefficients and circle-basis orientation identities. Strict sum-of-nonnegative-lengths comparison via squared lengths, supporting circular hole containment/separation. Cylinder circular-tangent / axial-direction cross product equals its outward non-unit normal. Weighted ellipse line-substitution and restricted-cylinder Gram determinant identities over commutative rings. Polynomial identity underlying ellipse/ellipse coordinate elimination.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
@@ -208,6 +210,7 @@
     "Algebraic endpoint segments, correlated translation/subtraction, dyadic angular witnesses, embedded cylinder band/arc-product domains, exact location and oriented normals use documented arguments and independent tests, not full TypeScript machine verification. General cylinder trims and complete shell/solid certification remain outside this constructor.",
     "Algebraic rectangle faces, factory-owned planar face translation and analytic vertical extrusion BReps use documented product-embedding/orientation arguments and independent geometric/mesh oracles, not whole-program machine verification. Constructive extrusion certification does not validate arbitrary existing BRep tables or general surface intersections/3D Booleans.",
     "Ellipses and elliptic arcs, plane/plane and complete supporting plane/cylinder intersections, algebraic generator lines and whole-arc support predicates use documented geometric reductions and independent tests, not whole-program verification. Bounded face trimming, general conic/conic intersections and curved BRep Booleans are not supplied by these APIs.",
-    "Finite plane/cylinder-band or angular-patch intersection, boundary-cut completeness, isolated contact retention and elliptic-arc rational-ray interior witnesses use documented construction arguments and independent exact point-set tests, not machine-verified TypeScript. Face splitting/sewing, bounded face/face intersection and curved BRep Booleans are outside this API."
+    "Finite plane/cylinder-band or angular-patch intersection, boundary-cut completeness, isolated contact retention and elliptic-arc rational-ray interior witnesses use documented construction arguments and independent exact point-set tests, not machine-verified TypeScript. Face splitting/sewing, bounded face/face intersection and curved BRep Booleans are outside this API.",
+    "Single-source algebraic rational images, complete spatial ellipse/ellipse intersections, algebraic segment/ellipse intersections and bounded planar/cylindrical face intersection use documented construction arguments and independent exact-set tests, not full TypeScript verification. Face splitting/sewing, arbitrary cylinder trims, cylinder/cylinder intersections and curved solid Booleans remain future work."
   ]
 }

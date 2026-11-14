@@ -2,7 +2,7 @@ import { Rational } from './rational.js';
 import type { Sign } from './rational.js';
 import type { ExactInput } from '../geometry/point2.js';
 import { Polynomial, exactRational } from './polynomial.js';
-import {sumElimination,productElimination} from './resultant.js';
+import {sumElimination,productElimination,resultantInParameter} from './resultant.js';
 
 /** Sturm sequence of the monic square-free part. Zero has infinitely many roots. */
 export function sturmSequence(input:Polynomial):readonly Polynomial[] {
@@ -117,11 +117,11 @@ export class AlgebraicReal {
   sign():Sign{return this.signOf(new Polynomial([0n,1n]));}
   equals(other:AlgebraicReal):boolean{return this.compare(other)===0;}
   neg():AlgebraicReal{return this.affine(-1n);}
-  add(other:AlgebraicReal):AlgebraicReal{return this.combine(other,'sum');}
+  add(other:AlgebraicReal):AlgebraicReal{return this===other?this.affine(2n):this.combine(other,'sum');}
   sub(other:AlgebraicReal):AlgebraicReal {
     return this===other?AlgebraicReal.fromRational(0n):this.add(other.neg());
   }
-  mul(other:AlgebraicReal):AlgebraicReal{return this.combine(other,'product');}
+  mul(other:AlgebraicReal):AlgebraicReal{return this===other?this.rationalFunction(new Polynomial([0n,0n,1n])):this.combine(other,'product');}
   div(other:AlgebraicReal):AlgebraicReal{return this.mul(other.reciprocal());}
   /** Principal nonnegative square root, selected exactly among conjugate roots. */
   sqrt():AlgebraicReal {
@@ -178,6 +178,33 @@ export class AlgebraicReal {
       if(candidates.length===1)return candidates[0]!;
       candidates=candidates.map(c=>c.refine());
       if(a.upper.sub(a.lower).compare(b.upper.sub(b.lower))>=0)a=a.refine();else b=b.refine();
+    }
+  }
+  /** Evaluate N(root)/D(root) while retaining the single source parameter.
+   * Elimination degree is bounded by the source degree, rather than repeated
+   * independent conjugate products. Zero denominator at this root is rejected.
+   */
+  rationalFunction(numerator:Polynomial,denominator:Polynomial=new Polynomial([1n])):AlgebraicReal {
+    if(this.signOf(denominator)===0)throw new RangeError('Algebraic rational function has a zero denominator');
+    const n=numerator.divRem(this.polynomial).remainder,d=denominator.divRem(this.polynomial).remainder;
+    if(this.signOf(n)===0)return AlgebraicReal.fromRational(0n);
+    if(this.rational!==null)return AlgebraicReal.fromRational(n.evaluate(this.rational).div(d.evaluate(this.rational)));
+    // Remove denominator-zero conjugates, even when the defining polynomial
+    // is reducible. They cannot be the represented source root.
+    const sourcePolynomial=this.polynomial.divRem(this.polynomial.gcd(d)).quotient;
+    const equation=Array.from({length:Math.max(n.degree,d.degree)+1},(_,i)=>new Polynomial([n.coefficient(i).neg(),d.coefficient(i)]));
+    const image=resultantInParameter(sourcePolynomial.coefficients.map(c=>new Polynomial([c])),equation).squareFree();
+    if(image.degree<=0)throw new Error('Rational algebraic image has no defining polynomial');
+    let candidates=[...AlgebraicReal.isolate(image)],root:AlgebraicReal=this;
+    while(true){
+      if(root.rational!==null)return AlgebraicReal.fromRational(n.evaluate(root.rational).div(d.evaluate(root.rational)));
+      const [dl,du]=intervalValue(d,root.lower,root.upper);
+      if(dl.sign()*du.sign()<=0){root=root.refine();continue;}
+      const [nl,nu]=intervalValue(n,root.lower,root.upper),bounds=[nl.div(dl),nl.div(du),nu.div(dl),nu.div(du)].sort((a,b)=>a.compare(b));
+      candidates=candidates.filter(c=>c.lower.compare(bounds[3]!)<=0&&c.upper.compare(bounds[0]!)>=0);
+      if(!candidates.length)throw new Error('Rational image lost all candidates');
+      if(candidates.length===1)return candidates[0]!;
+      candidates=candidates.map(c=>c.refine());root=root.refine();
     }
   }
   /** Exact sign of another polynomial evaluated at this root, including equality. */

@@ -707,7 +707,7 @@ node examples/extruded-brep3.ts
 
 `ellipticArc3`・`fullEllipseArc3`で楕円弧を構築し、所属判定・厳密な巡回順序・分割ができます。`Curve3`の`elliptic-arc`として平行移動・反転・支持面への所属判定・B-repの周期辺に接続します。
 
-現段階は支持面の交線です。有限の面による交線の切り取り、楕円同士の一般の交差、楕円でトリムされた面の構築、曲面B-repのBoolean演算は今後の開発です。[計算式・構成・検証範囲](docs/proofs/plane-cylinder3.md)を参照してください。
+このAPIは支持面の交線を返します。有限の面での切り取りと楕円同士の交差は後述のAPIを使ってください。楕円でトリムされた面の構築と曲面B-repのBoolean演算は今後の開発です。[計算式・構成・検証範囲](docs/proofs/plane-cylinder3.md)を参照してください。
 
 ```sh
 npm run build
@@ -727,4 +727,17 @@ const section = intersectPlaneCylinderFace3(plane3(1n, 0n, -1n), face);
 // x=zの楕円を高さ範囲で切り取り、閉じた楕円弧として返す
 ```
 
-`interiorPointOnEllipticArc3`は非退化な楕円弧の内部点を厳密に求めます。有限の平面側の領域による切り取り、切断後の面の構築・接続、一般の曲面Boolean演算はまだ対象外です。[完全性の構成・検証範囲](docs/proofs/cylinder-face-section3.md)を参照してください。
+`interiorPointOnEllipticArc3`は非退化な楕円弧の内部点を厳密に求めます。有限の平面側の領域による切り取りは後述の`intersectPlanarCylinderFaces3`に対応しています。切断後の面の構築・接続、一般の曲面Boolean演算はまだ対象外です。[完全性の構成・検証範囲](docs/proofs/cylinder-face-section3.md)を参照してください。
+
+## 有限の平面と円柱面の交差
+
+`intersectPlanarCylinderFaces3(planarFace, cylinderFace)`は両方の有限領域で交線を切り取り、楕円弧・線分と孤立した接触点を返します。平面側は既存の円形・穴付き円形・長方形・線分と円弧のチャート領域に対応します。平面はファクトリで構築したものを渡してください。戻り値は`intersectPlaneCylinderFace3`と同じ`CylinderFaceSection3`です。
+
+`intersectEllipses3`は異なる平面上の楕円、同一平面上の最大4交点、接触、一致を扱います。`intersectAlgebraicSegmentEllipse3`は代数的な端点の線分との交点を返します。`AlgebraicReal.rationalFunction(numerator, denominator)`は同じ代数的数を含む有理式を、元の代数的数の次数以下で評価します。
+
+切断後の面の構築・縫い合わせや一般の曲面立体Boolean演算は今後の開発です。[構成・完全性・検証範囲](docs/proofs/planar-cylinder-intersection3.md)を参照してください。
+
+```sh
+npm run build
+node examples/planar-cylinder-intersection3.ts
+```

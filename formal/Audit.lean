@@ -157,3 +157,5 @@ import SortedAdjacency
 
 #print axioms Cadloom.line_ellipse_polynomial
 #print axioms Cadloom.cylinder_section_gram
+
+#print axioms Cadloom.ellipse_elimination_identity
