@@ -14,7 +14,7 @@ import {intersectPlaneCylinderFace3} from './cylinder-face-section3.js';
 import {prepareCylinderFace3} from './cylinder-face3.js';
 import type {PreparedCylinderFace3} from './cylinder-face3.js';
 import {intersectCirclePlane3,pointOnArc3,splitCircularArc3,interiorPointOnArc3} from './circle3.js';
-import {pointOnEllipticArc3,splitEllipticArc3,interiorPointOnEllipticArc3} from './ellipse3.js';
+import {pointOnEllipticArc3,splitEllipticArc3,interiorPointOnEllipticArc3,intersectEllipsePlane3} from './ellipse3.js';
 import {pointInPlaneFrame3} from './plane-frame3.js';
 import {snapshotCurve3,curveEndpoints3,pointOnCurve3,curveOnSurface3} from './curve3.js';
 import type {Curve3} from './curve3.js';
@@ -52,7 +52,7 @@ function midpoint(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):AlgebraicCoor
   if(axes.every(k=>d[k].rational!==null))return translateAlgebraicPoint3(a,vector3(d.x.rational!.div(new Rational(2n)),d.y.rational!.div(new Rational(2n)),d.z.rational!.div(new Rational(2n))));
   return algebraicCoordinates3(a.x.add(b.x).affine('1/2'),a.y.add(b.y).affine('1/2'),a.z.add(b.z).affine('1/2'));
 }
-function witness(c:Curve3):AlgebraicCoordinates3 {
+export function witness(c:Curve3):AlgebraicCoordinates3 {
   if(c.kind==='circular-arc')return interiorPointOnArc3(c.arc);
   if(c.kind==='elliptic-arc')return interiorPointOnEllipticArc3(c.arc);
   if(c.kind==='algebraic-segment')return midpoint(c.segment.start,c.segment.end);
@@ -63,7 +63,7 @@ function witness(c:Curve3):AlgebraicCoordinates3 {
  * sign is fixed by the chart normal. Generators reduce to a rational linear
  * predicate on the point; neither case needs independent algebraic products.
  */
-function orientation(c:Curve3,p:AlgebraicCoordinates3,face:PreparedCylinderFace3,plane:Plane3):Sign {
+export function orientation(c:Curve3,p:AlgebraicCoordinates3,face:PreparedCylinderFace3,plane:Plane3):Sign {
   if(c.kind==='elliptic-arc'){
     const f=c.arc.ellipse.frame,sign=dot3(cross3(f.u,f.v),plane.normal).sign();
     return (-face.sense*(c.arc.direction==='ccw'?1:-1)*sign) as Sign;
@@ -81,11 +81,18 @@ function orientation(c:Curve3,p:AlgebraicCoordinates3,face:PreparedCylinderFace3
   throw new Error('Unexpected cylinder orientation curve');
 }
 function unique(points:readonly AlgebraicCoordinates3[]):AlgebraicCoordinates3[]{return points.filter((p,i,all)=>all.findIndex(q=>same(p,q))===i);}
-function splitBoundary(c:Curve3,plane:Plane3):readonly Curve3[] {
+export function splitBoundary(c:Curve3,plane:Plane3):readonly Curve3[] {
   if(c.kind==='circular-arc'){
     const arc=c.arc,C=arc.circle,n=C.normal,u=n.y.sign()!==0||n.z.sign()!==0?cross3(n,vector3(1n,0n,0n)):cross3(n,vector3(0n,1n,0n)),v=cross3(n,u);
     const rays=[u,v,vector3(u.x.neg(),u.y.neg(),u.z.neg()),vector3(v.x.neg(),v.y.neg(),v.z.neg())],cardinals=rays.map(d=>algebraicPoint3(C.center,d,AlgebraicReal.fromRational(C.radiusSquared.div(dot3(d,d))).sqrt())),hit=intersectCirclePlane3(C,plane),cuts=unique([...cardinals,...(hit.kind==='points'?hit.points:[])]).filter(p=>pointOnArc3(p,arc));
     return splitCircularArc3(arc,cuts).map(arc=>snapshotCurve3({kind:'circular-arc',arc}));
+  }
+  if(c.kind==='elliptic-arc'){
+    const hit=intersectEllipsePlane3(c.arc.ellipse,plane),cuts=hit.kind==='points'?hit.points:[];
+    return sectionPieces(c).flatMap(piece=>{
+      if(piece.kind!=='elliptic-arc')throw new Error('Expected an elliptic boundary');
+      return splitEllipticArc3(piece.arc,cuts.filter(p=>pointOnEllipticArc3(p,piece.arc))).map(arc=>snapshotCurve3({kind:'elliptic-arc',arc}));
+    });
   }
   if(c.kind==='algebraic-segment'){
     const s=c.segment,hit=intersectAlgebraicSegmentPlane3(s,plane);
@@ -95,13 +102,13 @@ function splitBoundary(c:Curve3,plane:Plane3):readonly Curve3[] {
   }
   throw new Error('Unexpected cylinder domain boundary');
 }
-function sectionPieces(c:Curve3):readonly Curve3[] {
+export function sectionPieces(c:Curve3):readonly Curve3[] {
   if(c.kind!=='elliptic-arc')return [c];
   const a=c.arc,e=a.ellipse,f=e.frame,rx=AlgebraicReal.fromRational(e.radiusUSquared).sqrt(),ry=AlgebraicReal.fromRational(e.radiusVSquared).sqrt();
   const cuts=[algebraicPoint3(f.origin,f.u,rx),algebraicPoint3(f.origin,f.u,rx.neg()),algebraicPoint3(f.origin,f.v,ry),algebraicPoint3(f.origin,f.v,ry.neg())].filter(p=>pointOnEllipticArc3(p,a));
   return splitEllipticArc3(a,cuts).map(arc=>snapshotCurve3({kind:'elliptic-arc',arc}));
 }
-function traceLoops(edges:readonly Curve3[],uses:readonly BRepEdgeUse3[]):readonly (readonly BRepEdgeUse3[])[]|null {
+export function traceLoops(edges:readonly Curve3[],uses:readonly BRepEdgeUse3[]):readonly (readonly BRepEdgeUse3[])[]|null {
   const vertices:AlgebraicCoordinates3[]=[],vertex=(p:AlgebraicCoordinates3)=>{let id=vertices.findIndex(q=>same(p,q));if(id<0){id=vertices.length;vertices.push(p);}return id;};
   const records=uses.map(use=>{const [a,b]=curveEndpoints3(edges[use.edge]!);return {use,origin:vertex(use.direction===1?a:b),target:vertex(use.direction===1?b:a)};}),out=vertices.map(()=>[] as number[]),incoming=vertices.map(()=>0);
   records.forEach((r,i)=>{out[r.origin]!.push(i);incoming[r.target]!++;});

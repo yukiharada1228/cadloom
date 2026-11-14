@@ -103,3 +103,5 @@ export { splitCylinderFaceByPlane3 } from './geometry/cylinder-plane-split3.js';
 export type { SplitCylinderRegion3, CylinderPlaneSplit3 } from './geometry/cylinder-plane-split3.js';
 export { intersectAlgebraicSegmentPlane3 } from './geometry/algebraic-segment-plane3.js';
 export type { AlgebraicSegmentPlaneIntersection3 } from './geometry/algebraic-segment-plane3.js';
+export { prepareTrimmedCylinder3, splitTrimmedCylinderByPlane3, extractTrimmedCylinderComponent3 } from './geometry/trimmed-cylinder3.js';
+export type { CylinderHalfSpace3, TrimmedCylinderComponent3, PreparedTrimmedCylinder3, TrimmedCylinderPlaneSplit3 } from './geometry/trimmed-cylinder3.js';
