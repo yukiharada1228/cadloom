@@ -76,7 +76,9 @@ orientation, axis/plane equivalence, immutable snapshots and 10^-30 offsets from
 tangency.
 
 No whole-program formal verification or production-scale performance is claimed.
-General algebraic field operations may have substantial degree growth. Bounded
-curves on these supports, face domains, coedges, manifold shell validation and
+General algebraic field operations may have substantial degree growth.
+Bounded curves and explicit coedge/shell incidence are implemented in
+[brep-curves3.md](brep-curves3.md), [spatial-circles3.md](spatial-circles3.md) and
+[brep-topology3.md](brep-topology3.md). Face domains, geometric shell validation and
 curved BRep Booleans remain subsequent kernel work; a supporting surface alone
 must not be treated as a certified solid face.

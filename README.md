@@ -535,7 +535,7 @@ const hit = intersectLineSurface3(
 
 `intersectSegmentSurface3`は端点を含む線分との交差を扱います。`classifyPointToSurface3`は平面の向きに対する符号、または円柱の内側（-1）・面上（0）・外側（1）を返します。座標は有理数でも、`algebraicCoordinates3`で作った独立した代数的実数でも構いません。`normalToSurface3`は面上で厳密な非単位法線を返し、`surfacesCoincide3`は軸の原点・スケールや平面の向きを無視して支持面の一致を判定します。
 
-このAPIは無限に広がる支持面の層です。境界付きの面・辺・シェルを持つB-repや、その立体検証はこれから構築します。[円柱の式・交差・法線の証明と検証範囲](docs/proofs/analytic-surfaces3.md)を参照してください。
+このAPIは無限に広がる支持面の層です。境界曲線と共有辺・面・シェルの接続は後述のAPIで扱います。面の領域や立体の幾何学的検証は引き続き構築します。[円柱の式・交差・法線の証明と検証範囲](docs/proofs/analytic-surfaces3.md)を参照してください。
 
 ```sh
 npm run build
@@ -564,7 +564,7 @@ const loop = curveLoop3([edge], {
 
 `mapPlanePoint3`と`pointInPlaneFrame3`は平面座標の写像と逆写像です。平面外の点への逆写像は`null`を返します。`pointOnCurve3`はトリムを含む辺上の判定、`reverseCurve3`は向きの反転、`curveOnSurface3`は辺全体が支持面上にあるかの判定を行います。端点だけの一致では面上と判定しません。
 
-`curveLoop3`は閉路の接続と全曲線の支持面への所属を検査します。自己交差・往復・面積ゼロはまだ排除しないため、これだけでB-repの面や立体の妥当性を保証するものではありません。辺の共有、面の領域、シェルの検証へ続けます。[構成の根拠・検証範囲](docs/proofs/brep-curves3.md)を参照してください。
+`curveLoop3`は閉路の接続と全曲線の支持面への所属を検査します。自己交差・往復・面積ゼロはまだ排除しないため、これだけでB-repの面や立体の妥当性を保証するものではありません。辺の共有とシェルの接続は後述の`buildBRepTopology3`で扱います。面の領域と立体の検証は引き続き構築します。[構成の根拠・検証範囲](docs/proofs/brep-curves3.md)を参照してください。
 
 ```sh
 npm run build
@@ -588,9 +588,35 @@ const hits = intersectLineCircle3(
 
 `circularArc3`は空間円上の端点と`direction`・`fullCircle`から円弧を作ります。CCW/CWは法線に対する向きです。所属判定・巡回順序・分割・反転に加え、直線／線分・平面・円・円弧との交差を角度の小数近似なしで扱います。重なる円弧と孤立した接点を区別し、反対向きの法線で記述された同じ円も照合します。
 
-`Curve3`の円弧として`curveLoop3`や支持面への所属判定に渡せます。中心と法線は現在有理数です。面の領域・共有辺・シェルの検証は引き続き構築します。[交差・向き・検証範囲](docs/proofs/spatial-circles3.md)を参照してください。
+`Curve3`の円弧として`curveLoop3`や支持面への所属判定に渡せます。中心と法線は現在有理数です。共有辺とシェルの接続は後述の`buildBRepTopology3`で扱います。面の領域と立体の検証は引き続き構築します。[交差・向き・検証範囲](docs/proofs/spatial-circles3.md)を参照してください。
 
 ```sh
 npm run build
 node examples/spatial-circles3.ts
+```
+
+
+## B-repの共有辺・コエッジ・面・シェルの接続
+
+`buildBRepTopology3(edges, faces)`は、`Curve3`の辺をIDで明示的に共有し、向き付きの使用（コエッジ）、閉じた境界巡回、支持面を持つ面、辺で接続したシェルを構築します。
+
+```ts
+const faces: BRepFaceInput3[] = [{
+  surface: { kind: 'plane', plane: plane3(0n, 0n, 1n) },
+  sense: 1,
+  loops: [[{ edge: 0, direction: 1 }]],
+}];
+// edges[0]がこの平面上の全円なら、1辺の閉路を持つ開いた面の接続構造
+const topology = buildBRepTopology3(edges, faces);
+```
+
+端点は代数的実数の厳密な座標一致で頂点へ統合します。辺全体の支持面への所属、閉路の接続、辺の使用回数と方向、頂点まわりの接続を検査します。全円の始終点や同じ端点を持つ別の円弧でも、辺の両端の接続口を区別します。円柱の周期的な継ぎ目で、同じ面が辺を両方向に使う場合にも対応します。
+
+`issues`で境界辺・未使用辺・非多様体の辺／頂点・使用方向の不一致を参照できます。`sense`は支持面に対する法線の向きで、ループはその向きを含めて明示的に渡します。`sense`を変えてもループを自動反転しません。
+
+`closedOrientedIncidence`は接続検査の結果です。面の領域・境界と法線の幾何学的な整合・自己交差・シェルの入れ子・立体の内外はまだ保証しません。同じ座標の辺でもIDが異なれば自動共有せず、辺の交差や重なりの分割もこの関数では行いません。[接続口のモデル・検証範囲](docs/proofs/brep-topology3.md)を参照してください。
+
+```sh
+npm run build
+node examples/brep-topology3.ts
 ```

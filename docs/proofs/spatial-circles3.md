@@ -122,6 +122,7 @@ library, arc cell enumeration, all control-flow branches or TypeScript execution
 
 This is exact circle/arc geometry and its integration with surface walks, not
 completed BRep face or shell certification. General conic intersections, algebraic
-circle centers/normals, nonplanar curves, shared-edge topology and curved BRep
-Booleans remain later work. General algebraic operations can be expensive; no
+circle centers/normals, nonplanar curves and curved BRep Booleans remain later work.
+Explicit shared-edge incidence is implemented in [brep-topology3.md](brep-topology3.md).
+General algebraic operations can be expensive; no
 production-scale performance guarantee is claimed.

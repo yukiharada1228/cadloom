@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "23075649e4349d63c4aa278582ea28a2c894761c589e8e3b46e2b3fc660d4c6c",
+    "src/index.ts": "9af76d26f7dcd5ffe7957f9a9882369239b5768c9604555cf66f2b3d4ab82019",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -40,7 +40,8 @@
     "src/geometry/algebraic-point3.ts": "226ffbe98987060263f1c31cb06bc266d3518e9198f79af7f8ed89c4604f0ae0",
     "src/geometry/surface3.ts": "6481781cc6ec8b591145b2eb3d8e89a8cec25183afc9cf04426f8161c87b6c54",
     "src/geometry/curve3.ts": "481c10f0d3bf28091ce878f0aabf1f2c86e10d766e0e580c7c3ec652903cee6a",
-    "src/geometry/circle3.ts": "5c76735c5e3408d3cce1fd405ec81588b5d9b057787072e1f982e2a126532f84"
+    "src/geometry/circle3.ts": "5c76735c5e3408d3cce1fd405ec81588b5d9b057787072e1f982e2a126532f84",
+    "src/geometry/brep-topology3.ts": "ecd43ac39ea9ee945a04600a1c9f728ef2dca4a378561f2157587929db48c86f"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -188,6 +189,7 @@
     "Curved region winding propagation, regularized Boolean face selection, boundary reconstruction and filled-region location use construction arguments and independent tests, not machine-verified TypeScript execution.",
     "3D algebraic coordinates, trusted factory correlation, plane/cylinder predicates, finite/contained line and segment intersections and supporting-surface coincidence are independently tested and supported by arithmetic identities, not whole-program machine verification; bounded BRep faces and shell certification are not provided by the surface API.",
     "Rational plane-chart mapping/inversion, bounded algebraic line trims, affine images of circular arcs, whole-curve surface membership and connected surface loops use construction arguments and independent tests, not machine-verified TypeScript execution; a validated loop is not a certified BRep face or shell.",
-    "Spatial rational-center/normal circles, oriented arcs, line/plane/circle intersections, cyclic arc overlap/subdivision and whole-circle supporting-surface membership use construction arguments and independent tests, not whole-program machine verification. BRep face/shell certification and general conic intersections remain outside this layer."
+    "Spatial rational-center/normal circles, oriented arcs, line/plane/circle intersections, cyclic arc overlap/subdivision and whole-circle supporting-surface membership use construction arguments and independent tests, not whole-program machine verification. BRep face/shell certification and general conic intersections remain outside this layer.",
+    "Explicit BRep coedge/loop/face/shell incidence, semantic algebraic endpoint welding and port-multigraph vertex links use documented graph invariants and independent tests, not machine-verified TypeScript execution. Closed oriented incidence does not certify face domains, geometric orientation, embedding, shell nesting or solid material."
   ]
 }
