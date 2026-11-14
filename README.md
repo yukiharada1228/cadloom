@@ -185,3 +185,18 @@ locatePointInPolygon(point2(1n, 1n), region); // 単発の問い合わせ
 ```
 
 既定は偶奇規則で、`preparePolygon(region, "nonzero")`も使えます。判定対象は正則化後の塗り領域です。打ち消された環や内部の共有辺は境界とは扱わず、面積0の入力曲線だけなら全ての点が外部になります。準備済みオブジェクトは入力から独立し、繰り返し判定は正規化後の辺数に対して線形です。[正当性と前提](docs/proofs/polygon-location.md)を参照してください。
+
+## 厳密アフィン変換
+
+```ts
+import { affine2, transformPoint, composeAffine2, invertAffine2, point2 } from "cadloom";
+const move = affine2(1n, 0n, 0n, 1n, 10n, 20n);
+const scale = affine2(2n, 0n, 0n, 3n);
+const t = composeAffine2(move, scale); // 先にscale、次にmove
+transformPoint(t, point2(1n, 2n)); // (12, 26)
+const inverse = invertAffine2(t);
+```
+
+係数順は`a,b,c,d,tx,ty`で、`x'=a*x+b*y+tx, y'=c*x+d*y+ty`です。引数を省略すると恒等変換になります。`transformSegment`・`transformPolygon`も使え、結果は不変です。反転・せん断・有理数係数の回転も表せます。
+
+`affineDeterminant`が0なら逆変換は例外になります。特異変換の適用自体は可能ですが、面が潰れる場合があります。任意角度の回転は一般に無理数を要するため、有理数係数だけで厳密には表せません。[証明と制約](docs/proofs/affine-transforms.md)を参照してください。

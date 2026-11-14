@@ -42,3 +42,5 @@ node formal/scripts/verify.mjs
 検証スクリプトはソース一覧・SHA-256、TypeScriptのビルド、式の抽出結果、Leanビルド、公理依存を確認します。ハッシュはレビュー基準の変更検知であり、実装の正しさの証明ではありません。ソース変更時には対応をレビューして基準を更新してください。
 
 Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choice`・`Quot.sound`を信頼します。監査対象が` sorryAx `など許可外の公理に依存した場合は失敗します。
+
+`AffineGeometry.lean`では有理数アフィン変換による外積の倍率、線形補間との可換性、非特異変換の逆写像と線分所属の同値性を検査します。TypeScriptとの全体精緻化や平面位相全体は対象外です。
