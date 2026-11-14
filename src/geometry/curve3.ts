@@ -13,6 +13,8 @@ import {circularArc2,reverseCircularArc2,pointOnArc2} from './circular-arc2.js';
 import type {CircularArc2} from './circular-arc2.js';
 import {circularArc3,reverseCircularArc3,pointOnArc3,circlePlane3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
+import {algebraicSegment3,pointOnAlgebraicSegment3,algebraicSegmentOnSurface3} from './algebraic-segment3.js';
+import type {AlgebraicSegment3} from './algebraic-segment3.js';
 import {line3,cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js';
 import type {Line3,Surface3} from './surface3.js';
 import {plane3} from './plane3.js';
@@ -30,7 +32,7 @@ export interface PlanarArc3 {
   readonly frame:PlaneFrame3;readonly arc:CircularArc2;
   readonly start:AlgebraicCoordinates3;readonly end:AlgebraicCoordinates3;
 }
-export type Curve3={readonly kind:'line';readonly interval:LineInterval3}|{readonly kind:'planar-arc';readonly arc:PlanarArc3}|{readonly kind:'circular-arc';readonly arc:CircularArc3};
+export type Curve3={readonly kind:'line';readonly interval:LineInterval3}|{readonly kind:'planar-arc';readonly arc:PlanarArc3}|{readonly kind:'circular-arc';readonly arc:CircularArc3}|{readonly kind:'algebraic-segment';readonly segment:AlgebraicSegment3};
 /** Connected closed walk on a supporting surface; not a certified simple face domain. */
 export interface CurveLoop3 {readonly surface:Surface3;readonly curves:readonly Curve3[];}
 const axes=['x','y','z'] as const,zero=new Rational(0n),two=new Rational(2n);
@@ -79,6 +81,7 @@ export function planarArc3(inputFrame:PlaneFrame3,inputArc:CircularArc2):PlanarA
 /** Internal snapshot never trusts cached start/end fields from structural objects. */
 export function snapshotCurve3(curve:Curve3):Curve3 {
   switch(curve.kind){
+    case 'algebraic-segment':return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(curve.segment.start,curve.segment.end)});
     case 'line':return Object.freeze({kind:'line',interval:lineInterval3(curve.interval.line,curve.interval.startParameter,curve.interval.endParameter)});
     case 'planar-arc':return Object.freeze({kind:'planar-arc',arc:planarArc3(curve.arc.frame,curve.arc.arc)});
     case 'circular-arc':return Object.freeze({kind:'circular-arc',arc:circularArc3(curve.arc.circle,curve.arc.start,curve.arc.end,{direction:curve.arc.direction,fullCircle:curve.arc.fullCircle})});
@@ -86,16 +89,18 @@ export function snapshotCurve3(curve:Curve3):Curve3 {
   }
 }
 export function curveEndpoints3(input:Curve3):readonly [AlgebraicCoordinates3,AlgebraicCoordinates3] {
-  const c=snapshotCurve3(input),data=c.kind==='line'?c.interval:c.arc;return Object.freeze([data.start,data.end]);
+  const c=snapshotCurve3(input),data=c.kind==='line'?c.interval:c.kind==='algebraic-segment'?c.segment:c.arc;return Object.freeze([data.start,data.end]);
 }
 export function reverseCurve3(input:Curve3):Curve3 {
   const c=snapshotCurve3(input);
+  if(c.kind==='algebraic-segment')return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(c.segment.end,c.segment.start)});
   if(c.kind==='line')return Object.freeze({kind:'line',interval:lineInterval3(c.interval.line,c.interval.endParameter,c.interval.startParameter)});
   if(c.kind==='circular-arc')return Object.freeze({kind:'circular-arc',arc:reverseCircularArc3(c.arc)});
   return Object.freeze({kind:'planar-arc',arc:planarArc3(c.arc.frame,reverseCircularArc2(c.arc.arc))});
 }
 export function pointOnCurve3(inputPoint:Point3|AlgebraicCoordinates3,input:Curve3):boolean {
   const curve=snapshotCurve3(input),p=snapshotExactPoint3(inputPoint);
+  if(curve.kind==='algebraic-segment')return pointOnAlgebraicSegment3(p,curve.segment);
   if(curve.kind==='circular-arc')return pointOnArc3(p,curve.arc);
   if(curve.kind==='planar-arc'){const local=pointInPlaneFrame3(curve.arc.frame,p);return local!==null&&pointOnArc2(local,curve.arc.arc);}
   const {line,startParameter:a,endParameter:b}=curve.interval,k=axes.find(k=>line.direction[k].sign()!==0)!;
@@ -107,9 +112,11 @@ export function pointOnCurve3(inputPoint:Point3|AlgebraicCoordinates3,input:Curv
  * Nondegenerate supports are checked by polynomial identities, not endpoint tests.
  */
 export function curveOnSurface3(input:Curve3,inputSurface:Surface3):boolean {
-  const curve=snapshotCurve3(input),start=curve.kind==='line'?curve.interval.start:curve.arc.start,end=curve.kind==='line'?curve.interval.end:curve.arc.end;
-  const isPoint=compareAlgebraicPoints3(start,end)===0&&(curve.kind==='line'||!(curve.kind==='planar-arc'?curve.arc.arc.fullCircle:curve.arc.fullCircle));
+  const curve=snapshotCurve3(input),data=curve.kind==='line'?curve.interval:curve.kind==='algebraic-segment'?curve.segment:curve.arc,start=data.start,end=data.end;
+  const periodic=curve.kind==='circular-arc'?curve.arc.fullCircle:curve.kind==='planar-arc'&&curve.arc.arc.fullCircle;
+  const isPoint=compareAlgebraicPoints3(start,end)===0&&!periodic;
   if(isPoint)return classifyPointToSurface3(start,inputSurface)===0;
+  if(curve.kind==='algebraic-segment')return algebraicSegmentOnSurface3(curve.segment,inputSurface);
   let surface:Surface3;
   switch(inputSurface.kind){
     case 'plane':{const p=inputSurface.plane;surface={kind:'plane',plane:plane3(p.normal.x,p.normal.y,p.normal.z,p.offset)};break;}

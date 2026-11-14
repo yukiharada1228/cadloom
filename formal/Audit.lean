@@ -152,3 +152,5 @@ import SortedAdjacency
 #print axioms Cadloom.circle_basis_orientation
 
 #print axioms Cadloom.strict_sum_squares_iff
+
+#print axioms Cadloom.cylinder_tangent_axis_cross

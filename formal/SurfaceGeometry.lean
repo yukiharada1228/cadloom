@@ -106,4 +106,17 @@ theorem strict_sum_squares_iff {K : Type*} [Field K] [LinearOrder K] [IsStrictOr
     have hp : 0 ≤ ((b+c)-a)*((b+c)+a) := mul_nonneg (by linarith) (by positivity)
     nlinarith [hp]
 
+/-- CCW circular tangent crossed with increasing axial direction gives the
+outward non-unit cylinder normal; no unit-axis normalization is needed. -/
+theorem cylinder_tangent_axis_cross {K : Type*} [CommRing K] (dx dy dz x y z : K) :
+    (dz*x-dx*z)*dz-(dx*y-dy*x)*dy =
+      (dx^2+dy^2+dz^2)*x-dx*(dx*x+dy*y+dz*z) ∧
+    (dx*y-dy*x)*dx-(dy*z-dz*y)*dz =
+      (dx^2+dy^2+dz^2)*y-dy*(dx*x+dy*y+dz*z) ∧
+    (dy*z-dz*y)*dy-(dz*x-dx*z)*dx =
+      (dx^2+dy^2+dz^2)*z-dz*(dx*x+dy*y+dz*z) := by
+  constructor
+  · ring
+  · constructor <;> ring
+
 end Cadloom

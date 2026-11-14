@@ -78,3 +78,5 @@ Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choi
 B-repの共有辺・コエッジ・面・シェルと頂点リンクの接続検査は、[グラフの不変条件と独立テスト](../docs/proofs/brep-topology3.md)で検証します。閉じた向き付き接続は、面の領域や幾何学的埋め込み、立体としての妥当性の証明ではありません。
 
 `Cadloom.strict_sum_squares_iff`は、非負の長さの厳密な三角不等式と平方値だけの判定の同値性を検証します。円形の穴の包含・分離に用います。[平面の面領域の構成と制限](../docs/proofs/planar-face3.md)のとおり、面構築全体の実行検証ではありません。
+
+`Cadloom.cylinder_tangent_axis_cross`は円柱の円周接線と軸方向の外積が外向き非単位法線になる恒等式を検証します。[円柱面の構成と検証範囲](../docs/proofs/cylinder-face3.md)のとおり、領域構築・二分探索・TypeScript全体の機械検証ではありません。

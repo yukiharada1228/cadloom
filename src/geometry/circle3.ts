@@ -217,3 +217,28 @@ export function intersectArcs3(inputA:CircularArc3,inputB:CircularArc3):ArcInter
   if(!arcs.length)return resultPoints(points);
   return Object.freeze({kind:'overlap',arcs:Object.freeze(arcs.sort((a,b)=>orderAlong(first,a.start,b.start))),points:Object.freeze(points.sort((a,b)=>orderAlong(first,a,b)))});
 }
+/** Exact open-arc witness. Dyadic slope bisection uses only rational linear
+ * predicates at the endpoints; the returned point needs only a quadratic root.
+ */
+export function interiorPointOnArc3(input:CircularArc3):AlgebraicCoordinates3 {
+  const arc=snapshotArc(input);
+  if(arc.fullCircle)return arc.start;
+  if(same(arc.start,arc.end))throw new RangeError('A point arc has no open-arc interior');
+  const c=arc.circle,[u,v]=basis(c),neg=(a:Vector3)=>vector3(a.x.neg(),a.y.neg(),a.z.neg()),pairs:readonly (readonly [Vector3,Vector3])[]=[[u,v],[v,neg(u)],[neg(u),neg(v)],[neg(v),u]];
+  const onRay=(d:Vector3)=>algebraicPoint3(c.center,d,AlgebraicReal.fromRational(c.radiusSquared.div(dot3(d,d))).sqrt());
+  for(const [U,V] of pairs){
+    const quadrant=make(c,onRay(U),onRay(V),'ccw'),hit=intersectArcs3(quadrant,arc);
+    if(hit.kind!=='overlap')continue;
+    const piece=hit.arcs[0]!;let lo=new Rational(0n),hi=new Rational(1n);
+    while(true){
+      const q=lo.add(hi).div(new Rational(2n)),a=new Rational(1n).sub(q),axis=vector3(V.x.mul(a).sub(U.x.mul(q)),V.y.mul(a).sub(U.y.mul(q)),V.z.mul(a).sub(U.z.mul(q)));
+      // Y/(X+Y)-q has the sign of (1-q)Y-qX in a closed quadrant.
+      if(coordinate(c,piece.start,axis).sign()>=0){lo=q;continue;}
+      if(coordinate(c,piece.end,axis).sign()<=0){hi=q;continue;}
+      const A=a.div(dot3(U,U)),B=q.div(dot3(V,V)),direction=vector3(U.x.mul(A).add(V.x.mul(B)),U.y.mul(A).add(V.y.mul(B)),U.z.mul(A).add(V.z.mul(B))),point=onRay(direction);
+      if(locatePointOnArc3(point,arc)!=='interior')throw new Error('Angular witness did not lie in the open arc');
+      return point;
+    }
+  }
+  throw new Error('Nonpoint arc has no positive quadrant overlap');
+}
