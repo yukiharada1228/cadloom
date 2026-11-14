@@ -11,7 +11,9 @@ import {algebraicCoordinates3,algebraicPoint3,compareAlgebraicPoints3,snapshotEx
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {circularArc2,reverseCircularArc2,pointOnArc2} from './circular-arc2.js';
 import type {CircularArc2} from './circular-arc2.js';
-import {line3,cylinder3,classifyPointToSurface3} from './surface3.js';
+import {circularArc3,reverseCircularArc3,pointOnArc3,circlePlane3} from './circle3.js';
+import type {CircularArc3} from './circle3.js';
+import {line3,cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js';
 import type {Line3,Surface3} from './surface3.js';
 import {plane3} from './plane3.js';
 
@@ -28,7 +30,7 @@ export interface PlanarArc3 {
   readonly frame:PlaneFrame3;readonly arc:CircularArc2;
   readonly start:AlgebraicCoordinates3;readonly end:AlgebraicCoordinates3;
 }
-export type Curve3={readonly kind:'line';readonly interval:LineInterval3}|{readonly kind:'planar-arc';readonly arc:PlanarArc3};
+export type Curve3={readonly kind:'line';readonly interval:LineInterval3}|{readonly kind:'planar-arc';readonly arc:PlanarArc3}|{readonly kind:'circular-arc';readonly arc:CircularArc3};
 /** Connected closed walk on a supporting surface; not a certified simple face domain. */
 export interface CurveLoop3 {readonly surface:Surface3;readonly curves:readonly Curve3[];}
 const axes=['x','y','z'] as const,zero=new Rational(0n),two=new Rational(2n);
@@ -79,6 +81,7 @@ export function snapshotCurve3(curve:Curve3):Curve3 {
   switch(curve.kind){
     case 'line':return Object.freeze({kind:'line',interval:lineInterval3(curve.interval.line,curve.interval.startParameter,curve.interval.endParameter)});
     case 'planar-arc':return Object.freeze({kind:'planar-arc',arc:planarArc3(curve.arc.frame,curve.arc.arc)});
+    case 'circular-arc':return Object.freeze({kind:'circular-arc',arc:circularArc3(curve.arc.circle,curve.arc.start,curve.arc.end,{direction:curve.arc.direction,fullCircle:curve.arc.fullCircle})});
     default:throw new RangeError('Unknown 3D curve kind');
   }
 }
@@ -87,10 +90,13 @@ export function curveEndpoints3(input:Curve3):readonly [AlgebraicCoordinates3,Al
 }
 export function reverseCurve3(input:Curve3):Curve3 {
   const c=snapshotCurve3(input);
-  return c.kind==='line'?Object.freeze({kind:'line',interval:lineInterval3(c.interval.line,c.interval.endParameter,c.interval.startParameter)}):Object.freeze({kind:'planar-arc',arc:planarArc3(c.arc.frame,reverseCircularArc2(c.arc.arc))});
+  if(c.kind==='line')return Object.freeze({kind:'line',interval:lineInterval3(c.interval.line,c.interval.endParameter,c.interval.startParameter)});
+  if(c.kind==='circular-arc')return Object.freeze({kind:'circular-arc',arc:reverseCircularArc3(c.arc)});
+  return Object.freeze({kind:'planar-arc',arc:planarArc3(c.arc.frame,reverseCircularArc2(c.arc.arc))});
 }
 export function pointOnCurve3(inputPoint:Point3|AlgebraicCoordinates3,input:Curve3):boolean {
   const curve=snapshotCurve3(input),p=snapshotExactPoint3(inputPoint);
+  if(curve.kind==='circular-arc')return pointOnArc3(p,curve.arc);
   if(curve.kind==='planar-arc'){const local=pointInPlaneFrame3(curve.arc.frame,p);return local!==null&&pointOnArc2(local,curve.arc.arc);}
   const {line,startParameter:a,endParameter:b}=curve.interval,k=axes.find(k=>line.direction[k].sign()!==0)!;
   const t=p[k].affine(new Rational(1n).div(line.direction[k]),line.origin[k].neg().div(line.direction[k]));
@@ -102,7 +108,7 @@ export function pointOnCurve3(inputPoint:Point3|AlgebraicCoordinates3,input:Curv
  */
 export function curveOnSurface3(input:Curve3,inputSurface:Surface3):boolean {
   const curve=snapshotCurve3(input),start=curve.kind==='line'?curve.interval.start:curve.arc.start,end=curve.kind==='line'?curve.interval.end:curve.arc.end;
-  const isPoint=compareAlgebraicPoints3(start,end)===0&&(curve.kind==='line'||!curve.arc.arc.fullCircle);
+  const isPoint=compareAlgebraicPoints3(start,end)===0&&(curve.kind==='line'||!(curve.kind==='planar-arc'?curve.arc.arc.fullCircle:curve.arc.fullCircle));
   if(isPoint)return classifyPointToSurface3(start,inputSurface)===0;
   let surface:Surface3;
   switch(inputSurface.kind){
@@ -115,6 +121,12 @@ export function curveOnSurface3(input:Curve3,inputSurface:Surface3):boolean {
     if(surface.kind==='plane')return dot3(surface.plane.normal,v).sign()===0&&dot3(surface.plane.normal,o).add(surface.plane.offset).sign()===0;
     const c=surface.cylinder,d=c.axis.direction,u=cross3(d,subtract3(o,c.axis.origin)),w=cross3(d,v);
     return dot3(w,w).sign()===0&&dot3(u,u).sub(c.radiusSquared.mul(dot3(d,d))).sign()===0;
+  }
+  if(curve.kind==='circular-arc'){
+    const circle=curve.arc.circle;
+    if(surface.kind==='plane')return surfacesCoincide3(surface,{kind:'plane',plane:circlePlane3(circle)});
+    const c=surface.cylinder,parallel=cross3(c.axis.direction,circle.normal),onAxis=cross3(c.axis.direction,subtract3(circle.center,c.axis.origin));
+    return dot3(parallel,parallel).sign()===0&&dot3(onAxis,onAxis).sign()===0&&c.radiusSquared.equals(circle.radiusSquared);
   }
   const {frame,arc}=curve.arc;
   if(surface.kind==='plane'){

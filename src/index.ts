@@ -65,3 +65,5 @@ export { line3, cylinder3, evaluateCylinder3, classifyPointToSurface3, normalToS
 export type { Line3, Cylinder3, Surface3, LineSurfaceHit3, LineSurfaceIntersection3, SegmentSurfaceIntersection3 } from './geometry/surface3.js';
 export { planeFrame3, mapPlanePoint3, pointInPlaneFrame3, lineInterval3, planarArc3, curveEndpoints3, reverseCurve3, pointOnCurve3, curveOnSurface3, curveLoop3 } from './geometry/curve3.js';
 export type { PlaneFrame3, LineInterval3, PlanarArc3, Curve3, CurveLoop3 } from './geometry/curve3.js';
+export { circle3, circleThroughPoints3, circlePlane3, pointOnCircle3, circlesCoincide3, intersectLineCircle3, intersectSegmentCircle3, intersectCirclePlane3, intersectCircles3, comparePointsAroundCircle3, circularArc3, fullCircleArc3, reverseCircularArc3, locatePointOnArc3, pointOnArc3, comparePointsOnArc3, splitCircularArc3, intersectLineArc3, intersectSegmentArc3, intersectArcs3 } from './geometry/circle3.js';
+export type { Circle3, CirclePointInput3, LineCircleHit3, CirclePlaneIntersection3, CircleCircleIntersection3, ArcDirection3, CircularArcOptions3, CircularArc3, ArcPointLocation3, ArcIntersection3 } from './geometry/circle3.js';

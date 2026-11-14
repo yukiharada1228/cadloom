@@ -545,7 +545,7 @@ node examples/analytic-surfaces3.ts
 
 ## B-repへ向けた3Dの辺と支持面上の閉路
 
-`lineInterval3`は有理数の直線を代数的なパラメータで切り取ります。`planarArc3`は局所的な円弧を有理数の平面座標系`PlaneFrame3`へ写します。座標系は直交・単位長である必要がなく、傾いた断面の楕円状の辺も表現できます。ただし有理数のアフィン円弧だけでは、任意軸のすべての円や楕円を表せません。一般の空間円・円錐曲線は引き続き拡張します。
+`lineInterval3`は有理数の直線を代数的なパラメータで切り取ります。`planarArc3`は局所的な円弧を有理数の平面座標系`PlaneFrame3`へ写します。座標系は直交・単位長である必要がなく、傾いた断面の楕円状の辺も表現できます。有理数のアフィン円弧では表せない任意軸の円は、後述の`circle3`・`circularArc3`で扱います。一般の円錐曲線の交差は引き続き拡張します。
 
 ```ts
 const frame = planeFrame3(
@@ -569,4 +569,28 @@ const loop = curveLoop3([edge], {
 ```sh
 npm run build
 node examples/brep-curves3.ts
+```
+
+
+## 任意の有理数法線を持つ空間円と円弧
+
+`circle3(center, normal, radiusSquared)`は、中心・平面法線・半径の二乗から空間円を表します。法線の長さを単位化せず、`(1,1,1)`のような向きでも厳密に扱えます。半径ゼロは点円です。`circleThroughPoints3`は非共線な有理数の3点を通る円を構築します。
+
+```ts
+const circle = circle3(point3(0n, 0n, 0n), vector3(1n, 1n, 1n), 1n);
+const arc = fullCircleArc3(circle);
+const edge: Curve3 = { kind: 'circular-arc', arc };
+const hits = intersectLineCircle3(
+  line3(point3(0n, 0n, 0n), vector3(1n, -1n, 0n)), circle,
+);
+// 交差パラメータは ±sqrt(1/2)。座標も代数的実数として保持
+```
+
+`circularArc3`は空間円上の端点と`direction`・`fullCircle`から円弧を作ります。CCW/CWは法線に対する向きです。所属判定・巡回順序・分割・反転に加え、直線／線分・平面・円・円弧との交差を角度の小数近似なしで扱います。重なる円弧と孤立した接点を区別し、反対向きの法線で記述された同じ円も照合します。
+
+`Curve3`の円弧として`curveLoop3`や支持面への所属判定に渡せます。中心と法線は現在有理数です。面の領域・共有辺・シェルの検証は引き続き構築します。[交差・向き・検証範囲](docs/proofs/spatial-circles3.md)を参照してください。
+
+```sh
+npm run build
+node examples/spatial-circles3.ts
 ```

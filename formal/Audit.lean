@@ -146,3 +146,7 @@ import SortedAdjacency
 #print axioms Cadloom.line_cylinder_polynomial
 #print axioms Cadloom.cylinder_normal_perpendicular
 #print axioms Cadloom.cylinder_normal_squared
+
+#print axioms Cadloom.line_sphere_polynomial
+#print axioms Cadloom.plane_gram_intersection
+#print axioms Cadloom.circle_basis_orientation
