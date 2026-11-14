@@ -353,3 +353,23 @@ console.log(assembled.locate(point3('1/2', '1/2', '1/2')));
 同一平面上の重なり、空洞、斜面を有理数のまま処理し、再接続後の辺の向きの釣り合いと面の不正交差も検査します。現時点では全平面による分割と全ペア検査を使うため、大きなモデルの性能最適化は残っています。[構成の証明・比較テスト・限界](docs/proofs/solid-booleans.md)を参照してください。
 
 内外判定では、同一平面の交点計算を共有し、辺の判定式と厳密な座標範囲を事前計算します。幾何学的な許容誤差は追加していません。`npm run build`後に`node benchmarks/solid-location.ts`で、独立した箱の内外判定と照合するベンチマークを実行できます。[最適化の等価性・Lean補題・測定条件](docs/proofs/solid-location-performance.md)を参照してください。
+
+## 曲線のための多項式・実代数的な根の基盤
+
+有理数で表せない交点に備え、`Polynomial`と`AlgebraicReal`を追加しました。係数・区間端点は有理数で保持し、Sturm列による実根の個数・分離、根の厳密な順序・等値比較、根での多項式の符号判定を行います。
+
+```ts
+const equation = new Polynomial([-2n, 0n, 1n]); // 定数項から順に x² - 2
+const sqrt2 = isolateRealRoots(equation)[1]!;
+sqrt2.compare(AlgebraicReal.fromRational('7/5')); // 1
+sqrt2.signOf(equation);                         // 0
+sqrt2.signOf(new Polynomial([-3n, 0n, 1n]));     // -1
+const refined = sqrt2.refine();                // 厳密な区間を狭めた新しい証明用データ
+```
+
+重根は1回だけ返し、`countRealRoots(p, a, b)`は両端を除く開区間の根を数えます。区間表現の`rational === null`は、無理数であることの証明ではありません。現段階では代数的数どうしの一般的な四則演算や、曲線・曲面の交差計算は未実装です。[構成の根拠・独立比較テスト・未検証範囲](docs/proofs/real-roots.md)を参照してください。
+
+```sh
+npm run build
+node examples/algebraic-roots.ts
+```

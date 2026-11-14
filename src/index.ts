@@ -40,3 +40,5 @@ export { partitionTriangleByPlanes3 } from './geometry/triangle-plane-arrangemen
 export type { TrianglePlaneCell3 } from './geometry/triangle-plane-arrangement.js';
 export { booleanSolids3 } from './geometry/solid-boolean3.js';
 export type { SolidBooleanResult3, SolidBooleanOperand3 } from './geometry/solid-boolean3.js';
+export { Polynomial } from './numeric/polynomial.js';
+export { AlgebraicReal, sturmSequence, countRealRoots, isolateRealRoots } from './numeric/real-roots.js';
