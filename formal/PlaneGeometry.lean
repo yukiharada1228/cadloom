@@ -128,4 +128,17 @@ theorem plane_segment_meets_iff (plane : PlaneEquation3) (a b : SpacePoint) :
       refine ⟨_, (plane_parameter_unit_iff _ _ h).mpr hp, ?_⟩
       exact (plane_zero_parameter_iff plane a b _ h).mpr rfl
 
+/-- Precomputed edge halfplanes equal the original oriented triangle edge test. -/
+theorem cached_edge_halfplane (a b p normal : SpacePoint) :
+    spaceDot (spaceCross (spaceDelta a b) (spaceDelta a p)) normal =
+      spaceDot (spaceCross normal (spaceDelta a b)) p -
+      spaceDot (spaceCross normal (spaceDelta a b)) a := by
+  dsimp [spaceDot, spaceCross, spaceDelta]
+  ring
+
+/-- Canonical plane rescaling preserves every nonparallel ray intersection parameter. -/
+theorem ray_parameter_rescale (value slope scale : ℚ) (hs : slope ≠ 0) (hc : scale ≠ 0) :
+    -(value / scale) / (slope / scale) = -value / slope := by
+  field_simp
+
 end Cadloom

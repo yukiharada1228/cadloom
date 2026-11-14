@@ -24,7 +24,7 @@
     "src/geometry/triangle-intersection3.ts": "a0f1f33675c0bec7de05e4389bbcc1a7556b05872713ba50f4cca65c0a92e168",
     "src/geometry/solid3.ts": "499abef4704146865304c37f8f1b33764268714f0553c741b4171de4a4cc3822",
     "src/geometry/triangle-plane-arrangement.ts": "b5cb012f855fdd5296cb72b15b19cfc8abed954b8d160e38d201d580f282e568",
-    "src/geometry/surface-location3.ts": "93decd672b3000bf281eb9c417945692b98dabe6e31c7f392b7294bf8974cd31",
+    "src/geometry/surface-location3.ts": "367745afeff743741bfa3851d54455723bdff32f4dd1271744bba8d4ac1e0094",
     "src/geometry/solid-boolean3.ts": "2354a04904c94c4003bfb6621659666ec5cc9fcc543f84bca447507d0454b2f1"
   },
   "checkedTheorems": [
@@ -130,10 +130,12 @@
     "Cadloom.triangle_plane_bounds",
     "Cadloom.triangle_fan_area_vector",
     "Cadloom.plane_lift_satisfies",
-    "Cadloom.plane_lift_unique"
+    "Cadloom.plane_lift_unique",
+    "Cadloom.cached_edge_halfplane",
+    "Cadloom.ray_parameter_rescale"
   ],
   "trustedBridge": "formal/scripts/extract-arithmetic.mjs interprets selected TypeScript AST arithmetic over mathematical rationals; it is not a proved compiler",
-  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate.",
+  "scope": "Mathematical rational arithmetic, segment membership, all intersection branches, cut completeness, sorted geometric edges, and arithmetic lemmas for left-side face sampling; selected extracted arithmetic expressions. Affine cross-product scaling, interpolation, inverse and segment membership. Signed volume formula for an oriented rational triangular prism. Rational 3D plane evaluation, orientation, unique intersection parameter and complete segment/plane intersection existence criterion. Barycentric plane evaluation/bounds and quadrilateral fan area-vector preservation. Coplanar plane-coordinate lifting satisfies the plane and uniquely restores the omitted coordinate. Cached oriented edge halfplane identity and nonparallel ray parameter invariance under nonzero plane rescaling.",
   "limitations": [
     "Not a verification of the entire TypeScript program or ECMAScript runtime.",
     "Parsing, BigInt runtime behavior, exceptions, Map/array/sort/freeze execution and compilation are outside this proof scope.",
@@ -142,6 +144,7 @@
     "Triangle/triangle intersection candidate enumeration, convex hull construction and all-pairs embedding inspection are covered by independent tests and hand proofs, not whole-program machine verification.",
     "Solid certification, rational generic-ray termination, PL separation and shell nesting are documented and independently tested, not machine-verified.",
     "Incremental triangle/plane arrangement clipping and strict interior witnesses are tested with independent halfplane enumeration and documented inductive invariants, not machine-verified.",
-    "Polyhedral Boolean plane grouping, coverage, two-sided sampling, boundary sewing, contact complexes and result provenance use documented construction arguments and independent tests, not whole-program machine verification."
+    "Polyhedral Boolean plane grouping, coverage, two-sided sampling, boundary sewing, contact complexes and result provenance use documented construction arguments and independent tests, not whole-program machine verification.",
+    "Solid locator plane grouping, cached data structures and strict coordinate-bound rejection are justified by arithmetic lemmas, geometric arguments and independent tests; the full cached query execution is not machine-verified."
   ]
 }

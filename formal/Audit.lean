@@ -122,3 +122,6 @@ import SortedAdjacency
 
 #print axioms Cadloom.plane_lift_satisfies
 #print axioms Cadloom.plane_lift_unique
+
+#print axioms Cadloom.cached_edge_halfplane
+#print axioms Cadloom.ray_parameter_rescale
