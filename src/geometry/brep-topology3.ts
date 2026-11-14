@@ -15,7 +15,7 @@ export interface BRepFaceInput3 {
   readonly sense:1|-1;
   readonly loops:readonly (readonly BRepEdgeUse3[])[];
 }
-export interface BRepEdge3 {readonly curve:Curve3;readonly start:number;readonly end:number;readonly coedges:readonly number[];}
+export interface BRepEdge3<C=Curve3> {readonly curve:C;readonly start:number;readonly end:number;readonly coedges:readonly number[];}
 export interface BRepCoedge3 extends BRepEdgeUse3 {
   readonly origin:number;readonly target:number;readonly face:number;readonly loop:number;
   readonly next:number;readonly previous:number;
@@ -48,10 +48,10 @@ export interface BRepShell3 {
 export type BRepIssue3=
  | {readonly kind:'unused-edge'|'boundary-edge'|'nonmanifold-edge'|'inconsistent-edge-orientation';readonly edge:number}
  | {readonly kind:'nonmanifold-vertex';readonly vertex:number};
-export interface BRepTopology3 {
+export interface BRepTopology3<C=Curve3> {
   readonly vertices:readonly AlgebraicCoordinates3[];
   readonly outgoing:readonly (readonly number[])[];
-  readonly edges:readonly BRepEdge3[];
+  readonly edges:readonly BRepEdge3<C>[];
   readonly coedges:readonly BRepCoedge3[];
   readonly loops:readonly BRepLoop3[];
   readonly faces:readonly BRepFace3[];
@@ -73,15 +73,22 @@ function snapshotSurface(surface:Surface3):Surface3 {
     default:throw new RangeError('Unknown analytic surface kind');
   }
 }
+/** Internal geometry bridge; adapters must supply immutable validated curves. */
+export interface BRepCurveAdapter3<C> {
+  snapshot(input:C):C;
+  endpoints(curve:C):readonly [AlgebraicCoordinates3,AlgebraicCoordinates3];
+  closed(curve:C):boolean;
+  onSurface(curve:C,surface:Surface3):boolean;
+}
 /** Builds explicit shared-edge BRep incidence; does not automatically node or weld
  * coincident edge geometries. Endpoint vertices are welded by exact algebraic equality.
  * Faces must later be certified as connected surface domains with valid boundaries.
  */
-export function buildBRepTopology3(inputEdges:readonly Curve3[],inputFaces:readonly BRepFaceInput3[]):BRepTopology3 {
-  const curves=inputEdges.map(snapshotCurve3),ends=curves.map(curveEndpoints3);
+export function buildBRepTopologyWithAdapter3<C>(inputEdges:readonly C[],inputFaces:readonly BRepFaceInput3[],adapter:BRepCurveAdapter3<C>):BRepTopology3<C> {
+  const curves=inputEdges.map(c=>adapter.snapshot(c)),ends=curves.map(c=>adapter.endpoints(c));
   curves.forEach((curve,i)=>{
-    const periodic=curve.kind==='circular-arc'?curve.arc.fullCircle:curve.kind==='elliptic-arc'?curve.arc.fullEllipse:curve.kind==='planar-arc'&&curve.arc.arc.fullCircle;
-    if(!periodic&&compareAlgebraicPoints3(ends[i]![0],ends[i]![1])===0)throw new RangeError('BRep edge must have positive extent; periodic circles are allowed');
+    const periodic=adapter.closed(curve);
+    if(!periodic&&compareAlgebraicPoints3(ends[i]![0],ends[i]![1])===0)throw new RangeError('BRep edge must have positive extent; validated closed curves are allowed');
   });
   const records=ends.flatMap((points,e)=>points.map((point,end)=>({point,port:2*e+end}))).sort((a,b)=>compareAlgebraicPoints3(a.point,b.point)||a.port-b.port);
   const vertices:AlgebraicCoordinates3[]=[],portVertex:number[]=[];
@@ -105,7 +112,7 @@ export function buildBRepTopology3(inputEdges:readonly Curve3[],inputFaces:reado
         if(!Number.isSafeInteger(use.edge)||use.edge<0||use.edge>=edges.length)throw new RangeError('Coedge must reference an existing edge');
         if(use.direction!==1&&use.direction!==-1)throw new RangeError('Coedge direction must be +1 or -1');
         const edge=edges[use.edge]!;
-        if(!checked.has(use.edge)){if(!curveOnSurface3(edge.curve,surface))throw new RangeError('Entire face edge must lie on its supporting surface');checked.add(use.edge);}
+        if(!checked.has(use.edge)){if(!adapter.onSurface(edge.curve,surface))throw new RangeError('Entire face edge must lie on its supporting surface');checked.add(use.edge);}
         const origin=use.direction===1?edge.start:edge.end,target=use.direction===1?edge.end:edge.start,id=coedges.length;
         coedges.push({edge:use.edge,direction:use.direction,origin,target,face,loop,next:start+(index+1)%inputLoop.length,previous:start+(index+inputLoop.length-1)%inputLoop.length,twin:null});
         uses.push(id);edge.coedges.push(id);outgoing[origin]!.push(id);
@@ -136,7 +143,7 @@ export function buildBRepTopology3(inputEdges:readonly Curve3[],inputFaces:reado
   }
   const vertexLinks=vertices.map((_,v)=>link(ports[v]!,outgoing[v]!));
   vertexLinks.forEach((report,vertex)=>{if(!report.manifold)issues.push({kind:'nonmanifold-vertex',vertex});});
-  const oriented=(e:BRepEdge3)=>e.coedges.length===1||e.coedges.length===2&&coedges[e.coedges[0]!]!.twin!==null;
+  const oriented=(e:BRepEdge3<C>)=>e.coedges.length===1||e.coedges.length===2&&coedges[e.coedges[0]!]!.twin!==null;
   const shells:BRepShell3[]=[];
   faces.forEach((first,start)=>{
     if(first.shell!==-1)return;
@@ -159,4 +166,12 @@ export function buildBRepTopology3(inputEdges:readonly Curve3[],inputFaces:reado
   }
   const closed=edges.every(e=>e.coedges.length===2),consistentlyOriented=edges.every(oriented),manifoldVertices=vertexLinks.every(v=>v.manifold);
   return Object.freeze({vertices:Object.freeze(vertices),outgoing:Object.freeze(outgoing.map(ids=>Object.freeze(ids))),edges:Object.freeze(edges.map(e=>Object.freeze({...e,coedges:Object.freeze(e.coedges)}))),coedges:Object.freeze(coedges.map(h=>Object.freeze(h))),loops:Object.freeze(loops),faces:Object.freeze(faces.map(f=>Object.freeze(f))),shells:Object.freeze(shells),vertexLinks:Object.freeze(vertexLinks),issues:Object.freeze(issues.map(i=>Object.freeze(i))),boundaryLoops,closed,consistentlyOriented,manifoldVertices,closedOrientedIncidence:closed&&consistentlyOriented&&manifoldVertices});
+}
+
+/** Native analytic-curve entry point using the shared incidence engine. */
+export function buildBRepTopology3(inputEdges:readonly Curve3[],inputFaces:readonly BRepFaceInput3[]):BRepTopology3 {
+  return buildBRepTopologyWithAdapter3(inputEdges,inputFaces,{
+    snapshot:snapshotCurve3,endpoints:curveEndpoints3,onSurface:curveOnSurface3,
+    closed:curve=>curve.kind==='circular-arc'?curve.arc.fullCircle:curve.kind==='elliptic-arc'?curve.arc.fullEllipse:curve.kind==='planar-arc'&&curve.arc.arc.fullCircle,
+  });
 }

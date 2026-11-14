@@ -4,6 +4,8 @@
 
 このREADMEはソース版のAPIを対象とし、公開済みnpmパッケージに未収録の機能を含みます。
 
+開発はカーネルを優先します。[次の開発と形状の成立条件](docs/kernel-priorities.md)を参照してください。
+
 ## 実行
 
 Node.js 24以上を使用します。
@@ -883,7 +885,7 @@ hit.points[0].branches[0].multiplicity; // 2: この曲線では接触
 
 ノットの最大重複度は次数+1です。不連続点では`'left'`／`'right'`で評価する側を選べます。
 交差結果はノットの両側の点と重複度、平面上に含まれる区間を保持します。
-自由曲線のB-rep接続と商用CAD形式の入出力は今後の開発です。NURBS曲面と曲線同士の交差の幾何APIは後述します。
+トリムされたNURBS面のB-rep接続と商用CAD形式の入出力は今後の開発です。検査済みNURBS辺の接続APIは後述します。NURBS曲面と曲線同士の交差の幾何APIは後述します。
 現在の`Curve3`とは別のパラメトリック形状APIです。
 [計算法・検証範囲](docs/proofs/nurbs-curve3.md)を参照してください。
 
@@ -1013,4 +1015,31 @@ intersection.relations; // uが第1曲線、vが第2曲線のパラメータ
 ```sh
 npm run build
 node examples/nurbs-curve-intersection3.ts
+```
+
+## NURBS曲線を検査してB-repの辺へ渡す
+
+`analyzeNurbsCurve3`は位置の連続性、停留点と最初の非ゼロ微分、接線方向、自己交差・重複を厳密に調べます。
+`prepareNurbsEdge3`は連続で単純な曲線を受け入れ、辺の内部にはG1の幾何学的な滑らかさを要求します。
+端点の`t²`や内部の`t³`のように、速度ゼロでも滑らかな形状を表す場合は有限の微分から判定します。
+
+```ts
+const report = analyzeNurbsCurve3(curve);
+report.parameterRegular; // 全区間の端点も含め、速度がゼロにならないか
+report.interiorG1; // 辺の内部で向きのそろった接線を持つか
+report.simple; // 端点で閉じる場合を除き、同じ点を再訪しないか
+report.monotoneCoordinate; // 厳密な単調性で単純性を保証できた座標。該当しなければnull
+const edge = prepareNurbsEdge3(curve);
+edge.contains(point3('3/5', '4/5', 0n));
+```
+
+内部の角や尖点は分割して頂点にします。閉じた辺では、継ぎ目に同じ位置の始点・終点のポートを保持します。
+`buildNurbsBRepTopology3(edges, faces)`は検査済みNURBS辺を既存と同じ接続エンジンへ渡します。
+対応する支持面は平面・円柱で、辺全体が面上にあることを多項式の恒等式で調べます。
+結果は`BRepTopology3<PreparedNurbsEdge3>`です。面領域、辺同士の交差、閉じた立体の認定には追加の検証が必要です。
+[判定・構成・検証範囲](docs/proofs/nurbs-edge3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-edge3.ts
 ```

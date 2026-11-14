@@ -80,7 +80,8 @@ and commercial CAD file import remain future work. Tensor-product surface
 geometry is supplied separately by [nurbsSurface3](nurbs-surface3.md).
 Curve/curve correspondences are supplied by [intersectNurbsCurves3](nurbs-curve-intersection3.md).
 These curves are consequently a separate parameterized-geometry API;
-they are not yet accepted as the existing `Curve3` BRep edge variants.
+they are not yet accepted as the existing `Curve3` variants. Validated
+NURBS edges use a separate [shared-incidence bridge](nurbs-edge3.md).
 High degree and algebraic operations may cause large exact coefficients.
 
 Algorithm references: Michigan Tech's [de Boor recurrence](https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/B-spline/de-Boor.html)

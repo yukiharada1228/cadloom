@@ -87,6 +87,7 @@ covered set. Its graph dimension and connected components are not asserted
 to be spatial intersection topology. Distinct span-pair charts are not
 globally welded; contact order, regularity, orientation, BRep integration
 and applying these relations to arbitrary spatial section sewing remain
-future work. High-degree exact elimination may be expensive. The new
+future work. Individual curve validation and NURBS-edge incidence are
+supplied by [prepareNurbsEdge3](nurbs-edge3.md). High-degree exact elimination may be expensive. The new
 algorithm is supported by construction arguments and independent tests,
 not machine-verified TypeScript execution.

@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "1bbd2cf18c41e6d6c1c13fcefb1a6e3c25acfbc5d5142648701db24583fbbe08",
+    "src/index.ts": "6c07a1aa1cec9806ff884bcc2980debf4ccf8bc6ea71e8ab40841dca6e990f62",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -41,7 +41,7 @@
     "src/geometry/surface3.ts": "6481781cc6ec8b591145b2eb3d8e89a8cec25183afc9cf04426f8161c87b6c54",
     "src/geometry/curve3.ts": "e8d7626dc99161be0f58d717f513cb63b4d0e9322ed520da9e188d20aa0f2043",
     "src/geometry/circle3.ts": "44a5e98e12842c9e5cc1aaff737a4a0e6eb0b7b91cbe9d1e2d82834ae7d0722c",
-    "src/geometry/brep-topology3.ts": "2addd022d961e0a2c14f709b16288fba53a5f9f964f31bedd8a75f78b1553915",
+    "src/geometry/brep-topology3.ts": "7738ec1b40a84f4b1302d4b9c58b96c70c588c52f911b18bbf418e49d3ff2f4b",
     "src/geometry/planar-face3.ts": "97635a4af8ad28423b49a1a92307d751143c82514c3e90fdae8263eeffacb0b9",
     "src/geometry/algebraic-segment3.ts": "d9f4028ff34ee949228eb095ef58fe12bd67ca6b3c2826f8771a5d5a003a93a1",
     "src/geometry/cylinder-face3.ts": "db8458fb255f2ee49028b559ccfad88ae477616b2b51c10cb06e2e7aaf58e6b1",
@@ -68,7 +68,9 @@
     "src/geometry/nurbs-plane-section3.ts": "b286bf499537d17cb5cb7a8e611b4b730a66849d83bc641497744c4ec3be4db8",
     "src/geometry/algebraic-curve-topology2.ts": "53dd30141ca3318a545147115218c7fa170720e00c54aee6f6f89e0ae99ad9e4",
     "src/geometry/nurbs-section-seams3.ts": "d6cff0d9a47d3018d937dff6b941b523e04cf3e0994bb4fd440608c2b6cb120e",
-    "src/geometry/nurbs-curve-intersection3.ts": "e9e4366d678cae50d24938c75c7e177a0c9734d1ab52952b2d1c637e9978b881"
+    "src/geometry/nurbs-curve-intersection3.ts": "34b2c6bb47907deccecb48d0eed3aca9cd7074863e6afff6e866ff00a07b97a8",
+    "src/geometry/nurbs-curve-analysis3.ts": "0b5a12627ba62d849adb6d52a64fc133c5adfdfddd063e941b6844eff1af651d",
+    "src/geometry/nurbs-edge3.ts": "46c1e85d8b7e562d02eef6be2097abfde8fde2d2d7d9d2544dab51627fef0c24"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -245,6 +247,7 @@
     "Exact bivariate division, primitive-PRS gcd, fraction-free resultants, nonminimal-certificate fiber norm lifting and isolated residual system roots use documented algebraic arguments and independent determinant/known-root tests, not full TypeScript verification. Shared zero loci remain implicit in the system solver, including any real isolated points within them; bounded tracing is a separate API. Multiplicities, arbitrary trim domains and global NURBS/BRep intersection assembly remain outside the system solver.",
     "Bounded algebraic zero-locus graphs, exact event fibers, separator-certified branch adjacency, rational recognition by continued fractions and patch-wise NURBS plane sections use documented construction arguments and independent graph/set/analytic fixtures, not machine-verified TypeScript execution. Components are in parameter space; general spatial overlap welding, spatial embedding, analytic germ pairing, oriented trimmed faces and BRep sewing remain future work.",
     "Exact equal-parameter NURBS section sewing, homogeneous boundary-map equality, section-plane contact gcds, algebraic seam noding, source provenance and contained-patch attachments use documented arguments and independent source-coverage/geometry fixtures, not full TypeScript verification. Components describe a seam quotient; distinct-parameter spatial overlaps, embedding, orientation and BRep face certification remain outside scope.",
-    "Multiple bivariate constraints and closed-span spatial NURBS curve intersections, including shared-factor parameter relation graphs, constant curves, self-intersection events and one-sided discontinuities use documented induction/denominator arguments and independent analytic/source-evaluation tests. TypeScript execution is not formally verified; global spatial topology, chart welding, contact multiplicity and BRep integration remain outside scope."
+    "Multiple bivariate constraints and closed-span spatial NURBS curve intersections, including shared-factor parameter relation graphs, constant curves, self-intersection events and one-sided discontinuities use documented induction/denominator arguments and independent analytic/source-evaluation tests. TypeScript execution is not formally verified; global spatial topology, chart welding, contact multiplicity and BRep integration remain outside scope.",
+    "Exact NURBS continuity, stationary-jet parity, root-isolated strict-monotonicity certificates, diagonal-removed simplicity checks, rational-function point membership and whole plane/cylinder support use documented arguments and independent geometric fixtures. Prepared NURBS edges share the native incidence engine through a typed geometry bridge. This is not machine-verified TypeScript or a face/solid embedding certificate; inter-edge noding, NURBS face supports, geometric face orientation and mixed-family sewing remain outside scope."
   ]
 }

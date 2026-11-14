@@ -1,0 +1,5 @@
+import {point3,vector3,line3,cylinder3,nurbsCurve3,prepareNurbsEdge3,reverseNurbsEdge3,buildNurbsBRepTopology3} from '../dist/index.js';
+const K=[0n,0n,1n,1n],quarter=(z:bigint)=>nurbsCurve3(2,[point3(1n,0n,z),point3(1n,1n,z),point3(0n,1n,z)],[0n,0n,0n,1n,1n,1n],[1n,1n,2n]);
+const bottom=prepareNurbsEdge3(quarter(0n)),up=prepareNurbsEdge3(nurbsCurve3(1,[point3(0n,1n,0n),point3(0n,1n,1n)],K)),top=reverseNurbsEdge3(prepareNurbsEdge3(quarter(1n))),down=prepareNurbsEdge3(nurbsCurve3(1,[point3(1n,0n,1n),point3(1n,0n,0n)],K)),edges=[bottom,up,top,down];
+const surface={kind:'cylinder' as const,cylinder:cylinder3(line3(point3(0n,0n,0n),vector3(0n,0n,1n)),1n)},topology=buildNurbsBRepTopology3(edges,[{surface,sense:1,loops:[edges.map((_,edge)=>({edge,direction:1 as const}))]}]);
+console.log({vertices:topology.vertices.length,edges:topology.edges.length,boundaryLoops:topology.boundaryLoops!.length,wholeCurveSupport:edges.every(e=>e.liesOn(surface)),manifoldVertices:topology.manifoldVertices,closedIncidence:topology.closedOrientedIncidence});

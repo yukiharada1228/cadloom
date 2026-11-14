@@ -36,14 +36,14 @@ const owned=new WeakSet<NurbsCurveIntersection3>();
 const real=(x:AlgebraicReal|ExactInput)=>x instanceof AlgebraicReal?x:AlgebraicReal.fromRational(x);
 const outer=(a:Polynomial,b:Polynomial)=>new BivariatePolynomial(a.coefficients.map(x=>b.coefficients.map(y=>x.mul(y))));
 function inSpan(t:AlgebraicReal,s:NurbsSpan3):boolean {return t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0;}
-function equations(a:NurbsSpan3,b:NurbsSpan3):readonly BivariatePolynomial[]{return (['x','y','z'] as const).map(k=>outer(a[k],b.weight).sub(outer(a.weight,b[k])));}
+export function nurbsSpanPairEquations3(a:NurbsSpan3,b:NurbsSpan3):readonly BivariatePolynomial[]{return (['x','y','z'] as const).map(k=>outer(a[k],b.weight).sub(outer(a.weight,b[k])));}
 /** Complete intersections of closed span images, retaining parameter relations
  * for coincident arcs, constant curves and nonlinear reparameterizations.
  */
 export function intersectNurbsCurves3(inputFirst:NurbsCurve3,inputSecond:NurbsCurve3):NurbsCurveIntersection3 {
   const first=nurbsCurve3(inputFirst.degree,inputFirst.controlPoints,inputFirst.knots,inputFirst.weights),second=nurbsCurve3(inputSecond.degree,inputSecond.controlPoints,inputSecond.knots,inputSecond.weights),points:{firstParameter:AlgebraicReal;secondParameter:AlgebraicReal;point:AlgebraicCoordinates3;branches:{firstSpan:number;secondSpan:number}[]}[]=[],relations:NurbsCurveParameterRelation3[]=[];
   for(const a of nurbsCurveSpans3(first))for(const b of nurbsCurveSpans3(second)){
-    const result=solveBivariateEquations(equations(a,b));
+    const result=solveBivariateEquations(nurbsSpanPairEquations3(a,b));
     const record=(p:{readonly u:AlgebraicReal;readonly v:AlgebraicReal})=>{
       if(!inSpan(p.u,a)||!inSpan(p.v,b))return;
       const point=evaluateNurbsSpanPoint3(a,p.u);let prior=points.find(q=>q.firstParameter.compare(p.u)===0&&q.secondParameter.compare(p.v)===0&&compareAlgebraicPoints3(q.point,point)===0);
