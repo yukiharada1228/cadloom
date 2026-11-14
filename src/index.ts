@@ -63,3 +63,5 @@ export { algebraicCoordinates3, algebraicPoint3, compareAlgebraicPoints3 } from 
 export type { AlgebraicCoordinates3, AlgebraicPoint3 } from './geometry/algebraic-point3.js';
 export { line3, cylinder3, evaluateCylinder3, classifyPointToSurface3, normalToSurface3, intersectLineSurface3, intersectSegmentSurface3, surfacesCoincide3 } from './geometry/surface3.js';
 export type { Line3, Cylinder3, Surface3, LineSurfaceHit3, LineSurfaceIntersection3, SegmentSurfaceIntersection3 } from './geometry/surface3.js';
+export { planeFrame3, mapPlanePoint3, pointInPlaneFrame3, lineInterval3, planarArc3, curveEndpoints3, reverseCurve3, pointOnCurve3, curveOnSurface3, curveLoop3 } from './geometry/curve3.js';
+export type { PlaneFrame3, LineInterval3, PlanarArc3, Curve3, CurveLoop3 } from './geometry/curve3.js';

@@ -541,3 +541,32 @@ const hit = intersectLineSurface3(
 npm run build
 node examples/analytic-surfaces3.ts
 ```
+
+
+## B-repへ向けた3Dの辺と支持面上の閉路
+
+`lineInterval3`は有理数の直線を代数的なパラメータで切り取ります。`planarArc3`は局所的な円弧を有理数の平面座標系`PlaneFrame3`へ写します。座標系は直交・単位長である必要がなく、傾いた断面の楕円状の辺も表現できます。ただし有理数のアフィン円弧だけでは、任意軸のすべての円や楕円を表せません。一般の空間円・円錐曲線は引き続き拡張します。
+
+```ts
+const frame = planeFrame3(
+  point3(0n, 0n, 0n), vector3(1n, 0n, 0n), vector3(0n, 1n, 1n),
+);
+const edge: Curve3 = {
+  kind: 'planar-arc',
+  arc: planarArc3(frame, fullCircleArc2(circle2(point2(0n, 0n), 1n))),
+};
+// (x,y,y), x²+y²=1：円柱 x²+y²=1 と平面 z-y=0 の断面
+const loop = curveLoop3([edge], {
+  kind: 'cylinder',
+  cylinder: cylinder3(line3(point3(0n, 0n, 0n), vector3(0n, 0n, 1n)), 1n),
+});
+```
+
+`mapPlanePoint3`と`pointInPlaneFrame3`は平面座標の写像と逆写像です。平面外の点への逆写像は`null`を返します。`pointOnCurve3`はトリムを含む辺上の判定、`reverseCurve3`は向きの反転、`curveOnSurface3`は辺全体が支持面上にあるかの判定を行います。端点だけの一致では面上と判定しません。
+
+`curveLoop3`は閉路の接続と全曲線の支持面への所属を検査します。自己交差・往復・面積ゼロはまだ排除しないため、これだけでB-repの面や立体の妥当性を保証するものではありません。辺の共有、面の領域、シェルの検証へ続けます。[構成の根拠・検証範囲](docs/proofs/brep-curves3.md)を参照してください。
+
+```sh
+npm run build
+node examples/brep-curves3.ts
+```
