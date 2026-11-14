@@ -123,4 +123,5 @@ is not claimed. General algebraic predicates can still be expensive; the tangent
 cancellation avoids unnecessary degree growth in this stage.
 
 Face grouping and exact face witnesses are implemented in [curve-faces.md](curve-faces.md).
-Filled curved Booleans, splines and curved 3D BRep remain later kernel stages. No GUI or tolerance-based healing is added.
+Filled curved Booleans are implemented in [curve-booleans.md](curve-booleans.md).
+Splines and curved 3D BRep remain later kernel stages. No GUI or tolerance-based healing is added.
