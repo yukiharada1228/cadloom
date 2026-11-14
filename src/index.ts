@@ -28,3 +28,5 @@ export type { Point3, Vector3, Segment3 } from "./geometry/point3.js";
 export { orient3d } from "./geometry/orient3d.js";
 export { plane3, planeFromPoints, evaluatePlane3, classifyPointToPlane3, intersectSegmentPlane } from "./geometry/plane3.js";
 export type { Plane3, SegmentPlaneIntersection } from "./geometry/plane3.js";
+export { triangle3, pointOnTriangle3, intersectTrianglePlane, splitTriangleByPlane } from "./geometry/triangle3.js";
+export type { Triangle3, TrianglePlaneIntersection, TrianglePlaneSplit } from "./geometry/triangle3.js";

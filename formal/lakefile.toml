@@ -1,6 +1,6 @@
 name = "cadloomProofs"
 version = "0.1.0"
-defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership", "IntersectionBranches", "CollinearOverlap", "PairLoop", "CutCompleteness", "SortedAdjacency", "FaceSampling", "AffineGeometry", "PrismVolume", "PlaneGeometry"]
+defaultTargets = ["Cadloom", "SourceArithmetic", "SegmentMembership", "IntersectionBranches", "CollinearOverlap", "PairLoop", "CutCompleteness", "SortedAdjacency", "FaceSampling", "AffineGeometry", "PrismVolume", "PlaneGeometry", "TriangleGeometry"]
 
 [[require]]
 name = "mathlib"
@@ -42,3 +42,6 @@ name = "PrismVolume"
 
 [[lean_lib]]
 name = "PlaneGeometry"
+
+[[lean_lib]]
+name = "TriangleGeometry"

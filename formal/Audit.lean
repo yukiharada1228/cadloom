@@ -1,3 +1,4 @@
+import TriangleGeometry
 import PlaneGeometry
 import PrismVolume
 import AffineGeometry
@@ -113,3 +114,7 @@ import SortedAdjacency
 #print axioms Cadloom.plane_parameter_unit_iff
 #print axioms Cadloom.plane_constant_on_parallel
 #print axioms Cadloom.plane_segment_meets_iff
+
+#print axioms Cadloom.triangle_plane_value
+#print axioms Cadloom.triangle_plane_bounds
+#print axioms Cadloom.triangle_fan_area_vector
