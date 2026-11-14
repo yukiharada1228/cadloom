@@ -30,3 +30,5 @@ export { plane3, planeFromPoints, evaluatePlane3, classifyPointToPlane3, interse
 export type { Plane3, SegmentPlaneIntersection } from "./geometry/plane3.js";
 export { triangle3, pointOnTriangle3, intersectTrianglePlane, splitTriangleByPlane } from "./geometry/triangle3.js";
 export type { Triangle3, TrianglePlaneIntersection, TrianglePlaneSplit } from "./geometry/triangle3.js";
+export { buildTriangleTopology } from "./geometry/triangle-topology.js";
+export type { TriangleTopology, TopologyHalfEdge3, TopologyEdge3, TopologyFace3, TriangleShell3, TopologyIssue3 } from "./geometry/triangle-topology.js";
