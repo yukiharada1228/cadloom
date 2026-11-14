@@ -296,7 +296,7 @@ node examples/triangle-plane-split.ts
 - `boundaryLoops`は向き付き境界半辺のループです。境界が枝分かれ・不整合ならnull、境界がなければ空配列です。
 - `closedManifold`は閉鎖・向き・リンク・重複の条件です。幾何学的な自己交差や外向きを保証するソリッド認定ではありません。
 
-開いたシェルや不整合なシェルの`signedVolume`はnullです。閉じた整合シェルでも内向きなら負になります。ずれの補正やT字接続の自動分割、シェルの包含・空洞分類はまだ行いません。[不変条件の証明と検査範囲](docs/proofs/triangle-topology.md)を参照してください。
+開いたシェルや不整合なシェルの`signedVolume`はnullです。閉じた整合シェルでも内向きなら負になります。このAPIではずれの補正やT字接続の自動分割は行いません。シェルの包含・空洞分類は後述の`prepareSolid3`で検査します。[不変条件の証明と検査範囲](docs/proofs/triangle-topology.md)を参照してください。
 
 ```sh
 npm run build
@@ -310,9 +310,22 @@ node examples/triangle-topology.ts
 
 `inspectTriangleEmbedding(triangles)`は全ての面ペアを調べ、共有する頂点・辺を超えた交差や重複面を、面インデックスと交差集合付きで返します。隣接面どうしの面積重複や未分割T字接続も検出します。
 
-`embedded`は閉じたソリッドの認定ではありません。閉鎖・向き・非多様体は位相構造で別に検査し、シェルの包含・空洞分類も今後必要です。現在はO(F²)の全ペア検査です。[仕様と証明](docs/proofs/triangle-intersection3.md)を参照してください。
+`embedded`は閉じたソリッドの認定ではありません。閉鎖・向き・非多様体は位相構造で別に検査し、シェルの包含・空洞分類は後述の`prepareSolid3`で検査します。現在はO(F²)の全ペア検査です。[仕様と証明](docs/proofs/triangle-intersection3.md)を参照してください。
 
 ```sh
 npm run build
 node examples/triangle-intersection3.ts
 ```
+
+## 厳密なソリッド認定と内外判定
+
+`prepareSolid3(triangles)`は閉じた面集合の位相・自己交差を検査し、シェルの包含深さと向きを確認します。外殻は外向き、空洞は内向き、その内側の島は外向きである必要があります。不正な入力は`RangeError`になります。接触するシェルの自動修復は行いません。
+
+```ts
+const solid = prepareSolid3(triangles);
+solid.volume.toString();                 // 空洞を差し引いた厳密な体積
+solid.locate(point3('1/3', '1/2', '2'));  // 'inside' | 'boundary' | 'outside'
+solid.shells.map(s => s.depth);          // 外殻0、空洞1、島2…
+```
+
+空集合・複数の離れた立体・貫通穴にも対応します。辺や頂点を通る半直線は別の有理数方向で再試行し、許容誤差を使いません。認定時はO(F²)、問い合わせも最悪O(F²)回の算術演算が必要です。面集合のBoolean演算は今後の実装です。[判定の根拠と検証範囲](docs/proofs/solid3.md)を参照してください。

@@ -34,3 +34,5 @@ export { buildTriangleTopology } from "./geometry/triangle-topology.js";
 export type { TriangleTopology, TopologyHalfEdge3, TopologyEdge3, TopologyFace3, TriangleShell3, TopologyIssue3 } from "./geometry/triangle-topology.js";
 export { intersectTriangles3, inspectTriangleEmbedding } from "./geometry/triangle-intersection3.js";
 export type { TriangleTriangleIntersection, TriangleEmbeddingInspection, TriangleEmbeddingIssue } from "./geometry/triangle-intersection3.js";
+export { prepareSolid3 } from './geometry/solid3.js';
+export type { PreparedSolid3, SolidShell3 } from './geometry/solid3.js';
