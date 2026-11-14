@@ -150,3 +150,5 @@ import SortedAdjacency
 #print axioms Cadloom.line_sphere_polynomial
 #print axioms Cadloom.plane_gram_intersection
 #print axioms Cadloom.circle_basis_orientation
+
+#print axioms Cadloom.strict_sum_squares_iff

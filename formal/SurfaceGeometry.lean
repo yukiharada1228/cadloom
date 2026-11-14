@@ -83,4 +83,27 @@ theorem circle_basis_orientation {K : Type*} [CommRing K] (nx ny nz ux uy uz : K
       (nx^2+ny^2+nz^2)*(ux^2+uy^2+uz^2)-(nx*ux+ny*uy+nz*uz)^2 := by
   ring
 
+/-- Strict circle inclusion and strict disk separation can be checked on squared
+radii and squared center distances without constructing square roots. -/
+theorem strict_sum_squares_iff {K : Type*} [Field K] [LinearOrder K] [IsStrictOrderedRing K]
+    (a b c : K) (ha : 0 ≤ a) (hb : 0 ≤ b) (hc : 0 ≤ c) :
+    b+c<a ↔ 0<a^2-b^2-c^2 ∧ 4*b^2*c^2<(a^2-b^2-c^2)^2 := by
+  have hbc : 0 ≤ 2*b*c := by positivity
+  constructor
+  · intro h
+    have hp : 0 < (a-(b+c))*(a+(b+c)) := mul_pos (by linarith) (by linarith)
+    have hA : 2*b*c < a^2-b^2-c^2 := by nlinarith [hp]
+    have hq : 0 < ((a^2-b^2-c^2)-2*b*c)*((a^2-b^2-c^2)+2*b*c) :=
+      mul_pos (by linarith) (by linarith)
+    constructor <;> nlinarith [hq]
+  · rintro ⟨hA, hq⟩
+    have hcross : 2*b*c < a^2-b^2-c^2 := by
+      by_contra h
+      have hp : 0 ≤ (2*b*c-(a^2-b^2-c^2))*(2*b*c+(a^2-b^2-c^2)) :=
+        mul_nonneg (by linarith) (by linarith)
+      nlinarith [hp]
+    by_contra h
+    have hp : 0 ≤ ((b+c)-a)*((b+c)+a) := mul_nonneg (by linarith) (by positivity)
+    nlinarith [hp]
+
 end Cadloom

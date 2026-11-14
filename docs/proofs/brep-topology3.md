@@ -85,7 +85,9 @@ holes or periodic seams.
 
 Even coincident opposite disks or a zero-area retraced face can pass abstract
 incidence. This is intentional evidence that the result is **not** a solid
-certificate. Face-domain validation, boundary/normal agreement, intersections,
+certificate. Constructed chart/circular planar face domains and their boundary/normal agreement
+are now validated by [planar-face3.md](planar-face3.md). Arbitrary face-table
+validation, intersections,
 embedding, shell nesting and material-side orientation remain necessary. Geometry
 must not be considered valid merely because this flag is true.
 
