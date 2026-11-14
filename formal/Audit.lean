@@ -1,3 +1,4 @@
+import PlaneGeometry
 import PrismVolume
 import AffineGeometry
 import FaceSampling
@@ -104,3 +105,11 @@ import SortedAdjacency
 #print axioms Cadloom.affine_segment_iff
 
 #print axioms Cadloom.prism_volume_eq_area_height
+
+#print axioms Cadloom.plane_lerp_value
+#print axioms Cadloom.plane_through_orientation
+#print axioms Cadloom.plane_through_endpoints
+#print axioms Cadloom.plane_zero_parameter_iff
+#print axioms Cadloom.plane_parameter_unit_iff
+#print axioms Cadloom.plane_constant_on_parallel
+#print axioms Cadloom.plane_segment_meets_iff
