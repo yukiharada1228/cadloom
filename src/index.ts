@@ -9,3 +9,5 @@ export { splitSegments } from "./geometry/split-segments.js";
 export type { SplitVertex, SplitEdge, SegmentArrangement } from "./geometry/split-segments.js";
 export { buildHalfEdges, compareDirections } from "./geometry/half-edges.js";
 export type { HalfEdge, BoundaryWalk, HalfEdgeArrangement } from "./geometry/half-edges.js";
+export { buildFaces } from "./geometry/faces.js";
+export type { ArrangementFace, FaceArrangement } from "./geometry/faces.js";

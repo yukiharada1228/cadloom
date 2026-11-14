@@ -1,3 +1,4 @@
+import FaceSampling
 import Cadloom
 import SourceArithmetic
 import SegmentMembership
@@ -88,3 +89,9 @@ import SortedAdjacency
 #print axioms Cadloom.sourceEdge_no_interior_global_vertex
 #print axioms Cadloom.sourceEdges_cover_segment
 #print axioms Cadloom.sourceEdge_provenance_complete
+
+#print axioms Cadloom.leftSample_cross
+#print axioms Cadloom.leftSample_strictly_left
+#print axioms Cadloom.shortenStep_positive
+#print axioms Cadloom.shortenStep_before_hit
+#print axioms Cadloom.shortenStep_preserves_bound
