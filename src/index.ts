@@ -11,3 +11,5 @@ export { buildHalfEdges, compareDirections } from "./geometry/half-edges.js";
 export type { HalfEdge, BoundaryWalk, HalfEdgeArrangement } from "./geometry/half-edges.js";
 export { buildFaces } from "./geometry/faces.js";
 export type { ArrangementFace, FaceArrangement } from "./geometry/faces.js";
+export { booleanPolygons } from "./geometry/polygon-boolean.js";
+export type { PolygonRegion, BooleanOperation, FillRule, PolygonBooleanResult } from "./geometry/polygon-boolean.js";

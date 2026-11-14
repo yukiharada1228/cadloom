@@ -149,3 +149,25 @@ node examples/faces-to-svg.ts
 ```
 
 既定の例では交差する2つの四角形から面積1・3・3の領域を色分けします。所属判定も有理数で行い、固定の許容誤差は使いません。SVG表示への射影だけを近似します。[正当性と保証の範囲](docs/proofs/faces.md)を参照してください。面抽出は全ペアによる線分分割に加え、各境界の包含判定を行う実装で、大規模データ向けの空間索引は未実装です。
+
+## ポリゴンの集合演算
+
+```ts
+import { booleanPolygons, point2 } from "cadloom";
+const a = [[point2(0n, 0n), point2(2n, 0n), point2(2n, 2n), point2(0n, 2n)]];
+const b = [[point2(1n, 1n), point2(3n, 1n), point2(3n, 3n), point2(1n, 3n)]];
+const result = booleanPolygons(a, b, "intersection");
+console.log(result.twiceArea.toString()); // "2"（面積1）
+```
+
+`union`・`intersection`・`difference`（aからbを引く）・`xor`を指定できます。入力は暗黙に閉じる環の配列で、各環には3点以上必要です。既定の塗り規則は`even-odd`、第4引数に`nonzero`も指定できます。自己交差・重複・退化環を扱います。
+
+結果の`rings`は選択領域を左に持つ向きで、外側は反時計回り、穴は時計回りです。穴を差し引いた面積の2倍を`twiceArea`に保持し、`arrangement`・`selectedFaces`で元の面を参照できます。環が単純であることは保証せず、接触頂点を共有する場合があります。
+
+これは面積領域の正則化演算です。点・線だけの交差は出力しません。[仕様と正当性](docs/proofs/polygon-booleans.md)を参照してください。
+
+```sh
+npm run build
+node examples/polygon-booleans-to-svg.ts
+# artifacts/polygon-booleans.{json,svg} に4演算の比較を生成
+```
