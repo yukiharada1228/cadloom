@@ -175,4 +175,14 @@ theorem quadratic_roots_vieta {K : Type*} [Field K] (a b c x y : K)
   · apply (eq_div_iff ha).2
     linear_combination -hx+x*hs
 
+/-- Contracting toward an axis point makes a regular cylinder boundary point
+strictly radial-interior for a scale between zero and one. -/
+theorem cylinder_radial_contraction {K : Type*} [CommRing K]
+    (dx dy dz x y z r s : K) :
+    cylinderForm3 dx dy dz (s*x) (s*y) (s*z) r =
+      s^2*cylinderForm3 dx dy dz x y z r+
+      (s^2-1)*r*(dx^2+dy^2+dz^2) := by
+  unfold cylinderForm3
+  ring
+
 end Cadloom

@@ -165,3 +165,5 @@ import SortedAdjacency
 #print axioms Cadloom.positive_height_bound
 
 #print axioms Cadloom.quadratic_roots_vieta
+
+#print axioms Cadloom.cylinder_radial_contraction

@@ -799,9 +799,35 @@ if (split.kind === 'split') {
 }
 ```
 
-両方の子領域をさらに分割できます。切断面が元の平面全体と一致する場合は`kind: 'coplanar'`を返します。点や線だけが残る部分は正則化して除き、成分の境界が点で接する場合は接続診断へ保持します。任意の曲線領域による追加の切り取りや、円柱壁と平面の面を縫い合わせる処理は今後の開発です。[構成・連結性・検証範囲](docs/proofs/trimmed-planar3.md)を参照してください。
+両方の子領域をさらに分割できます。切断面が元の平面全体と一致する場合は`kind: 'coplanar'`を返します。点や線だけが残る部分は正則化して除き、成分の境界が点で接する場合は接続診断へ保持します。任意の曲線領域による追加の切り取りは今後の開発です。円柱と平面の積集合を閉じたB-repへ構築するAPIは後述しています。[構成・連結性・検証範囲](docs/proofs/trimmed-planar3.md)を参照してください。
 
 ```sh
 npm run build
 node examples/trimmed-planar3.ts
+```
+
+## 円柱と平面から閉じた立体B-repを構築する
+
+`clipCylinderBRep3(cylinder, lower, upper, halfspaces)`は、内部を満たした有限の円柱と有理数の平面半空間の積集合を構築します。円柱壁と平面の切断面を解析形状のまま生成し、境界をそろえて共有辺を持つ閉じたB-repへ接続します。
+
+```ts
+const solid = clipCylinderBRep3(
+  cylinder3(line3(point3(0n, 0n, 0n), vector3(0n, 0n, 1n)), 1n),
+  -2n, 2n,
+  [{ plane: plane3(1n, 0n, 1n), side: -1 }],
+);
+solid.topology.closedOrientedIncidence; // true
+solid.interiorSample; // 厳密に内部にある有理数の点
+solid.locate(point3(0n, 0n, -1n)); // inside
+```
+
+上下限は入力軸のパラメータです。`faces`は`topology.faces`と同じ順序で、各面の領域と連結成分を保持します。接するだけの面や体積を持たない結果は正則化して除きます。円柱壁がすべて消え、内側の多面体だけが残る場合にも対応します。切断で楕円が残る部分は楕円弧として保持します。
+
+`sewBRepFaces3`は面の境界を既知の端点で分割して共通の辺へまとめ、元の曲線から辺への対応を`sourceUses`へ記録します。任意の面同士の交差計算や立体の認定には追加の幾何検証が必要です。`clipCylinderBRep3`は円柱と半空間の既知の積集合として領域を構成し、閉じた接続・向き・内部点を検査します。対象は凸な円柱／平面の積集合で、一般の曲面Boolean演算や穴付き立体は今後の開発です。
+
+[境界の接続と範囲](docs/proofs/sew-brep3.md)・[立体の構成と検証範囲](docs/proofs/clipped-cylinder-brep3.md)を参照してください。
+
+```sh
+npm run build
+node examples/clipped-cylinder-brep3.ts
 ```
