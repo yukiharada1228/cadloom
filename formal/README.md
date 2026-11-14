@@ -29,6 +29,8 @@ node formal/scripts/verify.mjs
 | `CutCompleteness.lean` | 各線分上の分割対象頂点を取りこぼさないこと |
 | `SortedAdjacency.lean` | 隣接辺の健全性・被覆、内部頂点の不在、入力元との対応 |
 
+`FaceSampling.lean`では面の所属判定用の左側標本点と正の刻み幅の縮小に関する算術補題も検査します。面の包含・位相全体は機械検証の対象外です。
+
 `Audit.lean`で登録定理の依存公理を監査し、`verification-status.json`に対象を記録します。定理は任意の有理数入力に関するもので、有限のテスト結果ではありません。
 
 ## 保証の境界
