@@ -1063,3 +1063,23 @@ const matches = nurbsSurfaceBoundaryMatchesCurve3(boundary, spatialCurve);
 npm run build
 node examples/nurbs-surface-boundary3.ts
 ```
+
+## NURBS境界によるパラメータ領域
+
+`prepareNurbsParameterDomain2(outer, holes, sense)`は、NURBS曲線の列から外周と穴を持つ2D領域を検証します。
+曲線は`x=u, y=v, z=0`です。閉じた接続、自己交差、隣接端点以外の接触、重複、穴の内包関係、向きを検査します。
+外周は`sense`の向き、穴は逆向きが必要です。入力を自動で修復しません。
+
+```ts
+const domain = prepareNurbsParameterDomain2(outerCurves, holeCurveRings);
+domain.locate('1/3', '2/5'); // 'inside' | 'boundary' | 'outside'
+domain.sample; // 穴を避けた厳密な有理数の内部点 {u,v}
+```
+
+代数的数の点も判定できます。これは曲面のパラメータ空間の領域であり、写した先の曲面が自己重複しないことや、
+トリムされた3D面・立体の成立は別途検証が必要です。[構成と巻き数の計算法](docs/proofs/nurbs-parameter-domain2.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-parameter-domain2.ts
+```

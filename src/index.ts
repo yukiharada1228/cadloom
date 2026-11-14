@@ -146,3 +146,5 @@ export { prepareNurbsEdge3, reverseNurbsEdge3, buildNurbsBRepTopology3 } from '.
 export type { PreparedNurbsEdge3 } from './geometry/nurbs-edge3.js';
 export {liftNurbsSurfaceBoundary3,evaluateNurbsSurfaceBoundaryPiece3,nurbsSurfaceBoundaryMatchesCurve3} from './geometry/nurbs-surface-boundary3.js';
 export type {NurbsSurfaceBoundary3,NurbsSurfaceBoundaryPiece3} from './geometry/nurbs-surface-boundary3.js';
+export {prepareNurbsParameterDomain2} from './geometry/nurbs-parameter-domain2.js';
+export type {PreparedNurbsParameterDomain2,NurbsDomainLocation2} from './geometry/nurbs-parameter-domain2.js';
