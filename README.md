@@ -427,9 +427,30 @@ const otherArc = circularArc2(unit, point2(0n, 1n), point2(-1n, 0n));
 const common = intersectArcs2(quarter, otherArc); // 共有端点を保持
 ```
 
-所属・巡回順序・分割・直線／線分との交差・円弧どうしの交差を、角度の小数近似なしで扱います。重なりは複数の円弧成分と孤立した接触点を区別して保持します。`classifyAlgebraicPointToCircle2`も独立した代数的座標を受け取れるようになりました。円弧を共有位相へ接続する処理や曲線領域の集合演算は今後の実装です。[規約・構成の証明・比較テスト](docs/proofs/circular-arcs.md)を参照してください。
+所属・巡回順序・分割・直線／線分との交差・円弧どうしの交差を、角度の小数近似なしで扱います。重なりは複数の円弧成分と孤立した接触点を区別して保持します。`classifyAlgebraicPointToCircle2`も独立した代数的座標を受け取れるようになりました。円弧を共有頂点・辺へ分割する処理は後述の`splitCurves2`で扱います。曲線領域の集合演算は今後の実装です。[規約・構成の証明・比較テスト](docs/proofs/circular-arcs.md)を参照してください。
 
 ```sh
 npm run build
 node examples/circular-arcs.ts
+```
+
+## 線分・円弧の共有頂点と辺
+
+`splitCurves2`は線分、代数的なパラメータで切り取った直線区間、円弧、孤立点を混在させ、交点・接触点・重なりの端点を共有頂点へ統合します。重なった辺は1本にまとめ、`sources`に入力番号、`uses`に各入力の向き（+1/-1）を保持します。
+
+```ts
+const graph = splitCurves2([
+  { kind: 'arc', arc: fullCircleArc2(circle2(point2(0n, 0n), 2n)) },
+  { kind: 'segment', segment: segment2(point2(0n, -3n), point2(0n, 3n)) },
+]); // 6頂点・7辺。上下の交点は (0, ±√2)
+const nodedAgain = splitCurves2(graph.edges); // 代数的な端点を持つ辺も再入力可能
+```
+
+`lineInterval2(line, startParameter, endParameter)`で代数的な端点を持つ閉直線区間を作れます。入力の`kind: 'line'`で渡し、`kind: 'point'`では孤立した有理点・代数点を渡せます。円弧は左右の極点でも分割し、円全体の任意のシームがグラフの形状に影響しないようにします。座標の多項式表現が異なっても、値が同じ点は同じ頂点になります。
+
+ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた辺の回転順序、半辺・面、曲線領域の集合演算は今後の段階です。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
+
+```sh
+npm run build
+node examples/curved-arrangements.ts
 ```

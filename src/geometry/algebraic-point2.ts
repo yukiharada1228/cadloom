@@ -22,6 +22,11 @@ export function snapshotAlgebraicCoordinates2(point:AlgebraicCoordinates2):Algeb
   const data=parameters.get(point);
   return data?algebraicPoint2(data.origin,data.direction,data.parameter):algebraicCoordinates2(point.x,point.y);
 }
+/** Internal snapshot accepting rational or algebraic coordinates. */
+export function snapshotExactPoint2(point:Point2|AlgebraicCoordinates2):AlgebraicCoordinates2 {
+  if(point.x instanceof AlgebraicReal&&point.y instanceof AlgebraicReal)return snapshotAlgebraicCoordinates2(point as AlgebraicCoordinates2);
+  return algebraicCoordinates2(point.x,point.y);
+}
 export function algebraicPoint2(origin:Point2,direction:Point2,parameter:AlgebraicReal):AlgebraicPoint2 {
   const o=point2(origin.x,origin.y),d=point2(direction.x,direction.y);
   const result=Object.freeze({origin:o,direction:d,parameter,x:parameter.affine(d.x,o.x),y:parameter.affine(d.y,o.y)});
