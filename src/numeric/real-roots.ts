@@ -53,6 +53,15 @@ function intervalValue(p:Polynomial,lo:Rational,hi:Rational):readonly [Rational,
   return [lower,upper];
 }
 
+/** Integer Newton iteration from an upper power-of-two bound. The caller
+ * checks the square exactly before accepting a rational square root.
+ */
+function integerSquareRoot(n:bigint):bigint {
+  if(n<2n)return n;
+  let root=1n<<((BigInt(n.toString(2).length)+1n)/2n);
+  while(true){const next=(root+n/root)/2n;if(next>=root)return root;root=next;}
+}
+
 /** An exact real algebraic number, specified by a square-free polynomial and its
  * unique real root in a rational open interval, or by an exact rational point.
  * Refinement never mutates existing certificates. No floating-point approximation
@@ -117,18 +126,36 @@ export class AlgebraicReal {
   sign():Sign{return this.signOf(new Polynomial([0n,1n]));}
   equals(other:AlgebraicReal):boolean{return this.compare(other)===0;}
   neg():AlgebraicReal{return this.affine(-1n);}
-  add(other:AlgebraicReal):AlgebraicReal{return this===other?this.affine(2n):this.combine(other,'sum');}
-  sub(other:AlgebraicReal):AlgebraicReal {
-    return this===other?AlgebraicReal.fromRational(0n):this.add(other.neg());
+  add(other:AlgebraicReal):AlgebraicReal {
+    if(this===other)return this.affine(2n);
+    if(this.polynomial.equals(other.polynomial)){
+      if(this.compare(other)===0)return this.affine(2n);
+      if(this.polynomial.degree===2)return AlgebraicReal.fromRational(this.polynomial.coefficient(1).neg().div(this.polynomial.coefficient(2)));
+    }
+    return this.combine(other,'sum');
   }
-  mul(other:AlgebraicReal):AlgebraicReal{return this===other?this.rationalFunction(new Polynomial([0n,0n,1n])):this.combine(other,'product');}
+  sub(other:AlgebraicReal):AlgebraicReal {
+    return this===other||this.polynomial.equals(other.polynomial)&&this.compare(other)===0?AlgebraicReal.fromRational(0n):this.add(other.neg());
+  }
+  mul(other:AlgebraicReal):AlgebraicReal {
+    if(this===other)return this.rationalFunction(new Polynomial([0n,0n,1n]));
+    if(this.polynomial.equals(other.polynomial)){
+      if(this.compare(other)===0)return this.rationalFunction(new Polynomial([0n,0n,1n]));
+      if(this.polynomial.degree===2)return AlgebraicReal.fromRational(this.polynomial.coefficient(0).div(this.polynomial.coefficient(2)));
+    }
+    return this.combine(other,'product');
+  }
   div(other:AlgebraicReal):AlgebraicReal{return this.mul(other.reciprocal());}
   /** Principal nonnegative square root, selected exactly among conjugate roots. */
   sqrt():AlgebraicReal {
     const sign=this.sign();
     if(sign<0)throw new RangeError('Real algebraic square root of a negative value');
     if(sign===0)return AlgebraicReal.fromRational(0n);
-    if(this.rational!==null)return AlgebraicReal.isolate(new Polynomial([this.rational.neg(),0n,1n]))[1]!;
+    if(this.rational!==null){
+      const q=this.rational,n=integerSquareRoot(q.numerator),d=integerSquareRoot(q.denominator);
+      if(n*n===q.numerator&&d*d===q.denominator)return AlgebraicReal.fromRational(new Rational(n,d));
+      return AlgebraicReal.isolate(new Polynomial([q.neg(),0n,1n]))[1]!;
+    }
     const coefficients:Rational[]=Array.from({length:2*this.polynomial.degree+1},()=>new Rational(0n));
     this.polynomial.coefficients.forEach((c,i)=>{coefficients[2*i]=c;});
     let candidates=[...AlgebraicReal.isolate(new Polynomial(coefficients))].filter(c=>c.sign()>0),source:AlgebraicReal=this;

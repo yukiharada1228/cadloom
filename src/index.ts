@@ -105,3 +105,6 @@ export { intersectAlgebraicSegmentPlane3 } from './geometry/algebraic-segment-pl
 export type { AlgebraicSegmentPlaneIntersection3 } from './geometry/algebraic-segment-plane3.js';
 export { prepareTrimmedCylinder3, splitTrimmedCylinderByPlane3, extractTrimmedCylinderComponent3 } from './geometry/trimmed-cylinder3.js';
 export type { CylinderHalfSpace3, TrimmedCylinderComponent3, PreparedTrimmedCylinder3, TrimmedCylinderPlaneSplit3 } from './geometry/trimmed-cylinder3.js';
+export { prepareEllipseFace3 } from './geometry/planar-face3.js';
+export { prepareTrimmedPlanar3, splitTrimmedPlanarByPlane3 } from './geometry/trimmed-planar3.js';
+export type { PlanarHalfSpace3, TrimmedPlanarComponent3, PreparedTrimmedPlanar3, TrimmedPlanarSplit3 } from './geometry/trimmed-planar3.js';

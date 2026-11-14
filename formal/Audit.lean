@@ -163,3 +163,5 @@ import SortedAdjacency
 #print axioms Cadloom.cut_boundary_orientation
 
 #print axioms Cadloom.positive_height_bound
+
+#print axioms Cadloom.quadratic_roots_vieta

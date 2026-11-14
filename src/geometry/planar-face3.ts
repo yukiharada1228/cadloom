@@ -17,6 +17,8 @@ import {algebraicSegment3} from './algebraic-segment3.js';
 import type {PlaneFrame3,Curve3} from './curve3.js';
 import {circle3,circlePlane3,fullCircleArc3} from './circle3.js';
 import type {Circle3} from './circle3.js';
+import {ellipse3,ellipsePlane3,fullEllipseArc3,locatePointInEllipse3} from './ellipse3.js';
+import type {Ellipse3} from './ellipse3.js';
 import {booleanCurveRegions2} from './curve-boolean2.js';
 import type {CurveRegion2,CurveBoundary2,CurveBooleanResult2,CurveRegionLocation2} from './curve-boolean2.js';
 import {buildBRepTopology3} from './brep-topology3.js';
@@ -25,7 +27,8 @@ import type {BRepEdgeUse3,BRepTopology3} from './brep-topology3.js';
 export type PlanarFaceDomain3=
  | {readonly kind:'chart';readonly frame:PlaneFrame3;readonly region:CurveBooleanResult2}
  | {readonly kind:'rectangle';readonly frame:PlaneFrame3;readonly uMin:AlgebraicReal;readonly uMax:AlgebraicReal;readonly vMin:AlgebraicReal;readonly vMax:AlgebraicReal}
- | {readonly kind:'circular';readonly outer:Circle3;readonly holes:readonly Circle3[]};
+ | {readonly kind:'circular';readonly outer:Circle3;readonly holes:readonly Circle3[]}
+ | {readonly kind:'elliptic';readonly ellipse:Ellipse3};
 /** Nonempty connected compact planar region with disjoint manifold boundary loops,
  * oriented relative to its support. Not a shell or embedded-solid certificate.
  */
@@ -74,7 +77,8 @@ export function translatePlanarFace3(input:PreparedPlanarFace3,translation:Vecto
   assertSense(sense);if(!ownedFaces.has(input))throw new RangeError('Face translation requires a factory-created planar face');
   const v=vector3(translation.x,translation.y,translation.z),move=(p:Point3)=>point3(p.x.add(v.x),p.y.add(v.y),p.z.add(v.z)),domain=input.domain;
   let next:PlanarFaceDomain3;
-  if(domain.kind==='circular')next=Object.freeze({kind:'circular',outer:circle3(move(domain.outer.center),domain.outer.normal,domain.outer.radiusSquared),holes:Object.freeze(domain.holes.map(c=>circle3(move(c.center),c.normal,c.radiusSquared)))});
+  if(domain.kind==='elliptic'){const e=domain.ellipse;next=Object.freeze({kind:'elliptic',ellipse:ellipse3(planeFrame3(move(e.frame.origin),e.frame.u,e.frame.v),e.radiusUSquared,e.radiusVSquared)});}
+  else if(domain.kind==='circular')next=Object.freeze({kind:'circular',outer:circle3(move(domain.outer.center),domain.outer.normal,domain.outer.radiusSquared),holes:Object.freeze(domain.holes.map(c=>circle3(move(c.center),c.normal,c.radiusSquared)))});
   else {const f=domain.frame,frame=planeFrame3(move(f.origin),f.u,f.v);next=domain.kind==='chart'?Object.freeze({kind:'chart',frame,region:domain.region}):Object.freeze({...domain,frame});}
   let boundary=input.boundary.map(r=>r.map(c=>translateCurve3(c,v)));if(sense!==input.sense)boundary=boundary.map(r=>r.reverse().map(reverseCurve3));
   const p=input.surface,surface=plane3(p.normal.x,p.normal.y,p.normal.z,p.offset.sub(dot3(p.normal,v))),sample=translateAlgebraicPoint3(input.sample,v),negative=vector3(v.x.neg(),v.y.neg(),v.z.neg());
@@ -152,4 +156,10 @@ export function prepareCircularFace3(inputOuter:Circle3,inputHoles:readonly Circ
   let denominator=2n,sample:AlgebraicCoordinates3;
   while(true){sample=algebraicPoint3(outer.center,data.direction,data.parameter.affine(new Rational(denominator-1n,denominator)));if(locate(sample)==='inside')break;denominator*=2n;}
   return assemble(Object.freeze({kind:'circular',outer,holes:frozenHoles}),surface,sense,boundary,sample,locate);
+}
+
+/** Embedded closed ellipse disk with exact rational conjugate chart axes. */
+export function prepareEllipseFace3(input:Ellipse3,sense:1|-1=1):PreparedPlanarFace3 {
+  assertSense(sense);const e=ellipse3(input.frame,input.radiusUSquared,input.radiusVSquared),surface=ellipsePlane3(e),arc=fullEllipseArc3(e,sense===1?'ccw':'cw');
+  return assemble(Object.freeze({kind:'elliptic',ellipse:e}),surface,sense,[[Object.freeze({kind:'elliptic-arc',arc})]],snapshotExactPoint3(e.frame.origin),p=>{const where=locatePointInEllipse3(p,e);return where==='inside'?'inside':where;});
 }

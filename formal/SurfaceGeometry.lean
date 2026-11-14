@@ -161,4 +161,18 @@ theorem positive_height_bound {K : Type*} [Field K] [LinearOrder K] [IsStrictOrd
   rw [lt_div_iff₀ ha]
   constructor <;> intro h <;> nlinarith
 
+/-- Distinct roots of one quadratic give exact rational sums and products,
+without treating the two conjugates as independent algebraic parameters. -/
+theorem quadratic_roots_vieta {K : Type*} [Field K] (a b c x y : K)
+    (ha : a ≠ 0) (hne : x ≠ y)
+    (hx : a*x^2+b*x+c=0) (hy : a*y^2+b*y+c=0) :
+    x+y=(-b)/a ∧ x*y=c/a := by
+  have hfactor : (x-y)*(a*(x+y)+b)=0 := by linear_combination hx-hy
+  have hs : a*(x+y)+b=0 := (mul_eq_zero.mp hfactor).resolve_left (sub_ne_zero.mpr hne)
+  constructor
+  · apply (eq_div_iff ha).2
+    linear_combination hs
+  · apply (eq_div_iff ha).2
+    linear_combination -hx+x*hs
+
 end Cadloom
