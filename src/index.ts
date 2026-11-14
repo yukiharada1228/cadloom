@@ -13,3 +13,5 @@ export { buildFaces } from "./geometry/faces.js";
 export type { ArrangementFace, FaceArrangement } from "./geometry/faces.js";
 export { booleanPolygons } from "./geometry/polygon-boolean.js";
 export type { PolygonRegion, BooleanOperation, FillRule, PolygonBooleanResult } from "./geometry/polygon-boolean.js";
+export { preparePolygon, locatePointInPolygon } from "./geometry/polygon-location.js";
+export type { PointLocation, PreparedPolygon } from "./geometry/polygon-location.js";

@@ -171,3 +171,17 @@ npm run build
 node examples/polygon-booleans-to-svg.ts
 # artifacts/polygon-booleans.{json,svg} に4演算の比較を生成
 ```
+
+## 点の内外・境界判定
+
+```ts
+import { preparePolygon, locatePointInPolygon, point2 } from "cadloom";
+const region = [[point2(0n, 0n), point2(4n, 0n), point2(4n, 4n), point2(0n, 4n)]];
+const polygon = preparePolygon(region); // 正規化は一度だけ
+polygon.locate(point2(1n, 1n)); // "inside"
+polygon.locate(point2(0n, 1n)); // "boundary"
+polygon.locate(point2(-1n, 1n)); // "outside"
+locatePointInPolygon(point2(1n, 1n), region); // 単発の問い合わせ
+```
+
+既定は偶奇規則で、`preparePolygon(region, "nonzero")`も使えます。判定対象は正則化後の塗り領域です。打ち消された環や内部の共有辺は境界とは扱わず、面積0の入力曲線だけなら全ての点が外部になります。準備済みオブジェクトは入力から独立し、繰り返し判定は正規化後の辺数に対して線形です。[正当性と前提](docs/proofs/polygon-location.md)を参照してください。
