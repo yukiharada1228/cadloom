@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Implementation planning coverage, not a compatibility result or test certificate",
+  "reference": {
+    "repository": "https://github.com/tangency-labs/solidcraft",
+    "commit": "cd20a1fe14062cc1642e1c04fb9805f86d9e2eef",
+    "kernelRoot": "solidcore/",
+    "sourceLicense": "SolidCore: Apache-2.0; SolidCraft code: MIT OR Apache-2.0; UI/brand have separate terms"
+  },
+  "localBaseline": {
+    "commit": "bc5a004c3cc9eb66429ee609e76e5b2516b65b47",
+    "statusMeaning": {
+      "partial": "Some related local capability exists; no API or behavior parity claimed",
+      "missing": "No implementation of the named responsibility found in the inspected local source"
+    },
+    "scope": "Working branch, not necessarily merged main or published npm"
+  },
+  "modules": [
+    {
+      "id": "numeric",
+      "referencePath": "solidcore/crates/solidcore/src/math.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/math.rs",
+      "localPaths": [
+        "src/numeric/rational.ts",
+        "src/numeric/polynomial.ts",
+        "src/numeric/real-roots.ts"
+      ],
+      "status": "partial",
+      "gap": "Exact rational/algebraic arithmetic exists; general rounded intervals, transcendental enclosures and certified approximation policy are not implemented."
+    },
+    {
+      "id": "geometry",
+      "referencePath": "solidcore/crates/solidcore/src/geom.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/geom.rs",
+      "localPaths": [
+        "src/geometry/point3.ts",
+        "src/geometry/plane3.ts",
+        "src/geometry/surface3.ts"
+      ],
+      "status": "partial",
+      "gap": "Exact vectors, planes and cylinders exist; a complete analytic surface family and common transform/placement API are missing."
+    },
+    {
+      "id": "nurbs",
+      "referencePath": "solidcore/crates/solidcore/src/nurbs.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/nurbs.rs",
+      "localPaths": [
+        "src/geometry/nurbs-curve3.ts",
+        "src/geometry/nurbs-surface3.ts"
+      ],
+      "status": "partial",
+      "gap": "Positive rational weights, evaluation, derivatives, knot insertion, split and reversal exist; general fitting, degree editing and broad imported data coverage are missing."
+    },
+    {
+      "id": "record",
+      "referencePath": "solidcore/crates/solidcore-record/src/brep.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-record/src/brep.rs",
+      "localPaths": [
+        "src/geometry/brep-topology3.ts"
+      ],
+      "status": "partial",
+      "gap": "Incidence tables exist; a versioned portable record with geometry tables, regions/voids, complete pcurves and read/write validation is missing."
+    },
+    {
+      "id": "topology",
+      "referencePath": "solidcore/crates/solidcore/src/topology.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/topology.rs",
+      "localPaths": [
+        "src/geometry/brep-topology3.ts",
+        "src/geometry/nurbs-edge3.ts"
+      ],
+      "status": "partial",
+      "gap": "Native/NURBS edge incidence exists; arbitrary mixed-family NURBS face bodies and their global validity are not certified."
+    },
+    {
+      "id": "conversion",
+      "referencePath": "solidcore/crates/solidcore-convert/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-convert/src/lib.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No explicit portable-record to owned-kernel conversion layer."
+    },
+    {
+      "id": "ops",
+      "referencePath": "solidcore/crates/solidcore-ops/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-ops/src/lib.rs",
+      "localPaths": [
+        "src/geometry/extruded-brep3.ts",
+        "src/geometry/clipped-cylinder-brep3.ts"
+      ],
+      "status": "partial",
+      "gap": "Constructive operations exist independently; common Body API, result/error contracts and operation provenance are missing."
+    },
+    {
+      "id": "primitive",
+      "referencePath": "solidcore/crates/solidcore/src/primitive.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/primitive.rs",
+      "localPaths": [
+        "src/geometry/extruded-brep3.ts",
+        "src/geometry/clipped-cylinder-brep3.ts"
+      ],
+      "status": "partial",
+      "gap": "Boxes via vertical profiles and clipped finite cylinders exist; no common primitive API or complete sphere/cone/torus/pyramid constructors."
+    },
+    {
+      "id": "trim",
+      "referencePath": "solidcore/crates/solidcore-ops/src/trim.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-ops/src/trim.rs",
+      "localPaths": [
+        "src/geometry/nurbs-parameter-domain2.ts",
+        "src/geometry/nurbs-surface-boundary3.ts",
+        "src/geometry/nurbs-trim-regularity3.ts",
+        "src/geometry/nurbs-trim-seams3.ts"
+      ],
+      "status": "partial",
+      "gap": "Parameter domains, lifted boundaries, restricted rank and seam checks exist; complete embedded spatial trimmed NURBS faces are missing."
+    },
+    {
+      "id": "intersect",
+      "referencePath": "solidcore/crates/solidcore/src/intersect.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/intersect.rs",
+      "localPaths": [
+        "src/geometry/plane-cylinder3.ts",
+        "src/geometry/nurbs-curve-intersection3.ts",
+        "src/geometry/nurbs-plane-section3.ts"
+      ],
+      "status": "partial",
+      "gap": "Selected exact intersections exist; general surface/surface parameter correspondence and trim-domain clipping are missing."
+    },
+    {
+      "id": "split-and-stitch",
+      "referencePath": "solidcore/crates/solidcore-ops/src/split.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-ops/src/split.rs",
+      "localPaths": [
+        "src/geometry/trimmed-planar3.ts",
+        "src/geometry/trimmed-cylinder3.ts",
+        "src/geometry/sew-brep3.ts",
+        "src/geometry/clipped-cylinder-split3.ts"
+      ],
+      "status": "partial",
+      "gap": "Plane splitting of selected domains and analytic sewing exist; arbitrary face/face noding, splitting and sewing are missing."
+    },
+    {
+      "id": "boolean",
+      "referencePath": "solidcore/crates/solidcore/src/boolean.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/boolean.rs",
+      "localPaths": [
+        "src/geometry/solid-boolean3.ts",
+        "src/geometry/curve-boolean2.ts"
+      ],
+      "status": "partial",
+      "gap": "Triangle solid and planar curve-region Booleans exist; these are not general analytic/NURBS BRep solid Booleans."
+    },
+    {
+      "id": "sweep",
+      "referencePath": "solidcore/crates/solidcore/src/sweep.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/sweep.rs",
+      "localPaths": [
+        "src/geometry/extruded-brep3.ts"
+      ],
+      "status": "partial",
+      "gap": "Vertical line/circular-profile extrusion exists; general revolve, path sweep, loft and procedural definitions are missing."
+    },
+    {
+      "id": "blend",
+      "referencePath": "solidcore/crates/solidcore/src/blend.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/blend.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No general fillet/chamfer or rolling-ball construction."
+    },
+    {
+      "id": "offset",
+      "referencePath": "solidcore/crates/solidcore/src/offset.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/offset.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No general surface offset or solid shell/thickness operation."
+    },
+    {
+      "id": "heal",
+      "referencePath": "solidcore/crates/solidcore/src/heal.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/heal.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No general imported-body healing or tolerance-aware repair."
+    },
+    {
+      "id": "mass",
+      "referencePath": "solidcore/crates/solidcore/src/mass.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/mass.rs",
+      "localPaths": [
+        "src/geometry/mesh3.ts",
+        "src/geometry/solid3.ts"
+      ],
+      "status": "partial",
+      "gap": "Some polyhedral quantities exist; curved-body volume/area/centroid/inertia with explicit exact or certified numeric results are missing."
+    },
+    {
+      "id": "query",
+      "referencePath": "solidcore/crates/solidcore/src/query.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/query.rs",
+      "localPaths": [
+        "src/geometry/solid3.ts",
+        "src/geometry/extruded-brep3.ts",
+        "src/geometry/clipped-cylinder-brep3.ts"
+      ],
+      "status": "partial",
+      "gap": "Membership exists for selected validated solids; general distances, closest points and ray/body queries are missing."
+    },
+    {
+      "id": "tessellation",
+      "referencePath": "solidcore/crates/solidcore-tess/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-tess/src/lib.rs",
+      "localPaths": [
+        "src/geometry/triangulate.ts",
+        "src/geometry/extrude.ts"
+      ],
+      "status": "partial",
+      "gap": "Planar polygon triangulation and polygon extrusion meshes exist; watertight analytic/NURBS face tessellation with bounds is missing."
+    },
+    {
+      "id": "step",
+      "referencePath": "solidcore/crates/solidcore-step/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-step/src/lib.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No STEP importer/exporter or assembly translation."
+    },
+    {
+      "id": "sketch",
+      "referencePath": "crates/sketch/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/crates/sketch/src/lib.rs",
+      "localPaths": [
+        "src/geometry/segment-intersection.ts",
+        "src/geometry/curve-boolean2.ts"
+      ],
+      "status": "partial",
+      "gap": "Geometry primitives exist; constraint solving and a parameterized sketch document are missing."
+    },
+    {
+      "id": "document",
+      "referencePath": "crates/doc/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/crates/doc/src/lib.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No feature history, parameter expression evaluation or incremental regeneration."
+    },
+    {
+      "id": "engine",
+      "referencePath": "crates/engine/src/lib.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/crates/engine/src/lib.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "No shared command/session API, CLI command catalog or MCP integration."
+    },
+    {
+      "id": "application",
+      "referencePath": "apps/solidcraft/src/main.rs",
+      "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/apps/solidcraft/src/main.rs",
+      "localPaths": [],
+      "status": "missing",
+      "gap": "Desktop/browser application, assemblies and product workflows remain later scope; no UI reuse is planned."
+    }
+  ]
+}

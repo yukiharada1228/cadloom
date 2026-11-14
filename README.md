@@ -4,7 +4,7 @@
 
 このREADMEはソース版のAPIを対象とし、公開済みnpmパッケージに未収録の機能を含みます。
 
-開発はカーネルを優先します。[次の開発と形状の成立条件](docs/kernel-priorities.md)を参照してください。
+開発はカーネルを優先します。[SolidCoreを参照したピュアTypeScript再実装方針](docs/solidcore-reimplementation.md)と[現状・不足の対応表](docs/solidcore-coverage.json)を基準に、共通Bodyと基本操作から進めます。[カーネルの成立条件](docs/kernel-priorities.md)も参照してください。
 
 ## 実行
 
