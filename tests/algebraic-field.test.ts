@@ -83,3 +83,14 @@ test('fully irrational translated triangles preserve orientation without assumin
  assert.equal(orientAlgebraicPoints2(origin,first,second),1);
  assert.equal(orientAlgebraicPoints2(origin,second,first),-1);
 });
+test('principal square roots select exact nonnegative branches across conjugate fields',()=>{
+ const a=sqrt(2n),b=sqrt(3n),fourth=a.sqrt();
+ assert.equal(fourth.compare(isolateRealRoots(new Polynomial([-2n,0n,0n,0n,1n]))[1]!),0);
+ assert.equal(a.affine(1n,2n).sqrt().compare(isolateRealRoots(new Polynomial([2n,0n,-4n,0n,1n]))[3]!),0);
+ assert.equal(b.affine(1n,2n).sqrt().compare(sqrt(6n).add(a).affine('1/2')),0);
+ assert.equal(b.affine(-1n,2n).sqrt().compare(sqrt(6n).sub(a).affine('1/2')),0);
+ assert.equal(q('9/16').sqrt().compare(q('3/4')),0);assert.equal(q(0n).sqrt().sign(),0);
+ assert.throws(()=>a.neg().sqrt(),RangeError);
+ const hiddenZero=isolateRealRoots(new Polynomial([0n,1n,0n,1n]))[0]!;assert.equal(hiddenZero.sqrt().compare(q(0n)),0);
+ const nonminimal=isolateRealRoots(new Polynomial([0n,-2n,1n]))[1]!;assert.equal(nonminimal.sqrt().compare(a),0);
+});

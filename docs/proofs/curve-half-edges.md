@@ -122,5 +122,5 @@ permutation construction or TypeScript runtime behavior. Complete program verifi
 is not claimed. General algebraic predicates can still be expensive; the tangent
 cancellation avoids unnecessary degree growth in this stage.
 
-Face grouping, exact face witnesses, filled curved Booleans, splines and curved
-3D BRep remain later kernel stages. No GUI or tolerance-based healing is added.
+Face grouping and exact face witnesses are implemented in [curve-faces.md](curve-faces.md).
+Filled curved Booleans, splines and curved 3D BRep remain later kernel stages. No GUI or tolerance-based healing is added.
