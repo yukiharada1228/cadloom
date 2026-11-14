@@ -367,9 +367,30 @@ sqrt2.signOf(new Polynomial([-3n, 0n, 1n]));     // -1
 const refined = sqrt2.refine();                // 厳密な区間を狭めた新しい証明用データ
 ```
 
-重根は1回だけ返し、`countRealRoots(p, a, b)`は両端を除く開区間の根を数えます。区間表現の`rational === null`は、無理数であることの証明ではありません。現段階では代数的数どうしの一般的な四則演算や、曲線・曲面の交差計算は未実装です。[構成の根拠・独立比較テスト・未検証範囲](docs/proofs/real-roots.md)を参照してください。
+重根は1回だけ返し、`countRealRoots(p, a, b)`は両端を除く開区間の根を数えます。区間表現の`rational === null`は、無理数であることの証明ではありません。現段階では代数的数どうしの一般的な四則演算や一般曲線・曲面の交差計算は未実装です。円との交差は後述の専用APIで扱います。[構成の根拠・独立比較テスト・未検証範囲](docs/proofs/real-roots.md)を参照してください。
 
 ```sh
 npm run build
 node examples/algebraic-roots.ts
+```
+
+## 円と代数的な交点
+
+`circle2(center, radiusSquared)`は**半径の二乗**を受け取ります。たとえば`circle2(point2(0n, 0n), 2n)`は半径√2の円です。中心と半径の二乗は有理数、交点は実代数的な数として保持します。
+
+```ts
+const circle = circle2(point2(0n, 0n), 2n);
+const line = line2(point2(0n, 0n), point2(1n, 0n)); // 原点＋t×方向
+const hits = intersectLineCircle2(line, circle);  // (-√2,0), (√2,0)
+hits[1]!.point.x.compare(AlgebraicReal.fromRational('7/5')); // 1
+classifyAlgebraicPointToCircle2(hits[1]!.point, circle);     // 0（円上）
+```
+
+`intersectSegmentCircle2`は閉線分の端点を含み、`intersectCircles2`は有限個の交点または円全体の一致を返します。接線、同心円、半径ゼロの点円、長さゼロの線分も扱います。`circleThroughPoints2`で非共線な有理数の3点から円を作れます。
+
+交点には相関を保つ共通パラメータと厳密なx・y座標があり、他の円への所属、2つの有理点に対する向き、交点どうしの辞書順を判定できます。`AlgebraicReal.affine(scale, offset)`で有理数による拡大・平行移動も行えます。円弧や曲線領域の集合演算、曲面ソリッドとの統合はまだ未実装です。[仕様・証明・比較テスト](docs/proofs/circle-intersections.md)を参照してください。
+
+```sh
+npm run build
+node examples/circle-intersections.ts
 ```
