@@ -448,7 +448,7 @@ const nodedAgain = splitCurves2(graph.edges); // 代数的な端点を持つ辺�
 
 `lineInterval2(line, startParameter, endParameter)`で代数的な端点を持つ閉直線区間を作れます。入力の`kind: 'line'`で渡し、`kind: 'point'`では孤立した有理点・代数点を渡せます。円弧は左右の極点でも分割し、円全体の任意のシームがグラフの形状に影響しないようにします。座標の多項式表現が異なっても、値が同じ点は同じ頂点になります。
 
-ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた回転順序と半辺は後述の`buildCurveHalfEdges2`で扱います。面の分類と曲線領域の集合演算は今後の段階です。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
+ここで得られるのは頂点と辺のグラフです。接線が一致する場合も含めた回転順序と半辺は後述の`buildCurveHalfEdges2`で扱います。面の分類は後述の`buildCurveFaces2`で扱います。曲線領域の集合演算は今後の段階です。[構成の証明・不変条件・比較テスト](docs/proofs/curved-arrangements.md)を参照してください。
 
 ```sh
 npm run build
@@ -470,9 +470,26 @@ const walks = topology.boundaries.map(w => w.halfEdges);
 
 `outgoing`は接線方向と符号付き曲率による反時計回りの巡回順序です。`germ`には非単位の厳密な接線と、曲率の符号・半径の二乗を保持します。接線の外積は一次式へ整理し、角度近似や不要な代数的乗算を避けています。
 
-境界巡回はまだ面へ分類していません。円弧の弦から面積を計算する代用値も返しません。[順序付けの根拠・接触時の左右・検証範囲](docs/proofs/curve-half-edges.md)を参照してください。
+この関数は境界巡回までを返します。面への分類は`buildCurveFaces2`で行います。円弧の弦から面積を計算する代用値は返しません。[順序付けの根拠・接触時の左右・検証範囲](docs/proofs/curve-half-edges.md)を参照してください。
 
 ```sh
 npm run build
 node examples/curve-half-edges.ts
 ```
+
+
+## 円弧を含む面の構築と位置判定
+
+`buildCurveFaces2(curves)`は線分と円弧の境界巡回を面へ分類します。`faces[0]`は非有界面で、各面には境界巡回の番号、孤立頂点、面内の厳密な有理数サンプル点を保持します。穴や橋を含むため、境界巡回の数と面の数は一致しません。
+
+```ts
+const arrangement = buildCurveFaces2([
+  { kind: 'arc', arc: fullCircleArc2(circle2(point2(0n, 0n), 4n)) },
+  { kind: 'arc', arc: fullCircleArc2(circle2(point2(0n, 0n), 1n)) },
+]);
+// 外部・環状部分・内側の円の内部の3面
+const location = arrangement.locate(point2('3/2', 0n));
+// { kind: 'face', face: ... }; 境界上なら edge または vertex
+```
+
+`boundaryFaces`と`halfEdgeFaces`は左側の面、`vertexFaces`は接する面の番号を返します。位置判定は代数的実数の座標にも対応します。分類は厳密な垂直断面と接線・曲率の順序で行い、円弧の面積近似は使いません。これは平面の分割であり、塗りつぶし規則や曲線領域の集合演算はまだ含みません。[構成の根拠と検証範囲](docs/proofs/curve-faces.md)を参照してください。

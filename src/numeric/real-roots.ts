@@ -123,6 +123,25 @@ export class AlgebraicReal {
   }
   mul(other:AlgebraicReal):AlgebraicReal{return this.combine(other,'product');}
   div(other:AlgebraicReal):AlgebraicReal{return this.mul(other.reciprocal());}
+  /** Principal nonnegative square root, selected exactly among conjugate roots. */
+  sqrt():AlgebraicReal {
+    const sign=this.sign();
+    if(sign<0)throw new RangeError('Real algebraic square root of a negative value');
+    if(sign===0)return AlgebraicReal.fromRational(0n);
+    if(this.rational!==null)return AlgebraicReal.isolate(new Polynomial([this.rational.neg(),0n,1n]))[1]!;
+    const coefficients:Rational[]=Array.from({length:2*this.polynomial.degree+1},()=>new Rational(0n));
+    this.polynomial.coefficients.forEach((c,i)=>{coefficients[2*i]=c;});
+    let candidates=[...AlgebraicReal.isolate(new Polynomial(coefficients))].filter(c=>c.sign()>0),source:AlgebraicReal=this;
+    while(true){
+      candidates=candidates.filter(c=>{
+        const lo=c.lower.sign()<0?new Rational(0n):c.lower;
+        return lo.mul(lo).compare(source.upper)<=0&&c.upper.mul(c.upper).compare(source.lower)>=0;
+      });
+      if(candidates.length===0)throw new Error('Algebraic square root lost all positive candidates');
+      if(candidates.length===1)return candidates[0]!;
+      candidates=candidates.map(c=>c.refine());source=source.refine();
+    }
+  }
   reciprocal():AlgebraicReal {
     if(this.signOf(new Polynomial([0n,1n]))===0)throw new RangeError('Algebraic division by zero');
     let root:AlgebraicReal=this;

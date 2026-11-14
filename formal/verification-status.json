@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "a1e52949e64ccccde852dd64607da9c1ee7f220af38c8f7d4a020e440c641c7a",
+    "src/index.ts": "74ffe3166254e6a9be54d8a614dc477562e2fcc736488bc6f307ca1ca1e1b1fa",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -27,14 +27,15 @@
     "src/geometry/surface-location3.ts": "367745afeff743741bfa3851d54455723bdff32f4dd1271744bba8d4ac1e0094",
     "src/geometry/solid-boolean3.ts": "2354a04904c94c4003bfb6621659666ec5cc9fcc543f84bca447507d0454b2f1",
     "src/numeric/polynomial.ts": "54a4d89dff48a4ebd4e2825cd80532616a433cb7c010dd5635c83ab7dbb51650",
-    "src/numeric/real-roots.ts": "13093a15d0cccefec94ecb155d96b2a26f738a4c7c440d0f56d5dfa9f415a5d6",
+    "src/numeric/real-roots.ts": "4ccedb02aefab2dcc6566402307cde705f2bf6c77b3eb93724ae62e4dc854bd3",
     "src/geometry/algebraic-point2.ts": "f26fc55bd108af49edd944dad81cb8478bdd06826a4b1b7503f99885a1704dec",
     "src/geometry/circle2.ts": "29443ea2c7508f0011a8c1c37926b61bca7453fc853c519d7e4700bdcdf473b4",
     "src/numeric/resultant.ts": "f3756924c33ec134fcca49f722fd47a79292df6fb827133f7e4c6df702961545",
     "src/geometry/circular-arc2.ts": "66fbe25de9d9cd41bd8e11cfd1c13033f6f36096b12cdd3ddcb858c9ed24aa97",
     "src/geometry/line-interval2.ts": "cd751dd63d8ba15b7817dd21df12bf0d6e4a862bc2318111835fb15d8cc02735",
     "src/geometry/split-curves2.ts": "e8e5bda60a37dbde12b5bcd0613cea089105b332d334b4510ab3db08314720b9",
-    "src/geometry/curve-half-edges2.ts": "520e7700826dccb029c59c52323b2f8ed89aba04713ebecd2f034768dca234e0"
+    "src/geometry/curve-half-edges2.ts": "520e7700826dccb029c59c52323b2f8ed89aba04713ebecd2f034768dca234e0",
+    "src/geometry/curve-faces2.ts": "05f02ea5d8ed14c3446c866b45771b2653a35b16ac49e3ce118ccc23a3c4286b"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -168,6 +169,7 @@
     "Resultants over rational polynomial coefficients, Bareiss elimination, algebraic field arithmetic with interval branch selection, reciprocals and general algebraic-coordinate predicates are independently tested and documented, not machine-verified.",
     "Circular arc membership/order/subdivision, endpoint-cell intersection, general-coordinate circle classification and trusted correlated-point registry use construction arguments and independent cyclic-index tests, not full runtime machine verification.",
     "Algebraic line trims and mixed line/arc noding, all-pairs cut completeness, semantic vertex welding, canonical edge merging and oriented source uses are documented and differentially tested, not full TypeScript machine verification.",
-    "Curve tangent/curvature germ sorting, half-edge permutations and boundary walks use documented geometric arguments and independent planar/sector checks, not full TypeScript machine verification."
+    "Curve tangent/curvature germ sorting, half-edge permutations and boundary walks use documented geometric arguments and independent planar/sector checks, not full TypeScript machine verification.",
+    "Curved face grouping by exact vertical visibility, vertical-only component attachment, algebraic point location and principal algebraic square roots use construction arguments and differential tests, not machine-verified TypeScript execution."
   ]
 }

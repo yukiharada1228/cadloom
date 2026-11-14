@@ -64,3 +64,5 @@ Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choi
 `Cadloom.canonical_line_frame`は非垂直な有理直線のx座標をパラメータにした標準形が元の直線と一致することを体上で証明します。混合曲線の全ペア分割、値による頂点統合、共有辺・入力方向の復元全体は機械検証していません。
 
 `Cadloom.circle_tangent_cross_linear`は共有点での円の接線の外積が一次式になる恒等式を、`Cadloom.circle_germ_normal_offset`は接触点のまわりの小円との交点の法線方向変位が`rho²/(2*r)`になる関係を証明します。接線・曲率による巡回順序と半辺構築全体を機械検証したものではありません。
+
+円弧を含む面の分類・垂直レイによる位置判定・代数的実数の非負平方根は、[構成の議論と比較テスト](../docs/proofs/curve-faces.md)で検証します。これらのアルゴリズム全体をLeanで機械検証したものではありません。
