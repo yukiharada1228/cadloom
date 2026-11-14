@@ -388,7 +388,7 @@ classifyAlgebraicPointToCircle2(hits[1]!.point, circle);     // 0（円上）
 
 `intersectSegmentCircle2`は閉線分の端点を含み、`intersectCircles2`は有限個の交点または円全体の一致を返します。接線、同心円、半径ゼロの点円、長さゼロの線分も扱います。`circleThroughPoints2`で非共線な有理数の3点から円を作れます。
 
-交点には相関を保つ共通パラメータと厳密なx・y座標があり、他の円への所属、2つの有理点に対する向き、交点どうしの辞書順を判定できます。`AlgebraicReal.affine(scale, offset)`で有理数による拡大・平行移動も行えます。円弧や曲線領域の集合演算、曲面ソリッドとの統合はまだ未実装です。[仕様・証明・比較テスト](docs/proofs/circle-intersections.md)を参照してください。
+交点には相関を保つ共通パラメータと厳密なx・y座標があり、他の円への所属、2つの有理点に対する向き、交点どうしの辞書順を判定できます。`AlgebraicReal.affine(scale, offset)`で有理数による拡大・平行移動も行えます。円弧は後述のAPIで扱います。曲線領域の集合演算や曲面ソリッドとの統合はまだ未実装です。[仕様・証明・比較テスト](docs/proofs/circle-intersections.md)を参照してください。
 
 ```sh
 npm run build
@@ -412,4 +412,24 @@ value.equals(AlgebraicReal.fromRational(-1n)); // true
 ```sh
 npm run build
 node examples/algebraic-field.ts
+```
+
+## 代数的な端点を持つ円弧
+
+`circularArc2(circle, start, end, { direction: 'ccw' })`で、閉じた円弧を作れます。端点は有理点でも代数的な交点でも構いません。`cw`で時計回りにできます。同じ端点は既定では点円弧になり、円全体は`fullCircleArc2(circle)`または`fullCircle: true`で明示します。
+
+```ts
+const unit = circle2(point2(0n, 0n), 1n);
+const quarter = circularArc2(unit, point2(1n, 0n), point2(0n, 1n));
+locatePointOnArc2(point2('3/5', '4/5'), quarter); // 'interior'
+const pieces = splitCircularArc2(quarter, [point2('3/5', '4/5')]);
+const otherArc = circularArc2(unit, point2(0n, 1n), point2(-1n, 0n));
+const common = intersectArcs2(quarter, otherArc); // 共有端点を保持
+```
+
+所属・巡回順序・分割・直線／線分との交差・円弧どうしの交差を、角度の小数近似なしで扱います。重なりは複数の円弧成分と孤立した接触点を区別して保持します。`classifyAlgebraicPointToCircle2`も独立した代数的座標を受け取れるようになりました。円弧を共有位相へ接続する処理や曲線領域の集合演算は今後の実装です。[規約・構成の証明・比較テスト](docs/proofs/circular-arcs.md)を参照してください。
+
+```sh
+npm run build
+node examples/circular-arcs.ts
 ```

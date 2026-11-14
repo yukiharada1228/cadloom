@@ -4,8 +4,8 @@ import { exactRational,Polynomial } from '../numeric/polynomial.js';
 import { AlgebraicReal,isolateRealRoots } from '../numeric/real-roots.js';
 import { point2,segment2,pointsEqual } from './point2.js';
 import type { ExactInput,Point2,Segment2 } from './point2.js';
-import { algebraicPoint2,compareAlgebraicPoints2 } from './algebraic-point2.js';
-import type { AlgebraicPoint2 } from './algebraic-point2.js';
+import { algebraicPoint2,compareAlgebraicPoints2,getPointParameterization2 } from './algebraic-point2.js';
+import type { AlgebraicPoint2,AlgebraicCoordinates2 } from './algebraic-point2.js';
 
 export interface Circle2 {readonly center:Point2;readonly radiusSquared:Rational;}
 /** Squared radius is used so all circles through rational points remain expressible.
@@ -45,9 +45,11 @@ export function classifyPointToCircle2(point:Point2,input:Circle2):Sign {
   const c=circle2(input.center,input.radiusSquared);
   return equation(point,point2(0n,0n),c).evaluate(0n).sign();
 }
-export function classifyAlgebraicPointToCircle2(point:AlgebraicPoint2,input:Circle2):Sign {
-  const c=circle2(input.center,input.radiusSquared);
-  return point.parameter.signOf(equation(point.origin,point.direction,c));
+export function classifyAlgebraicPointToCircle2(point:AlgebraicCoordinates2,input:Circle2):Sign {
+  const c=circle2(input.center,input.radiusSquared),data=getPointParameterization2(point);
+  if(data)return data.parameter.signOf(equation(data.origin,data.direction,c));
+  const x=point.x.affine(1n,c.center.x.neg()),y=point.y.affine(1n,c.center.y.neg());
+  return x.mul(x).add(y.mul(y)).affine(1n,c.radiusSquared.neg()).sign();
 }
 export interface LineCircleHit2 {
   readonly point:AlgebraicPoint2;

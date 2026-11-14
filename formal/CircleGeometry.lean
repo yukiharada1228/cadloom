@@ -34,4 +34,16 @@ theorem circumcenter_linear_equations (ux uy vx vy : ℚ) (h : ux*vy-uy*vx ≠ 0
   generalize hd : ux*vy-uy*vx = determinant at *
   constructor <;> field_simp [h] <;> rw [← hd] <;> ring
 
+/-- On a fixed circle, x and a common closed vertical half determine a unique y. -/
+theorem circle_same_x_half_unique {K : Type*} [Field K] [LinearOrder K] [IsStrictOrderedRing K]
+    (x y1 y2 cx cy radiusSquared : K)
+    (h1 : (x-cx)^2+(y1-cy)^2=radiusSquared)
+    (h2 : (x-cx)^2+(y2-cy)^2=radiusSquared)
+    (hh : (0 ≤ y1-cy ∧ 0 ≤ y2-cy) ∨ (y1-cy ≤ 0 ∧ y2-cy ≤ 0)) :
+    y1=y2 := by
+  have hs : (y1-cy)^2=(y2-cy)^2 := by linarith
+  rcases (sq_eq_sq_iff_eq_or_eq_neg).mp hs with he | he
+  · linarith
+  · rcases hh with ⟨ha,hb⟩ | ⟨ha,hb⟩ <;> linarith
+
 end Cadloom

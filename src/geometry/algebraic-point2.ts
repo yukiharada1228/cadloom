@@ -14,9 +14,19 @@ export interface AlgebraicPoint2 extends AlgebraicCoordinates2 {
   readonly direction:Point2;
   readonly parameter:AlgebraicReal;
 }
+type Parameterization2=Readonly<Pick<AlgebraicPoint2,'origin'|'direction'|'parameter'>>;
+const parameters=new WeakMap<AlgebraicCoordinates2,Parameterization2>();
+/** Internal verified-by-construction correlation, never inferred from extra object fields. */
+export function getPointParameterization2(point:AlgebraicCoordinates2):Parameterization2|undefined{return parameters.get(point);}
+export function snapshotAlgebraicCoordinates2(point:AlgebraicCoordinates2):AlgebraicCoordinates2 {
+  const data=parameters.get(point);
+  return data?algebraicPoint2(data.origin,data.direction,data.parameter):algebraicCoordinates2(point.x,point.y);
+}
 export function algebraicPoint2(origin:Point2,direction:Point2,parameter:AlgebraicReal):AlgebraicPoint2 {
   const o=point2(origin.x,origin.y),d=point2(direction.x,direction.y);
-  return Object.freeze({origin:o,direction:d,parameter,x:parameter.affine(d.x,o.x),y:parameter.affine(d.y,o.y)});
+  const result=Object.freeze({origin:o,direction:d,parameter,x:parameter.affine(d.x,o.x),y:parameter.affine(d.y,o.y)});
+  parameters.set(result,Object.freeze({origin:o,direction:d,parameter}));
+  return result;
 }
 export function compareAlgebraicPoints2(a:AlgebraicCoordinates2,b:AlgebraicCoordinates2):Sign {
   return a.x.compare(b.x)||a.y.compare(b.y);
