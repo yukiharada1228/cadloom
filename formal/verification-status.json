@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "fdb9d112f0707b7fe2fd7c1d42653af598ea2b6f0759aec5654cede42e6298b0",
+    "src/index.ts": "15c754a54d3efde14837a6a273e0a92b7e8d6fd9116838499775746a397bffd1",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -75,7 +75,14 @@
     "src/geometry/nurbs-parameter-domain2.ts": "c33315979b6b7737126e57734e8d1ab41bf7b9e332e1483417fd145312f63045",
     "src/geometry/nurbs-surface-regularity3.ts": "8c596eab7763cf2bbdc7047c473bb538f9f48546929bf8ecb0438d2eaa76d799",
     "src/geometry/nurbs-trim-regularity3.ts": "71f9a50ed069e55d486851b59b8b648b8f89feb99172ba694070427ab0acbb04",
-    "src/geometry/nurbs-trim-seams3.ts": "409364c9ec1d8b5bc944744f22aceda154e576f494a5a5092bd94cf4e2743919"
+    "src/geometry/nurbs-trim-seams3.ts": "409364c9ec1d8b5bc944744f22aceda154e576f494a5a5092bd94cf4e2743919",
+    "src/record/schema.ts": "766ec3787acaba44901fec58aed701b7f25c31a9986c10c50da2c4cd2ad06f3b",
+    "src/record/geometry3.ts": "8a40ac9a500c9e202bb82da953a096d87983ff5d9a7590255647588c782347f7",
+    "src/record/body3.ts": "8d8ef6bfe97c7357f5142509458b937ff03d74e6058750a36edd53b529ac769f",
+    "src/record/exact3.ts": "4d079d13dfbf28e94b58fd6a0694c0eabdb9dacd2571664c7223f86526649146",
+    "src/convert/geometry3.ts": "27bd3114d8821c9a30ce7161b8e7774a1ba0225dc85c71390223203c6e2ef75d",
+    "src/convert/body3.ts": "1fcbff8081db898c3d24b015f69bb70eaa4152b00fa63600c35c05c42493d980",
+    "src/convert/exact3.ts": "c3f52a51e8277f3e97d5f20e960a63a3a5ae9573e71cbbb90d7d6391e681f6b4"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -258,6 +265,7 @@
     "Oriented NURBS parameter-domain Jordan boundary validation, exact algebraic ray winding, hole containment and dyadic strict material witnesses use documented arguments and independent location oracles, not machine verification of TypeScript. This certifies parameter-space domains only, not surface embedding, seam quotients, trimmed spatial faces or solids.",
     "Complete one-sided NURBS patch normal-zero loci, isolated singular point lifting and whole-seam positional identities use documented arguments and independent differential fixtures, not machine verification of TypeScript. Patchwise regularity and positional continuity do not certify C1/G1 seams, global injectivity, trim-restricted regularity, face embedding or solid validity.",
     "Exact restriction of one-sided singular loci to validated NURBS parameter domains, complete boundary event noding, retained implicit subintervals and whole-patch/domain region intersections use documented arguments and independent fixtures, not machine verification of TypeScript. Rank regularity includes all incident closed patches and does not imply positional seam continuity, G1/C1 matching, global embedding, spatial face validity or solid validity.",
-    "Trim-restricted positional, shared-coordinate C1 and cooriented nondegenerate tangent-plane seam matching use complete algebraic boundary/predicate event partitions, documented arguments and independent fixtures, not machine verification of TypeScript. These are conditions on adjacent closed seam sides only; empty retained seams pass vacuously and no interior rank, global injectivity, spatial face or solid certificate follows."
+    "Trim-restricted positional, shared-coordinate C1 and cooriented nondegenerate tangent-plane seam matching use complete algebraic boundary/predicate event partitions, documented arguments and independent fixtures, not machine verification of TypeScript. These are conditions on adjacent closed seam sides only; empty retained seams pass vacuously and no interior rank, global injectivity, spatial face or solid certificate follows.",
+    "Exact numeric/geometry codecs, immutable versioned Body records, structural references/loop ownership, input budgets and per-definition geometry restoration use executable tests and documented contracts, not machine verification of TypeScript. Record roles, closed incidence and successful geometry decoding do not certify geometry/topology agreement, face domains, shell/void embedding or material solid validity; a trusted common Body importer remains future work."
   ]
 }

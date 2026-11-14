@@ -1147,3 +1147,24 @@ seams.seams; // 区間と孤立接触点ごとの結果
 npm run build
 node examples/nurbs-trim-seams3.ts
 ```
+
+## 共通Bodyレコードと正確な保存
+
+`BodyRecord3`は、曲線・曲面・頂点・辺・ループ・面・シェル・領域を持つデータ形式です。
+有理数を文字列、代数的数を根の隔離情報として保存し、JSONの浮動小数へ丸めません。
+
+```ts
+const record = bodyRecordFromTopology3(topology, declaredRegions);
+const json = stringifyBodyRecord3(record);
+const restored = parseBodyRecord3(json); // 構造検査と不変のスナップショット
+const geometry = decodeBodyGeometry3(restored); // 各幾何定義の復元・検査
+```
+
+これらの処理だけでは有効な立体とは認定しません。領域の材料・空洞の宣言は呼び出し側が指定し、
+面領域・埋め込み・空洞の内包関係の検証は、今後の共通Body変換層で行います。
+[形式・検査範囲・入力制限](docs/body-record3.md)を参照してください。
+
+```sh
+npm run build
+node examples/body-record3.ts
+```

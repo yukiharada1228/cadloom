@@ -154,3 +154,13 @@ export {analyzeNurbsTrimRegularity3,evaluateNurbsTrimSingularEdge3} from './geom
 export type {NurbsTrimRegularity3,NurbsTrimPatchRegularity3,NurbsTrimSingularEdge3} from './geometry/nurbs-trim-regularity3.js';
 export {analyzeNurbsTrimSeams3} from './geometry/nurbs-trim-seams3.js';
 export type {NurbsTrimSeams3,NurbsTrimSeam3,NurbsTrimSeamState3,NurbsTrimSeamPoint3,NurbsTrimSeamInterval3} from './geometry/nurbs-trim-seams3.js';
+export {encodeExactReal3,decodeExactReal3,encodeExactPoint3,decodeExactPoint3} from './convert/exact3.js';
+export type {ExactRealRecord3,ExactPointRecord3,RationalPointRecord3} from './record/exact3.js';
+export {encodeCurveRecord3,decodeCurveRecord3,encodeSurfaceRecord3,decodeSurfaceRecord3} from './convert/geometry3.js';
+export type {FrameRecord3,CurveRecord3,SurfaceRecord3} from './record/geometry3.js';
+export type {RecordCurveGeometry3,RecordSurfaceGeometry3} from './convert/geometry3.js';
+export {readBodyRecord3,parseBodyRecord3,stringifyBodyRecord3} from './record/body3.js';
+export {bodyRecordFromTopology3,decodeBodyGeometry3} from './convert/body3.js';
+export type {BodyRecord3,BodyEdgeRecord3,BodyEdgeUseRecord3,BodyLoopRecord3,BodyFaceRecord3,BodyShellRecord3,BodyRegionRecord3} from './record/body3.js';
+export type {DecodedBodyGeometry3} from './convert/body3.js';
+export type {RecordReadLimits3} from './record/schema.js';

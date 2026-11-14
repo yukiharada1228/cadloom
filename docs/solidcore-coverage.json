@@ -13,7 +13,7 @@
       "partial": "Some related local capability exists; no API or behavior parity claimed",
       "missing": "No implementation of the named responsibility found in the inspected local source"
     },
-    "scope": "Working branch, not necessarily merged main or published npm"
+    "scope": "Working branch including subsequent record milestone changes beyond the recorded baseline; not necessarily merged main or published npm"
   },
   "modules": [
     {
@@ -56,10 +56,14 @@
       "referencePath": "solidcore/crates/solidcore-record/src/brep.rs",
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-record/src/brep.rs",
       "localPaths": [
-        "src/geometry/brep-topology3.ts"
+        "src/geometry/brep-topology3.ts",
+        "src/record/body3.ts",
+        "src/record/geometry3.ts",
+        "src/record/exact3.ts",
+        "src/record/schema.ts"
       ],
       "status": "partial",
-      "gap": "Incidence tables exist; a versioned portable record with geometry tables, regions/voids, complete pcurves and read/write validation is missing."
+      "gap": "Versioned exact geometry/topology/region records and structural validation exist. Complete imported face domains, general unbounded support restrictions and geometric Body certification remain missing."
     },
     {
       "id": "topology",
@@ -76,9 +80,13 @@
       "id": "conversion",
       "referencePath": "solidcore/crates/solidcore-convert/src/lib.rs",
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-convert/src/lib.rs",
-      "localPaths": [],
-      "status": "missing",
-      "gap": "No explicit portable-record to owned-kernel conversion layer."
+      "localPaths": [
+        "src/convert/exact3.ts",
+        "src/convert/geometry3.ts",
+        "src/convert/body3.ts"
+      ],
+      "status": "partial",
+      "gap": "Exact value/geometry definition restoration and native boundary export exist. Geometry/topology agreement and a trusted owned Body importer with face/region certification remain missing."
     },
     {
       "id": "ops",
