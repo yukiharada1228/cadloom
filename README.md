@@ -831,3 +831,32 @@ solid.locate(point3(0n, 0n, -1n)); // inside
 npm run build
 node examples/clipped-cylinder-brep3.ts
 ```
+
+## 閉じた円柱立体の平面分割と再接続
+
+`splitClippedCylinderByPlane3`は上記の立体を平面の負側・正側へ分割します。
+両側に体積が残る場合、閉じた子立体と共通の切断面を返します。
+
+```ts
+const split = splitClippedCylinderByPlane3(solid, plane3(1n, 0n, 0n));
+if (split.kind === 'split') {
+  split.negative.topology.closedOrientedIncidence; // true
+  split.positive.topology.closedOrientedIncidence; // true
+  split.shared.edges; // 両側で共用する境界曲線の表
+  split.shared.negativeBoundary; // 子の辺から共通表への対応
+  const joined = rejoinClippedCylinderSplit3(split);
+  joined.sewing.topology.closedOrientedIncidence; // true
+}
+```
+
+結果は`split`・`touching`・`disjoint`・`empty`を区別します。
+接触のみ・交差なしの場合、体積が残る側は元の立体をそのまま保持します。
+子の外側の面には元の面への対応を記録し、新しい切断面には`null`を記録します。
+再接続は対応する内部の切断面を除いて外側の境界を接続する操作です。
+対象は凸な円柱／平面の積集合で、任意の立体同士の和演算は今後の開発です。
+[構成・接触判定・検証範囲](docs/proofs/clipped-cylinder-split3.md)を参照してください。
+
+```sh
+npm run build
+node examples/clipped-cylinder-split3.ts
+```

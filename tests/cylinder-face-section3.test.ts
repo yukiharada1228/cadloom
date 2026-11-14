@@ -59,3 +59,6 @@ test('oblique-axis angular patches match an independent rational chart and ignor
  for(const {curve} of result.curves){assert.ok(curveOnSurface3(curve,{kind:'plane',plane}));assert.ok(curveOnSurface3(curve,{kind:'cylinder',cylinder:c}));}
  assert.ok(Object.isFrozen(result)&&Object.isFrozen(result.curves)&&Object.isFrozen(result.points));
 });
+test('a sole tangency at the full-ellipse seam is an isolated point, not a retained ellipse',()=>{
+ const face=prepareCylinderFace3(cylinder,1n,2n);for(const plane of [plane3(0n,-1n,1n),plane3(0n,1n,-1n)]){const r=intersectPlaneCylinderFace3(plane,face);assert.equal(r.curves.length,0);assert.equal(r.points.length,1);assert.equal(compareAlgebraicPoints3(r.points[0]!,algebraicCoordinates3(0n,1n,1n)),0);}
+});

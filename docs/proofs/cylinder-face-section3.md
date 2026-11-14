@@ -30,7 +30,7 @@ entire ellipse; angular generators still supply its trimming endpoints.
 A full band needs no angular cuts in this case.
 
 Deduplicate contacts by semantic coordinate equality. Together with the
-ellipse representation seam they partition the ellipse into open cells.
+ellipse representation seam and four chart-axis extrema they partition the ellipse into open cells. The extrema are artificial cuts: they ensure a sole boundary contact at the periodic seam cannot also be selected as the witness for a whole ellipse.
 Membership can change only at the product-domain boundary, all of whose
 intersection points were enumerated. One strict interior witness therefore
 decides each cell. Closed cells are retained when their witness is in the
@@ -52,7 +52,7 @@ a fixed iteration limit. A positive multiple of the rational chart ray
 `sqrt(A*B/(B*(1-q)^2+A*q^2))`.
 It is represented by one correlated algebraic parameter rather than
 normalizing a sum of algebraic endpoints, which can cause large resultant
-expressions. Full ellipses may use their seam as an interior witness; point
+expressions. The standalone witness helper may use a full ellipse seam; this intersection algorithm subdivides at the extrema before calling it. Point
 arcs have no open interior and are rejected.
 
 ## Validation and scope
