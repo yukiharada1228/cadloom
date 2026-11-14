@@ -1,0 +1,42 @@
+# 重要な幾何処理のLean検証
+
+CADカーネルの土台となる数学的モデルをLean 4で検査します。対象は厳密演算、線分交差、線分分割です。**TypeScript実行コード全体の形式検証ではありません。** 全体実行検証のためのMap・配列・ヒープ・型消去などのモデルは削除しました。
+
+## 実行方法
+
+Leanは`lean-toolchain`、Mathlibと依存は`lake-manifest.json`で固定しています。elanとMathlibの依存を準備してから実行します。
+
+```sh
+cd formal
+MATHLIB_NO_CACHE_ON_UPDATE=1 lake update
+lake exe cache get Mathlib.Data.Rat.Lemmas Mathlib.Data.Finset.Sort Mathlib.Tactic.FieldSimp Mathlib.Tactic.Ring Mathlib.Tactic.Linarith Mathlib.Tactic.LinearCombination
+cd ..
+node formal/scripts/verify.mjs
+```
+
+既定のコマンドは、この文書の範囲の証明を検査し、成功時に終了コード0を返します。従来の`--partial`も同じ動作です。`--require-full`は、全体実行検証を提供していないため終了コード2を返します。
+
+## 残す証明
+
+| ファイル | 対象 |
+|---|---|
+| `Cadloom.lean` | 有理数演算の公式、自然数上のEuclid法、非平行交差の必要十分性、区間・隣接辺 |
+| `SegmentMembership.lean` | 座標・辞書順による所属判定と、パラメーターによる線分定義の同値性 |
+| `SourceArithmetic.lean` | TypeScriptから抽出した交点の算術式と数学モデルとの一致 |
+| `IntersectionBranches.lean` | 退化・非平行・平行非同一直線の交差モデル |
+| `CollinearOverlap.lean` | 同一直線の重複を含む全交差分岐の集合的な正しさ |
+| `PairLoop.lean` | 全線分ペアから集める分割点の数学的モデルと健全性 |
+| `CutCompleteness.lean` | 各線分上の分割対象頂点を取りこぼさないこと |
+| `SortedAdjacency.lean` | 隣接辺の健全性・被覆、内部頂点の不在、入力元との対応 |
+
+`Audit.lean`で登録定理の依存公理を監査し、`verification-status.json`に対象を記録します。定理は任意の有理数入力に関するもので、有限のテスト結果ではありません。
+
+## 保証の境界
+
+証明対象は数学的モデルです。実際のTypeScriptのパース、BigInt、例外、Map、配列、ソート、凍結、コンパイル・実行環境の動作を証明するものではありません。これらの実装は通常のテストで検査します。
+
+`scripts/extract-arithmetic.mjs`は選択したTypeScript ASTの算術式を数学的有理数演算として解釈する未検証の抽出器です。`--check`で抽出結果の変更を検知しますが、パーサー・抽出器やRationalメソッドとの意味的対応は信頼します。
+
+検証スクリプトはソース一覧・SHA-256、TypeScriptのビルド、式の抽出結果、Leanビルド、公理依存を確認します。ハッシュはレビュー基準の変更検知であり、実装の正しさの証明ではありません。ソース変更時には対応をレビューして基準を更新してください。
+
+Leanカーネル、固定したMathlib、標準公理`propext`・`Classical.choice`・`Quot.sound`を信頼します。監査対象が` sorryAx `など許可外の公理に依存した場合は失敗します。

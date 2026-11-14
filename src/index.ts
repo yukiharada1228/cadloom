@@ -5,3 +5,7 @@ export type { ExactInput, Point2, Segment2 } from "./geometry/point2.js";
 export { orient2d } from "./geometry/orient2d.js";
 export { intersectSegments, pointOnSegment } from "./geometry/segment-intersection.js";
 export type { SegmentIntersection } from "./geometry/segment-intersection.js";
+export { splitSegments } from "./geometry/split-segments.js";
+export type { SplitVertex, SplitEdge, SegmentArrangement } from "./geometry/split-segments.js";
+export { buildHalfEdges, compareDirections } from "./geometry/half-edges.js";
+export type { HalfEdge, BoundaryWalk, HalfEdgeArrangement } from "./geometry/half-edges.js";
