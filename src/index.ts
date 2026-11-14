@@ -17,3 +17,5 @@ export { preparePolygon, locatePointInPolygon } from "./geometry/polygon-locatio
 export type { PointLocation, PreparedPolygon } from "./geometry/polygon-location.js";
 export { affine2, affineDeterminant, transformPoint, transformSegment, transformPolygon, composeAffine2, invertAffine2 } from "./geometry/affine2.js";
 export type { Affine2 } from "./geometry/affine2.js";
+export { triangulatePolygon } from "./geometry/triangulate.js";
+export type { PolygonMesh } from "./geometry/triangulate.js";

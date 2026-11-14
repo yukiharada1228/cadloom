@@ -200,3 +200,21 @@ const inverse = invertAffine2(t);
 係数順は`a,b,c,d,tx,ty`で、`x'=a*x+b*y+tx, y'=c*x+d*y+ty`です。引数を省略すると恒等変換になります。`transformSegment`・`transformPolygon`も使え、結果は不変です。反転・せん断・有理数係数の回転も表せます。
 
 `affineDeterminant`が0なら逆変換は例外になります。特異変換の適用自体は可能ですが、面が潰れる場合があります。任意角度の回転は一般に無理数を要するため、有理数係数だけで厳密には表せません。[証明と制約](docs/proofs/affine-transforms.md)を参照してください。
+
+## 穴を含む領域の三角形分割
+
+```ts
+import { triangulatePolygon } from "cadloom";
+const mesh = triangulatePolygon(region); // 第2引数に"nonzero"も指定可能
+// mesh.vertices: 厳密な有理数座標
+// mesh.triangles: verticesを参照する反時計回りの3頂点インデックス
+// mesh.twiceArea: 正規化後の領域の面積の2倍
+```
+
+凹形状・穴・自己交差を正規化してから、有理数の補助頂点を追加して分割します。隣接三角形の辺を揃え、辺の途中に頂点が接するT字接続を避けます。接触成分が頂点だけを共有する場合はあります。入力頂点だけを使う分割やDelaunay分割ではありません。[正当性と制約](docs/proofs/triangulation.md)を参照してください。
+
+```sh
+npm run build
+node examples/triangulation-to-svg.ts
+# artifacts/triangulation.{json,svg} に穴と島を含むメッシュを生成
+```
