@@ -101,7 +101,13 @@ export interface TriangleEmbeddingInspection {
 /** Checks that every pair meets only in its shared vertex or shared full edge. O(F²). */
 export function inspectTriangleEmbedding(input: readonly Triangle3[]): TriangleEmbeddingInspection {
   const faces=input.map(t=>triangle3(...t)),issues:TriangleEmbeddingIssue[]=[];
+  const bounds=faces.map(face=>(['x','y','z'] as const).map(axis=>{
+    const values=face.map(p=>p[axis]).sort((a,b)=>a.compare(b));
+    return {min:values[0]!,max:values[2]!};
+  }));
   for(let i=0;i<faces.length;i++)for(let j=i+1;j<faces.length;j++){
+    // Strict separation only: equality must retain vertex/edge/face contacts.
+    if(bounds[i]!.some((a,k)=>a.max.compare(bounds[j]![k]!.min)<0||bounds[j]![k]!.max.compare(a.min)<0))continue;
     const a=faces[i]!,b=faces[j]!,hit=intersectTriangles3(a,b);
     const shared=a.filter(p=>b.some(q=>pointsEqual3(p,q))).sort(compare3);
     const proper=shared.length===0?hit.kind==="none":shared.length===1?

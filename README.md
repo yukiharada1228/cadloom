@@ -1,6 +1,6 @@
 # cadloom
 
-ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による2D線分交差・領域の集合演算・三角形分割と、平面領域の3D押し出し** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
+ピュアTypeScriptのCADカーネルに向けた最初の基盤です。現在は **有理数による2D領域演算、3D押し出し、三角形ソリッドの内外判定と立体集合演算** を実装しています。完全なCADカーネルや商用CADファイルのインポーターではありません。
 
 このREADMEはソース版のAPIを対象とし、公開済みnpmパッケージに未収録の機能を含みます。
 
@@ -241,7 +241,7 @@ node examples/extrusion-viewer.ts
 open artifacts/extrusion.html
 ```
 
-穴のある板を回転・拡大縮小できる単独HTMLと、厳密なJSONを生成します。WebGL対応ブラウザーが必要です。表示だけ浮動小数点を使い、カーネルの座標・体積は有理数のままです。曲面・3D集合演算・商用CAD互換はまだ対象外です。
+穴のある板を回転・拡大縮小できる単独HTMLと、厳密なJSONを生成します。WebGL対応ブラウザーが必要です。表示だけ浮動小数点を使い、カーネルの座標・体積は有理数のままです。この表示例は曲面・3D集合演算・商用CAD互換を扱いません。
 
 ## 厳密な3D向き判定と平面交差
 
@@ -265,7 +265,7 @@ npm run build
 node examples/segment-plane-intersection.ts
 ```
 
-[数学的仕様・証明・比較テスト](docs/proofs/plane3.md)を参照してください。これは3Dカーネルの基礎であり、BRepや3Dソリッド集合演算はまだ未実装です。
+[数学的仕様・証明・比較テスト](docs/proofs/plane3.md)を参照してください。これは3Dカーネルの基礎です。三角形ソリッドの集合演算は後述の`booleanSolids3`で扱います。曲面BRepは未実装です。
 
 ## 三角形面と平面の交差・分割
 
@@ -328,10 +328,26 @@ solid.locate(point3('1/3', '1/2', '2'));  // 'inside' | 'boundary' | 'outside'
 solid.shells.map(s => s.depth);          // 外殻0、空洞1、島2…
 ```
 
-空集合・複数の離れた立体・貫通穴にも対応します。辺や頂点を通る半直線は別の有理数方向で再試行し、許容誤差を使いません。認定時はO(F²)、問い合わせも最悪O(F²)回の算術演算が必要です。面集合のBoolean演算は今後の実装です。[判定の根拠と検証範囲](docs/proofs/solid3.md)を参照してください。
+空集合・複数の離れた立体・貫通穴にも対応します。辺や頂点を通る半直線は別の有理数方向で再試行し、許容誤差を使いません。認定時はO(F²)、問い合わせも最悪O(F²)回の算術演算が必要です。面集合のBoolean演算は後述の`booleanSolids3`で扱います。[判定の根拠と検証範囲](docs/proofs/solid3.md)を参照してください。
 
 ## 面の平面群による分割
 
 `partitionTriangleByPlanes3(triangle, planes)`は、三角形を平面群で凸多角形へ分割します。各断片は元の面の向き、各平面に対する内部の符号列`signs`、厳密な内部代表点`witness`を持ちます。接触だけでは面積ゼロの断片を生成せず、同一平面の断片を両側へ重複させません。
 
 三角形化の対角線を追加しないため、集合演算の面分類前に必要な断片を保持できます。面どうしの再接続や同一平面で重なる面の統合は別工程であり、このAPI単体では立体Boolean演算は行いません。[仕様と証明](docs/proofs/triangle-plane-arrangement.md)を参照してください。
+
+
+## 厳密な多面体の集合演算
+
+`booleanSolids3(a, b, operation)`は`union`・`intersection`・`difference`・`xor`を扱います。入力は`prepareSolid3`で認定可能な三角形配列、または同じカーネルから返されたBoolean結果です。出力は向き付き三角形配列`boundary`、共有位相`topology`、厳密な`volume`、内外判定`locate`を持ちます。
+
+```ts
+const cut = booleanSolids3(firstTriangles, secondTriangles, 'difference');
+const assembled = booleanSolids3(cut, thirdTriangles, 'union');
+console.log(assembled.volume.toString());
+console.log(assembled.locate(point3('1/2', '1/2', '1/2')));
+```
+
+正則化した体積領域を返すため、点や辺だけの共通部分は空になります。和や対称差の結果で立体が辺・頂点だけで接する場合、その接触は保持し、`topology.closedManifold`はfalseになります。その場合も結果オブジェクトを次の演算へ渡せます。`boundary`だけを`prepareSolid3`へ渡すと、非多様体入力として拒否されます。
+
+同一平面上の重なり、空洞、斜面を有理数のまま処理し、再接続後の辺の向きの釣り合いと面の不正交差も検査します。現時点では全平面による分割と全ペア検査を使うため、大きなモデルの性能最適化は残っています。[構成の証明・比較テスト・限界](docs/proofs/solid-booleans.md)を参照してください。

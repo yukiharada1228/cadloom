@@ -22,7 +22,7 @@
     "typescript": "~5.9.3",
     "@types/node": "^24.0.0"
   },
-  "description": "Pure TypeScript exact rational 2D geometry foundations for a CAD kernel",
+  "description": "Pure TypeScript exact rational geometry and polyhedral CAD kernel foundations",
   "license": "MIT",
   "files": [
     "dist",
