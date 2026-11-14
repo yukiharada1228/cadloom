@@ -16,6 +16,8 @@ export interface NurbsPlaneSection3 {
   readonly containedPatches:readonly NurbsSurfacePatch3[];
 }
 const owned=new WeakSet<NurbsPlaneSection3>();
+/** Internal provenance guard for section-complex construction. */
+export function assertOwnedNurbsPlaneSection3(input:NurbsPlaneSection3):void {if(!owned.has(input))throw new RangeError('Section evaluation requires a factory-created section');}
 /** Complete closed patch-wise plane section, retaining isolated contacts and
  * patches wholly on the plane. Graph topology is in each parameter rectangle.
  */
@@ -29,14 +31,14 @@ export function intersectNurbsSurfacePlane3(input:NurbsSurface3,inputPlane:Plane
   const result=Object.freeze({surface,plane,pieces:Object.freeze(pieces),containedPatches:Object.freeze(containedPatches)});owned.add(result);return result;
 }
 function pieceAt(input:NurbsPlaneSection3,piece:number):NurbsPlaneSection3['pieces'][number] {
-  if(!owned.has(input))throw new RangeError('Section evaluation requires a factory-created section');
+  assertOwnedNurbsPlaneSection3(input);
   if(!Number.isSafeInteger(piece)||piece<0||piece>=input.pieces.length)throw new RangeError('Invalid section piece index');return input.pieces[piece]!;
 }
-function lift(p:NurbsSurfacePatch3,u:AlgebraicReal,v:AlgebraicReal):AlgebraicCoordinates3{return algebraicCoordinates3(p.x.rationalImage(u,v,p.weight),p.y.rationalImage(u,v,p.weight),p.z.rationalImage(u,v,p.weight));}
+export function liftNurbsSectionPatch3(p:NurbsSurfacePatch3,u:AlgebraicReal,v:AlgebraicReal):AlgebraicCoordinates3{return algebraicCoordinates3(p.x.rationalImage(u,v,p.weight),p.y.rationalImage(u,v,p.weight),p.z.rationalImage(u,v,p.weight));}
 export function nurbsPlaneSectionVertex3(input:NurbsPlaneSection3,piece:number,vertex:number):AlgebraicCoordinates3 {
-  const p=pieceAt(input,piece);if(!Number.isSafeInteger(vertex)||vertex<0||vertex>=p.topology.vertices.length)throw new RangeError('Invalid section vertex index');const v=p.topology.vertices[vertex]!;return lift(p.patch,v.u,v.v);
+  const p=pieceAt(input,piece);if(!Number.isSafeInteger(vertex)||vertex<0||vertex>=p.topology.vertices.length)throw new RangeError('Invalid section vertex index');const v=p.topology.vertices[vertex]!;return liftNurbsSectionPatch3(p.patch,v.u,v.v);
 }
 /** Parameter is u on a branch and v on a vertical parameter-space edge. */
 export function nurbsPlaneSectionEdgePoint3(input:NurbsPlaneSection3,piece:number,edge:number,parameter:AlgebraicReal|ExactInput):AlgebraicCoordinates3 {
-  const p=pieceAt(input,piece),point=evaluateAlgebraicCurveEdge2(p.topology,edge,parameter);return lift(p.patch,point.u,point.v);
+  const p=pieceAt(input,piece),point=evaluateAlgebraicCurveEdge2(p.topology,edge,parameter);return liftNurbsSectionPatch3(p.patch,point.u,point.v);
 }

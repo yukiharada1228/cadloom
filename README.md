@@ -962,11 +962,33 @@ const p = nurbsPlaneSectionEdgePoint3(section, 0, 0, '1/2');
 
 `intersectNurbsSurfacePlane3`はパッチごとのパラメータ空間のグラフと、平面上に含まれるパッチを返します。
 一点だけの接触も頂点として保持します。辺の評価引数は通常の枝では`u`、垂直成分では`v`です。
-パッチ境界の統合、空間上の自己重複の解決、トリムされたB-rep面への接続は今後の開発です。
+同じパラメータで一致するパッチ境界の統合は後述します。空間上の自己重複の解決と、トリムされたB-rep面への接続は今後の開発です。
 パラメータ空間の接続成分を、そのまま空間上の接続成分とは認定しません。
 [構成・完全性・検証範囲](docs/proofs/algebraic-curve-topology2.md)を参照してください。
 
 ```sh
 npm run build
 node examples/nurbs-plane-section3.ts
+```
+
+## NURBS断面のパッチ境界を接続する
+
+`sewNurbsPlaneSection3`は、同じグローバルパラメータ`(u,v)`で空間位置が一致する境界を接続します。
+境界の分割点をそろえ、曲線全体の有理式が一致する区間を共有辺にまとめます。
+不連続な境界が有限個のパラメータだけで一致する場合は、その点を頂点として保持します。
+
+```ts
+const joined = sewNurbsPlaneSection3(section);
+joined.vertices; // 元の頂点・辺との対応、接触する面積パッチ
+joined.edges; // 分割区間と、統合した元の辺の一覧
+joined.components; // 同じパラメータで境界を接続した結果の成分
+```
+
+平面上に含まれるパッチとの接触も記録します。異なるパラメータの点が空間上で重なる場合の統合、
+曲面全体の埋め込みの認定、トリムされたB-rep面の構築は今後の開発です。
+[一致判定・分割・検証範囲](docs/proofs/nurbs-section-seams3.md)を参照してください。
+
+```sh
+npm run build
+node examples/nurbs-section-seams3.ts
 ```

@@ -132,3 +132,6 @@ export type { CurveRectangle2, CurveEvent2, AlgebraicCurveVertex2, AlgebraicCurv
 
 export { intersectNurbsSurfacePlane3, nurbsPlaneSectionVertex3, nurbsPlaneSectionEdgePoint3 } from './geometry/nurbs-plane-section3.js';
 export type { NurbsPlaneSection3 } from './geometry/nurbs-plane-section3.js';
+
+export { sewNurbsPlaneSection3, nurbsSectionComplexEdgePoint3 } from './geometry/nurbs-section-seams3.js';
+export type { NurbsSectionCell3, NurbsSectionSeam3, NurbsSectionVertexUse3, NurbsSectionComplexVertex3, NurbsSectionComplexEdge3, NurbsSectionComplex3 } from './geometry/nurbs-section-seams3.js';

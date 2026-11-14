@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "a45c301e4fe0e4cb39dd0009be28a4d5cef49da8ceb16fbbfdbf14f564f35b69",
+    "src/index.ts": "0cc0508197550788947ec80461d978c3d786d76559937d5bed4c560a6e1777b6",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -65,8 +65,9 @@
     "src/numeric/bivariate-polynomial.ts": "f4c0e6d3d67dbf0331fa23bcc110fcce92e0f125d87205732b8e22b5e2a587f6",
     "src/geometry/nurbs-surface3.ts": "5e1dbbbdf4c6a2fa3e6b6bcbc5e4069e00b154e4ea4ce9220d482b3e159f5d04",
     "src/numeric/bivariate-system.ts": "a6dba0acb55ecdfa1a7879f709eb9f27cf3d500821c2bbb772bedbded7acffb6",
-    "src/geometry/nurbs-plane-section3.ts": "639a2c3bc556df62d52d3f863b5318f4a38af1c319730d184606f43e97aed515",
-    "src/geometry/algebraic-curve-topology2.ts": "53dd30141ca3318a545147115218c7fa170720e00c54aee6f6f89e0ae99ad9e4"
+    "src/geometry/nurbs-plane-section3.ts": "b286bf499537d17cb5cb7a8e611b4b730a66849d83bc641497744c4ec3be4db8",
+    "src/geometry/algebraic-curve-topology2.ts": "53dd30141ca3318a545147115218c7fa170720e00c54aee6f6f89e0ae99ad9e4",
+    "src/geometry/nurbs-section-seams3.ts": "d6cff0d9a47d3018d937dff6b941b523e04cf3e0994bb4fd440608c2b6cb120e"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -241,6 +242,7 @@
     "Rational positive-weight nonperiodic NURBS span compilation, one-sided evaluation/derivatives, rational knot insertion/splitting/reversal and exact plane intersections use documented arguments and independent polynomial-basis/shape tests, not full TypeScript verification. The generic positive-blend lemma is checked in Lean; full basis refinement, compiler/runtime semantics, NURBS surfaces, general curve intersections and BRep integration remain outside scope.",
     "Positive rational tensor-product NURBS surfaces, bivariate polynomial arithmetic, algebraic evaluation, partials/local normals, rational isocurves, direction-wise refinement/splitting/reversal and exact plane restriction/containment use documented arguments and independent tensor-coefficient/shape tests. Existing positive-blend mathematics is reused; TypeScript execution, global regularity/embedding, zero-set tracing, trimmed BRep integration and file import are not proved or supplied by this layer.",
     "Exact bivariate division, primitive-PRS gcd, fraction-free resultants, nonminimal-certificate fiber norm lifting and isolated residual system roots use documented algebraic arguments and independent determinant/known-root tests, not full TypeScript verification. Shared zero loci remain implicit in the system solver, including any real isolated points within them; bounded tracing is a separate API. Multiplicities, arbitrary trim domains and global NURBS/BRep intersection assembly remain outside the system solver.",
-    "Bounded algebraic zero-locus graphs, exact event fibers, separator-certified branch adjacency, rational recognition by continued fractions and patch-wise NURBS plane sections use documented construction arguments and independent graph/set/analytic fixtures, not machine-verified TypeScript execution. Components are in parameter space; patch seam welding, spatial embedding, analytic germ pairing, oriented trimmed faces and BRep sewing remain future work."
+    "Bounded algebraic zero-locus graphs, exact event fibers, separator-certified branch adjacency, rational recognition by continued fractions and patch-wise NURBS plane sections use documented construction arguments and independent graph/set/analytic fixtures, not machine-verified TypeScript execution. Components are in parameter space; general spatial overlap welding, spatial embedding, analytic germ pairing, oriented trimmed faces and BRep sewing remain future work.",
+    "Exact equal-parameter NURBS section sewing, homogeneous boundary-map equality, section-plane contact gcds, algebraic seam noding, source provenance and contained-patch attachments use documented arguments and independent source-coverage/geometry fixtures, not full TypeScript verification. Components describe a seam quotient; distinct-parameter spatial overlaps, embedding, orientation and BRep face certification remain outside scope."
   ]
 }

@@ -98,8 +98,8 @@ discontinuous knot seams instead of applying a global right-side default.
 Positive weights make clearing the denominator equivalent to the plane
 equation, so these lifted sets form the complete closed patch-wise section.
 
-Graphs and connected components describe the parameter rectangles. Seams
-between patches are not welded, and a noninjective surface may identify
+Graphs and connected components describe the parameter rectangles. This patch-wise API does not weld seams; equal-parameter sewing is supplied
+separately by [section seams](nurbs-section-seams3.md). A noninjective surface may identify
 different parameter points or edges in space. Global spatial topology,
 surface embedding, trimmed-face classification, orientation and BRep sewing
 remain future work. Exact arithmetic can be expensive at high degrees.
