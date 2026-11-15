@@ -17,3 +17,5 @@ The connected 25-test group passed against an isolated source-35 build, includin
 The existing scoped Lean audit passed all 133 declared theorems after updating the reviewed source manifest. These declarations do not prove this new runtime reuse path.
 
 The full source-35 broad suite subsequently passed all 767 tests outside the unchanged two-test hard oblique file in one isolated invocation (103913 ms). This includes the historical fixture and both new certificate/reuse tests. The unchanged source-35 hard integration remains live; no measured speedup or complete latest-source oblique result is established by the broad suite.
+
+The preceding source-34 sewing snapshot completed its unchanged hard oblique run successfully with status 0: both tests passed, Body ended at 807441 ms and total duration was 807495 ms. Together with its 764-test broad run and separately passing historical fixture, this establishes the scoped source-34 integration before region reuse. The source-35 reuse run remains separate and live; elapsed durations are not controlled comparisons.
