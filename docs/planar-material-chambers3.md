@@ -1,6 +1,7 @@
 # Planar material from physical-plane chambers
 
-Status: local algorithm experiment, not a replacement for the production parity compiler.
+Status: implemented as the separate `compilePlanarChambers3` API; the existing
+parity compiler and public boundary wrapper are unchanged.
 
 The current cone-parity compiler adds internal tetrahedron carriers. For the
 extruded L fixture it produces 21 carriers, and the existing exact material
@@ -17,8 +18,9 @@ planar-boundary API build. Compilation took 26 ms and the experiment through
 boundary/sample checks took 1,850 ms in one invocation. These are observations,
 not a controlled speedup benchmark. Common Body replay, cavity/disconnected
 boundary reconstruction and general degeneracy coverage have not been checked
-for this new expression builder. The older retained-Body replay remains a
-separate running process and must not be reported as fixed by this experiment.
+for this new expression builder. The older retained-Body replay subsequently passed on combined runtime f4f4eee
+in 1,593,584 ms. It used the 21-plane expression and is separate from this
+experiment; no attribution to the new chamber compiler is appropriate.
 
 ## Construction and correctness obligations
 
@@ -52,7 +54,7 @@ The source boundary lies in the physical carrier union, so membership is
 constant on each open convex chamber. The witness therefore determines its
 material label. Box restriction and the inactive guard then recover the same
 regularized material. This is a mathematical design argument, not a Lean proof
-or a verification of the uncommitted experimental implementation.
+or a verification of the TypeScript implementation.
 
 ## Before production integration
 
@@ -66,3 +68,16 @@ Do not change the old stored expressions or their replay ordering. Measure
 candidate/chamber growth for many physical planes; triple enumeration and
 recursive incidence work can still be expensive. Keep existing general
 algebraic/cylinder boundary processing complete.
+
+## Initial implementation validation
+
+The separate immutable compiler passed its build and five focused tests: L
+chambers, nested cavity/island/disconnected strict predicates, an affine skew
+with thickness 10^-40, the empty path, and L boundary/Body/replay with the original
+Body observable after replay. The L replay test checks all bounded-face samples,
+64 independent strict points and nine seam/boundary cases. Total focused run:
+7,706 ms under concurrent work; no timing threshold is asserted. The separate actual cavity-boundary replay test passed (18,802 ms): two
+cooriented shells, void and material membership, bounded face witnesses and
+post-replay original Body queries. The scoped source/Lean audit passed its
+existing 133 declarations; this is not a proof of the new chamber algorithm or
+of full TypeScript execution. The tests also passed standalone strict typing.

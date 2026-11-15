@@ -301,3 +301,5 @@ export {boundaryConvexPlanarMaterial3} from './geometry/convex-planar-material3.
 export {compilePlanarMaterial3} from './geometry/planar-material-program3.js';
 export {boundaryPlanarMaterial3} from './geometry/planar-material-boundary3.js';
 export type {PlanarMaterialProgram3} from './geometry/planar-material-program3.js';
+export {compilePlanarChambers3} from './geometry/planar-material-chambers3.js';
+export type {PlanarChamberProgram3} from './geometry/planar-material-chambers3.js';

@@ -254,3 +254,26 @@ and serialized document observable throughout replay. The example passed syntax
 and standalone strict TypeScript checks. Its complete resource run has not yet
 been launched: the preceding same-input prototype is still being observed, so
 no second competing warm replay is started merely to obtain a new process.
+
+### Retained 21-plane L replay completed
+
+The original resource prototype on combined runtime `f4f4eee` terminated with
+exit 0: 275 manifold faces at 914,327 ms, Body adoption at 953,457 ms, replay at
+1,593,568 ms and all seven prototype membership queries at 1,593,584 ms. The
+source58 fixed-abscissa provenance and source59 cheap-comparison admission
+changes are combined in this runtime; this is not an isolated attribution or
+a controlled speed benchmark. Both earlier OOMs remain historical failures.
+The new public resource example adds stronger full-face/64-point/seam assertions
+and post-replay retention checks; its own complete run is still pending.
+
+The separate `compilePlanarChambers3` implementation now passes five focused
+tests, including a retained 14-face L Body replay with those stronger membership
+checks. The parity compiler and public boundary entry point remain unchanged
+until further general boundary coverage is established.
+
+The separate cavity-boundary test also passed: exact physical supports, two
+shells, cavity/material/boundary classification, all bounded-face samples and
+retained original Body queries. The six new cases passed as five initial cases
+plus the added cavity integration case, with standalone strict typing and the
+existing 133-declaration scoped audit. No general native planar Boolean dispatch
+or production compiler replacement is included in this additive milestone.
