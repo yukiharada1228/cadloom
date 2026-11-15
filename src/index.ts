@@ -268,3 +268,5 @@ export type {CylinderExpressionSectionPatch3,CylinderExpressionPlaneSection3} fr
 
 export {splitFiniteCylinderExpressionByPlane3,assertOwnedCylinderExpressionPlaneSplit3} from './geometry/cylinder-expression-plane-split3.js';
 export type {CylinderExpressionSplitFaceOrigin3,CylinderExpressionSplitFace3,CylinderExpressionSplitChild3,CylinderExpressionSplitInterface3,CylinderExpressionPlaneSplit3} from './geometry/cylinder-expression-plane-split3.js';
+
+export {bodyRecordFromCylinderExpressionSplit3} from './convert/cylinder-expression-split3.js';
