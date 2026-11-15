@@ -208,3 +208,5 @@ export type {BRepCurve3} from './geometry/brep-curve3.js';
 export {sewMixedBRepFaces3} from './geometry/sew-mixed-brep3.js';
 export type {MixedBRepFace3,SewnMixedBRep3} from './geometry/sew-mixed-brep3.js';
 export {clipCylinderIntersectionToFaces3} from './geometry/cylinder-intersection-face3.js';
+export {partitionCylinderFaceByCylinder3,assertOwnedCylinderFaceCylinderPartition3} from './geometry/cylinder-face-cylinder-partition3.js';
+export type {CylinderHeightBound3,CylinderFaceCell3,CylinderFaceCylinderPartition3} from './geometry/cylinder-face-cylinder-partition3.js';

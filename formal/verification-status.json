@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "d1d69920a6f079c034513ab086a29bfc3559eb706481d79173c0f741e23e6ce9",
+    "src/index.ts": "85b0f2b6f10a0d557f2755a413a7a3b31c803c42fec536e27ea7b52f189efcb4",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -109,7 +109,8 @@
     "src/geometry/sew-mixed-brep3.ts": "7e5b2436b1ff57193a2cb664d52a92cb0ef3494ab934548817047098aa5e6b52",
     "src/geometry/cylinder-intersection-support3.ts": "b97ce126a107b6c302ab6ac00aba7c2fa62f9ca3b3277215b65c2b0421fb130b",
     "src/geometry/cylinder-intersection-face3.ts": "fd7b490e9c3685c2ca3993b3345e001995ec12d11bc3e74451332241c1bcc1cd",
-    "src/geometry/cylinder-coordinates3.ts": "972f33278cb6dd05fbbead3a9c447e041f996ec5cf50f9e8aa3d89102a823b01"
+    "src/geometry/cylinder-coordinates3.ts": "972f33278cb6dd05fbbead3a9c447e041f996ec5cf50f9e8aa3d89102a823b01",
+    "src/geometry/cylinder-face-cylinder-partition3.ts": "1ff6b042d57e501e19cd3bc27afed840cd288341dbaae1a2b621e7268c518271"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -306,6 +307,7 @@
     "Arbitrary rational circular-cylinder supporting SSI reduces nonparallel axes to a base-circle strip and two exact algebraic height sheets, with complete critical-point partition, isolated contacts, singular-node incidence and owned branch evaluation/membership. Factory biparametric affine points expand full linear/quadratic predicates without assuming parameter relations. These are documented mathematical reductions and executable tests, not new machine proofs. Bounded face trimming, common curve/BRep binding, persistent SSI graphs and general curved Booleans remain incomplete.",
     "Algebraic cylinder SSI plane intersections use complete circle/conic quartic recovery with zero-coefficient exceptions and whole-ellipse overlap classification. Owned subdivision and closed-halfspace clipping retain isolated contacts and supporting-normal degeneracies. Single-source rational point certificates evaluate linear/quadratic predicates with exact denominator signs. These are documented reductions and executable tests, not new machine proofs; arbitrary face boundaries, pcurve/common-edge binding, SSI persistence and curved Booleans remain incomplete.",
     "Mixed native/algebraic cylinder-SSI BRep edges use whole-support polynomial identities, endpoint noding and support/interior path matching, with executable source-use, singular-branch and parameterization tests. This is not machine-verified TypeScript. Closed incidence does not certify bounded face domains, orientation, embedding or material; missing interior crossings, pcurves, Body persistence and curved Booleans remain incomplete.",
-    "Bounded cylinder SSI graph restriction to two reconstructed finite height/angular domains uses exact algebraic generator quadratics, complete boundary event subdivision and closed-set contact retention. Correlated axial projection supports face membership. Documented reductions and executable tests do not prove TypeScript execution. Oriented pcurves, SSI-trimmed face construction/splitting, parallel/coincident face intersection families, common Body persistence and curved Booleans remain incomplete."
+    "Bounded cylinder SSI graph restriction to two reconstructed finite height/angular domains uses exact algebraic generator quadratics, complete boundary event subdivision and closed-set contact retention. Correlated axial projection supports face membership. Documented reductions and executable tests do not prove TypeScript execution. Oriented pcurves, SSI-trimmed face construction/splitting, parallel/coincident face intersection families, common Body persistence and curved Booleans remain incomplete.",
+    "Cylinder band/angular faces partition constructively by a second cylinder using complete angular/height SSI events, ordered constant/SSI axial bounds, rational interior witnesses, implicit quadratic root comparisons and oriented mixed-edge sewing. Parallel, coincident and isolated-contact families are retained. Documented domain/coverage arguments and tests are not machine verification of TypeScript. Artificial generator cells are not maximal faces; arbitrary repeated face cuts, finite cutter solids, common mixed Body persistence and material curved Booleans remain incomplete."
   ]
 }

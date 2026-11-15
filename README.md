@@ -1316,3 +1316,11 @@ node examples/face-domain-record3.ts
 `clipCylinderIntersectionToFaces3(graph, firstFace, secondFace)`は、所有された円柱SSIグラフを二つの`PreparedCylinderFace3`の閉じた領域へ制限します。高さだけでなく、無理数座標の端点を持つ角度範囲、大きな角度範囲、周期の継ぎ目も扱います。曲線片と点だけの接触を区別し、既に切り取られた入力部分を復活させません。支持円柱は面の順序・軸の原点移動・非零の軸倍率に対して幾何学的に照合します。
 
 入力面の領域を再構築するため、外部の`locate`コールバックは信頼しません。対象は非平行な支持円柱の`bounded`グラフです。有界面そのものの分割・パラメータ曲線・曲面ブーリアンは引き続き必要です。[構成と検証範囲](docs/proofs/cylinder-intersection-face3.md)。実行例は`npm run build && node examples/cylinder-ssi-face-trims3.ts`です。
+
+### 円柱面を円柱で分割する
+
+`partitionCylinderFaceByCylinder3(face, cutter)`は、有限な円柱面を別の円柱の支持面で分割します。各`cells[]`は角度区間・上下の定数／SSI境界、負・正・同一支持面の分類`side`、内部点、厳密な`locate`、向き付き`boundary`を持ちます。`sewn`は面片間の共有辺と元の曲線使用への対応です。
+
+面片は元の面を覆い、内部は重なりません。人工的な母線分割を残すため、最大の連結面へ統合した結果ではありません。平行軸の交線・接線、同一支持面、交差なし、孤立接触も区別します。対象は一つの帯／角度領域を一つの支持円柱で分ける処理で、有限な切断立体の全境界、複数回の任意分割、共通Bodyへの採用、曲面ブーリアンの組み立ては残ります。[構成と検証範囲](docs/proofs/cylinder-face-cylinder-partition3.md)。
+
+`npm run build && node examples/cylinder-face-cylinder-partition3.ts`で、四次交線を境界に持つ面分割を実行できます。

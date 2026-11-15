@@ -1,0 +1,4 @@
+import {point3,line3,cylinder3,prepareCylinderFace3,partitionCylinderFaceByCylinder3} from '../dist/index.js';
+const origin=point3(0n,0n),source=cylinder3(line3(origin,point3(0n,0n,1n)),1n),cutter=cylinder3(line3(origin,point3(1n,0n,0n)),4n),result=partitionCylinderFaceByCylinder3(prepareCylinderFace3(source,'-7/4','7/4'),cutter);
+// Surface partition diagnostic, not a persistent solid Body record.
+console.log(JSON.stringify({cells:result.cells.length,inside:result.cells.filter(c=>c.side===-1).length,outside:result.cells.filter(c=>c.side===1).length,vertices:result.sewn.topology.vertices.length,edges:result.sewn.topology.edges.length,ssiEdges:result.sewn.topology.edges.filter(e=>e.curve.kind==='cylinder-ssi').length,isolatedContacts:result.contacts.length,openBoundaryEdges:result.sewn.topology.issues.filter(i=>i.kind==='boundary-edge').length,otherIssues:result.sewn.topology.issues.filter(i=>i.kind!=='boundary-edge')},null,2));

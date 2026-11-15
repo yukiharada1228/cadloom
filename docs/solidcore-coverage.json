@@ -169,10 +169,11 @@
         "src/geometry/cylinder-cylinder3.ts",
         "src/geometry/cylinder-intersection-plane3.ts",
         "src/geometry/sew-mixed-brep3.ts",
-        "src/geometry/cylinder-intersection-face3.ts"
+        "src/geometry/cylinder-intersection-face3.ts",
+        "src/geometry/cylinder-face-cylinder-partition3.ts"
       ],
       "status": "partial",
-      "gap": "Finite cylinder height/angular domains now restrict owned SSI graphs, with exact generator events and contacts. Native/SSI shared-edge sewing remains incidence-level; SSI-trimmed bounded face construction/splitting, pcurves, embedding and general curved Booleans remain incomplete."
+      "gap": "Finite cylinder bands/angular patches partition by a circular cylinder into owned embedded monotone strip domains with exact location/sign labels and oriented native/SSI shared boundaries. Artificial generator subdivisions remain. Finite cutter solids, arbitrary repeated face cuts, maximal consolidation, common mixed Body adoption and general curved Booleans remain incomplete."
     },
     {
       "id": "boolean",
