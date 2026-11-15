@@ -2,12 +2,13 @@ import type {Surface3} from './surface3.js';
 import {snapshotBRepCurve3,nativeBRepCurve3,cylinderIntersectionBRepCurve3,brepCurveEndpoints3,pointOnBRepCurve3,brepCurveOnSurface3,buildMixedBRepTopology3} from './brep-curve3.js';
 import type {BRepCurve3} from './brep-curve3.js';
 import {algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
-import {compareAlgebraicPoints3} from './algebraic-point3.js';
+import {compareAlgebraicPoints3,getPointParameterization3,getRationalParameterization3,getBiparameterization3} from './algebraic-point3.js';
 import {ellipsesCoincide3,splitEllipticArc3} from './ellipse3.js';
 import {curveOnSurface3} from './curve3.js';
 import {canonical,samePoint} from './planar-trim-utils3.js';
 import {sectionPieces,witness} from './cylinder-plane-split3.js';
-import {splitCylinderIntersectionArc3} from './cylinder-cylinder3.js';
+import type {AlgebraicCoordinates3} from './algebraic-point3.js';
+import {splitCylinderIntersectionArc3,cylinderIntersectionPointCylinders3} from './cylinder-cylinder3.js';
 import type {BRepTopology3,BRepEdgeUse3} from './brep-topology3.js';
 import type {SewBRepOptions3,SewnBRep3} from './sew-brep3.js';
 
@@ -16,6 +17,12 @@ export interface SewnMixedBRep3 {
   readonly topology:BRepTopology3<BRepCurve3>;
   readonly sourceUses:SewnBRep3['sourceUses'];
   readonly faceLoops:SewnBRep3['faceLoops'];
+}
+/** Equal values may have different construction records. Preserve useful
+ * immutable support/field provenance instead of retaining an arbitrary copy. */
+function preferredPoints(input:readonly AlgebraicCoordinates3[]):AlgebraicCoordinates3[] {
+ const rank=(p:AlgebraicCoordinates3)=>cylinderIntersectionPointCylinders3(p)?4:getRationalParameterization3(p)?3:getPointParameterization3(p)?2:getBiparameterization3(p)?1:0,result:AlgebraicCoordinates3[]=[];
+ for(const p of [...input].sort(compareAlgebraicPoints3)){const previous=result[result.length-1];if(previous&&samePoint(previous,p)){if(rank(p)>rank(previous))result[result.length-1]=p;}else result.push(p);}return result;
 }
 function sample(curve:BRepCurve3){return curve.kind==='native'?witness(curve.curve):curve.arc.sample;}
 function sameSupport(a:BRepCurve3,b:BRepCurve3):boolean {
@@ -34,7 +41,7 @@ function sameSupport(a:BRepCurve3,b:BRepCurve3):boolean {
  */
 export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewBRepOptions3={}):SewnMixedBRep3 {
   if(options.requireClosed!==undefined&&typeof options.requireClosed!=='boolean')throw new TypeError('requireClosed must be boolean');
-  const prepared=input.map(f=>f.loops.map(loop=>loop.map(c=>{const p=snapshotBRepCurve3(c);return p.kind==='native'?sectionPieces(canonical(p.curve)).map(nativeBRepCurve3):[p];}))),points=prepared.flat(3).flatMap(brepCurveEndpoints3).sort(compareAlgebraicPoints3).filter((p,i,all)=>i===0||!samePoint(p,all[i-1]!)),edges:BRepCurve3[]=[];
+  const prepared=input.map(f=>f.loops.map(loop=>loop.map(c=>{const p=snapshotBRepCurve3(c);return p.kind==='native'?sectionPieces(canonical(p.curve)).map(nativeBRepCurve3):[p];}))),points=preferredPoints(prepared.flat(3).flatMap(brepCurveEndpoints3)),edges:BRepCurve3[]=[];
   function equal(a:BRepCurve3,b:BRepCurve3):1|-1|0 {
     const A=brepCurveEndpoints3(a),B=brepCurveEndpoints3(b),direction=samePoint(A[0],B[0])&&samePoint(A[1],B[1])?1:samePoint(A[0],B[1])&&samePoint(A[1],B[0])?-1:0;
     if(!direction||!sameSupport(a,b))return 0;

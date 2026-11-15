@@ -1,3 +1,4 @@
+import {cylinderIntersectionPointCylinders3} from './cylinder-cylinder3.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
 import {exactRational,Polynomial} from '../numeric/polynomial.js';
@@ -9,7 +10,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,signBiparametricQuadratic3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -48,6 +49,13 @@ export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,in
     if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
     const [U,V]=duals(e),X=rationalPointLinearNumerator3(rational,U,dot3(U,e.frame.origin).neg()),Y=rationalPointLinearNumerator3(rational,V,dot3(V,e.frame.origin).neg()),W=rational.denominator,sign=rational.parameter.signOf(X.mul(X).scale(e.radiusVSquared).add(Y.mul(Y).scale(e.radiusUSquared)).sub(W.mul(W).scale(e.radiusUSquared.mul(e.radiusVSquared))));
     return sign===0?'boundary':sign<0?'inside':'outside';
+  }
+  const pair=getBiparameterization3(point);if(pair){
+    if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';const [U,V]=duals(e),delta=subtract3(pair.origin,e.frame.origin),q=point2(dot3(U,delta),dot3(V,delta)),a=point2(dot3(U,pair.u),dot3(V,pair.u)),b=point2(dot3(U,pair.v),dot3(V,pair.v)),inner=(a:Point2,b:Point2)=>a.x.mul(b.x).mul(e.radiusVSquared).add(a.y.mul(b.y).mul(e.radiusUSquared)),two=new Rational(2n),sign=signBiparametricQuadratic3(pair,inner(q,q).sub(e.radiusUSquared.mul(e.radiusVSquared)),inner(q,a).mul(two),inner(q,b).mul(two),inner(a,a),inner(a,b).mul(two),inner(b,b));return sign===0?'boundary':sign<0?'inside':'outside';
+  }
+  const supports=cylinderIntersectionPointCylinders3(point);if(supports){
+    if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
+    for(const c of supports){const d=c.axis.direction,q=cross3(d,subtract3(e.frame.origin,c.axis.origin)),u=cross3(d,e.frame.u),v=cross3(d,e.frame.v),scale=dot3(u,u).mul(e.radiusUSquared);if(scale.sign()>0&&scale.compare(dot3(v,v).mul(e.radiusVSquared))===0&&dot3(q,u).sign()===0&&dot3(q,v).sign()===0&&dot3(u,v).sign()===0&&dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))).add(scale).sign()===0)return 'boundary';}
   }
   const p=pointInPlaneFrame3(e.frame,point);if(p===null)return 'outside';const sign=localSign(p,e);return sign===0?'boundary':sign<0?'inside':'outside';
 }
@@ -158,8 +166,7 @@ export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordin
     const phase=(p:AlgebraicCoordinates2,q:Rational)=>{
       const X=q.mul(new Rational(-sx)),Y=one.sub(q).mul(new Rational(sy)),data=getPointParameterization2(p);
       if(data)return data.parameter.signOf(new Polynomial([data.origin.x.mul(X).add(data.origin.y.mul(Y)),data.direction.x.mul(X).add(data.direction.y.mul(Y))]));
-      const source=p===s?piece.start:piece.end;if(getRationalParameterization3(source)){const [U,V]=duals(e),n=vector3(U.x.mul(X).add(V.x.mul(Y)),U.y.mul(X).add(V.y.mul(Y)),U.z.mul(X).add(V.z.mul(Y)));return classifyPointToSurface3(source,{kind:'plane',plane:plane3(n.x,n.y,n.z,dot3(n,f.origin).neg())});}
-      return p.x.affine(X).add(p.y.affine(Y)).sign();
+      const source=p===s?piece.start:piece.end,[U,V]=duals(e),n=vector3(U.x.mul(X).add(V.x.mul(Y)),U.y.mul(X).add(V.y.mul(Y)),U.z.mul(X).add(V.z.mul(Y)));return classifyPointToSurface3(source,{kind:'plane',plane:plane3(n.x,n.y,n.z,dot3(n,f.origin).neg())});
     };
     // Either endpoint may have the smaller phase, independently of traversal.
     let lo=zero,hi=one;

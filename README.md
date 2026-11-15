@@ -1342,3 +1342,13 @@ node examples/face-domain-record3.ts
 `partitionPlanarFaceByFiniteCylinder3(face, cutter, lower, upper)`は二つの端面も加え、面片の開いた内部の所属を`materialLocations`へ返します。一致する端面のパッチは`boundary`として残します。これで円柱側面と平面キャップの両方を有限円柱に対して分割・分類できます。両方の立体から面片を選び、閉じた材料境界へ接続する処理と共通Bodyへの採用は残っています。[構成と検証範囲](docs/proofs/planar-face-cylinder-partition3.md)。
 
 `npm run build && node examples/planar-face-finite-cylinder3.ts`でキャップの分割例を実行できます。
+
+### 二つの有限円柱のブーリアン
+
+`prepareFiniteCylinder3(cylinder, lower, upper)`は、側面・両キャップ・厳密な内外判定を持つ所有された有限円柱を構築します。`booleanFiniteCylinders3(first, second, operation)`は`union`・`intersection`・`difference`・`xor`の面片を選択し、ネイティブ曲線と代数的SSI辺を保持した境界へ接続します。
+
+`faces[].source`で入力の側面／下端／上端と分割片、向きの反転をたどれます。`partitions`には両入力の分割結果があります。空洞側の面は反転し、一致面は物理的な向きに応じて重複・内部界面を除きます。`locate`は正則化された材料の厳密な位置を返します。
+
+辺や頂点だけで接触する結果も保持するため、全結果が多様体になるわけではありません。`manifold`と`sewn.topology.issues`で区別します。人工的な面分割は残ります。対象は二つの構築済み有限円柱で、前回結果を入力にする一般の曲面再演算、共通Bodyの保存復元、領域ID、面統合、質量特性は引き続き必要です。[構成と検証範囲](docs/proofs/finite-cylinder-boolean3.md)。
+
+`npm run build && node examples/finite-cylinder-booleans3.ts`で、側面とキャップを含む4種類の演算を実行できます。

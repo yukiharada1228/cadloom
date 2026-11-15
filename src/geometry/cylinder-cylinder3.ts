@@ -3,11 +3,11 @@ import {AlgebraicReal} from '../numeric/real-roots.js';
 import {Polynomial} from '../numeric/polynomial.js';
 import {point3,cross3,dot3,subtract3} from './point3.js';
 import type {Point3,Vector3} from './point3.js';
-import {cylinder3,classifyPointToSurface3} from './surface3.js';
+import {cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js';
 import type {Cylinder3} from './surface3.js';
-import {circle3,fullCircleArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,intersectCircles3} from './circle3.js';
+import {circle3,fullCircleArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,intersectCircles3,containsCircularArcProjection3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluatePlaneAtAlgebraicPoint3} from './algebraic-segment-plane3.js';
 import {algebraicLine3} from './algebraic-line3.js';
@@ -58,7 +58,7 @@ interface Family {
   cache:{q:AlgebraicCoordinates3;branch:-1|1;p:AlgebraicCoordinates3}[];
 }
 const arcFamilies=new WeakMap<CylinderIntersectionArc3,Family>();
-const lifted=new WeakMap<AlgebraicCoordinates3,{family:Family;base:AlgebraicCoordinates3;branch:-1|0|1}>();
+const lifted=new WeakMap<AlgebraicCoordinates3,{family:Family;base:AlgebraicCoordinates3;branch:-1|0|1;height:AlgebraicReal}>();
 const same=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>compareAlgebraicPoints3(p,q)===0;
 function discriminant(f:Family,q:AlgebraicCoordinates3):AlgebraicReal {
   const offset=dot3(f.n,f.second.axis.origin).neg(),data=getPointParameterization3(q);
@@ -70,10 +70,25 @@ function lift(f:Family,q:AlgebraicCoordinates3,branch:-1|1):AlgebraicCoordinates
   const known=f.cache.find(e=>e.branch===branch&&same(q,e.q));if(known)return known.p;
   const disc=discriminant(f,q),discSign=disc.sign();if(discSign<0)throw new RangeError('Base point has no real cylinder intersection fiber');
   const root=disc.sqrt(),offset=dot3(f.m,f.second.axis.origin).neg(),data=getPointParameterization3(q),d=f.first.axis.direction,inv=one.div(f.a);
-  let p:AlgebraicCoordinates3;
-  if(data){const b0=dot3(f.m,data.origin).add(offset),b1=dot3(f.m,data.direction),o=point3(...axes.map(k=>data.origin[k].sub(d[k].mul(b0).mul(inv))) as [Rational,Rational,Rational]),u=point3(...axes.map(k=>data.direction[k].sub(d[k].mul(b1).mul(inv))) as [Rational,Rational,Rational]);p=affineTwo(o,u,data.parameter,scale(d,inv.mul(new Rational(BigInt(branch)))),root);}
-  else {const t=linear(q,f.m,offset).neg().add(root.affine(BigInt(branch))).affine(inv);p=algebraicCoordinates3(...axes.map(k=>q[k].add(t.affine(d[k]))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
-  if(!f.sealed)f.cache.push({q,branch,p});lifted.set(p,{family:f,base:q,branch:discSign===0?0:branch});return p;
+  let p:AlgebraicCoordinates3,height:AlgebraicReal;
+  if(data){const b0=dot3(f.m,data.origin).add(offset),b1=dot3(f.m,data.direction),o=point3(...axes.map(k=>data.origin[k].sub(d[k].mul(b0).mul(inv))) as [Rational,Rational,Rational]),u=point3(...axes.map(k=>data.direction[k].sub(d[k].mul(b1).mul(inv))) as [Rational,Rational,Rational]);p=affineTwo(o,u,data.parameter,scale(d,inv.mul(new Rational(BigInt(branch)))),root);height=data.parameter.affine(b1.neg().mul(inv),b0.neg().mul(inv)).add(root.affine(inv.mul(new Rational(BigInt(branch)))));}
+  else {const t=linear(q,f.m,offset).neg().add(root.affine(BigInt(branch))).affine(inv);p=algebraicCoordinates3(...axes.map(k=>q[k].add(t.affine(d[k]))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);height=t;}
+  if(!f.sealed)f.cache.push({q,branch,p});lifted.set(p,{family:f,base:q,branch:discSign===0?0:branch,height});return p;
+}
+/** Internal supporting identities of an actual factory-generated SSI point. */
+export function cylinderIntersectionPointCylinders3(point:AlgebraicCoordinates3):readonly [Cylinder3,Cylinder3]|undefined {const data=lifted.get(point);return data?Object.freeze([data.family.first,data.family.second]):undefined;}
+/** Internal exact inverse coordinates of a factory-lifted point on any parallel
+ * axial frame. Read-only construction provenance; no public properties trusted. */
+export function cylinderIntersectionPointCoordinates3(point:AlgebraicCoordinates3,cylinder:Cylinder3):{base:AlgebraicCoordinates3;height:AlgebraicReal}|undefined {
+ const data=lifted.get(point);if(!data)return undefined;const source=data.family.first.axis,d=source.direction,target=cylinder.axis,normal=cross3(d,target.direction);if(dot3(normal,normal).sign()!==0)return undefined;
+ const k=axes.find(k=>d[k].sign()!==0)!,ratio=target.direction[k].div(d[k]),shift=dot3(subtract3(target.origin,source.origin),d).div(dot3(d,d));return {base:shift.sign()===0?data.base:translateAlgebraicPoint3(data.base,scale(d,shift)),height:data.height.affine(one.div(ratio),shift.neg().div(ratio))};
+}
+/** Internal radial projection using actual SSI support provenance. The returned
+ * point is a coordinate construction, not an unchecked caller-supplied flag. */
+export function cylinderIntersectionPointBase3(point:AlgebraicCoordinates3,cylinder:Cylinder3):AlgebraicCoordinates3|undefined {
+ const parallel=cylinderIntersectionPointCoordinates3(point,cylinder);if(parallel)return parallel.base;const data=lifted.get(point);if(!data||![data.family.first,data.family.second].some(c=>surfacesCoincide3({kind:'cylinder',cylinder:c},{kind:'cylinder',cylinder})))return undefined;
+ const d=cylinder.axis.direction,o=cylinder.axis.origin,u=cross3(d,data.family.first.axis.direction),v=cross3(d,u),U=dot3(u,u),V=dot3(v,v);if(U.sign()===0||V.sign()===0)throw new Error('Parallel SSI projection missed its axial inverse');
+ const alpha=linear(data.base,u,dot3(u,o).neg()).affine(one.div(U)),squared=alpha.rationalFunction(new Polynomial([cylinder.radiusSquared.div(V),0n,U.neg().div(V)])),sign=signLinearAlgebraicPoint3(point,v,dot3(v,o).neg());if(squared.sign()<0||(squared.sign()===0)!==(sign===0))throw new Error('Certified SSI radial projection has inconsistent signs');return affineTwo(o,u,alpha,v,squared.sqrt().affine(BigInt(sign)));
 }
 function family(arc:CylinderIntersectionArc3){const f=arcFamilies.get(arc);if(!f)throw new RangeError('Expected a factory-created cylinder intersection arc');return f;}
 /** Evaluate an owned algebraic SSI branch at a point on its base circular arc. */
@@ -86,11 +101,13 @@ export function evaluateCylinderIntersectionArc3(arc:CylinderIntersectionArc3,in
 export function pointOnCylinderIntersectionArc3(input:Point3|AlgebraicCoordinates3,arc:CylinderIntersectionArc3):boolean {
   const f=family(arc);
   if(input===arc.start||input===arc.end||input===arc.sample)return true;
-  const registered=lifted.get(input as AlgebraicCoordinates3),p=snapshotExactPoint3(input),q=projectCylinderIntersectionBase3(arc,input);
-  if(!pointOnArc3(q,arc.base))return false;
-  if(registered?.family===f)return registered.branch===0||registered.branch===arc.branch;
-  if(classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0)return false;
-  const sign=linear(p,f.m,dot3(f.m,f.second.axis.origin).neg()).sign();return sign===0||sign===arc.branch;
+  const registered=lifted.get(input as AlgebraicCoordinates3),p=snapshotExactPoint3(input);
+  if(same(p,arc.start)||same(p,arc.end))return true;
+  if(registered?.family===f)return pointOnArc3(registered.base,arc.base)&&(registered.branch===0||registered.branch===arc.branch);
+  const known=(c:Cylinder3)=>registered&&[registered.family.first,registered.family.second].some(s=>surfacesCoincide3({kind:'cylinder',cylinder:s},{kind:'cylinder',cylinder:c}));
+  if(!known(f.first)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.first})!==0)return false;
+  if(!known(f.second)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0)return false;
+  const sign=signLinearAlgebraicPoint3(p,f.m,dot3(f.m,f.second.axis.origin).neg());return (sign===0||sign===arc.branch)&&containsCircularArcProjection3(p,arc.base);
 }
 
 /** Internal projection preserving certified rational/affine source fields. */
@@ -102,6 +119,9 @@ export function projectCylinderIntersectionBase3(arc:CylinderIntersectionArc3,in
     if(rational){const T=rationalPointLinearNumerator3(rational,d,dot3(d,o).neg()).scale(one.div(f.D));q=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
     else if(data)q=algebraicPoint3(project(data.origin),project(data.direction,true),data.parameter);
     else if(pair)q=affineTwo(project(pair.origin),project(pair.u,true),pair.s,project(pair.v,true),pair.t);
+    else if(registered&&[registered.family.first,registered.family.second].some(c=>surfacesCoincide3({kind:'cylinder',cylinder:c},{kind:'cylinder',cylinder:f.first}))){
+      const base=cylinderIntersectionPointBase3(p,f.first);if(!base)throw new Error('Expected a certified SSI projection');q=base;
+    }
     else {const t=linear(p,d,dot3(d,o).neg()).affine(one.div(f.D));q=algebraicCoordinates3(...axes.map(k=>p[k].sub(t.affine(d[k]))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
   }
   return q;
@@ -166,7 +186,7 @@ export function intersectCylinders3(inputA:Cylinder3,inputB:Cylinder3):CylinderC
     const root=s.affine(one.div(V)).sqrt();
     for(const side of s.sign()===0?[1n]:[-1n,1n]){
       const t=root.affine(side),q=affineTwo(center,scale(n,inv),lambda,v,t),o=point3(center.x.sub(d.x.mul(b0).mul(inv)),center.y.sub(d.y.mul(b0).mul(inv)),center.z.sub(d.z.mul(b0).mul(inv))),w=point3(v.x.sub(d.x.mul(bV).mul(inv)),v.y.sub(d.y.mul(bV).mul(inv)),v.z.sub(d.z.mul(bV).mul(inv))),p=affineTwo(o,scale(n,inv),lambda,w,t);
-      if(!f.events.some(event=>same(event.q,q))){f.events.push({q,p,singular:s.sign()===0});lifted.set(p,{family:f,base:q,branch:0});}
+      if(!f.events.some(event=>same(event.q,q))){f.events.push({q,p,singular:s.sign()===0});lifted.set(p,{family:f,base:q,branch:0,height:t.affine(bV.neg().mul(inv),b0.neg().mul(inv))});}
     }
   }
   const arcs:CylinderIntersectionArc3[]=[];

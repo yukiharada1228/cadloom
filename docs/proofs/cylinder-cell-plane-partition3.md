@@ -4,7 +4,7 @@
 
 ## Complete boundary events and ordered heights
 
-Intersect the new plane with every boundary curve of an input cell. Native circles, ellipses and algebraic segments use their complete native plane-section algorithms; owned SSI curves use complete quartic point recovery or whole-curve overlap. Project all finite events and native-piece endpoints onto the reference circle, then subdivide the input angular interval.
+Intersect the new plane with every non-generator boundary curve of an input cell. Native segment sides in these owned strip domains are axial generators: their projection is already an angular endpoint, so their plane intersections add no interior angular event. New height bounds reconstruct the cut vertices on those sides directly. Native circles, ellipses and algebraic segments use their complete native plane-section algorithms; owned SSI curves use complete quartic point recovery or whole-curve overlap. Project all finite events and native-piece endpoints onto the reference circle, then subdivide the input angular interval.
 
 If `a = plane.normal · source.axis.direction` is nonzero, the plane is a height graph `h_plane(q) = -plane(q)/a`. Its relative order against either old height bound cannot change inside a refined angular cell: a change or isolated equality would be a boundary/plane event already used to cut the interval. Whole-bound overlap needs no zero-width cell. A strict interior height comparison decides whether to insert the plane between the old bounds. Construct one or two cells from consecutive bounds, using the same embedded strip construction as the original cylinder partition.
 

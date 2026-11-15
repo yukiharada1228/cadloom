@@ -34,7 +34,13 @@ export function partitionCylinderFaceCellsByPlane3(input:CylinderFaceCylinderPar
  input.cells.forEach((source,id)=>{
   const points:AlgebraicCoordinates3[]=[];
   for(const c of source.boundary){
-   if(c.kind==='native')for(const piece of splitBoundary(c.curve,plane))points.push(...curveEndpoints3(piece));
+   if(c.kind==='native'){
+    // Native segments in these owned strip cells are axial generator sides.
+    // Their projection is an existing angular endpoint; their plane cut is
+    // reconstructed from the new height bound, not an additional angular event.
+    if(c.curve.kind==='algebraic-segment')continue;
+    for(const piece of splitBoundary(c.curve,plane))points.push(...curveEndpoints3(piece));
+   }
    else {const hit=intersectCylinderIntersectionArcPlane3(c.arc,plane);if(hit.kind==='points')points.push(...hit.points);}
   }
   const cuts=points.map(p=>cylinderCoordinates3(base.surface,p).base).filter((p,i,all)=>all.findIndex(q=>compareAlgebraicPoints3(p,q)===0)===i&&pointOnArc3(p,source.angular));

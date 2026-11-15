@@ -1,0 +1,4 @@
+import {point3,line3,cylinder3,prepareFiniteCylinder3,booleanFiniteCylinders3} from '../dist/index.js';
+const origin=point3(0n,0n),a=prepareFiniteCylinder3(cylinder3(line3(origin,point3(0n,0n,1n)),1n),'-1/2','1/2'),b=prepareFiniteCylinder3(cylinder3(line3(origin,point3(1n,0n,0n)),1n),'-1/2','1/2');
+// Exact boundary/material diagnostics, not a persistent common Body record.
+for(const operation of ['union','intersection','difference','xor'] as const){const r=booleanFiniteCylinders3(a,b,operation);console.log(JSON.stringify({operation,faces:r.faces.length,edges:r.sewn.topology.edges.length,ssiEdges:r.sewn.topology.edges.filter(e=>e.curve.kind==='cylinder-ssi').length,empty:r.empty,manifold:r.manifold,center:r.locate(origin),nonmanifoldEdges:r.sewn.topology.issues.filter(i=>i.kind==='nonmanifold-edge').length,nonmanifoldVertices:r.sewn.topology.issues.filter(i=>i.kind==='nonmanifold-vertex').length}));}

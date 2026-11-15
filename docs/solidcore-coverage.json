@@ -174,10 +174,11 @@
         "src/geometry/cylinder-cell-plane-partition3.ts",
         "src/geometry/cylinder-face-finite-cylinder3.ts",
         "src/geometry/planar-face-cylinder-partition3.ts",
-        "src/geometry/planar-face-finite-cylinder3.ts"
+        "src/geometry/planar-face-finite-cylinder3.ts",
+        "src/geometry/finite-cylinder-boolean3.ts"
       ],
       "status": "partial",
-      "gap": "Cylinder walls and native planar caps now partition/classify against finite cylinders. Planar conic/segment arrangements retain exact graph domains, orientation, shared uses and cap-coincident boundary patches. Arbitrary further curved cutters, maximal consolidation, two-operand material face selection, shell certification and persistent common mixed Body adoption remain incomplete."
+      "gap": "Finite-cylinder wall/cap partitions now select and sew balanced native/SSI Boolean material boundaries, including coincident/opposed faces and contact diagnostics. General repeated curved cuts, maximal consolidation, persistent regions and common mixed Body adoption remain incomplete."
     },
     {
       "id": "boolean",
@@ -188,10 +189,11 @@
         "src/geometry/curve-boolean2.ts",
         "src/geometry/planar-solid-boolean3.ts",
         "src/ops/body3.ts",
-        "src/geometry/consolidate-planar-solid3.ts"
+        "src/geometry/consolidate-planar-solid3.ts",
+        "src/geometry/finite-cylinder-boolean3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar material Booleans, manifold common Body replay and coplanar face consolidation with holes/provenance are connected. Common Body contact-region support and general analytic/NURBS solid Booleans/consolidation remain missing."
+      "gap": "Owned rational planar materials and constructive two-finite-cylinder native/SSI union/intersection/difference/xor have exact face provenance and material queries. Curved results are not yet reusable operands or persistent common Bodies; persistent regions, maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",

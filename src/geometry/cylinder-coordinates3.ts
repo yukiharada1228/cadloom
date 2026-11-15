@@ -1,3 +1,4 @@
+import {cylinderIntersectionPointCoordinates3} from './cylinder-cylinder3.js';
 import {Rational} from '../numeric/rational.js';
 import {Polynomial} from '../numeric/polynomial.js';
 import {point3,dot3,subtract3} from './point3.js';
@@ -11,7 +12,8 @@ const axes=['x','y','z'] as const;
  * Defined off the surface too; callers separately check cylinder membership.
  */
 export function cylinderCoordinates3(cylinder:Cylinder3,input:Point3|AlgebraicCoordinates3){
- const p=snapshotExactPoint3(input),d=cylinder.axis.direction,o=cylinder.axis.origin,D=dot3(d,d),inv=new Rational(1n).div(D),offset=dot3(d,o).neg(),height=evaluate({normal:d,offset},p).affine(inv),project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
+ const p=snapshotExactPoint3(input),known=cylinderIntersectionPointCoordinates3(p,cylinder);if(known)return known;
+ const d=cylinder.axis.direction,o=cylinder.axis.origin,D=dot3(d,d),inv=new Rational(1n).div(D),offset=dot3(d,o).neg(),height=evaluate({normal:d,offset},p).affine(inv),project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
  const affine=getPointParameterization3(p),pair=getBiparameterization3(p),rational=getRationalParameterization3(p);let base:AlgebraicCoordinates3;
  if(rational){const T=rationalPointLinearNumerator3(rational,d,offset).scale(inv);base=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
  else if(affine)base=algebraicPoint3(project(affine.origin),project(affine.direction,true),affine.parameter);

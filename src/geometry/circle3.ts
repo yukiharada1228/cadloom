@@ -5,7 +5,7 @@ import {AlgebraicReal,isolateRealRoots} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,compareAlgebraicPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -133,7 +133,7 @@ function coordinate(circle:Circle3,p:AlgebraicCoordinates3,axis:Vector3):Algebra
 function angleCompare(circle:Circle3,a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
   if(circle.radiusSquared.sign()===0)return 0;
   const [u,v]=basis(circle),ax=coordinate(circle,a,u),bx=coordinate(circle,b,u);
-  const half=(p:AlgebraicCoordinates3,x:AlgebraicReal)=>{const y=coordinate(circle,p,v).sign();return y>0||y===0&&x.sign()>=0?0:1;};
+  const half=(p:AlgebraicCoordinates3,x:AlgebraicReal)=>{const y=signLinearAlgebraicPoint3(p,v,dot3(circle.center,v).neg());return y>0||y===0&&x.sign()>=0?0:1;};
   const ha=half(a,ax),hb=half(b,bx);if(ha!==hb)return ha<hb?-1:1;
   const comparison=ax.compare(bx);return ha===0?comparison===0?0:comparison===1?-1:1:comparison;
 }
@@ -169,6 +169,13 @@ function containsOnCircle(p:AlgebraicCoordinates3,arc:CircularArc3):boolean {
   const start=arc.direction==='ccw'?arc.start:arc.end,end=arc.direction==='ccw'?arc.end:arc.start;
   const order=angleCompare(arc.circle,start,end),from=angleCompare(arc.circle,start,p),to=angleCompare(arc.circle,p,end);
   return order<0?from<=0&&to<=0:from<=0||to<=0;
+}
+/** Internal angular-only test: caller certifies that the normal projection of
+ * the point belongs to the circle. No support/sphere certificate is inferred. */
+export function containsCircularArcProjection3(input:CirclePointInput3,arc:CircularArc3):boolean {
+ const p=snapshotExactPoint3(input);if(arc.fullCircle)return true;const [u,v]=basis(arc.circle),shift=dot3(arc.circle.center,u),half=(p:AlgebraicCoordinates3)=>{const y=signLinearAlgebraicPoint3(p,v,dot3(arc.circle.center,v).neg());return y>0||y===0&&signLinearAlgebraicPoint3(p,u,shift.neg())>=0?0:1;},hp=half(p);
+ const against=(endpoint:AlgebraicCoordinates3):Sign=>{const h=half(endpoint);if(h!==hp)return h<hp?-1:1;const sign=compareLinearAlgebraicPoint3(p,u,coordinate(arc.circle,endpoint,u).affine(1n,shift));return h===0?sign:sign===0?0:sign===1?-1:1;};
+ if(same(arc.start,arc.end))return against(arc.start)===0;const start=arc.direction==='ccw'?arc.start:arc.end,end=arc.direction==='ccw'?arc.end:arc.start,order=angleCompare(arc.circle,start,end),from=against(start),endToPoint=against(end),to=endToPoint===0?0:-endToPoint;return order<0?from<=0&&to<=0:from<=0||to<=0;
 }
 export function locatePointOnArc3(inputPoint:CirclePointInput3,input:CircularArc3):ArcPointLocation3 {
   const p=snapshotExactPoint3(inputPoint),a=snapshotArc(input);
@@ -237,8 +244,8 @@ export function interiorPointOnArc3(input:CircularArc3):AlgebraicCoordinates3 {
     while(true){
       const q=lo.add(hi).div(new Rational(2n)),a=new Rational(1n).sub(q),axis=vector3(V.x.mul(a).sub(U.x.mul(q)),V.y.mul(a).sub(U.y.mul(q)),V.z.mul(a).sub(U.z.mul(q)));
       // Y/(X+Y)-q has the sign of (1-q)Y-qX in a closed quadrant.
-      if(coordinate(c,piece.start,axis).sign()>=0){lo=q;continue;}
-      if(coordinate(c,piece.end,axis).sign()<=0){hi=q;continue;}
+      if(signLinearAlgebraicPoint3(piece.start,axis,dot3(c.center,axis).neg())>=0){lo=q;continue;}
+      if(signLinearAlgebraicPoint3(piece.end,axis,dot3(c.center,axis).neg())<=0){hi=q;continue;}
       const A=a.div(dot3(U,U)),B=q.div(dot3(V,V)),direction=vector3(U.x.mul(A).add(V.x.mul(B)),U.y.mul(A).add(V.y.mul(B)),U.z.mul(A).add(V.z.mul(B))),point=onRay(direction);
       if(locatePointOnArc3(point,arc)!=='interior')throw new Error('Angular witness did not lie in the open arc');
       return point;
