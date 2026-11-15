@@ -352,3 +352,17 @@ The prior boundary-API broad run remains live specifically in the historical
 275-face reader and the eight-case chamber test file; both have increasing CPU
 time. The explicit retained 21-plane resource example is independently still
 restoring. No completed broad/resource result is inferred from elapsed time.
+
+### Boundary API integrated broad regression completed
+
+The isolated boundary-API runtime `9597d95` passed all 842 non-hard tests in one
+invocation (1,456,088 ms under concurrent work). This includes the immutable
+af34fb3 275-face reader, all eight chamber cases, nested four-shell/three-region
+replay and the positive-genus through-hole. The two earlier oblique cases passed
+on ancestor f4f4eee and were not repeated here; no new hard-case result is claimed.
+
+A fresh isolated build and complete non-hard snapshot of current kernel source
+(the general native planar dispatch plus corrected canonical/public fixtures)
+have now started their own full invocation. That result and the explicit
+retained 21-plane resource example remain pending. Review source hashes matched
+the current manifest; that is artifact bookkeeping, not an equivalence proof.
