@@ -162,3 +162,7 @@ Clipped cylinder-family operands now compose through common Body Boolean dispatc
 ### Exact six-plane box bridge into mixed material
 
 `boundaryBoxMaterial3` now preserves the exact six-plane box boundary in the bounded plane/cylinder predicate backend. A strictly inactive enclosing finite cylinder establishes boundedness without contributing any face. Box/cylinder composition, independent rational material grids, signed edge balance and manifold Body replay pass. See [construction and scope](box-material3.md). Native Box Body automatic dispatch and general polyhedral/curved interoperability remain integration work.
+
+### Native Box / cylinder common Body composition
+
+`booleanMixedBodies3` connects actual owned/restored native boxes to cylinder-family operands, retaining local cuts through complete material-recipe replay and further operations. The cylinder-specific API keeps its earlier family contract. See [invariants and validation](box-cylinder-body3.md). General polyhedral/curved interoperability, transformed boxes, contact promotion and NURBS remain incomplete.

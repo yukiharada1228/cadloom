@@ -293,3 +293,5 @@ export type {CylinderMaterialRegions3} from './geometry/finite-cylinder-regions3
 export {bodyFromCylinderMaterial3} from './ops/body3.js';
 
 export {boundaryBoxMaterial3} from './geometry/box-material3.js';
+
+export {booleanMixedBodies3} from './ops/body3.js';
