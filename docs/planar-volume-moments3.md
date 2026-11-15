@@ -76,4 +76,5 @@ The existing constructed/planar Body regression invocation passed all 22 cases.
 Build, standalone strict typing and the existing scoped audit passed. The prior
 native-pair kernel snapshot passed 854 non-hard tests; that predates this module
 and the wrapped-curve conversion extension, so it is not a full pass for this
-new source. The latest complete non-hard gate remains a separate requirement.
+new source. A complete non-hard snapshot including the new moment cases is now running;
+its result remains a separate requirement.

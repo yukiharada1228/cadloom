@@ -435,3 +435,10 @@ cases passed in one invocation. Build, strict typing and the existing scoped
 133-declaration audit passed; no new mechanical moment/TypeScript proof is
 claimed. Curved-body mass, surface area, certified integration and other M3
 capabilities remain incomplete. See planar-volume-moments3.md for units/formulas.
+
+The complete non-hard source74 snapshot, including all nine moment cases, is
+now running. A remaining M1/M2 gap observed in the actual dispatch code is native
+product Extrude Body mixed-Boolean lowering: the mass adapter can convert its
+straight planar topology, but mixed operand selection still handles explicit
+planar sources/Box/cylinder families only. Do not infer native Extrude Boolean
+coverage from the successful createPlanarBody3/extrudePolygon fixtures.
