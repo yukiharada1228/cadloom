@@ -1,6 +1,7 @@
 import {assertOwnedPlanarSolid3} from './planar-solid3.js';
 import type {PreparedPlanarSolid3} from './planar-solid3.js';
 import {point3} from './point3.js';
+import {orient3d} from './orient3d.js';
 import type {Point3} from './point3.js';
 import {plane3,planeFromPoints,evaluatePlane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -25,8 +26,11 @@ export function compilePlanarMaterial3(source:PreparedPlanarSolid3):PlanarMateri
  const extrema=(minimum:boolean):Point3=>vertices.length?point3(...axes.map(k=>vertices.reduce((a,p)=>(minimum?p[k].compare(a)<0:p[k].compare(a)>0)?p[k]:a,vertices[0]![k])) as Parameters<typeof point3>):zero;
  const lo=extrema(true),hi=extrema(false),apex=point3(lo.x.add(hi.x).div(two),lo.y.add(hi.y).div(two),lo.z.add(hi.z).div(two)),w=hi.x.sub(lo.x),d=hi.y.sub(lo.y),guard=prepareFiniteCylinder3(cylinder3(line3(point3(lo.x,lo.y,0n),point3(0n,0n,1n)),w.mul(w).add(d.mul(d)).add(one)),lo.z.sub(one),hi.z.add(one)),planes:Plane3[]=[],ids=new Map<string,number>(),terms:CylinderMaterialExpression3[]=[];
  const add=(input:Plane3)=>{const n=input.normal,pivot=[n.x,n.y,n.z].find(v=>v.sign()!==0)!,scale=one.div(pivot.sign()<0?pivot.neg():pivot),p=plane3(n.x.mul(scale),n.y.mul(scale),n.z.mul(scale),input.offset.mul(scale)),key=[p.normal.x,p.normal.y,p.normal.z,p.offset].map(v=>v.toString()).join(',');let id=ids.get(key);if(id===undefined){id=planes.length;planes.push(p);ids.set(key,id);}return leaf(id);};
- for(const triangle of source.triangles){
-  if(evaluatePlane3(planeFromPoints(...triangle),apex).sign()===0)continue;
+ for(const polygon of source.polygons)for(let i=1;i+1<polygon.length;i++){
+  // Validated convex faces admit a vertex fan; collinear boundary ports
+  // generate zero-volume cones and do not alter the regularized parity.
+  const triangle=[polygon[0]!,polygon[i]!,polygon[i+1]!] as const;
+  if(orient3d(triangle[0],triangle[1],triangle[2],apex)===0)continue;
   const points=[apex,...triangle],faces=points.map((opposite,i)=>{const f=points.filter((_,j)=>i!==j),p=planeFromPoints(f[0]!,f[1]!,f[2]!);return add(evaluatePlane3(p,opposite).sign()<0?p:plane3(p.normal.x.neg(),p.normal.y.neg(),p.normal.z.neg(),p.offset.neg()));});
   terms.push(join('intersection',join('intersection',faces[0]!,faces[1]!),join('intersection',faces[2]!,faces[3]!)));
  }

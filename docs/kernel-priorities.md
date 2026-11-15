@@ -182,3 +182,7 @@ Owned rational planar material now compiles into a balanced bounded halfspace/te
 ### Shared quadratic planar arrangement endpoints
 
 Fallback ellipse graph endpoints now preserve one common abscissa and one quadratic radical in world coordinates, avoiding independent-field resultants during support checks. Eighteen existing connected tests, the consolidated convex-Body diagnostic and an irrational cross-circle chart/degree regression pass. See [formula, evidence and pending integrated gates](planar-quadratic-endpoints3.md). Corrected runtime b64db64 passed all 827 non-hard tests, the added endpoint regression separately, and the unchanged two-test slow oblique integration; no controlled speedup or full execution proof is claimed.
+
+### Minimal convex-face fans for planar parity
+
+The parity compiler now derives a direct vertex fan from each already validated convex polygon rather than coning the embedding checker's additional face-center triangles. Exact zero-volume/collinear cones skip by orientation. Four focused material tests and the scoped audit pass; the same L source drops from 84 tetrahedra/138 planes to 28 tetrahedra/36 planes. General sewn-boundary verification remains in progress; see [construction and scope](planar-material-program3.md).
