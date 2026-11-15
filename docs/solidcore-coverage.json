@@ -170,10 +170,11 @@
       "localPaths": [
         "src/geometry/solid-boolean3.ts",
         "src/geometry/curve-boolean2.ts",
-        "src/geometry/planar-solid-boolean3.ts"
+        "src/geometry/planar-solid-boolean3.ts",
+        "src/ops/body3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar BRep material Booleans directly subdivide polygon faces, arrange coplanar coverage, classify both sides and preserve face provenance, including chainable contact complexes. Common Body adoption, face consolidation and general analytic/NURBS solid Booleans remain missing."
+      "gap": "Owned rational planar material Booleans and manifold common Body save/replay are connected, including cavities, islands and algebraic point queries. Common Body contact-region support, face consolidation and general analytic/NURBS solid Booleans remain missing."
     },
     {
       "id": "sweep",

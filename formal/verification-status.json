@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "d05de6bf6874ef31ca4b000bfb0723155127d1bc824ca25c141f259aa583bb0a",
+    "src/index.ts": "0cf0476633f116248d3fd3285980e62092b20cda5445bd26a0da805f1310660d",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -83,9 +83,9 @@
     "src/convert/geometry3.ts": "27bd3114d8821c9a30ce7161b8e7774a1ba0225dc85c71390223203c6e2ef75d",
     "src/convert/body3.ts": "1fcbff8081db898c3d24b015f69bb70eaa4152b00fa63600c35c05c42493d980",
     "src/convert/exact3.ts": "c3f52a51e8277f3e97d5f20e960a63a3a5ae9573e71cbbb90d7d6391e681f6b4",
-    "src/record/body-document3.ts": "6acb03fb3ff7dba49ca3b572e4ffe6ebf2f932e0ded7300e6cef3e68980e55c6",
-    "src/model/body3.ts": "6bbcfbedca0123180a56691e51b6f9c4591b3191cd8d9abd6dc0736847226293",
-    "src/ops/body3.ts": "522b537ebee2d8a2958070ef256dc92a1a55d13c0a0b6579ccfaae35bfd54f88",
+    "src/record/body-document3.ts": "39b7627e57c21c688dbeb0c35e6555e5fd5bd32f92ddf2e53a433b8b0fba3849",
+    "src/model/body3.ts": "33c183c4fa72aca54244efdb671db41da4e40ef84cacc53b4cd865858356193b",
+    "src/ops/body3.ts": "c035bfad182e073d2c1cc1719b961e64216fbee39c7faab4cbe2af5536d28ae5",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "62dc8f630181a3d046cd96c2b56b0c3904f5d54ee511bcd62a33afbe3342b3d3",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
@@ -97,7 +97,10 @@
     "src/geometry/convex-polygon-plane-arrangement3.ts": "5a7e666a795f9d2713fab1df0c8dfe4db4337e6563be1e6d0faa654181d11e6a",
     "src/geometry/planar-brep-partition3.ts": "a7f8aaaf1ac30d41dc47345a77a686a95e41ba5a67bd022baaf69aca5add7184",
     "src/geometry/planar-solid3.ts": "2042db4f6bc1fff906320b5dd22e545793c9bf352ee2542994b11b95c573aee7",
-    "src/geometry/planar-solid-boolean3.ts": "25e09df8503edd57ca575270237631dcd8b3839f30a02f79176462ef902895ed"
+    "src/geometry/planar-solid-boolean3.ts": "25e09df8503edd57ca575270237631dcd8b3839f30a02f79176462ef902895ed",
+    "src/convert/planar-body3.ts": "b7dbf478661faa946c1d27cc30368e172926b8446ee281190667dad0da3a4d3c",
+    "src/geometry/exact-planar-location3.ts": "2f04df28e02e595c7fc44cda55ee90064319a82381466d687f4e14edb321a8b2",
+    "src/geometry/planar-solid-regions3.ts": "24a7e1f0af0d5474d7cdc13c8463be840db5a2de45463dd8b88bc40a91f1933e"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -287,6 +290,7 @@
     "Convex rational planar polygon subdivision uses input convexity/planarity checks and exact halfspace clipping, tested against independent halfplane vertex enumeration and geometric invariants; no machine-verified TypeScript refinement or general BRep Boolean certification is claimed.",
     "Rational convex planar polygon-soup subdivision, shared-edge sewing and source face/edge/cutting-plane provenance use documented constructions and executable coverage/incidence/volume tests, not machine-verified TypeScript. Closed oriented incidence does not establish global embedding, shell nesting, material classification, safe common Body adoption or general BRep Boolean validity.",
     "Convex rational planar polygon shells are sewn and decomposed exactly for existing triangle embedding, shell nesting, orientation, volume and rational point-query checks. Polygon/triangle shell partitions are checked for equality. These are documented constructions and executable tests, not a new machine proof, curved/algebraic BRep certification, common Body adoption or general BRep Boolean implementation.",
-    "Owned rational planar material Booleans use exact polygon/support/boundary-line arrangements, coplanar extreme-vertex deduplication, support-separated side samples, shared-edge balance and exact triangle embedding checks. Face provenance, chainable contact material, volume and rational queries are executably tested, not machine-proved TypeScript. Common Body adoption, curved/algebraic faces and general CAD equivalence remain unimplemented."
+    "Owned rational planar material Booleans use exact polygon/support/boundary-line arrangements, coplanar extreme-vertex deduplication, support-separated side samples, shared-edge balance and exact triangle embedding checks. Face provenance, chainable contact material, volume and rational queries are executably tested, not machine-proved TypeScript. Common Body adoption, curved/algebraic faces and general CAD equivalence remain unimplemented.",
+    "Manifold rational planar material adopts common Body through exact face-domain binding, recomputed shell-parent/void roles and replayed polygon snapshots. Algebraic queries choose exact rational representatives of support/edge-plane sign cells using rational elimination and interval refinement. These are documented constructions and tests, not runtime machine proofs. Contact-region Body adoption, curved/algebraic faces and persistent Boolean provenance remain incomplete."
   ]
 }

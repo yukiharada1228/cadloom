@@ -186,3 +186,5 @@ export {preparePlanarSolid3} from './geometry/planar-solid3.js';
 export type {PreparedPlanarSolid3,PlanarSolidShell3} from './geometry/planar-solid3.js';
 export {booleanPlanarSolids3} from './geometry/planar-solid-boolean3.js';
 export type {PlanarSolidBooleanResult3,PlanarSolidBooleanOperand3,PlanarBooleanFaceSource3} from './geometry/planar-solid-boolean3.js';
+
+export {createPlanarBody3,booleanPlanarBodies3} from './ops/body3.js';
