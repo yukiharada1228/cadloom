@@ -202,3 +202,14 @@ Rational chart segments now construct fallback graph endpoints as a genuine affi
 ### Preserve both rational graph construction identities
 
 Rational graph endpoints now pass through the actual affine plane-map factory, retaining both a common abscissa field and the fixed-abscissa line parallel to the second frame vector. A strengthened regression rejects the earlier direct-world-affine implementation; all 35 connected cases and the scoped audit pass. Integrated retained-Body replay still needs resource validation.
+
+### Cheap algebraic comparison cache admission
+
+Rational/rational and disjoint isolating-interval comparisons now return before
+allocating pair-cache entries. Overlapping algebraic certificates retain the
+existing exact comparison and genuine-instance cache. This avoids retaining
+quadratically many trivial pair decisions when an arrangement keeps its operands
+alive; it does not establish a bounded-memory guarantee. The focused numeric,
+root, endpoint and inverse-chart checks passed 21 tests. Broad regressions and
+the retained-Body L-shaped serialization/replay experiment are still running;
+the earlier default-heap failures must not be reported as resolved yet.

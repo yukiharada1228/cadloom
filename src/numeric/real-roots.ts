@@ -319,6 +319,12 @@ export class AlgebraicReal {
   }
   compare(other:AlgebraicReal):Sign {
     if(this===other)return 0;
+    // Trivial rational/interval decisions need no pair-cache allocation. Dense
+    // arrangements keep many operands alive, so even weak pair tables can grow
+    // quadratically when these inexpensive decisions are memoized.
+    if(this.rational!==null&&other.rational!==null)return this.rational.compare(other.rational);
+    if(this.upper.compare(other.lower)<=0)return -1;
+    if(other.upper.compare(this.lower)<=0)return 1;
     const cached=comparisons.get(this)?.get(other);if(cached!==undefined)return cached;
     const result=this.compareUncached(other);
     // Genuine instances and their polynomial/rational certificates are deeply
