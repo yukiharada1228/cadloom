@@ -178,3 +178,7 @@ Owned convex single-shell rational polyhedra now lower to their outward supporti
 ### General planar parity programs
 
 Owned rational planar material now compiles into a balanced bounded halfspace/tetrahedron parity expression, including concave material, nested voids/islands, disconnected shells and empty input. Three focused strict-chamber tests pass against independent rational-cell predicates and the prepared-solid classifier. See [construction argument and explicit boundary gap](planar-material-program3.md). No general sewn BRep, native Body dispatch or complete mixed Boolean parity is claimed by this compiler alone.
+
+### Shared quadratic planar arrangement endpoints
+
+Fallback ellipse graph endpoints now preserve one common abscissa and one quadratic radical in world coordinates, avoiding independent-field resultants during support checks. Eighteen existing connected tests, the consolidated convex-Body diagnostic and an irrational cross-circle chart/degree regression pass. See [formula, evidence and pending integrated gates](planar-quadratic-endpoints3.md). Corrected broad and unchanged slow oblique integration checks remain in progress; no controlled speedup or full execution proof is claimed.

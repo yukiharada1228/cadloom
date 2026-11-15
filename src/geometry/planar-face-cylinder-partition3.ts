@@ -10,7 +10,7 @@ import {cylinder3,classifyPointToSurface3} from './surface3.js';
 import type {Cylinder3} from './surface3.js';
 import {algebraicLine3} from './algebraic-line3.js';
 import type {AlgebraicLine3} from './algebraic-line3.js';
-import {algebraicCoordinates3,compareAlgebraicPoints3,snapshotExactPoint3,getPointParameterization3,getRationalParameterization3,algebraicRationalPoint3,algebraicPoint3,rationalPointLinearNumerator3} from './algebraic-point3.js';
+import {algebraicQuadraticPoint3,algebraicCoordinates3,compareAlgebraicPoints3,snapshotExactPoint3,getPointParameterization3,getRationalParameterization3,algebraicRationalPoint3,algebraicPoint3,rationalPointLinearNumerator3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {pointInPlaneFrame3} from './plane-frame3.js';
 import type {PlaneFrame3} from './plane-frame3.js';
@@ -76,8 +76,8 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
  const cuts=uniqueReals([AlgebraicReal.fromRational(original.xMin),AlgebraicReal.fromRational(original.xMax),...g.critical,...known.map(p=>pointInPlaneFrame3(frame,p)!.x)]).filter(x=>x.compare(AlgebraicReal.fromRational(original.xMin))>=0&&x.compare(AlgebraicReal.fromRational(original.xMax))<=0),cells:PlanarCylinderFaceCell3[]=[];
  function bound(c:Curve3,x:AlgebraicReal,y:AlgebraicReal):PlanarVerticalBound3 {if(c.kind==='algebraic-segment')return Object.freeze({kind:'segment',curve:c});if(c.kind!=='elliptic-arc')throw new Error('Unexpected bound');const fullCurve=fullFor.get(c)!;if(fullCurve.kind!=='elliptic-arc')throw new Error('Missing full ellipse');const values=g.slice(fullCurve,x);return Object.freeze({kind:'ellipse',ellipse:fullCurve.arc.ellipse,branch:values[0]!.compare(y)===0?-1:1});}
  function value(b:PlanarVerticalBound3,x:AlgebraicReal):AlgebraicReal {if(b.kind==='segment'){const values=g.slice(b.curve,x);if(values.length!==1)throw new Error('A nonvertical graph bound has no unique value');return values[0]!;}const c=[...fullFor.values()].find(c=>c.kind==='elliptic-arc'&&c.arc.ellipse===b.ellipse);if(!c)throw new Error('Missing ellipse chart');const values=g.slice(c,x);return values.length===1?values[0]!:values[b.branch===-1?0:1]!;}
- const ellipseCache=new Map<Ellipse3,{K:Rational;vertex:Plane3}>();
- function ellipseData(e:Ellipse3){let result=ellipseCache.get(e);if(result)return result;const [EU,EV]=duals(e.frame),a=dot3(EU,frame.u),b=dot3(EU,frame.v),h=dot3(EU,frame.origin).sub(dot3(EU,e.frame.origin)),d=dot3(EV,frame.u),v=dot3(EV,frame.v),k=dot3(EV,frame.origin).sub(dot3(EV,e.frame.origin)),K=e.radiusVSquared.mul(b.mul(b)).add(e.radiusUSquared.mul(v.mul(v))),L0=e.radiusVSquared.mul(b).mul(h).add(e.radiusUSquared.mul(v).mul(k)).mul(two),L1=e.radiusVSquared.mul(a).mul(b).add(e.radiusUSquared.mul(d).mul(v)).mul(two),n=point3(DU.x.mul(L1).add(DV.x.mul(K).mul(two)),DU.y.mul(L1).add(DV.y.mul(K).mul(two)),DU.z.mul(L1).add(DV.z.mul(K).mul(two)));result={K,vertex:plane3(n.x,n.y,n.z,L0.sub(dot3(n,frame.origin)))};ellipseCache.set(e,result);return result;}
+ const ellipseCache=new Map<Ellipse3,{K:Rational;vertex:Plane3;linear:Polynomial;radicand:Polynomial}>();
+ function ellipseData(e:Ellipse3){let result=ellipseCache.get(e);if(result)return result;const [EU,EV]=duals(e.frame),a=dot3(EU,frame.u),b=dot3(EU,frame.v),h=dot3(EU,frame.origin).sub(dot3(EU,e.frame.origin)),d=dot3(EV,frame.u),v=dot3(EV,frame.v),k=dot3(EV,frame.origin).sub(dot3(EV,e.frame.origin)),K=e.radiusVSquared.mul(b.mul(b)).add(e.radiusUSquared.mul(v.mul(v))),L0=e.radiusVSquared.mul(b).mul(h).add(e.radiusUSquared.mul(v).mul(k)).mul(two),L1=e.radiusVSquared.mul(a).mul(b).add(e.radiusUSquared.mul(d).mul(v)).mul(two),n=point3(DU.x.mul(L1).add(DV.x.mul(K).mul(two)),DU.y.mul(L1).add(DV.y.mul(K).mul(two)),DU.z.mul(L1).add(DV.z.mul(K).mul(two)));const linear=new Polynomial([L0,L1]),U=new Polynomial([h,a]),V=new Polynomial([k,d]),constant=U.mul(U).scale(e.radiusVSquared).add(V.mul(V).scale(e.radiusUSquared)).sub(new Polynomial([e.radiusUSquared.mul(e.radiusVSquared)])),radicand=linear.mul(linear).sub(constant.scale(K.mul(new Rational(4n))));result={K,vertex:plane3(n.x,n.y,n.z,L0.sub(dot3(n,frame.origin))),linear,radicand};ellipseCache.set(e,result);return result;}
  function compare(b:PlanarVerticalBound3,p:AlgebraicCoordinates3,x:AlgebraicReal,y:AlgebraicReal):Sign {if(b.kind==='segment')return y.compare(value(b,x));const vertex=classifyPointToSurface3(p,{kind:'plane',plane:ellipseData(b.ellipse).vertex}),location=locatePointInEllipse3(p,b.ellipse),sign=location==='boundary'?0:location==='inside'?-1:1;return b.branch===-1?vertex>0?1:sign===0?0:sign>0?-1:1:vertex<0?-1:sign===0?0:sign>0?1:-1;}
  function point(b:PlanarVerticalBound3,x:AlgebraicReal):AlgebraicCoordinates3 {
   for(const p of known){const q=pointInPlaneFrame3(frame,p)!;if(q.x.compare(x)!==0)continue;if(compare(b,p,q.x,q.y)===0)return p;
@@ -88,6 +88,12 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
     if(rational){const T=rationalPointLinearNumerator3(rational,data.vertex.normal,data.vertex.offset).scale(one.div(data.K));return algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(frame.v[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
     if(affine){const t0=dot3(data.vertex.normal,affine.origin).add(data.vertex.offset).div(data.K),rate=dot3(data.vertex.normal,affine.direction).div(data.K);return algebraicPoint3(point3(...axes.map(k=>affine.origin[k].sub(frame.v[k].mul(t0))) as Parameters<typeof point3>),point3(...axes.map(k=>affine.direction[k].sub(frame.v[k].mul(rate))) as Parameters<typeof point3>),affine.parameter);}
    }
+  }
+  if(b.kind==='ellipse'){
+   // y=(-L(x) +/- sqrt(L(x)^2-4*K*M(x)))/(2*K). Preserve x as
+   // the common source so support predicates reduce in one quadratic field.
+   const data=ellipseData(b.ellipse),D=data.K.mul(two),axes=['x','y','z'] as const,N=axes.map(k=>new Polynomial([frame.origin[k],frame.u[k]]).scale(D).sub(data.linear.scale(frame.v[k]))) as [Polynomial,Polynomial,Polynomial],coefficients=point3(...axes.map(k=>frame.v[k].mul(new Rational(BigInt(b.branch)))) as Parameters<typeof point3>);
+   return algebraicQuadraticPoint3(x,N,coefficients,data.radicand,new Polynomial([D]));
   }
   return map(frame,x,value(b,x));
  }
