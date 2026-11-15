@@ -235,3 +235,6 @@ export type {MixedBRepFaces3} from './convert/mixed-faces3.js';
 export {encodePlanarCellDomain3} from './convert/mixed-face-domain3.js';
 export type {PlanarCellDomainRecord3} from './record/face-domain3.js';
 export {bodyRecordFromFiniteCylinderBoolean3} from './convert/finite-cylinder-boolean3.js';
+export {assertOwnedMixedBRepFaces3} from './convert/mixed-faces3.js';
+export {intersectMixedBoundaryRay3,locatePointInMixedShell3} from './geometry/mixed-shell-ray3.js';
+export type {MixedRayFaceUse3,MixedBoundaryRayHit3,MixedBoundaryRay3,MixedShellPointLocation3} from './geometry/mixed-shell-ray3.js';

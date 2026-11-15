@@ -248,10 +248,11 @@
         "src/geometry/solid3.ts",
         "src/geometry/extruded-brep3.ts",
         "src/geometry/clipped-cylinder-brep3.ts",
-        "src/model/body3.ts"
+        "src/model/body3.ts",
+        "src/geometry/mixed-shell-ray3.ts"
       ],
       "status": "partial",
-      "gap": "Common owned constructed Body and bounded-face membership exist alongside earlier classifiers. General distances, closest points and ray/body queries remain missing."
+      "gap": "Common owned constructed Body and bounded-face membership exist alongside earlier classifiers. Factory-restored mixed plane/cylinder boundaries support exact rational forward rays and closed locally manifold shell parity with explicit degeneracy/retry. Global shell embedding/material certification, algebraic-origin/general NURBS rays, general distances and closest points remain missing."
     },
     {
       "id": "tessellation",

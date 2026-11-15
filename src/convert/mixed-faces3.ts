@@ -8,6 +8,8 @@ import {reverseBRepCurve3,nativeBRepCurve3} from '../geometry/brep-curve3.js';
 import type {RecordReadLimits3} from '../record/schema.js';
 
 export interface MixedBRepFaces3 {readonly boundary:MixedBRepBoundary3;readonly faces:readonly DecodedMixedFaceDomain3[];}
+const owned=new WeakSet<MixedBRepFaces3>();
+export function assertOwnedMixedBRepFaces3(input:MixedBRepFaces3):void {if(!owned.has(input))throw new RangeError('Expected factory-restored mixed BRep faces');}
 /** Reconstruct bounded analytic face domains and bind their entire oriented
  * boundaries to the serialized uses. Not a shell/region/solid validity claim.
  */
@@ -21,5 +23,5 @@ export function restoreMixedBRepFaces3(input:unknown,limits:RecordReadLimits3={}
     const loops=f.loops.map(l=>r.loops[l]!.uses.map(u=>{const edge=r.edges[u.edge]!,curve=g.curves[edge.curve]!;if(curve.kind==='nurbs')throw new RangeError('Mixed face-edge binding does not support NURBS');const c=curve.kind==='cylinder-ssi'?curve:nativeBRepCurve3(curve);return u.direction===1?c:reverseBRepCurve3(c);}));
     validateMixedFaceBoundary3(face.surface,face.sense,face.boundary,loops);const shell=r.shells.find(s=>s.kind==='faces'&&s.faces.some(u=>u.face===i)),direction=shell?.kind==='faces'?shell.faces.find(u=>u.face===i)!.direction:1;return direction===1?face:Object.freeze({...face,sense:-face.sense as 1|-1,boundary:Object.freeze(face.boundary.map(loop=>Object.freeze([...loop].reverse().map(reverseBRepCurve3))))});
   }));
-  return Object.freeze({boundary,faces});
+  const result=Object.freeze({boundary,faces});owned.add(result);return result;
 }
