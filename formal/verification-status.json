@@ -46,7 +46,7 @@
     "src/geometry/algebraic-segment3.ts": "15ce937808c06199e46b6fc0eb493dfa70ea00033937338932944c01d1a7e26f",
     "src/geometry/cylinder-face3.ts": "ce15c7027222cd12d046a1e8bb78ad26d21c939165a29432d8c34053d00c292d",
     "src/geometry/extruded-brep3.ts": "6eb174b4cb30bb862a919b25de7d37f06a9e5f91c90d1e1d543da2ebb668575b",
-    "src/geometry/plane-frame3.ts": "37aebb3aeae6c6d3a648e36946b1b5e89b71e1338a18c36bfdd8abe181bf8151",
+    "src/geometry/plane-frame3.ts": "bf14b769553654b07e441fab4d7e9e74c2d103624cb0faed5b32073957a28b52",
     "src/geometry/plane-cylinder3.ts": "412516f87f5a3a710c35f93511910684d5d69727e3fa5f6ad7ddd3641557c13e",
     "src/geometry/algebraic-line3.ts": "871f5579828ba7b14b4e67bd77220330b1a172eafa334a834b2001c7b2efb39e",
     "src/geometry/ellipse3.ts": "143a33b6e7f7307884a0a140e9774dc686f98b192debc69c0d3c31a1b8d257b3",

@@ -186,3 +186,7 @@ Fallback ellipse graph endpoints now preserve one common abscissa and one quadra
 ### Minimal convex-face fans for planar parity
 
 The parity compiler now derives a direct vertex fan from each already validated convex polygon rather than coning the embedding checker's additional face-center triangles. Exact zero-volume/collinear cones skip by orientation. Four focused material tests and the scoped audit pass; the same L source drops from 84 tetrahedra/138 planes to 28 tetrahedra/36 planes. General sewn-boundary verification remains in progress; see [construction and scope](planar-material-program3.md).
+
+### Reuse validated plane inverse charts
+
+Actual frozen frame factories now retain the validated normal and exact Gram inverse constants; inverse/null results reuse only actual immutable snapshotted points. Mutable/copied frame and point inputs still revalidate. All 34 connected cases, all 831 non-hard regressions and the scoped audit pass. See [invariants and pending hard/boundary gates](plane-frame-projection-reuse3.md). This preserves exact membership and affine provenance without tolerance or public certification flags.
