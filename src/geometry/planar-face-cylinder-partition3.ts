@@ -3,7 +3,9 @@ import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3,vector3,dot3,cross3} from './point3.js';
-import type {Point3,Vector3} from './point3.js';
+import {point2} from './point2.js';
+import {algebraicPoint2} from './algebraic-point2.js';
+import type {Point3} from './point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {cylinder3,classifyPointToSurface3} from './surface3.js';
@@ -12,7 +14,7 @@ import {algebraicLine3} from './algebraic-line3.js';
 import type {AlgebraicLine3} from './algebraic-line3.js';
 import {algebraicQuadraticPoint3,algebraicCoordinates3,compareAlgebraicPoints3,snapshotExactPoint3,getPointParameterization3,getRationalParameterization3,algebraicRationalPoint3,algebraicPoint3,rationalPointLinearNumerator3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
-import {pointInPlaneFrame3} from './plane-frame3.js';
+import {pointInPlaneFrame3,mapPlanePoint3} from './plane-frame3.js';
 import type {PlaneFrame3} from './plane-frame3.js';
 import {translatePlanarFace3} from './planar-face3.js';
 import type {PreparedPlanarFace3} from './planar-face3.js';
@@ -79,14 +81,14 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
  const ellipseCache=new Map<Ellipse3,{K:Rational;vertex:Plane3;linear:Polynomial;radicand:Polynomial}>();
  function ellipseData(e:Ellipse3){let result=ellipseCache.get(e);if(result)return result;const [EU,EV]=duals(e.frame),a=dot3(EU,frame.u),b=dot3(EU,frame.v),h=dot3(EU,frame.origin).sub(dot3(EU,e.frame.origin)),d=dot3(EV,frame.u),v=dot3(EV,frame.v),k=dot3(EV,frame.origin).sub(dot3(EV,e.frame.origin)),K=e.radiusVSquared.mul(b.mul(b)).add(e.radiusUSquared.mul(v.mul(v))),L0=e.radiusVSquared.mul(b).mul(h).add(e.radiusUSquared.mul(v).mul(k)).mul(two),L1=e.radiusVSquared.mul(a).mul(b).add(e.radiusUSquared.mul(d).mul(v)).mul(two),n=point3(DU.x.mul(L1).add(DV.x.mul(K).mul(two)),DU.y.mul(L1).add(DV.y.mul(K).mul(two)),DU.z.mul(L1).add(DV.z.mul(K).mul(two)));const linear=new Polynomial([L0,L1]),U=new Polynomial([h,a]),V=new Polynomial([k,d]),constant=U.mul(U).scale(e.radiusVSquared).add(V.mul(V).scale(e.radiusUSquared)).sub(new Polynomial([e.radiusUSquared.mul(e.radiusVSquared)])),radicand=linear.mul(linear).sub(constant.scale(K.mul(new Rational(4n))));result={K,vertex:plane3(n.x,n.y,n.z,L0.sub(dot3(n,frame.origin))),linear,radicand};ellipseCache.set(e,result);return result;}
  function compare(b:PlanarVerticalBound3,p:AlgebraicCoordinates3,x:AlgebraicReal,y:AlgebraicReal):Sign {if(b.kind==='segment')return y.compare(value(b,x));const vertex=classifyPointToSurface3(p,{kind:'plane',plane:ellipseData(b.ellipse).vertex}),location=locatePointInEllipse3(p,b.ellipse),sign=location==='boundary'?0:location==='inside'?-1:1;return b.branch===-1?vertex>0?1:sign===0?0:sign>0?-1:1:vertex<0?-1:sign===0?0:sign>0?1:-1;}
- const rationalGraphs=new Map<Extract<Curve3,{kind:'algebraic-segment'}>,Readonly<{origin:Point3;direction:Vector3}>|null>();
+ const rationalGraphs=new Map<Extract<Curve3,{kind:'algebraic-segment'}>,Readonly<{slope:Rational;offset:Rational}>|null>();
  function rationalGraph(curve:Extract<Curve3,{kind:'algebraic-segment'}>){
   const cached=rationalGraphs.get(curve);if(cached!==undefined)return cached;
   const a=pointInPlaneFrame3(frame,curve.segment.start)!,b=pointInPlaneFrame3(frame,curve.segment.end)!,ax=a.x.rational,ay=a.y.rational,bx=b.x.rational,by=b.y.rational;
-  let result:Readonly<{origin:Point3;direction:Vector3}>|null=null;
+  let result:Readonly<{slope:Rational;offset:Rational}>|null=null;
   if(ax!==null&&ay!==null&&bx!==null&&by!==null&&!ax.equals(bx)){
-   const slope=by.sub(ay).div(bx.sub(ax)),offset=ay.sub(slope.mul(ax)),mix=(u:Vector3,v:Vector3,k:Rational)=>point3(u.x.add(v.x.mul(k)),u.y.add(v.y.mul(k)),u.z.add(v.z.mul(k)));
-   result=Object.freeze({origin:mix(frame.origin,frame.v,offset),direction:mix(frame.u,frame.v,slope)});
+   const slope=by.sub(ay).div(bx.sub(ax)),offset=ay.sub(slope.mul(ax));
+   result=Object.freeze({slope,offset});
   }
   rationalGraphs.set(curve,result);return result;
  }
@@ -102,8 +104,8 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
   }
   if(b.kind==='segment'){
    // A rational chart line y=m*x+k has world point o+v*k+(u+v*m)*x.
-   // Retain the actual abscissa field instead of treating x and y independently.
-   const graph=rationalGraph(b.curve);if(graph)return algebraicPoint3(graph.origin,graph.direction,x);
+   // The affine plane map retains both that source field and its actual fixed-x line construction.
+   const graph=rationalGraph(b.curve);if(graph)return mapPlanePoint3(frame,algebraicPoint2(point2(0n,graph.offset),point2(1n,graph.slope),x));
   }
   if(b.kind==='ellipse'){
    // y=(-L(x) +/- sqrt(L(x)^2-4*K*M(x)))/(2*K). Preserve x as

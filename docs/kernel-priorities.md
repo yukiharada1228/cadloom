@@ -197,4 +197,8 @@ The parity compiler now folds opposite plane orientations into one geometric car
 
 ### Shared abscissa fields for rational line graphs
 
-Rational chart segments now construct fallback graph endpoints as a genuine affine image of the actual abscissa, preserving dependencies just as ellipse endpoints retain their shared quadratic source. General algebraic/vertical fallback and known-event priority remain. A regression fails on the prior runtime and passes after the change; all 35 connected cases and the scoped audit pass. Corrected runtime c95d946 passed all 833 non-hard tests; its hard and L replay gates remain in progress. See [construction and validation scope](rational-planar-graph3.md).
+Rational chart segments now construct fallback graph endpoints as a genuine affine image of the actual abscissa, preserving dependencies just as ellipse endpoints retain their shared quadratic source. General algebraic/vertical fallback and known-event priority remain. A regression fails on the prior runtime and passes after the change; all 35 connected cases and the scoped audit pass. Runtime c95d946 passed all 833 non-hard tests, both unchanged hard tests and cold restoration of the genuine archived L document. Retained-Body L replay exhausted the default heap; resource correctness remains a gate. See [construction and validation scope](rational-planar-graph3.md).
+
+### Preserve both rational graph construction identities
+
+Rational graph endpoints now pass through the actual affine plane-map factory, retaining both a common abscissa field and the fixed-abscissa line parallel to the second frame vector. A strengthened regression rejects the earlier direct-world-affine implementation; all 35 connected cases and the scoped audit pass. Integrated retained-Body replay still needs resource validation.
