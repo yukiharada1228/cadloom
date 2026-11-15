@@ -1,3 +1,5 @@
+import {Polynomial} from '../numeric/polynomial.js';
+import type {Rational} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import type {Sign} from '../numeric/rational.js';
 import type {ExactInput} from './point2.js';
@@ -24,6 +26,7 @@ export function algebraicPoint3(origin:Point3,direction:Vector3,parameter:Algebr
 }
 /** Internal immutable snapshot preserving only registered coordinate correlations. */
 export function snapshotExactPoint3(point:Point3|AlgebraicCoordinates3):AlgebraicCoordinates3 {
+  if(biparameters.has(point as AlgebraicCoordinates3))return point as AlgebraicCoordinates3;
   const data=parameters.get(point as AlgebraicCoordinates3);
   return data?algebraicPoint3(data.origin,data.direction,data.parameter):algebraicCoordinates3(point.x,point.y,point.z);
 }
@@ -41,4 +44,24 @@ export function subtractAlgebraicPoints3(inputA:Point3|AlgebraicCoordinates3,inp
   if(A&&B&&A.parameter.compare(B.parameter)===0)return algebraicPoint3(point3(A.origin.x.sub(B.origin.x),A.origin.y.sub(B.origin.y),A.origin.z.sub(B.origin.z)),vector3(A.direction.x.sub(B.direction.x),A.direction.y.sub(B.direction.y),A.direction.z.sub(B.direction.z)),A.parameter);
   const sub=(k:'x'|'y'|'z')=>a[k].compare(b[k])===0?AlgebraicReal.fromRational(0n):a[k].sub(b[k]);
   return algebraicCoordinates3(sub('x'),sub('y'),sub('z'));
+}
+
+export interface Biparameterization3 {readonly origin:Point3;readonly u:Vector3;readonly s:AlgebraicReal;readonly v:Vector3;readonly t:AlgebraicReal;}
+const biparameters=new WeakMap<AlgebraicCoordinates3,Biparameterization3>();
+/** Internal rational affine chart with two exact algebraic parameters. No
+ * relation between parameters is assumed; predicates expand the full polynomial.
+ */
+export function algebraicBiparametricPoint3(origin:Point3,u:Vector3,s:AlgebraicReal,v:Vector3,t:AlgebraicReal):AlgebraicCoordinates3 {
+  const o=point3(origin.x,origin.y,origin.z),U=vector3(u.x,u.y,u.z),V=vector3(v.x,v.y,v.z),p=algebraicCoordinates3(s.affine(U.x,o.x).add(t.affine(V.x)),s.affine(U.y,o.y).add(t.affine(V.y)),s.affine(U.z,o.z).add(t.affine(V.z)));
+  biparameters.set(p,Object.freeze({origin:o,u:U,s,v:V,t}));return p;
+}
+export function getBiparameterization3(p:AlgebraicCoordinates3):Biparameterization3|undefined{return biparameters.get(p);}
+/** Exact sign of c + a*s + b*t + A*s² + B*s*t + C*t². */
+export function signBiparametricQuadratic3(p:Biparameterization3,c:Rational,a:Rational,b:Rational,A:Rational,B:Rational,C:Rational):Sign {
+  if(b.sign()===0&&B.sign()===0&&C.sign()===0)return p.s.signOf(new Polynomial([c,a,A]));
+  if(a.sign()===0&&A.sign()===0&&B.sign()===0)return p.t.signOf(new Polynomial([c,b,C]));
+  let value=p.s.rationalFunction(new Polynomial([c,a,A]));
+  if(b.sign()!==0||B.sign()!==0)value=value.add(p.s.affine(B,b).mul(p.t));
+  if(C.sign()!==0)value=value.add(p.t.rationalFunction(new Polynomial([0n,0n,C])));
+  return value.sign();
 }

@@ -142,10 +142,11 @@
       "localPaths": [
         "src/geometry/plane-cylinder3.ts",
         "src/geometry/nurbs-curve-intersection3.ts",
-        "src/geometry/nurbs-plane-section3.ts"
+        "src/geometry/nurbs-plane-section3.ts",
+        "src/geometry/cylinder-cylinder3.ts"
       ],
       "status": "partial",
-      "gap": "Selected exact intersections exist; general surface/surface parameter correspondence and trim-domain clipping are missing."
+      "gap": "Exact planar/cylindrical intersections and arbitrary rational cylinder/cylinder supporting SSI with algebraic branch graphs exist. Bounded cylinder/cylinder face trimming, general NURBS SSI and common curve/BRep binding remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -159,10 +160,11 @@
         "src/geometry/convex-polygon-plane-arrangement3.ts",
         "src/geometry/planar-brep-partition3.ts",
         "src/geometry/planar-solid3.ts",
-        "src/ops/cylinder-body-split3.ts"
+        "src/ops/cylinder-body-split3.ts",
+        "src/geometry/cylinder-cylinder3.ts"
       ],
       "status": "partial",
-      "gap": "Rational planar subdivision/sewing and exact convex cylinder/halfspace cuts are connected to common Body persistence, repeated cuts and owned inverse sewing with cap/edge/parent-face correspondence. Arbitrary BRep plane cuts, cylinder/cylinder SSI and general curved splitting/sewing remain missing."
+      "gap": "Planar subdivision/sewing and constructive cylinder plane cuts connect to common Body. Arbitrary rational cylinder/cylinder supporting SSI now has exact algebraic branch graphs; bounded trimming, pcurve/edge binding and general curved splitting/sewing remain missing."
     },
     {
       "id": "boolean",

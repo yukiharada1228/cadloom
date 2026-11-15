@@ -1278,3 +1278,13 @@ node examples/face-domain-record3.ts
 `rejoinCylinderBodySplit3(split)`は所有された分割の対になる内部面を除き、外側の境界を独立に再接続して元の材料Bodyを返します。任意の立体同士の和ではなく、この分割の逆操作です。分割の対応表そのものは永続化せず、個別に復元した子からの再結合は未対応です。
 
 対象は構築来歴のある凸な円柱・平面半空間の族で、任意のBodyや円柱同士・一般曲面のブーリアンではありません。`npm run build && node examples/cylinder-body-split3.ts`で斜めの切断、保存復元、再切断と再接続を実行できます。[構成と検証範囲](docs/proofs/cylinder-body-split3.md)。
+
+## 円柱同士の厳密な支持面交差
+
+`intersectCylinders3(first, second)`は任意の有理軸・正の有理半径二乗を持つ二つの無限円柱面の交差を計算します。平行軸の場合は`none`・`coincident`・`lines`を区別し、一つの二重接線または二つの共通母線を返します。
+
+非平行軸では`bounded`として、一般に四次となる代数的な曲線片`arcs`と端点接続グラフを返します。各片は第一円柱の垂直断面の円弧`base`と、軸方向の高さの枝`branch`で表します。`evaluateCylinderIntersectionArc3(arc, basePoint)`で基準円弧上の点を3Dへ厳密に持ち上げ、`pointOnCylinderIntersectionArc3(point, arc)`で所属を判定します。角度を浮動小数点へ丸めたり、交線を楕円・NURBS・ポリラインとして誤って表現したりしません。
+
+`vertices`・`edges`・`ports`・`components`で接続を保持します。孤立した接点は`isolatedPoints`、四つの枝が出会う頂点は`singularVertices`へ残します。成分は交点集合の連結成分であり、交差する曲線を任意の経路へ分けません。二つの高さの枝の合流点と、パラメータ化のための補助的な継ぎ目を区別して扱います。
+
+この型は支持面交差用で、既存の`Curve3`や有界面のB-rep辺へはまだ接続していません。曲線片の平面切り取り・面のパラメータ曲線・一般曲面ブーリアン・永続的な曲線レコードは引き続き必要です。`npm run build && node examples/cylinder-cylinder3.ts`で、ずれた非平行軸の交線グラフと正確な診断用座標を出力できます。[完全性の構成と検証範囲](docs/proofs/cylinder-cylinder3.md)。
