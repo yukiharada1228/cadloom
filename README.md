@@ -1161,10 +1161,33 @@ const geometry = decodeBodyGeometry3(restored); // 各幾何定義の復元・�
 ```
 
 これらの処理だけでは有効な立体とは認定しません。領域の材料・空洞の宣言は呼び出し側が指定し、
-面領域・埋め込み・空洞の内包関係の検証は、今後の共通Body変換層で行います。
+任意レコードの面領域・埋め込み・空洞の内包関係の検証は、引き続き変換層の課題です。
 [形式・検査範囲・入力制限](docs/body-record3.md)を参照してください。
 
 ```sh
 npm run build
 node examples/body-record3.ts
+```
+
+## 共通Bodyと基本操作
+
+Box・有限Cylinder・XY領域の垂直Extrudeを、共通の`Body3`として扱えます。
+
+```ts
+const body = createBoxBody3(point3(0n, 0n, 0n), 2n, 3n, 4n);
+locateBody3(body, point3(1n, 1n, 1n)); // 'inside'
+const saved = serializeBody3(body);
+const restored = restoreBody3(saved); // 構築し直して保存レコードと照合
+```
+
+`body.record`、`body.geometry`、`body.topology`を同じ形式で参照できます。
+穴・複数成分・代数的数の境界も、対応する押し出し構成のまま保持します。
+`createCylinderBody3`の上下限は、指定した非単位軸も含めた軸パラメータです。
+
+復元できるのは対応済み構築レシピの文書です。任意のレコードの構造検査だけで立体とは認定しません。
+[構築・変換・保存復元の検証範囲](docs/constructed-body3.md)を参照してください。
+
+```sh
+npm run build
+node examples/constructed-body3.ts
 ```

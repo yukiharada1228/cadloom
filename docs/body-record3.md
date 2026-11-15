@@ -85,7 +85,7 @@ value does not imply byte-for-byte equality after re-encoding decoded geometry.
    invalid NURBS knots/weights. It restores only vertices and the curve/surface
    tables; face parameter bounds are retained as data for the later face-domain
    importer. It still does not create a trusted modelling Body.
-3. A future owned Body import must check curve endpoints against vertices,
+3. An arbitrary owned Body import must check curve endpoints against vertices,
    complete pcurve correspondence, face domains, face/shell connectivity,
    orientation, embedding, region nesting and solid validity before granting any
    geometric certificate. Neither of the preceding APIs claims these checks.
@@ -119,7 +119,9 @@ malformed data, budgets and the distinction between structural and geometric
 validity. Deliberately coincident shells can pass structural checks, illustrating
 why those checks do not prove a solid.
 
-Next, the common owned Body and Box/Cylinder/Extrude operation API must consume
-this representation and establish the missing geometry/topology invariants.
-This record milestone alone does not satisfy M1. The algorithms are executable
+The [common constructed Body API](constructed-body3.md) now consumes this
+representation for Box/Cylinder/vertical Extrude, adding native boundary checks
+and construction replay. Arbitrary record-to-solid import still needs the
+remaining geometry/topology invariants. This record milestone alone does not
+satisfy M1. The algorithms are executable
 checks, not whole-TypeScript machine verification or new Lean proofs.

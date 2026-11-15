@@ -39,6 +39,9 @@ export interface ExtrudedBRep3 {
   readonly samples:readonly AlgebraicCoordinates3[];
   locate(point:Point3|AlgebraicCoordinates3):CurveRegionLocation2;
 }
+const ownedExtrusions=new WeakSet<ExtrudedBRep3>();
+/** Internal construction provenance check for common Body adoption. */
+export function assertOwnedExtrudedBRep3(input:ExtrudedBRep3):void {if(!ownedExtrusions.has(input))throw new RangeError('Operation requires a factory-created extrusion');}
 const Z=vector3(0n,0n,1n),xy=planeFrame3(point3(0n,0n,0n),vector3(1n,0n,0n),vector3(0n,1n,0n));
 const use=(edge:number,direction:1|-1):BRepEdgeUse3=>({edge,direction});
 /** Exact line/circular-arc extrusion, retaining analytic edges/faces rather than
@@ -109,5 +112,10 @@ export function extrudeCurveRegionBRep3(input:CurveRegion2,height:ExactInput,opt
   };
   const middle=vector3(0n,0n,zMin.add(zMax).div(new Rational(2n))),samples=Object.freeze(profiles.map(p=>translateAlgebraicPoint3(p.sample,middle)));
   if(samples.some(p=>locate(p)!=='inside'))throw new Error('Extrusion interior witness invariant failed');
-  return Object.freeze({region,profiles,zMin,zMax,topology,faces:Object.freeze(faces),samples,locate});
+  const result=Object.freeze({region,profiles,zMin,zMax,topology,faces:Object.freeze(faces),samples,locate});ownedExtrusions.add(result);return result;
+}
+
+/** Product construction from increasing rational endpoint heights. */
+export function extrudeBetweenBRep3(input:CurveRegion2,lower:ExactInput,upper:ExactInput):ExtrudedBRep3 {
+  const lo=exactRational(lower),hi=exactRational(upper);if(lo.compare(hi)>=0)throw new RangeError('Extrusion bounds must be increasing');return extrudeCurveRegionBRep3(input,hi.sub(lo),{baseZ:lo,fillRule:'nonzero'});
 }

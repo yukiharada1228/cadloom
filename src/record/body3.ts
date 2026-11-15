@@ -31,10 +31,10 @@ const indices=arraySchema3(indexSchema3),useSchema=objectSchema3({edge:indexSche
   wire:objectSchema3({kind:literalSchema3('wire'),edges:arraySchema3(indexSchema3,1)}),
   vertex:objectSchema3({kind:literalSchema3('vertex'),vertex:indexSchema3}),
 });
-const bodySchema=objectSchema3({version:literalSchema3(1),units:literalSchema3('mm'),coordinates:literalSchema3('right-handed-z-up'),curves:arraySchema3(curveSchema3),surfaces:arraySchema3(surfaceSchema3),vertices:arraySchema3(pointSchema3),edges:arraySchema3(objectSchema3({curve:indexSchema3,start:indexSchema3,end:indexSchema3})),loops:arraySchema3(objectSchema3({uses:arraySchema3(useSchema,1)})),faces:arraySchema3(objectSchema3({surface:indexSchema3,sense:directionSchema3,loops:indices},{parameterBounds:arraySchema3(realSchema3,4,4)})),shells:arraySchema3(shellSchema),regions:arraySchema3(objectSchema3({shells:indices,void:booleanSchema3}),1)});
+export const bodySchema3=objectSchema3({version:literalSchema3(1),units:literalSchema3('mm'),coordinates:literalSchema3('right-handed-z-up'),curves:arraySchema3(curveSchema3),surfaces:arraySchema3(surfaceSchema3),vertices:arraySchema3(pointSchema3),edges:arraySchema3(objectSchema3({curve:indexSchema3,start:indexSchema3,end:indexSchema3})),loops:arraySchema3(objectSchema3({uses:arraySchema3(useSchema,1)})),faces:arraySchema3(objectSchema3({surface:indexSchema3,sense:directionSchema3,loops:indices},{parameterBounds:arraySchema3(realSchema3,4,4)})),shells:arraySchema3(shellSchema),regions:arraySchema3(objectSchema3({shells:indices,void:booleanSchema3}),1)});
 /** Strict, immutable JSON/data snapshot. No geometry evaluation or body certification. */
 export function readBodyRecord3(input:unknown,limits:RecordReadLimits3={}):BodyRecord3 {
-  const b=bodySchema(input,'body',new RecordReader3(limits)) as unknown as BodyRecord3;
+  const b=bodySchema3(input,'body',new RecordReader3(limits)) as unknown as BodyRecord3;
   const ref=(id:number,length:number,path:string)=>{if(id>=length)recordError3(path,'reference is out of range');};
   const unique=(ids:readonly number[],path:string)=>{if(new Set(ids).size!==ids.length)recordError3(path,'duplicate reference');};
   const dimensions=(degree:number,n:number,k:number,path:string)=>{if(degree<1||n<degree+1||k!==n+degree+1)recordError3(path,'NURBS degree, point and knot counts disagree');};

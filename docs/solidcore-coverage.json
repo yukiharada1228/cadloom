@@ -83,10 +83,13 @@
       "localPaths": [
         "src/convert/exact3.ts",
         "src/convert/geometry3.ts",
-        "src/convert/body3.ts"
+        "src/convert/body3.ts",
+        "src/convert/native-boundary3.ts",
+        "src/convert/body-profile3.ts",
+        "src/convert/body-equivalence3.ts"
       ],
       "status": "partial",
-      "gap": "Exact value/geometry definition restoration and native boundary export exist. Geometry/topology agreement and a trusted owned Body importer with face/region certification remain missing."
+      "gap": "Exact geometry decoding, checked native boundary reconstruction and supported construction replay exist. Arbitrary face-domain/void certification and NURBS boundary conversion remain missing."
     },
     {
       "id": "ops",
@@ -94,10 +97,13 @@
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore-ops/src/lib.rs",
       "localPaths": [
         "src/geometry/extruded-brep3.ts",
-        "src/geometry/clipped-cylinder-brep3.ts"
+        "src/geometry/clipped-cylinder-brep3.ts",
+        "src/ops/body3.ts",
+        "src/model/body3.ts",
+        "src/record/body-document3.ts"
       ],
       "status": "partial",
-      "gap": "Constructive operations exist independently; common Body API, result/error contracts and operation provenance are missing."
+      "gap": "Box, finite Cylinder and vertical Extrude share owned Body records, queries and replay-checked persistence. General Body operations, arbitrary record-to-solid certification, rich shared result contracts and feature provenance/history remain missing."
     },
     {
       "id": "primitive",
@@ -105,10 +111,12 @@
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/primitive.rs",
       "localPaths": [
         "src/geometry/extruded-brep3.ts",
-        "src/geometry/clipped-cylinder-brep3.ts"
+        "src/geometry/clipped-cylinder-brep3.ts",
+        "src/geometry/box-brep3.ts",
+        "src/ops/body3.ts"
       ],
       "status": "partial",
-      "gap": "Boxes via vertical profiles and clipped finite cylinders exist; no common primitive API or complete sphere/cone/torus/pyramid constructors."
+      "gap": "A common axis-aligned Box/finite Cylinder API and vertical profile Extrude exist. Complete sphere/cone/torus/pyramid constructors and broader placements remain missing."
     },
     {
       "id": "trim",
@@ -211,10 +219,11 @@
       "localPaths": [
         "src/geometry/solid3.ts",
         "src/geometry/extruded-brep3.ts",
-        "src/geometry/clipped-cylinder-brep3.ts"
+        "src/geometry/clipped-cylinder-brep3.ts",
+        "src/model/body3.ts"
       ],
       "status": "partial",
-      "gap": "Membership exists for selected validated solids; general distances, closest points and ray/body queries are missing."
+      "gap": "Common owned constructed Body and bounded-face membership exist alongside earlier classifiers. General distances, closest points and ray/body queries remain missing."
     },
     {
       "id": "tessellation",
