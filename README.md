@@ -1302,3 +1302,11 @@ node examples/face-domain-record3.ts
 一般の平面断面は四次方程式へ帰着し、一つの根から各座標を有理式で復元します。分母がその根で0の場合は別に扱い、同じ射影座標を持つ二交点も取りこぼしません。曲線は近似しません。有界面の任意角度境界、パラメータ曲線とB-rep辺への結合、曲面ブーリアンは未実装です。[構成と検証範囲](docs/proofs/cylinder-intersection-plane3.md)。
 
 `npm run build && node examples/cylinder-ssi-plane-trims3.ts`で、ずれた軸の交線を高さの区間へ制限し、正確な診断用グラフを出力できます。
+
+### 円柱交線と共有B-rep辺
+
+`cylinderIntersectionBRepCurve3`と`nativeBRepCurve3`で、代数的な円柱交線と既存曲線を共通の`BRepCurve3`として扱えます。`buildMixedBRepTopology3`は明示的な共有辺から接続を構築し、`sewMixedBRepFaces3`は与えられた端点で分割して同一の曲線片を共有辺へ接続します。`sourceUses`は元の各曲線から分割後の辺への順序付き対応です。
+
+支持面への所属は曲線全体について検査します。端点と代表点だけが別の円柱上にある反例も拒否します。異なる円柱パラメータ化や、同じ楕円を表す既存曲線とSSI辺も接続できます。閉じた接続は有界面・埋め込み・材料の認定ではありません。任意の未指定交点の発見、パラメータ境界との対応、Body保存形式への採用、曲面ブーリアンは残っています。[構成と検証範囲](docs/proofs/mixed-brep3.md)。
+
+`npm run build && node examples/mixed-brep3.ts`で、異なる半径の直交円柱の交線を三つの面の共有境界へ接続する例を実行できます。

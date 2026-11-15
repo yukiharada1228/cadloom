@@ -72,10 +72,11 @@
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/topology.rs",
       "localPaths": [
         "src/geometry/brep-topology3.ts",
-        "src/geometry/nurbs-edge3.ts"
+        "src/geometry/nurbs-edge3.ts",
+        "src/geometry/brep-curve3.ts"
       ],
       "status": "partial",
-      "gap": "Native/NURBS edge incidence exists; arbitrary mixed-family NURBS face bodies and their global validity are not certified."
+      "gap": "Native, NURBS and mixed native/cylinder-SSI edge incidence exists; bounded curved face domains, geometric orientation, global embedding and common mixed Body persistence remain incomplete."
     },
     {
       "id": "conversion",
@@ -145,10 +146,11 @@
         "src/geometry/nurbs-curve-intersection3.ts",
         "src/geometry/nurbs-plane-section3.ts",
         "src/geometry/cylinder-cylinder3.ts",
-        "src/geometry/cylinder-intersection-plane3.ts"
+        "src/geometry/cylinder-intersection-plane3.ts",
+        "src/geometry/cylinder-intersection-support3.ts"
       ],
       "status": "partial",
-      "gap": "Arbitrary rational cylinder/cylinder supporting graphs now have complete rational-plane sections, including shared elliptic components and quartic point recovery. General NURBS SSI and common curve/BRep binding remain incomplete."
+      "gap": "Rational cylinder supporting SSI graphs, rational-plane sections and whole native-support identity checks bind owned SSI arcs to mixed BRep edges. General NURBS SSI, face-domain/pcurve correspondence and persistent mixed Bodies remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -164,10 +166,11 @@
         "src/geometry/planar-solid3.ts",
         "src/ops/cylinder-body-split3.ts",
         "src/geometry/cylinder-cylinder3.ts",
-        "src/geometry/cylinder-intersection-plane3.ts"
+        "src/geometry/cylinder-intersection-plane3.ts",
+        "src/geometry/sew-mixed-brep3.ts"
       ],
       "status": "partial",
-      "gap": "Planar/cylinder Body cuts and algebraic cylinder SSI plane subdivision/closed-halfspace graph clipping exist. Arbitrary angular face trimming, pcurve/edge binding and general curved BRep splitting/sewing remain missing."
+      "gap": "Planar/cylinder Body cuts, SSI plane subdivision and endpoint-noded native/SSI shared-edge sewing exist, including reparameterized and elliptic overlap matching. Missing interior intersections are not discovered; bounded curved face splitting, pcurves, embedding and general curved Booleans remain incomplete."
     },
     {
       "id": "boolean",

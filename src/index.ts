@@ -202,3 +202,8 @@ export {splitCylinderIntersectionArc3} from './geometry/cylinder-cylinder3.js';
 export type {BoundedCylinderIntersection3} from './geometry/cylinder-cylinder3.js';
 export {intersectCylinderIntersectionArcPlane3,splitCylinderIntersectionArcByPlane3,clipCylinderIntersectionByHalfspaces3} from './geometry/cylinder-intersection-plane3.js';
 export type {CylinderIntersectionArcPlane3,CylinderIntersectionArcPlaneSplit3} from './geometry/cylinder-intersection-plane3.js';
+export {cylinderIntersectionArcOnSurface3} from './geometry/cylinder-intersection-support3.js';
+export {nativeBRepCurve3,cylinderIntersectionBRepCurve3,snapshotBRepCurve3,brepCurveEndpoints3,pointOnBRepCurve3,brepCurveOnSurface3,reverseBRepCurve3,buildMixedBRepTopology3} from './geometry/brep-curve3.js';
+export type {BRepCurve3} from './geometry/brep-curve3.js';
+export {sewMixedBRepFaces3} from './geometry/sew-mixed-brep3.js';
+export type {MixedBRepFace3,SewnMixedBRep3} from './geometry/sew-mixed-brep3.js';
