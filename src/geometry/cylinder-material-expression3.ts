@@ -1,3 +1,4 @@
+import {surfaceGermSides3} from './surface-germ3.js';
 import {assertOwnedClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
 import type {ClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
 import type {FiniteCylinderExpression3} from './finite-cylinder-expression3.js';
@@ -6,9 +7,9 @@ import {assertOwnedFiniteCylinder3} from './finite-cylinder-boolean3.js';
 import type {FiniteCylinder3} from './finite-cylinder-boolean3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
-import {point3,dot3,cross3} from './point3.js';
+import {point3,dot3} from './point3.js';
 import type {Vector3,Point3} from './point3.js';
-import {snapshotExactPoint3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
+import {snapshotExactPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {classifyPointToSurface3,surfacesCoincide3} from './surface3.js';
 import type {Surface3} from './surface3.js';
@@ -77,7 +78,7 @@ export function boundaryCylinderMaterialExpression3(input:readonly FiniteCylinde
   if(empty)return 'outside';const p=snapshotExactPoint3(inputPoint),cs=cylinders.map(c=>c.locate(p)),ps=planes.map(plane=>classifyPointToSurface3(p,{kind:'plane',plane}));if(cs.every(c=>c!=='boundary')&&ps.every(s=>s!==0))return truth(expression,cs.map(c=>c==='inside'),ps.map(s=>s<0))?'inside':'outside';if(frozenFaces.some(f=>f.domain.locate(p)!=='outside'))return 'boundary';
   for(let k=0n;;k++){
    const v=point3(1n,k,k*k),cv:boolean[]=[],pv:boolean[]=[];let retry=false;
-   for(const c of cylinders){const d=c.cylinder.axis.direction,o=c.cylinder.axis.origin,D=dot3(d,d),dv=dot3(d,v),n=point3(v.x.mul(D).sub(d.x.mul(dv)),v.y.mul(D).sub(d.y.mul(dv)),v.z.mul(D).sub(d.z.mul(dv)));let radial=classifyPointToSurface3(p,{kind:'cylinder',cylinder:c.cylinder});if(radial===0){radial=signLinearAlgebraicPoint3(p,n,dot3(n,o).neg());if(radial===0){const cross=cross3(d,v);if(dot3(cross,cross).sign()===0){retry=true;break;}radial=1;}}const cap=(t:Rational)=>{const sign=classifyPointToSurface3(p,{kind:'plane',plane:plane3(d.x,d.y,d.z,dot3(d,o).add(D.mul(t)).neg())});return sign===0?dv.sign():sign;},lo=cap(c.lower),hi=cap(c.upper);if(lo===0||hi===0){retry=true;break;}cv.push(radial<0&&lo>0&&hi<0);}
+   for(const c of cylinders){const d=c.cylinder.axis.direction,o=c.cylinder.axis.origin,D=dot3(d,d),dv=dot3(d,v),radial=surfaceGermSides3(p,v,{kind:'cylinder',cylinder:c.cylinder}).plus;if(radial===0){retry=true;break;}const cap=(t:Rational)=>{const sign=classifyPointToSurface3(p,{kind:'plane',plane:plane3(d.x,d.y,d.z,dot3(d,o).add(D.mul(t)).neg())});return sign===0?dv.sign():sign;},lo=cap(c.lower),hi=cap(c.upper);if(lo===0||hi===0){retry=true;break;}cv.push(radial<0&&lo>0&&hi<0);}
    if(retry)continue;for(let i=0;i<planes.length;i++){const sign=ps[i]===0?dot3(planes[i]!.normal,v).sign():ps[i]!;if(sign===0){retry=true;break;}pv.push(sign<0);}if(!retry)return truth(expression,cv,pv)?'inside':'outside';
   }
  };
