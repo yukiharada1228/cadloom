@@ -1,6 +1,7 @@
 import type {ExactInput} from './point2.js';
 import {dot3} from './point3.js';
 import {plane3} from './plane3.js';
+import type {Plane3} from './plane3.js';
 import type {Cylinder3} from './surface3.js';
 import {prepareCylinderFace3} from './cylinder-face3.js';
 import type {PreparedCylinderFace3} from './cylinder-face3.js';
@@ -33,7 +34,8 @@ export interface PlanarFaceFiniteCylindersPartition3 {
 const multiOwned=new WeakSet<PlanarFaceFiniteCylindersPartition3>();
 export function assertOwnedPlanarFaceFiniteCylindersPartition3(input:PlanarFaceFiniteCylindersPartition3):void {if(!multiOwned.has(input))throw new RangeError('Expected a factory-created finite-cylinder arrangement');}
 /** Simultaneously nodes every radial section and both cap planes of every
- * cutter. Labels open face cells only; no Boolean material is selected here. */
-export function partitionPlanarFaceByFiniteCylinders3(input:PreparedPlanarFace3,definitions:readonly PlanarFiniteCylinderCut3[]):PlanarFaceFiniteCylindersPartition3 {
- const cutters=Object.freeze(definitions.map(c=>prepareCylinderFace3(c.cylinder,c.lower,c.upper))),planes=cutters.flatMap(c=>{const d=c.surface.axis.direction,o=c.surface.axis.origin,D=dot3(d,d),at=(t:typeof c.lower)=>plane3(d.x,d.y,d.z,dot3(d,o).add(D.mul(t)).neg());return [at(c.lower),at(c.upper)];}),partition=partitionPlanarFaceByCylinders3(input,cutters.map(c=>c.surface),planes),materialLocations=Object.freeze(partition.cells.map(cell=>Object.freeze(cutters.map((_,j):CurveRegionLocation2=>{const lo=cell.planeSides[2*j]!,hi=cell.planeSides[2*j+1]!,radial=cell.cylinderSides[j]!;return lo<0||hi>0||radial>0?'outside':lo===0||hi===0||radial===0?'boundary':'inside';})))),result=Object.freeze({cutters,partition,materialLocations});multiOwned.add(result);return result;
+ * cutter, followed by optional oriented plane cuts. Labels open face cells only;
+ * no Boolean material is selected and no new solid cap is created here. */
+export function partitionPlanarFaceByFiniteCylinders3(input:PreparedPlanarFace3,definitions:readonly PlanarFiniteCylinderCut3[],additionalPlanes:readonly Plane3[]=[]):PlanarFaceFiniteCylindersPartition3 {
+ const cutters=Object.freeze(definitions.map(c=>prepareCylinderFace3(c.cylinder,c.lower,c.upper))),planes=cutters.flatMap(c=>{const d=c.surface.axis.direction,o=c.surface.axis.origin,D=dot3(d,d),at=(t:typeof c.lower)=>plane3(d.x,d.y,d.z,dot3(d,o).add(D.mul(t)).neg());return [at(c.lower),at(c.upper)];}),partition=partitionPlanarFaceByCylinders3(input,cutters.map(c=>c.surface),[...planes,...additionalPlanes]),materialLocations=Object.freeze(partition.cells.map(cell=>Object.freeze(cutters.map((_,j):CurveRegionLocation2=>{const lo=cell.planeSides[2*j]!,hi=cell.planeSides[2*j+1]!,radial=cell.cylinderSides[j]!;return lo<0||hi>0||radial>0?'outside':lo===0||hi===0||radial===0?'boundary':'inside';})))),result=Object.freeze({cutters,partition,materialLocations});multiOwned.add(result);return result;
 }
