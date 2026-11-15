@@ -1,5 +1,5 @@
-import {assertOwnedCylinderMaterialBoundary3} from './cylinder-material-expression3.js';
-import type {CylinderMaterialBoundary3} from './cylinder-material-expression3.js';
+import {resolveCylinderMaterialProgram3} from './cylinder-material-expression3.js';
+import type {CylinderMaterialDefinition3} from './cylinder-material-expression3.js';
 import {boundaryPlanarMaterialSurfaces3} from './planar-material-surfaces3.js';
 import type {PlanarMaterialSurfaces3} from './planar-material-surfaces3.js';
 import {boundaryCylinderMaterialSurfaces3} from './cylinder-material-surfaces3.js';
@@ -15,7 +15,7 @@ export interface MaterialSurfaceBoundaryOptions3 {
  readonly requireClosed?:boolean;
 }
 export interface MaterialSurfaceBoundary3 {
- readonly material:CylinderMaterialBoundary3;
+ readonly material:CylinderMaterialDefinition3;
  readonly planar:PlanarMaterialSurfaces3;readonly cylindrical:CylinderMaterialSurfaces3;
  readonly faces:readonly MixedBRepFace3[];readonly faceOrigins:readonly MaterialSurfaceFaceOrigin3[];
  readonly sewn:SewnMixedBRep3;readonly empty:boolean;
@@ -30,8 +30,8 @@ export function assertOwnedMaterialSurfaceBoundary3(input:MaterialSurfaceBoundar
  * Balanced nonmanifold contacts retain diagnostics unless requireClosed is set.
  * Supports only the owned finite-cylinder/halfspace material program family.
  */
-export function boundaryMaterialSurfaces3(material:CylinderMaterialBoundary3,options:MaterialSurfaceBoundaryOptions3={}):MaterialSurfaceBoundary3 {
- assertOwnedCylinderMaterialBoundary3(material);
+export function boundaryMaterialSurfaces3(material:CylinderMaterialDefinition3,options:MaterialSurfaceBoundaryOptions3={}):MaterialSurfaceBoundary3 {
+ resolveCylinderMaterialProgram3(material);
  if(options.requireClosed!==undefined&&typeof options.requireClosed!=='boolean')throw new TypeError('requireClosed must be boolean');
  const planar=boundaryPlanarMaterialSurfaces3(material),cylindrical=boundaryCylinderMaterialSurfaces3(material);
  const faces=Object.freeze([...planar.faces,...cylindrical.faces]);
@@ -42,7 +42,7 @@ export function boundaryMaterialSurfaces3(material:CylinderMaterialBoundary3,opt
  const splitPoints=[...planar.supports.flatMap(s=>s.refinement.classification.source.events),...cylindrical.walls.flatMap(w=>w.source.source.partition.contacts)];
  const sewn=sewMixedBRepFaces3(faces,{splitPoints,requireClosed:options.requireClosed??false});
  for(const edge of sewn.topology.edges)if(edge.coedges.length<2||edge.coedges.reduce((sum,id)=>sum+sewn.topology.coedges[id]!.direction,0)!==0)throw new Error('Assembled material surface boundary has an unbalanced edge');
- const empty=faces.length===0;if(empty!==material.empty)throw new Error('Assembled and source material disagree on emptiness');
+ const empty=faces.length===0;if('empty' in material&&empty!==material.empty)throw new Error('Assembled and source material disagree on emptiness');
  const result=Object.freeze({material,planar,cylindrical,faces,faceOrigins,sewn,empty,closedOrientedIncidence:sewn.topology.closedOrientedIncidence&&sewn.topology.issues.length===0});
  owned.add(result);return result;
 }

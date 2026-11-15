@@ -154,8 +154,8 @@
     "src/geometry/refine-planar-material3.ts": "caa27e18cb9e4010f4e3dfa8d24b0ec557dac131f173ef93034463b869236b33",
     "src/geometry/planar-material-surfaces3.ts": "7fb7bfbe213a15ce795c850b807bd5c1b2aa4d35ad0d68a8040ff70e24a449db",
     "src/geometry/material-expression-eval3.ts": "3feef0a7aa2b6a02c2c5392e39e15bbaae72dc7a57ab876bab706e46dc2173d0",
-    "src/geometry/cylinder-material-surfaces3.ts": "4a353fd9835b42719b8cc3e0b581f3b34b6e549ffbada6b00e7c678632e48d3a",
-    "src/geometry/material-surface-boundary3.ts": "463ceeac1070ed2642cf35ef63d3edf0a853b2e357a026fb92d2283f9ed59c0d",
+    "src/geometry/cylinder-material-surfaces3.ts": "c22e44871978db70843b36d904a809dfbef96a6c3e494d2c96a6e86afd4591a3",
+    "src/geometry/material-surface-boundary3.ts": "ddda075ed1f60b22cfa29ec475df4e62f270c7925b3b7680a71c41c06bab10b1",
     "src/geometry/cylinder-material-program3.ts": "6bd3b7eb613b2aa2497776edc9843cd8f80926e9af025661177383c51ea0be64"
   },
   "checkedTheorems": [
