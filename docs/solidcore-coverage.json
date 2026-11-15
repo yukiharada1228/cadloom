@@ -91,10 +91,13 @@
         "src/convert/body-equivalence3.ts",
         "src/convert/face-domain3.ts",
         "src/convert/native-faces3.ts",
-        "src/geometry/face-domain-binding3.ts"
+        "src/geometry/face-domain-binding3.ts",
+        "src/convert/mixed-faces3.ts",
+        "src/convert/mixed-face-domain3.ts",
+        "src/convert/cylinder-expression-split3.ts"
       ],
       "status": "partial",
-      "gap": "Supported analytic face domains reconstruct from raw records and bind complete oriented boundaries. Arbitrary face/shell embedding, void containment, independent pcurves and NURBS face conversion remain missing."
+      "gap": "Supported native/mixed analytic face domains reconstruct from raw records and bind complete oriented boundaries, including both plane-cut cylinder-expression children. Arbitrary imported face/shell embedding, void containment, independent pcurves and NURBS face conversion remain missing."
     },
     {
       "id": "ops",
@@ -108,7 +111,7 @@
         "src/record/body-document3.ts"
       ],
       "status": "partial",
-      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials and manifold two-cylinder Booleans share owned Body records, bounded-face/material queries and replay-checked persistence. General curved Body operations, arbitrary record-to-solid certification and feature history remain missing."
+      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and their single-plane-cut children share owned Body records, derived material regions, bounded-face queries and replay-checked persistence. Repeated cuts of expression Bodies, clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing."
     },
     {
       "id": "primitive",
@@ -154,7 +157,7 @@
         "src/geometry/cylinder-intersection-cylinder3.ts"
       ],
       "status": "partial",
-      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI intersection/splitting via correlated degree-at-most-eight algebraic recovery. Multi-cutter curved face arrangements, general higher-dimensional analytic/NURBS SSI and robust material assembly remain incomplete."
+      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI recovery. Finite-cylinder expression plane sections and closed cut boundaries exist. General analytic/NURBS SSI, complete contact relations and broader clipped-material operations remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -195,10 +198,12 @@
         "src/geometry/consolidate-planar-solid3.ts",
         "src/geometry/finite-cylinder-boolean3.ts",
         "src/geometry/finite-cylinder-regions3.ts",
-        "src/geometry/finite-cylinder-expression3.ts"
+        "src/geometry/finite-cylinder-expression3.ts",
+        "src/geometry/cylinder-expression-plane-section3.ts",
+        "src/geometry/cylinder-expression-plane-split3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar materials and manifold finite-cylinder expressions support exact queries, shell/cavity regions, common Body adoption and replay-checked persistence. Previous finite-cylinder Boolean/expression results are reusable operands. Broader oblique/contact regression coverage, clipped leaves, maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned rational planar materials and manifold finite-cylinder expressions support exact queries, shell/cavity regions, common Body adoption and replay-checked persistence. Uncut finite-cylinder Boolean/expression results are reusable operands. Single-plane expression cuts now adopt and replay common Bodies; repeated cuts, clipped leaves in later Booleans, broad contact coverage, maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",

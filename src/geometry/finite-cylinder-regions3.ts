@@ -1,3 +1,7 @@
+import {assertOwnedCylinderExpressionPlaneSplit3} from './cylinder-expression-plane-split3.js';
+import type {CylinderExpressionPlaneSplit3} from './cylinder-expression-plane-split3.js';
+import {bodyRecordFromCylinderExpressionSplit3} from '../convert/cylinder-expression-split3.js';
+import {classifyPointToSurface3} from './surface3.js';
 import {assertOwnedFiniteCylinderExpressionBoundary3} from './finite-cylinder-expression3.js';
 import type {FiniteCylinderExpressionBoundary3,FiniteCylinderExpression3} from './finite-cylinder-expression3.js';
 import {bodyRecordFromFiniteCylinderExpression3} from '../convert/finite-cylinder-expression3.js';
@@ -29,7 +33,7 @@ export interface FiniteCylinderBooleanRegions3 {
 }
 const regionFaces=new WeakMap<object,MixedBRepFaces3>();
 /** Internal access requires an actual constructive region result, not a record. */
-export function finiteCylinderRegionFaces3(input:FiniteCylinderBooleanRegions3|FiniteCylinderExpressionRegions3):MixedBRepFaces3 {const faces=regionFaces.get(input);if(!faces)throw new RangeError('Expected factory-created cylinder region analysis');return faces;}
+export function finiteCylinderRegionFaces3(input:FiniteCylinderBooleanRegions3|FiniteCylinderExpressionRegions3|FiniteCylinderExpressionSplitRegions3):MixedBRepFaces3 {const faces=regionFaces.get(input);if(!faces)throw new RangeError('Expected factory-created cylinder region analysis');return faces;}
 const cache=new WeakMap<FiniteCylinderBoolean3,FiniteCylinderBooleanRegions3>(),two=new Rational(2n),one=new Rational(1n),axes=['x','y','z'] as const;
 function between(a:AlgebraicReal,b:AlgebraicReal):Rational {let lo=a,hi=b;while(lo.upper.compare(hi.lower)>=0){lo=lo.refine();hi=hi.refine();}return lo.upper.add(hi.lower).div(two);}
 function at(o:Point3,d:Point3,t:Rational):Point3 {return point3(...axes.map(k=>o[k].add(d[k].mul(t))) as [Rational,Rational,Rational]);}
@@ -68,6 +72,15 @@ function strictLocation(source:FiniteCylinderExpressionBoundary3,p:Point3):'insi
 export function finiteCylinderExpressionRegions3(source:FiniteCylinderExpressionBoundary3):FiniteCylinderExpressionRegions3 {
  assertOwnedFiniteCylinderExpressionBoundary3(source);const known=expressionCache.get(source);if(known)return known;if(!source.manifold)throw new RangeError('Material regions require a manifold cylinder expression');
  const ids=source.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromFiniteCylinderExpression3(source,[{shells:ids,void:false}]),locate=(p:Point3)=>strictLocation(source,p),data=regionData(raw,locate,(a,b)=>locate(a)!==null&&locate(b)!==null),result=Object.freeze({source,...data});regionFaces.set(result,regionFaces.get(data)!);expressionCache.set(source,result);return result;
+}
+export interface FiniteCylinderExpressionSplitRegions3 extends Omit<FiniteCylinderBooleanRegions3,'source'> {readonly source:CylinderExpressionPlaneSplit3;readonly side:-1|1;}
+const splitCache=new WeakMap<CylinderExpressionPlaneSplit3,Map<-1|1,FiniteCylinderExpressionSplitRegions3>>();
+/** Derived regions of one owned manifold cut child; imported incidence and
+ * balanced nonmanifold contacts do not acquire material certification. */
+export function finiteCylinderExpressionSplitRegions3(source:CylinderExpressionPlaneSplit3,side:-1|1):FiniteCylinderExpressionSplitRegions3 {
+ assertOwnedCylinderExpressionPlaneSplit3(source);if(side!==-1&&side!==1)throw new RangeError('Split child side must be -1 or 1');const child=side===-1?source.negative:source.positive;if(!child.manifold)throw new RangeError('Material regions require a manifold plane-cut cylinder expression');
+ let bySide=splitCache.get(source);if(!bySide){bySide=new Map();splitCache.set(source,bySide);}const known=bySide.get(side);if(known)return known;
+ const ids=child.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromCylinderExpressionSplit3(source,side,[{shells:ids,void:false}]),locate=(p:Point3):'inside'|'outside'|null=>{const sign=classifyPointToSurface3(p,{kind:'plane',plane:source.plane});return sign===0?null:sign!==side?'outside':strictLocation(source.source,p);},data=regionData(raw,locate,(a,b)=>locate(a)!==null&&locate(b)!==null),result=Object.freeze({source,side,...data});regionFaces.set(result,regionFaces.get(data)!);bySide.set(side,result);return result;
 }
 /** Private core: public entry points first establish constructive ownership. */
 function regionData(raw:BodyRecord3,locate:(p:Point3)=>'inside'|'outside'|'boundary'|null,acceptSamples:(a:Point3,b:Point3)=>boolean){

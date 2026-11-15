@@ -1,3 +1,6 @@
+import {splitFiniteCylinderExpressionByPlane3} from '../geometry/cylinder-expression-plane-split3.js';
+import type {CylinderExpressionPlaneSplit3} from '../geometry/cylinder-expression-plane-split3.js';
+import {adoptCylinderExpressionSplitBody3} from '../model/body3.js';
 import {boundaryFiniteCylinderExpression3} from '../geometry/finite-cylinder-expression3.js';
 import type {FiniteCylinderExpressionBoundary3,FiniteCylinderExpression3} from '../geometry/finite-cylinder-expression3.js';
 import type {FiniteCylinder3} from '../geometry/finite-cylinder-boolean3.js';
@@ -51,6 +54,7 @@ export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);
 export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
+    case 'plane-cut-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper)),source=boundaryFiniteCylinderExpression3(operands,construction.expression),cut=construction.cut,split=splitFiniteCylinderExpressionByPlane3(source,plane3(cut.normal[0],cut.normal[1],cut.normal[2],cut.offset));return bodyFromCylinderExpressionSplit3(split,cut.side);}
     case 'finite-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper));return bodyFromFiniteCylinderExpression3(boundaryFiniteCylinderExpression3(operands,construction.expression));}
     case 'finite-cylinder-boolean':{const cylinder=(p:typeof construction.first)=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper);return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(cylinder(construction.first),cylinder(construction.second),construction.operation));}
     case 'planar-consolidated':return replayConsolidated(construction.polygons.map(p=>p.map(decodeRationalPoint3))).body;
@@ -130,3 +134,6 @@ export function booleanCylinderBodies3(first:Body3,second:Body3,operation:Boolea
  const expression:FiniteCylinderExpression3={kind:operation,first:remap(a??leaf(first)),second:remap(b??leaf(second))};return bodyFromFiniteCylinderExpression3(boundaryFiniteCylinderExpression3(operands,expression));
 }
 export function bodyFromFiniteCylinderExpression3(source:FiniteCylinderExpressionBoundary3):Body3 {return adoptFiniteCylinderExpressionBody3(source);}
+
+/** Common Body with derived regions and replay-checked single-cut construction. */
+export function bodyFromCylinderExpressionSplit3(source:CylinderExpressionPlaneSplit3,side:-1|1):Body3 {return adoptCylinderExpressionSplitBody3(source,side);}

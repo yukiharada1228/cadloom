@@ -270,3 +270,8 @@ export {splitFiniteCylinderExpressionByPlane3,assertOwnedCylinderExpressionPlane
 export type {CylinderExpressionSplitFaceOrigin3,CylinderExpressionSplitFace3,CylinderExpressionSplitChild3,CylinderExpressionSplitInterface3,CylinderExpressionPlaneSplit3} from './geometry/cylinder-expression-plane-split3.js';
 
 export {bodyRecordFromCylinderExpressionSplit3} from './convert/cylinder-expression-split3.js';
+
+export {finiteCylinderExpressionSplitRegions3} from './geometry/finite-cylinder-regions3.js';
+export type {FiniteCylinderExpressionSplitRegions3} from './geometry/finite-cylinder-regions3.js';
+
+export {bodyFromCylinderExpressionSplit3} from './ops/body3.js';

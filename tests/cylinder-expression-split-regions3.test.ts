@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {point3,line3,cylinder3,plane3,prepareFiniteCylinder3,boundaryFiniteCylinderExpression3,splitFiniteCylinderExpressionByPlane3,finiteCylinderExpressionSplitRegions3,Rational} from '../dist/index.js';
+import {finiteCylinderRegionFaces3} from '../dist/geometry/finite-cylinder-regions3.js';
+const O=point3(0n,0n),Z=point3(0n,0n,1n),leaf=(operand:number)=>({kind:'operand' as const,operand}),make=(r:bigint,h:bigint,axis=Z)=>prepareFiniteCylinder3(cylinder3(line3(O,axis),r),-h,h),source=boundaryFiniteCylinderExpression3([make(9n,3n),make(4n,2n),make(1n,1n)],{kind:'difference',first:leaf(0),second:{kind:'difference',first:leaf(1),second:leaf(2)}});
+function inside(p:ReturnType<typeof point3>){const r=p.x.mul(p.x).add(p.y.mul(p.y)),z=p.z.sign()<0?p.z.neg():p.z;return r.compare(new Rational(9n))<0&&z.compare(new Rational(3n))<0&&!(r.compare(new Rational(4n))<0&&z.compare(new Rational(2n))<0&&!(r.compare(new Rational(1n))<0&&z.compare(new Rational(1n))<0));}
+test('a cut above the cavity retains a nested void and material island with strict witnesses',()=>{
+ const split=splitFiniteCylinderExpressionByPlane3(source,plane3(0n,0n,1n,'-5/2')),negative=finiteCylinderExpressionSplitRegions3(split,-1),positive=finiteCylinderExpressionSplitRegions3(split,1);assert.deepEqual(negative.shells.map(s=>s.depth).sort(),[0,1,2]);assert.equal(negative.regions.filter(r=>r.void).length,1);assert.equal(negative.materialSamples.length,2);assert.equal(positive.shells.length,1);assert.equal(positive.materialSamples.length,1);
+ for(const [r,side] of [[negative,-1],[positive,1]] as const){for(const p of r.materialSamples){assert.ok(inside(p));assert.equal(p.z.compare(new Rational(5n,2n)),side);}assert.deepEqual(finiteCylinderRegionFaces3(r).boundary.geometry.record,r.record);assert.equal(finiteCylinderExpressionSplitRegions3(split,side),r);assert.throws(()=>finiteCylinderRegionFaces3({...r}),/factory/);}
+});
+test('a cut opening the cavity produces separate outer and island material shells without a false void',()=>{
+ const split=splitFiniteCylinderExpressionByPlane3(source,plane3(1n,0n,0n));for(const side of [-1,1] as const){const r=finiteCylinderExpressionSplitRegions3(split,side);assert.deepEqual(r.shells.map(s=>s.depth),[0,0]);assert.equal(r.regions.some(r=>r.void),false);assert.equal(r.materialSamples.length,2);for(const p of r.materialSamples){assert.ok(inside(p));assert.equal(p.x.sign(),side);}}
+});
+test('empty children derive no material and nonmanifold or copied claims cannot acquire regions',()=>{
+ const a=make(1n,2n),b=make(1n,2n,point3(1n,0n)),xor=boundaryFiniteCylinderExpression3([a,b],{kind:'xor',first:leaf(0),second:leaf(1)}),contact=splitFiniteCylinderExpressionByPlane3(xor,plane3(0n,1n,0n));for(const side of [-1,1] as const)assert.throws(()=>finiteCylinderExpressionSplitRegions3(contact,side),/manifold/);
+ const empty=boundaryFiniteCylinderExpression3([a,a],{kind:'difference',first:leaf(0),second:leaf(1)}),split=splitFiniteCylinderExpressionByPlane3(empty,plane3(1n,0n,0n));for(const side of [-1,1] as const){const r=finiteCylinderExpressionSplitRegions3(split,side);assert.deepEqual(r.regions,[{shells:[],void:false}]);assert.equal(r.shells.length,0);assert.equal(r.materialSamples.length,0);}assert.throws(()=>finiteCylinderExpressionSplitRegions3({...split},-1),/factory/);assert.throws(()=>finiteCylinderExpressionSplitRegions3(split,0 as any),/side/);
+});
