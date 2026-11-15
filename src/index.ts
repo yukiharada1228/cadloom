@@ -242,3 +242,5 @@ export {intersectMixedBoundaryLine3} from './geometry/mixed-shell-ray3.js';
 export {finiteCylinderBooleanRegions3} from './geometry/finite-cylinder-regions3.js';
 export type {FiniteCylinderShellRegion3,FiniteCylinderBooleanRegions3} from './geometry/finite-cylinder-regions3.js';
 export {createMixedFaceDomainDecoder3} from './convert/mixed-face-domain3.js';
+export {bodyFromFiniteCylinderBoolean3,booleanCylinderBodies3} from './ops/body3.js';
+export type {FiniteCylinderConstructionRecord3} from './record/body-document3.js';

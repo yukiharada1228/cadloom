@@ -1,3 +1,6 @@
+import {prepareFiniteCylinder3,booleanFiniteCylinders3} from '../geometry/finite-cylinder-boolean3.js';
+import type {FiniteCylinderBoolean3} from '../geometry/finite-cylinder-boolean3.js';
+import {adoptFiniteCylinderBooleanBody3,nativeTopologyOfBody3,cylinderSourceOfBody3} from '../model/body3.js';
 import {plane3} from '../geometry/plane3.js';
 import type {CylinderHalfSpace3} from '../geometry/trimmed-cylinder3.js';
 import type {ClippedCylinderBRep3} from '../geometry/clipped-cylinder-brep3.js';
@@ -44,6 +47,7 @@ export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);
 export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
+    case 'finite-cylinder-boolean':{const cylinder=(p:typeof construction.first)=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper);return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(cylinder(construction.first),cylinder(construction.second),construction.operation));}
     case 'planar-consolidated':return replayConsolidated(construction.polygons.map(p=>p.map(decodeRationalPoint3))).body;
     case 'planar':return createPlanarBody3(construction.polygons.map(p=>p.map(decodeRationalPoint3)));
     case 'box':{const s=construction.size;return createBoxBody3(decodeRationalPoint3(construction.origin),s[0],s[1],s[2]);}
@@ -71,7 +75,7 @@ export function createPlanarBody3(polygons:readonly (readonly Point3[])[]):Body3
  */
 export function booleanPlanarBodies3(a:Body3,b:Body3,operation:BooleanOperation):Body3 {
   assertOwnedBody3(a);assertOwnedBody3(b);
-  const first=planarSourceOfBody3(a)??planarSolidFromBoundary3(a.topology),second=planarSourceOfBody3(b)??planarSolidFromBoundary3(b.topology),result=booleanPlanarSolids3(first,second,operation);
+  const first=planarSourceOfBody3(a)??planarSolidFromBoundary3(nativeTopologyOfBody3(a)),second=planarSourceOfBody3(b)??planarSolidFromBoundary3(nativeTopologyOfBody3(b)),result=booleanPlanarSolids3(first,second,operation);
   if(!result.topology.closedOrientedIncidence||result.topology.issues.length)throw new RangeError('Common Body does not yet support nonmanifold contact results; use booleanPlanarSolids3 to retain this material');
   return createPlanarBody3(result.polygons);
 }
@@ -92,7 +96,7 @@ function replayConsolidated(polygons:readonly (readonly Point3[])[]){return cons
  * material, shell roles and immediate input-face correspondence.
  */
 export function consolidatePlanarBody3(input:Body3):ConsolidatedPlanarBody3 {
-  assertOwnedBody3(input);const converted=planarSolidWithFaceOrigins3(input.topology),{merged,body}=consolidatedBody(converted.solid),unique=(ids:readonly number[])=>Object.freeze([...new Set(ids.map(id=>converted.faceOrigins[id]!))].sort((a,b)=>a-b));
+  assertOwnedBody3(input);const converted=planarSolidWithFaceOrigins3(nativeTopologyOfBody3(input)),{merged,body}=consolidatedBody(converted.solid),unique=(ids:readonly number[])=>Object.freeze([...new Set(ids.map(id=>converted.faceOrigins[id]!))].sort((a,b)=>a-b));
   return Object.freeze({body,sourceFaces:Object.freeze(merged.sourceFaces.map(unique)),retainedFaces:unique(merged.retainedFaces)});
 }
 
@@ -106,4 +110,13 @@ export function createClippedCylinderBody3(cylinder:Cylinder3,lower:ExactInput,u
 export function bodyFromClippedCylinder3(source:ClippedCylinderBRep3):Body3 {
   const c=source.cylinder;
   return adoptCylinderBody3(source,{kind:'clipped-cylinder',origin:encodeRationalPoint3(c.axis.origin),direction:encodeRationalPoint3(c.axis.direction),radiusSquared:c.radiusSquared.toString(),lower:source.lower.toString(),upper:source.upper.toString(),halfspaces:source.planes.map(p=>({normal:encodeRationalPoint3(p.normal),offset:p.offset.toString(),side:-1}))});
+}
+
+/** Adopt an owned manifold two-cylinder Boolean into the common Body contract. */
+export function bodyFromFiniteCylinderBoolean3(source:FiniteCylinderBoolean3):Body3 {return adoptFiniteCylinderBooleanBody3(source);}
+/** Primitive finite-cylinder Body operands only; clipping constraints and prior
+ * curved Boolean results require their own complete partition backends. */
+export function booleanCylinderBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
+ const primitive=(body:Body3)=>{const s=cylinderSourceOfBody3(body);if(s.planes.length!==2)throw new RangeError('Cylinder Body Boolean requires an unclipped finite cylinder');return prepareFiniteCylinder3(s.cylinder,s.lower,s.upper);};
+ return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(primitive(first),primitive(second),operation));
 }

@@ -1349,7 +1349,7 @@ node examples/face-domain-record3.ts
 
 `faces[].source`で入力の側面／下端／上端と分割片、向きの反転をたどれます。`partitions`には両入力の分割結果があります。空洞側の面は反転し、一致面は物理的な向きに応じて重複・内部界面を除きます。`locate`は正則化された材料の厳密な位置を返します。
 
-辺や頂点だけで接触する結果も保持するため、全結果が多様体になるわけではありません。`manifold`と`sewn.topology.issues`で区別します。人工的な面分割は残ります。対象は二つの構築済み有限円柱で、前回結果を入力にする一般の曲面再演算、共通の所有Bodyとしての操作、面統合、質量特性は引き続き必要です。面領域と殻・空洞のBodyレコード保存には、以下の領域構築処理を使います。[構成と検証範囲](docs/proofs/finite-cylinder-boolean3.md)。
+辺や頂点だけで接触する結果も保持するため、全結果が多様体になるわけではありません。`manifold`と`sewn.topology.issues`で区別します。人工的な面分割は残ります。対象は二つの構築済み有限円柱で、前回結果を入力にする一般の曲面再演算、面統合、質量特性は引き続き必要です。面領域と殻・空洞のBodyレコード保存には、以下の領域構築処理を使います。[構成と検証範囲](docs/proofs/finite-cylinder-boolean3.md)。
 
 `npm run build && node examples/finite-cylinder-booleans3.ts`で、側面とキャップを含む4種類の演算を実行できます。
 
@@ -1358,6 +1358,15 @@ node examples/face-domain-record3.ts
 
 `finiteCylinderBooleanRegions3(result)`は、カーネルが生成した多様体の有限円柱ブーリアン結果から、殻の親子関係・深さ・向き、材料／空洞の領域レコード、材料領域ごとの厳密な有理数内部点を求めます。`record`には全ての面領域と導出した領域表が含まれます。固定距離の微小移動や近似メッシュは使わず、完全な直線交差列の隣接区間から内部点を選びます。
 
-対象は所有権を保持した構築済みの結果です。任意に読み込んだ殻の自己交差を検証するAPIではありません。非多様体の接触は拒否します。共通の所有Bodyへの取り込みと、曲面演算結果を次の演算へ渡す処理は未実装です。[構成の根拠と検証範囲](docs/finite-cylinder-regions3.md)。
+対象は所有権を保持した構築済みの結果です。任意に読み込んだ殻の自己交差を検証するAPIではありません。非多様体の接触は拒否します。共通の所有Bodyへの取り込みは以下で対応しています。曲面演算結果を次の演算へ渡す処理は未実装です。[構成の根拠と検証範囲](docs/finite-cylinder-regions3.md)。
 
 `npm run build && node examples/finite-cylinder-regions3.ts`で、円柱内部の空洞と逆向きの内殻を持つ領域構築を実行できます。
+
+
+### 共通Bodyでの有限円柱ブーリアン
+
+`booleanCylinderBodies3(first, second, operation)`は、構築済みの有限円柱Bodyから、和・積・差・排他的論理和の多様体結果を共通の所有権付きBodyとして生成します。下位APIの所有結果は`bodyFromFiniteCylinderBoolean3(result)`で取り込めます。材料・面の内外判定、空洞を含む領域表、`serializeBody3`／`restoreBody3`による構築再実行と全レコード照合が利用できます。
+
+追加の平面で切った円柱や、前回の曲面ブーリアン結果を入力にする操作には、対応する分割処理が必要です。非多様体の接触を持つ結果は共通Bodyへ取り込まず、下位APIで保持します。[対応範囲と構築の検証](docs/finite-cylinder-body3.md)。
+
+`npm run build && node examples/finite-cylinder-body3.ts`で、交線を含むBodyの生成・保存・復元と共通の内外判定を実行できます。

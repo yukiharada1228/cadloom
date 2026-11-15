@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "f231dacf7c94f9cde5a7e7064be303f5e3a05bf36c733c74c623a364ed8299e7",
+    "src/index.ts": "884c799f464d42dbb33bb155d5dadca48fb44f5391ff539b49c28e5bbde73586",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -83,13 +83,13 @@
     "src/convert/geometry3.ts": "27bd3114d8821c9a30ce7161b8e7774a1ba0225dc85c71390223203c6e2ef75d",
     "src/convert/body3.ts": "6a928f480faf35040410e68175a44f04ea8509230fddd0c71544a1c6bd9c2588",
     "src/convert/exact3.ts": "819907e5bc68f80ec9bb45574d1f3d40f6d9b3894124203ed3677258771336ca",
-    "src/record/body-document3.ts": "e1bf3e2a4280ab8212e0bd416526e48dea7dd528032ea41af673ccb6729951e9",
-    "src/model/body3.ts": "12911184ee83389e733da11f769e0122c2c86866e0846567ec44daa0da411b79",
-    "src/ops/body3.ts": "5cca321f418658e705e2998f439e6d56066e3c1e3c7531af91cf240b6ba0d082",
+    "src/record/body-document3.ts": "71a18d2bb08de8cd37340baeeb58fb15b042ce1bb892f6c0e6d5da59d8dd5b18",
+    "src/model/body3.ts": "a1f9ff6ad50fbf767348aa5050117dc988004a74507beae42f7191933238de0f",
+    "src/ops/body3.ts": "b0c825de5b38ac87ed2275b62cba94f98903d1bf599af2b12d2ca323bcc838bf",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "bf554a7865790e7391da62adf73ae30d25c9942feeed6693a2fb7450167a475f",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
-    "src/convert/body-equivalence3.ts": "ef5e9b8d57c3dfb99597ea96ad60d7da4b5640565323e6402c8ec5e230fb1622",
+    "src/convert/body-equivalence3.ts": "5b594f473644a54b16064e63a298d1d893b60344e747708b423818fed4082522",
     "src/record/face-domain3.ts": "b6f9df6f0b13041532494c9c042345dca57452911b9fe3e2fc10b257ab1cd49d",
     "src/geometry/face-domain-binding3.ts": "24f3bc3634c5473ba5b46d1da906cd56b2fb61ff16f926ef14abbf3869f65010",
     "src/convert/face-domain3.ts": "b0c85af55cf30b69851e8a2b0354126bd10557ed5ffbdc5a9f9d019f4132358f",
@@ -332,6 +332,7 @@
     "Common cylinder partition face-domain records replay owned cylinder/plane partition definitions and select exactly one strict interior cell. Mixed face restoration pairs complete oriented boundaries through mixed sewing and applies shell face-use reversal. Runtime validation/tests are not new machine refinement proofs; planar cylinder-cut domains, global shell/material validity and owned Body3 adoption remain incomplete.",
     "Planar cylinder-cut cell records replay complete conic/plane partitions and select strict interior witnesses. Owned finite-cylinder Boolean export includes all selected wall/cap domains and orientation provenance in common BodyRecord; mixed face binding validates their boundaries. Runtime checks/tests are not new machine refinement proofs; shell/material validity, owned Body3 adoption and chained curved Booleans remain incomplete.",
     "Factory-restored mixed faces support exact bounded rational forward-ray hits with multiplicity and explicit edge/vertex/contained-support degeneracy. Closed locally manifold shell parity queries return boundary, regular parity or retry, without mesh/epsilon or a global shell embedding/material certificate. Runtime tests are not new machine refinement proofs; shell nesting and owned curved Body adoption remain incomplete.",
-    "Owned manifold finite-cylinder Boolean regions derive strict rational side witnesses, shell containment forests, cavity coorientation and material/void records from exact full-line scans and constructive support-partition provenance. Documented embedding/termination arguments and runtime checks are not new machine refinement proofs. Arbitrary imported shell certification, common curved Body3 adoption and chained curved operands remain incomplete. Restoration retains regenerated SSI endpoint provenance only after exact equality and scopes definition-only replay caches to one batch; individual witness/orientation/boundary checks remain active."
+    "Owned manifold finite-cylinder Boolean regions derive strict rational side witnesses, shell containment forests, cavity coorientation and material/void records from exact full-line scans and constructive support-partition provenance. Documented embedding/termination arguments and runtime checks are not new machine refinement proofs. Arbitrary imported shell certification, common curved Body3 adoption and chained curved operands remain incomplete. Restoration retains regenerated SSI endpoint provenance only after exact equality and scopes definition-only replay caches to one batch; individual witness/orientation/boundary checks remain active.",
+    "Owned manifold two-finite-cylinder Boolean results adopt into common Body3 with derived regions/samples, mixed bounded face binding, common material/face queries and replay-checked construction documents. Common topology/domain types include the mixed backend; native-only operations check actual backend ownership. Exact point comparison includes rational-map/biparametric charts. Runtime tests are not whole-program refinement proofs; arbitrary curved import, chained curved operands and nonmanifold Body material remain incomplete."
   ]
 }

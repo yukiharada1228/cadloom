@@ -108,7 +108,7 @@
         "src/record/body-document3.ts"
       ],
       "status": "partial",
-      "gap": "Box, finite Cylinder and vertical Extrude share owned Body records, queries and replay-checked persistence. General Body operations, arbitrary record-to-solid certification, rich shared result contracts and feature provenance/history remain missing."
+      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials and manifold two-cylinder Booleans share owned Body records, bounded-face/material queries and replay-checked persistence. General curved Body operations, arbitrary record-to-solid certification and feature history remain missing."
     },
     {
       "id": "primitive",
@@ -194,7 +194,7 @@
         "src/geometry/finite-cylinder-regions3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar materials and constructive two-finite-cylinder native/SSI Booleans have exact face provenance, persistent bounded face domains, material queries and geometry-derived manifold shell/cavity region tables with strict samples. Curved results are not yet reusable operands or owned common Bodies; maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned rational planar materials and constructive two-finite-cylinder native/SSI Booleans have face provenance, exact queries, derived manifold shell/cavity regions, common owned Body adoption and replay-checked persistence. Previous curved Boolean results are not yet new operands; maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",

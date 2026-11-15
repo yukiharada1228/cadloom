@@ -88,3 +88,7 @@ Factory-restored plane/cylinder face domains now support exact bounded forward-r
 ### Constructive curved shell regions
 
 Owned manifold two-cylinder Boolean boundaries now derive nesting forests, cavity orientation, strict rational adjacent-side samples and persistent material/void region roles using exact two-sided line scans. Arbitrary imported incidence is not promoted to a solid. See [construction argument and region algorithm](finite-cylinder-regions3.md). Common owned Body3 construction/persistence and reusable curved Boolean operands remain next integration work.
+
+### Common owned curved Bodies
+
+Owned manifold two-cylinder Boolean results now adopt into the existing Body3 contract with derived shell/void regions, exact samples, complete mixed face binding, common queries and replay-checked construction documents. Native-only backends check ownership/backend explicitly. See [curved Body construction and limits](finite-cylinder-body3.md). General curved re-operation, arbitrary curved BRep import and nonmanifold Body material remain incomplete.
