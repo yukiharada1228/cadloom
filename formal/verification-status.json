@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "4d337849c1046dfbc12a016e59829712912fe6b73e911719699d074f8a4eb271",
+    "src/index.ts": "54bb098bbaacf0e552b08f13bdb5ee99cc601c3cf12b922f6a84a9c9fce8dd25",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -126,7 +126,8 @@
     "src/geometry/mixed-shell-ray3.ts": "d608cdd1246a688b68e48930c4b86b6581391af1a42747339f7c5c219a3ab914",
     "src/geometry/finite-cylinder-regions3.ts": "513cf209b33c982a5141b079c5618a7ad522dc2187c1b50a529d83b7e6ea4a97",
     "src/geometry/cylinder-intersection-cylinder3.ts": "80b557b66b3927c5699b6ac9130eefe3f7716c17e9581c655b762f3de22c0ffd",
-    "src/geometry/cylinder-cell-refinement3.ts": "8586b5e7771198a69845f5268474c711e6e0d84b35e08db61c3532cbb45c74f6"
+    "src/geometry/cylinder-cell-refinement3.ts": "8586b5e7771198a69845f5268474c711e6e0d84b35e08db61c3532cbb45c74f6",
+    "src/geometry/finite-cylinder-expression3.ts": "489c8c014b5a5348e69e77bb9bd0de4fce5c653de42b3d14ab8db198337c3840"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -337,6 +338,7 @@
     "Owned manifold finite-cylinder Boolean regions derive strict rational side witnesses, shell containment forests, cavity coorientation and material/void records from exact full-line scans and constructive support-partition provenance. Documented embedding/termination arguments and runtime checks are not new machine refinement proofs. Arbitrary imported shell certification, common curved Body3 adoption and chained curved operands remain incomplete. Restoration retains regenerated SSI endpoint provenance only after exact equality and scopes definition-only replay caches to one batch; individual witness/orientation/boundary checks remain active.",
     "Owned manifold two-finite-cylinder Boolean results adopt into common Body3 with derived regions/samples, mixed bounded face binding, common material/face queries and replay-checked construction documents. Common topology/domain types include the mixed backend; native-only operations check actual backend ownership. Exact point comparison includes rational-map/biparametric charts. Runtime tests are not whole-program refinement proofs; arbitrary curved import, chained curved operands and nonmanifold Body material remain incomplete.",
     "Owned cylinder SSI arcs intersect/split against a third rational cylinder through height elimination, generic separating circle charts, degree-at-most-eight root certificates and correlated rational-univariate coordinate recovery, with whole-fiber/overlap/tangent cases. Documented algebraic/termination arguments and executable tests are not new machine refinement proofs. Multi-cutter face refinement, material assembly and reusable curved Boolean operands remain incomplete.",
-    "Owned cylinder face cells overlay repeated native cylinder/plane arrangements with complete old/new bound events, inherited side vectors and source-cell provenance; ordered refined-domain records replay and bind whole boundaries. Verified same-fiber affine reflection, RUR discriminants, genuine SSI point support identities and certified interval linear/quadratic sign filters preserve exactness while avoiding unnecessary field extensions. Runtime tests and documented constructions are not new machine refinement proofs; multi-cutter planar caps, material assembly and reusable curved Body operands remain incomplete."
+    "Owned cylinder face cells overlay repeated native cylinder/plane arrangements with complete old/new bound events, inherited side vectors and source-cell provenance; ordered refined-domain records replay and bind whole boundaries. Verified same-fiber affine reflection, RUR discriminants, genuine SSI point support identities and certified interval linear/quadratic sign filters preserve exactness while avoiding unnecessary field extensions. Runtime tests and documented constructions are not new machine refinement proofs; multi-cutter planar caps, material assembly and reusable curved Body operands remain incomplete.",
+    "Finite-cylinder expression boundaries use complete primitive-face arrangements and Boolean evaluation of exact two-sided membership vectors, with coincident-support checks and balanced-edge sewing. Executable regressions and documented constructions are not a machine proof. General oblique/contact regression coverage, common Body adoption, expression persistence and regularized material point location remain incomplete."
   ]
 }

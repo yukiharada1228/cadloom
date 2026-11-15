@@ -255,3 +255,5 @@ export {partitionPlanarFaceByFiniteCylinders3,assertOwnedPlanarFaceFiniteCylinde
 export type {PlanarFiniteCylinderCut3,PlanarFaceFiniteCylindersPartition3} from './geometry/planar-face-finite-cylinder3.js';
 export {partitionCylinderFaceByFiniteCylinders3,assertOwnedCylinderFaceFiniteCylindersPartition3} from './geometry/cylinder-face-finite-cylinder3.js';
 export type {CylinderFaceFiniteCylindersPartition3} from './geometry/cylinder-face-finite-cylinder3.js';
+export {boundaryFiniteCylinderExpression3,assertOwnedFiniteCylinderExpressionBoundary3} from './geometry/finite-cylinder-expression3.js';
+export type {FiniteCylinderExpression3,FiniteCylinderExpressionFace3,FiniteCylinderExpressionBoundary3} from './geometry/finite-cylinder-expression3.js';
