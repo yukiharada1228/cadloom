@@ -315,3 +315,7 @@ five compiler/tetrahedron cases run in the same focused invocation (17 total
 expected). Build, standalone strict typing and the existing scoped 133-declaration
 audit passed. No success is claimed for the pending execution invocation or for
 the prior boundary-API full suite, which remains independently live.
+
+The running focused invocation has emitted successful results for all seven
+existing convex Body/boundary cases. The new general planar cases and final
+invocation summary remain pending; seven observed passes are not a 17-case pass.
