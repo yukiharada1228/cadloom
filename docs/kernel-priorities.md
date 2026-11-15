@@ -319,3 +319,20 @@ the prior boundary-API full suite, which remains independently live.
 The running focused invocation has emitted successful results for all seven
 existing convex Body/boundary cases. The new general planar cases and final
 invocation summary remain pending; seven observed passes are not a 17-case pass.
+
+### General native dispatch execution results and fixture correction
+
+The first 17-case focused invocation terminated with 16 passes and one failure.
+All five new general native planar cases passed, including independent truth for
+the four concave operations, consolidated replay and repeated clipping, three
+disconnected output shells, a cavity splitting a cylinder into two components,
+and empty-material identities. All seven convex cases also passed.
+
+The remaining failure was the canonical-cone fixture asking the unified API for
+a negative-orientation face. The new convex selector deliberately supplies
+outward-oriented supporting planes, so this assertion no longer tests the cone
+compiler. Restore that fixture to the explicit original compiler/material path,
+keeping its negative-orientation assertion, and add a separate unified convex
+API fixture with four supports, copy rejection and exact Body replay/membership.
+The two targeted cases are running; this is not yet an all-green focused gate.
+No kernel implementation was changed to address that test routing mismatch.
