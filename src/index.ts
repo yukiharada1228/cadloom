@@ -250,3 +250,8 @@ export {refineCylinderFaceCells3,partitionCylinderFaceCellsByCylinder3,assertOwn
 export type {CylinderFaceRefinement3,CylinderFaceRefinementInput3} from './geometry/cylinder-cell-refinement3.js';
 export {encodeRefinedCylinderCellDomain3} from './convert/mixed-face-domain3.js';
 export type {RefinedCylinderCellDomainRecord3} from './record/face-domain3.js';
+
+export {partitionPlanarFaceByFiniteCylinders3,assertOwnedPlanarFaceFiniteCylindersPartition3} from './geometry/planar-face-finite-cylinder3.js';
+export type {PlanarFiniteCylinderCut3,PlanarFaceFiniteCylindersPartition3} from './geometry/planar-face-finite-cylinder3.js';
+export {partitionCylinderFaceByFiniteCylinders3,assertOwnedCylinderFaceFiniteCylindersPartition3} from './geometry/cylinder-face-finite-cylinder3.js';
+export type {CylinderFaceFiniteCylindersPartition3} from './geometry/cylinder-face-finite-cylinder3.js';
