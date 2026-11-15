@@ -32,11 +32,12 @@ const zero=new Rational(0n),one=new Rational(1n),two=new Rational(2n);
 export type PlanarVerticalBound3={readonly kind:'segment';readonly curve:Extract<Curve3,{kind:'algebraic-segment'}>}|{readonly kind:'ellipse';readonly ellipse:Ellipse3;readonly branch:-1|1};
 export interface PlanarCylinderFaceCell3 {
  readonly left:AlgebraicReal;readonly right:AlgebraicReal;readonly lower:PlanarVerticalBound3;readonly upper:PlanarVerticalBound3;
- readonly side:Sign;readonly planeSides:readonly Sign[];readonly sample:AlgebraicCoordinates3;readonly boundary:readonly Curve3[];
+ readonly side:Sign;readonly cylinderSides:readonly Sign[];readonly planeSides:readonly Sign[];readonly sample:AlgebraicCoordinates3;readonly boundary:readonly Curve3[];
  locate(point:Point3|AlgebraicCoordinates3):CurveRegionLocation2;
 }
 export interface PlanarFaceCylinderPartition3 {
  readonly base:PreparedPlanarFace3;readonly frame:PlaneFrame3;readonly cutter:Cylinder3;readonly planes:readonly Plane3[];
+ readonly cutters:readonly Cylinder3[];
  readonly cells:readonly PlanarCylinderFaceCell3[];readonly sewn:SewnBRep3;
  /** Boundary/support intersections and extrema; not a contact multiplicity certificate. */
  readonly events:readonly AlgebraicCoordinates3[];
@@ -53,12 +54,20 @@ function crossings(a:Curve3,b:Curve3):readonly AlgebraicCoordinates3[]{
  * split embedded strip cells; artificial vertical cuts remain in the result.
  */
 export function partitionPlanarFaceByCylinder3(input:PreparedPlanarFace3,inputCutter:Cylinder3,inputPlanes:readonly Plane3[]=[]):PlanarFaceCylinderPartition3 {
- const base=translatePlanarFace3(input,vector3(0n,0n,0n)),cutter=cylinder3(inputCutter.axis,inputCutter.radiusSquared),planes=Object.freeze(inputPlanes.map(p=>plane3(p.normal.x,p.normal.y,p.normal.z,p.offset))),original=chartGeometry(base),frame=original.frame,[DU,DV]=duals(frame),curves:Curve3[]=[...original.curves],section=intersectPlaneCylinder3(base.surface,cutter),known:AlgebraicCoordinates3[]=[];
+ return partitionPlanarFaceByCylinders3(input,[inputCutter],inputPlanes);
+}
+/** Exact simultaneous arrangement of all cylinder sections and plane cuts. */
+export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputCutters:readonly Cylinder3[],inputPlanes:readonly Plane3[]=[]):PlanarFaceCylinderPartition3 {
+ if(!inputCutters.length)throw new RangeError("At least one cylinder cutter is required");
+ const cutters=Object.freeze(inputCutters.map(c=>cylinder3(c.axis,c.radiusSquared))),cutter=cutters[0]!;
+ const base=translatePlanarFace3(input,vector3(0n,0n,0n)),planes=Object.freeze(inputPlanes.map(p=>plane3(p.normal.x,p.normal.y,p.normal.z,p.offset))),original=chartGeometry(base),frame=original.frame,[DU,DV]=duals(frame),curves:Curve3[]=[...original.curves],known:AlgebraicCoordinates3[]=[];
  function lineCurve(line:AlgebraicLine3):Curve3 {
   const p=pointInPlaneFrame3(frame,line.origin)!;const dx=dot3(DU,line.direction),dy=dot3(DV,line.direction),coordinate=dx.sign()!==0?'x':'y',rate=coordinate==='x'?dx:dy,start=coordinate==='x'?original.xMin:original.yMin,end=coordinate==='x'?original.xMax:original.yMax;
   const at=(bound:Rational)=>{const t=AlgebraicReal.fromRational(bound).sub(p[coordinate]).affine(one.div(rate)),x=p.x.add(t.affine(dx)),y=p.y.add(t.affine(dy));return map(frame,coordinate==='x'?AlgebraicReal.fromRational(bound):x,coordinate==='y'?AlgebraicReal.fromRational(bound):y);};return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(at(start),at(end))});
  }
+ for(const c of cutters){const section=intersectPlaneCylinder3(base.surface,c);
  if(section.kind==='ellipse')curves.push(Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(section.ellipse)}));else if(section.kind==='lines')for(const item of section.lines)curves.push(lineCurve(item.line));
+ }
  for(const p of planes){const hit=intersectPlanes3(base.surface,p);if(hit.kind==='line')curves.push(lineCurve(algebraicLine3(hit.line.origin,hit.line.direction)));}
  for(let i=0;i<curves.length;i++){known.push(...curveEndpoints3(curves[i]!));for(let j=0;j<i;j++)known.push(...crossings(curves[i]!,curves[j]!));}
  const full=new Map<Curve3,Curve3>();for(const c of curves)if(c.kind==='elliptic-arc')full.set(c,Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(c.arc.ellipse)}));
@@ -88,10 +97,10 @@ export function partitionPlanarFaceByCylinder3(input:PreparedPlanarFace3,inputCu
   for(let j=0;j+1<hits.length;j++){
    const lo=hits[j]!,hi=hits[j+1]!,sample=snapshotExactPoint3(mapQ(frame,x.rational!,between(lo.y,hi.y)));if(base.locate(sample)!=='inside')continue;
    const lower=bound(lo.curve,x,lo.y),upper=bound(hi.curve,x,hi.y),bottom=graph(lower,left,right),top=graph(upper,left,right),[bl,br]=curveEndpoints3(bottom),[tl,tr]=curveEndpoints3(top),loop:Curve3[]=[bottom];if(!samePoint(br,tr))loop.push(Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(br,tr)}));loop.push(reverseCurve3(top));if(!samePoint(tl,bl))loop.push(Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(tl,bl)}));
-   const boundary=Object.freeze(dot3(base.normal,cross3(frame.u,frame.v)).sign()>0?loop:[...loop].reverse().map(reverseCurve3)),side=classifyPointToSurface3(sample,{kind:'cylinder',cylinder:cutter}),planeSides=Object.freeze(planes.map(p=>{const sign=evaluate(p,sample).sign();if(sign===0&&intersectPlanes3(base.surface,p).kind!=='coincident')throw new Error('Open planar cell contains an unpartitioned plane zero');return sign;}));if(side===0)throw new Error('A planar open cell lies on an unpartitioned cylinder zero');
-   const locate:PlanarCylinderFaceCell3['locate']=inputPoint=>{const p=snapshotExactPoint3(inputPoint),q=pointInPlaneFrame3(frame,p);if(q===null)return 'outside';const l=q.x.compare(left),r=q.x.compare(right);if(l<0||r>0)return 'outside';const a=compare(lower,p,q.x,q.y),b=compare(upper,p,q.x,q.y);return a<0||b>0?'outside':l===0||r===0||a===0||b===0?'boundary':'inside';};const cell=Object.freeze({left,right,lower,upper,side,planeSides,sample,boundary,locate});if(locate(sample)!=='inside')throw new Error('Planar cell lacks an interior witness');cells.push(cell);
+   const boundary=Object.freeze(dot3(base.normal,cross3(frame.u,frame.v)).sign()>0?loop:[...loop].reverse().map(reverseCurve3)),cylinderSides=Object.freeze(cutters.map(cylinder=>classifyPointToSurface3(sample,{kind:'cylinder',cylinder}))),side=cylinderSides[0]!,planeSides=Object.freeze(planes.map(p=>{const sign=evaluate(p,sample).sign();if(sign===0&&intersectPlanes3(base.surface,p).kind!=='coincident')throw new Error('Open planar cell contains an unpartitioned plane zero');return sign;}));if(cylinderSides.some(s=>s===0))throw new Error('A planar open cell lies on an unpartitioned cylinder zero');
+   const locate:PlanarCylinderFaceCell3['locate']=inputPoint=>{const p=snapshotExactPoint3(inputPoint),q=pointInPlaneFrame3(frame,p);if(q===null)return 'outside';const l=q.x.compare(left),r=q.x.compare(right);if(l<0||r>0)return 'outside';const a=compare(lower,p,q.x,q.y),b=compare(upper,p,q.x,q.y);return a<0||b>0?'outside':l===0||r===0||a===0||b===0?'boundary':'inside';};const cell=Object.freeze({left,right,lower,upper,side,cylinderSides,planeSides,sample,boundary,locate});if(locate(sample)!=='inside')throw new Error('Planar cell lacks an interior witness');cells.push(cell);
   }
  }
  if(!cells.length)throw new Error('A nonempty planar source produced no arrangement cells');
- const sewn=sewBRepFaces3(cells.map(c=>({surface:{kind:'plane' as const,plane:base.surface},sense:base.sense,loops:[c.boundary]}))),result=Object.freeze({base,frame,cutter,planes,cells:Object.freeze(cells),sewn,events:Object.freeze(known.filter((p,i,all)=>all.findIndex(q=>samePoint(p,q))===i&&base.locate(p)!=='outside'))});owned.add(result);return result;
+ const sewn=sewBRepFaces3(cells.map(c=>({surface:{kind:'plane' as const,plane:base.surface},sense:base.sense,loops:[c.boundary]}))),result=Object.freeze({base,frame,cutter,cutters,planes,cells:Object.freeze(cells),sewn,events:Object.freeze(known.filter((p,i,all)=>all.findIndex(q=>samePoint(p,q))===i&&base.locate(p)!=='outside'))});owned.add(result);return result;
 }

@@ -1386,3 +1386,5 @@ node examples/face-domain-record3.ts
 `encodeRefinedCylinderCellDomain3`で切断順序と内部点を保存でき、共通の面復元処理が境界全体との一致を検査します。立体の再演算には、平面の端面の分割と材料選択・殻の組み立てを接続する必要があります。[構成と検証範囲](docs/cylinder-cell-refinement3.md)。
 
 `npm run build && node examples/cylinder-cell-refinement3.ts`で、円柱・平面による繰り返し分割と、全ての面領域の保存復元を実行できます。
+
+Multiple cylinder sections and rational plane cuts can also partition an owned planar face through `partitionPlanarFaceByCylinders3`. Every cell retains ordered `cylinderSides` and `planeSides`; `encodePlanarMultiCellDomain3` persists the full arrangement definition and a strict cell selector. Run `node examples/planar-multicylinder-partition3.ts` after building to restore all bounded faces of a two-cylinder planar partition. These are exact open face partitions; selecting material and assembling reusable closed Boolean solids remain separate kernel work.

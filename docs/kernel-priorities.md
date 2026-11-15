@@ -100,3 +100,5 @@ Owned cylinder SSI arcs now intersect and split against a third rational cylinde
 ### Reusable multi-cutter cylinder wall arrangements
 
 Owned SSI/plane-bounded cylinder cells now refine repeatedly by native cylinders and planes, retaining all prior side vectors, immediate cell provenance, complete mixed boundaries and ordered domain persistence. Exact same-fiber reflection and source-aware interval/projection predicates prevent unnecessary algebraic field expansion. See [overlay proof and scope](cylinder-cell-refinement3.md). Multi-cutter planar cap arrangements and material/Body assembly are still required before curved Boolean results become reusable operands.
+
+Multiple-cylinder planar arrangements now retain ordered cylinder sign vectors alongside plane signs. Full multi-cutter bounded planar domains can be replayed through the mixed face decoder. Material selection and closed-shell assembly for reusable cylinder expressions remain the next kernel dependency.
