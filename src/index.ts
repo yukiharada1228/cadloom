@@ -291,3 +291,5 @@ export {bodyRecordFromCylinderMaterial3} from './convert/cylinder-material3.js';
 export {cylinderMaterialRegions3} from './geometry/finite-cylinder-regions3.js';
 export type {CylinderMaterialRegions3} from './geometry/finite-cylinder-regions3.js';
 export {bodyFromCylinderMaterial3} from './ops/body3.js';
+
+export {boundaryBoxMaterial3} from './geometry/box-material3.js';

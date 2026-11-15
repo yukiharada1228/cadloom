@@ -158,3 +158,7 @@ A new bounded cylinder/plane predicate backend retains halfspaces inside each op
 ### Reusable operand-local material through common Body
 
 Clipped cylinder-family operands now compose through common Body Boolean dispatch while retaining each operand's local plane predicates. Complete selected domains and reversed subtraction faces persist; derived shell nesting and strict material samples certify manifold Body adoption. Restored results support further Booleans and cuts. See [contracts and validation](cylinder-material-body3.md). All 812 non-hard regressions and the existing 133-declaration scoped audit pass; the unchanged two-test slow oblique suite was not rerun for this milestone. Box/cylinder interoperability, general analytic/NURBS Booleans, broader contact semantics and interactive performance remain kernel gaps.
+
+### Exact six-plane box bridge into mixed material
+
+`boundaryBoxMaterial3` now preserves the exact six-plane box boundary in the bounded plane/cylinder predicate backend. A strictly inactive enclosing finite cylinder establishes boundedness without contributing any face. Box/cylinder composition, independent rational material grids, signed edge balance and manifold Body replay pass. See [construction and scope](box-material3.md). Native Box Body automatic dispatch and general polyhedral/curved interoperability remain integration work.
