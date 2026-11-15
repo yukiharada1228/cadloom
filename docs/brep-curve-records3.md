@@ -1,0 +1,11 @@
+# Portable mixed BRep curves
+
+`encodeBRepCurveRecord3` / `decodeBRepCurveRecord3` serialize native bounded curves and owned cylinder–cylinder intersection (SSI) arcs. The mixed curve codec is separate from the existing native BodyRecord decoder. NURBS are not accepted as mixed native edges yet.
+
+An SSI record contains two rational cylinder supports, exact start/end points on the first cylinder's normal section circle, a height-root branch sign, and a traversal direction. The base circle is derived from the first support; there is no redundant caller-provided circle or sample certificate. Its interval runs counterclockwise about the first axis; reversing edge traversal changes only direction.
+
+Decoding snapshots the structural record with item/numeric budgets, reconstructs both valid cylinders and their complete intersection, and finds a factory branch containing both base endpoints in strictly increasing order. Factory branches are nonperiodic angular intervals separated by critical points and helper seams. Endpoint membership plus interval order therefore establishes containment of the entire recorded angular interval, rather than testing a few samples. The decoder lifts the endpoints on the selected branch, subdivides the owned source arc and returns the matching owned piece. Parallel/coincident/empty supports, zero intervals, intervals crossing factory seams and malformed geometry are rejected. A reversed pair of endpoints can legitimately describe another factory interval; it is not intrinsically invalid.
+
+The encoding applies to the actual owned subarcs produced by current subdivision/partition operations. It is not an arbitrary unsplit intersection-curve importer. No global decode cache is retained. Common Body records, persistent bounded face domains/material regions, sewing imported boundaries and chaining curved Boolean results still require integration.
+
+Tests check native edges, both height branches and traversal directions, exact endpoint agreement, whole supporting-surface membership, trimmed interval exclusion, translated/signed/nonunit/oblique frames, invalid geometry and budgets. This is executable validation of a constructive decoder, not a new machine-checked TypeScript refinement proof.

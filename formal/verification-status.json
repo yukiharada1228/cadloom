@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "9e4f1a543fc146efa050a5d62d5333b238483f8d6324e82b1ab15050c0949541",
+    "src/index.ts": "39fa13956bd8a79af77f7d810ffb79a1a83050266e7e1e975d815499655e071e",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -115,7 +115,9 @@
     "src/geometry/cylinder-cell-plane-partition3.ts": "e4a46c2bb64e9142eedc8acb38550b8092cbbb6bfc225862c9856704b6fa225c",
     "src/geometry/planar-face-finite-cylinder3.ts": "4ad7888668d5711740713debb77ec3f1dbea370dfa3abf775292ebb9b9beb1d4",
     "src/geometry/planar-face-cylinder-partition3.ts": "19107c38d2488490cdc1b4f1cc0372e804f422f0d58e2b4c4be277ea9455364c",
-    "src/geometry/finite-cylinder-boolean3.ts": "e353bf087e5a66b921503222fb781f435e995304b9e72b1593d4ceac4f45679e"
+    "src/geometry/finite-cylinder-boolean3.ts": "e353bf087e5a66b921503222fb781f435e995304b9e72b1593d4ceac4f45679e",
+    "src/record/brep-curve3.ts": "72c9a4214f4dca2c4dbfe3973df8b7849c3f2205d941a8c4cfc067f01d9bcb2d",
+    "src/convert/brep-curve3.ts": "32d9d3eaecded4343fba0f312eac9e5b2b30468ac501d2e6d264f861417f8aef"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -317,6 +319,7 @@
     "Owned cylinder/SSI strip cells refine repeatedly by rational planes through complete native/SSI boundary events, constant/SSI/plane height bounds, exact projected ellipse boundaries and strict ordered sign vectors with immediate source-cell provenance. A finite-cylinder wrapper adds both cap planes and labels open source-wall cells against filled finite material, preserving coincident wall patches as boundary. These are documented constructions and executable tests, not machine-verified TypeScript. Arbitrary additional curved cutters, cutter cap face construction, maximal consolidation, common mixed Body persistence and material Boolean shell certification remain incomplete.",
     "Owned native planar domains partition by a cylinder section and rational planes through complete conic/segment intersections, vertical extrema/event slabs and embedded graph-bounded cells. Finite-cylinder cap constraints label open source planar cells, retaining cap-coincident boundary patches. Known opposite ellipse branches use rational affine reflection; ellipse quartic recovery and predicates preserve registered common-root rational coordinates, and segment noding uses necessary coordinate interval pruning. Documented arguments and executable tests are not machine-verified TypeScript. Maximal consolidation, arbitrary NURBS trim cutters, two-operand material face selection, global shell certification and common mixed Body persistence remain incomplete.",
     "Constructive regularized union/intersection/difference/xor boundaries of two owned finite cylinders select fully partitioned wall/cap domains, handle same/opposed coincident physical sides, reverse cavity/parity faces and sew exact native/SSI edges. Immediate partition/primitive provenance and material point queries retain balanced nonmanifold contacts. Immutable coordinate identity, axial/radial SSI inverse constructions, source-aware exact linear/ellipse predicates, certified interval rejection with complete fallbacks and equal-value provenance preference avoid unnecessary field extensions. These are documented mathematical constructions and executable tests, not new machine proofs. Previous curved Boolean results are not yet operands; common mixed Body persistence, persistent regions, maximal consolidation, mass properties and arbitrary analytic/NURBS material Booleans remain incomplete.",
-    "Rational-function and biparametric exact-point record reconstruction is runtime-validated and regression-tested, not a Lean refinement proof of the TypeScript codec."
+    "Rational-function and biparametric exact-point record reconstruction is runtime-validated and regression-tested, not a Lean refinement proof of the TypeScript codec.",
+    "Dedicated mixed BRep curve records reconstruct owned cylinder SSI subarcs through regenerated supporting intersections and exact ordered interval containment; validated by runtime checks/tests, not a new machine refinement proof. Common Body mixed boundary/domain persistence remains incomplete."
   ]
 }

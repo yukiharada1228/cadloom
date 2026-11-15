@@ -220,3 +220,5 @@ export {partitionPlanarFaceByFiniteCylinder3,assertOwnedPlanarFaceFiniteCylinder
 export type {PlanarFaceFiniteCylinderPartition3} from './geometry/planar-face-finite-cylinder3.js';
 export {prepareFiniteCylinder3,assertOwnedFiniteCylinder3,booleanFiniteCylinders3,assertOwnedFiniteCylinderBoolean3} from './geometry/finite-cylinder-boolean3.js';
 export type {FiniteCylinder3,FiniteCylinderFaceSource3,FiniteCylinderBooleanFace3,FiniteCylinderBoolean3,FiniteCylinderOperandPartition3} from './geometry/finite-cylinder-boolean3.js';
+export {encodeBRepCurveRecord3,decodeBRepCurveRecord3} from './convert/brep-curve3.js';
+export type {BRepCurveRecord3,CylinderSupportRecord3} from './record/brep-curve3.js';

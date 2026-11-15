@@ -64,3 +64,7 @@ SolidCraft全体のスケッチ・履歴・コマンド・アプリケーショ�
 ### Exact point chart persistence
 
 Portable exact points now retain registered rational-function and biparametric charts through JSON. This avoids discarding the common algebraic parameter used by curved-boundary predicates. Decoder evaluation and root/denominator checks remain mandatory; this does not certify surface membership. See [record semantics and limits](exact-point-chart-records3.md). Cylinder SSI curve records and common curved Body adoption remain next integration work.
+
+### Mixed edge persistence
+
+Native and cylinder SSI BRep edges now have a dedicated portable codec. SSI reconstruction regenerates the supporting intersection and validates whole ordered factory intervals before producing owned trimmed arcs. See [mixed curve record semantics](brep-curve-records3.md). Wiring these edges into common Body boundary/face-domain records and material-region reconstruction remains outstanding.
