@@ -72,3 +72,7 @@ Native and cylinder SSI BRep edges now have a dedicated portable codec. SSI reco
 ### Common mixed boundary tables
 
 The existing BodyRecord now carries cylinder SSI edges, and the mixed boundary restorer checks endpoints, whole-edge supports, exact vertex welding, face-use orientations and shell connectivity. See [common mixed boundary records](mixed-body-boundary-records3.md). Curved face-domain/material-region validation and owned Body3 adoption remain required before these restored boundaries can become operands.
+
+### Persistent SSI-bounded cylinder faces
+
+Cylinder/plane partition wall cells now have common domain records selected by strict interior witnesses after complete partition replay. Mixed face restoration binds entire oriented native/SSI domain boundaries to common serialized uses. See [domain reconstruction and limits](cylinder-cell-domain-records3.md). Planar cylinder-cut face records, global shell/material validation and owned Body3 adoption remain outstanding.

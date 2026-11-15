@@ -1,0 +1,4 @@
+import {point3,line3,cylinder3,prepareCylinderFace3,partitionCylinderFaceByCylinder3,encodeCylinderCellDomain3,decodeMixedFaceDomain3} from '../dist/index.js';
+const a=cylinder3(line3(point3(0n,0n),point3(0n,0n,1n)),1n),b=cylinder3(line3(point3(0n,0n),point3(1n,0n,0n)),4n),partition=partitionCylinderFaceByCylinder3(prepareCylinderFace3(a,-3n,3n),b),id=partition.cells.findIndex(c=>c.boundary.some(e=>e.kind==='cylinder-ssi'));
+if(id<0)throw new Error('Expected SSI-bounded wall cell');
+const json=JSON.stringify(encodeCylinderCellDomain3(partition,id)),face=decodeMixedFaceDomain3(JSON.parse(json));console.log({bytes:json.length,sense:face.sense,sourceSampleLocation:face.locate(partition.cells[id]!.sample),loops:face.boundary.length,ssiEdges:face.boundary.flat().filter(e=>e.kind==='cylinder-ssi').length});

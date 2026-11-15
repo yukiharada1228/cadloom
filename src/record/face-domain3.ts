@@ -3,6 +3,7 @@ import type {Schema3,RecordReadLimits3} from './schema.js';
 import {pointSchema3,rationalPointSchema3,realSchema3} from './exact3.js';
 import type {ExactPointRecord3,ExactRealRecord3,RationalPointRecord3} from './exact3.js';
 import {frameSchema3,curveSchema3} from './geometry3.js';
+import type {CylinderSupportRecord3} from './brep-curve3.js';
 import type {FrameRecord3,CurveRecord3} from './geometry3.js';
 
 export interface CircleSupportRecord3 {readonly center:RationalPointRecord3;readonly normal:RationalPointRecord3;readonly radiusSquared:string;}
@@ -17,7 +18,8 @@ export interface CylinderDomainRecord3 {
   readonly radiusSquared:string;readonly lower:string;readonly upper:string;readonly angular:CurveRecord3;readonly sense:1|-1;
 }
 export interface HalfSpaceRecord3 {readonly normal:RationalPointRecord3;readonly offset:string;readonly side:1|-1;}
-export type FaceDomainRecord3=PlanarDomainRecord3|CylinderDomainRecord3
+export interface CylinderCellDomainRecord3 {readonly kind:'cylinder-partition-cell';readonly base:CylinderDomainRecord3;readonly cutter:CylinderSupportRecord3;readonly planes:readonly {readonly normal:RationalPointRecord3;readonly offset:string}[];readonly sample:ExactPointRecord3;readonly orientation:1|-1;}
+export type FaceDomainRecord3=PlanarDomainRecord3|CylinderDomainRecord3|CylinderCellDomainRecord3
  | {readonly kind:'trimmed-planar';readonly base:PlanarDomainRecord3;readonly halfspaces:readonly HalfSpaceRecord3[];/** Strict interior point selects a recomputed component, not an unchecked ID. */readonly sample:ExactPointRecord3}
  | {readonly kind:'trimmed-cylinder';readonly base:CylinderDomainRecord3;readonly halfspaces:readonly HalfSpaceRecord3[];readonly sample:ExactPointRecord3};
 const circle=objectSchema3({center:rationalPointSchema3,normal:rationalPointSchema3,radiusSquared:rationalSchema3}),ellipse=objectSchema3({frame:frameSchema3,radiusUSquared:rationalSchema3,radiusVSquared:rationalSchema3});
@@ -32,6 +34,7 @@ const halfspaces=arraySchema3(objectSchema3({normal:rationalPointSchema3,offset:
 export const faceDomainSchema3:Schema3=(v,p,r)=>{
   if(v!==null&&typeof v==='object'&&Object.hasOwn(v,'kind')){
     const kind=(v as {kind:unknown}).kind;
+    if(kind==='cylinder-partition-cell')return objectSchema3({kind:literalSchema3('cylinder-partition-cell'),base:cylinderDomainSchema3,cutter:objectSchema3({origin:rationalPointSchema3,direction:rationalPointSchema3,radiusSquared:rationalSchema3}),planes:arraySchema3(objectSchema3({normal:rationalPointSchema3,offset:rationalSchema3})),sample:pointSchema3,orientation:directionSchema3})(v,p,r);
     if(kind==='cylinder-product')return cylinderDomainSchema3(v,p,r);
     if(kind==='trimmed-planar')return objectSchema3({kind:literalSchema3('trimmed-planar'),base:planarDomainSchema3,halfspaces,sample:pointSchema3})(v,p,r);
     if(kind==='trimmed-cylinder')return objectSchema3({kind:literalSchema3('trimmed-cylinder'),base:cylinderDomainSchema3,halfspaces,sample:pointSchema3})(v,p,r);

@@ -227,3 +227,8 @@ export {bodyRecordFromMixedTopology3} from './convert/body3.js';
 export {restoreMixedBRepBoundary3} from './convert/mixed-boundary3.js';
 export type {MixedBRepBoundary3} from './convert/mixed-boundary3.js';
 export type {BodyCurveRecord3} from './record/body3.js';
+export {encodeCylinderCellDomain3,decodeMixedFaceDomain3} from './convert/mixed-face-domain3.js';
+export type {DecodedMixedFaceDomain3} from './convert/mixed-face-domain3.js';
+export type {CylinderCellDomainRecord3} from './record/face-domain3.js';
+export {restoreMixedBRepFaces3} from './convert/mixed-faces3.js';
+export type {MixedBRepFaces3} from './convert/mixed-faces3.js';
