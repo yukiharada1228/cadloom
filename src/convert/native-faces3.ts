@@ -18,7 +18,7 @@ export function restoreNativeBRepFaces3(input:unknown,limits:RecordReadLimits3={
     if(f.parameterBounds!==undefined||f.loops.some(l=>r.loops[l]!.uses.some(u=>u.pcurve!==undefined)))throw new RangeError('Independent pcurve/parameter-bound metadata requires a correspondence validation backend');
     const face=decodeFaceDomain3(f.domain),surface=g.surfaces[f.surface]!;if(surface.kind==='nurbs')throw new RangeError('NURBS face-domain binding is not implemented');
     if(!faceSupportsAgree3(face.surface,face.sense,surface,f.sense,face.sample))throw new RangeError(`Face ${i} domain support or physical orientation disagrees with its surface`);
-    const loops=f.loops.map(l=>r.loops[l]!.uses.map(u=>{const edge=r.edges[u.edge]!,curve=g.curves[edge.curve]!;if(curve.kind==='nurbs')throw new RangeError('NURBS face-edge binding is not implemented');return u.direction===1?curve:reverseCurve3(curve as Curve3);}));
+    const loops=f.loops.map(l=>r.loops[l]!.uses.map(u=>{const edge=r.edges[u.edge]!,curve=g.curves[edge.curve]!;if(curve.kind==='nurbs'||curve.kind==='cylinder-ssi')throw new RangeError('Native face-edge binding does not support NURBS or cylinder SSI');return u.direction===1?curve:reverseCurve3(curve as Curve3);}));
     validateFaceBoundary3(face.surface,face.sense,face.boundary,loops);return face;
   }));
   return Object.freeze({boundary,faces});

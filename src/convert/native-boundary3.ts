@@ -19,7 +19,7 @@ export interface NativeBRepBoundary3 {
  */
 export function restoreNativeBRepBoundary3(input:unknown,limits:RecordReadLimits3={}):NativeBRepBoundary3 {
   const record=readBodyRecord3(input,limits),geometry=decodeBodyGeometry3(record,limits),curves:Curve3[]=[];
-  for(const e of record.edges){const c=geometry.curves[e.curve]!;if(c.kind==='nurbs')throw new RangeError('Native boundary conversion does not support NURBS edges');const ends=curveEndpoints3(c);if(compareAlgebraicPoints3(ends[0],geometry.vertices[e.start]!)!==0||compareAlgebraicPoints3(ends[1],geometry.vertices[e.end]!)!==0)throw new RangeError('Edge geometry does not match its declared vertices');curves.push(c);}
+  for(const e of record.edges){const c=geometry.curves[e.curve]!;if(c.kind==='nurbs'||c.kind==='cylinder-ssi')throw new RangeError('Native boundary conversion requires native edges; NURBS and cylinder SSI need other backends');const ends=curveEndpoints3(c);if(compareAlgebraicPoints3(ends[0],geometry.vertices[e.start]!)!==0||compareAlgebraicPoints3(ends[1],geometry.vertices[e.end]!)!==0)throw new RangeError('Edge geometry does not match its declared vertices');curves.push(c);}
   const directions=new Map<number,1|-1>();
   for(const shell of record.shells){if(shell.kind!=='faces'||shell.wires.length)throw new RangeError('Native face boundary conversion does not support wire or vertex shells');for(const f of shell.faces)directions.set(f.face,f.direction);}
   const faces:BRepFaceInput3[]=record.faces.map((f,id)=>{

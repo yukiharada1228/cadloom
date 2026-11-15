@@ -222,3 +222,8 @@ export {prepareFiniteCylinder3,assertOwnedFiniteCylinder3,booleanFiniteCylinders
 export type {FiniteCylinder3,FiniteCylinderFaceSource3,FiniteCylinderBooleanFace3,FiniteCylinderBoolean3,FiniteCylinderOperandPartition3} from './geometry/finite-cylinder-boolean3.js';
 export {encodeBRepCurveRecord3,decodeBRepCurveRecord3} from './convert/brep-curve3.js';
 export type {BRepCurveRecord3,CylinderSupportRecord3} from './record/brep-curve3.js';
+
+export {bodyRecordFromMixedTopology3} from './convert/body3.js';
+export {restoreMixedBRepBoundary3} from './convert/mixed-boundary3.js';
+export type {MixedBRepBoundary3} from './convert/mixed-boundary3.js';
+export type {BodyCurveRecord3} from './record/body3.js';

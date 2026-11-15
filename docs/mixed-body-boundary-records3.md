@@ -1,0 +1,11 @@
+# Mixed curved boundaries in the common BodyRecord
+
+`BodyRecord3.curves` now accepts cylinder SSI records alongside the existing native/NURBS definitions. Native records keep their original shape. Existing readers cannot read the newly added curve tag; new readers continue to accept old records. No duplicate body or separate material representation is introduced.
+
+`bodyRecordFromMixedTopology3(topology, regions)` exports the same vertex/edge/loop/face/shell/region tables as the native exporter. Native edge wrappers are flattened into the existing curve definitions; SSI edges use their dedicated exact branch-interval codec. Region roles must be supplied by the caller. They are declarations, not an embedding, nesting or material certificate.
+
+`decodeBodyGeometry3` reconstructs the additional curve type. An SSI curve is forbidden as a local pcurve. `restoreMixedBRepBoundary3` checks actual ordered endpoints against declared vertices, validates whole-curve supporting-surface membership through the mixed topology builder, applies shell face-use directions consistently to face senses and loop traversal, checks exact vertex-weld identity and verifies the declared partition of faces into edge-connected shells. It returns the rebuilt mixed topology and serialized-to-rebuilt vertex map. Native-only restoration explicitly rejects SSI edges.
+
+Restoration is boundary incidence reconstruction, not a solid importer. It does not infer or certify bounded face interiors, shell embedding, nested cavities, region truth or interior samples. Open/nonmanifold boundaries can be reconstructed and retain their topology issues; callers must inspect these. NURBS surfaces/edges, wires and isolated vertex shells require other backends. The owned common `Body3` adoption path still requires curved domain/region validation; restored boundary tables are not accepted as constructive solids by assumption.
+
+Tests round-trip an actual two-cylinder Boolean boundary through common BodyRecord JSON, check exact endpoints, SSI sample retention and oriented closure, preserve native-only behavior, test reversed shell face uses, and reject wrong vertices/supports/shell partitions/pcurves/budgets. No new machine-checked refinement proof is claimed.
