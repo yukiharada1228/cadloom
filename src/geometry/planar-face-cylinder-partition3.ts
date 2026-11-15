@@ -66,6 +66,10 @@ export interface PlanarFaceCurvePartition3 {
  readonly cutCurves:readonly Curve3[];readonly cells:readonly PlanarCurveFaceCell3[];
  readonly sewn:SewnBRep3;readonly events:readonly AlgebraicCoordinates3[];
 }
+const ownedCurvePartitions=new WeakSet<PlanarFaceCurvePartition3>();
+export function assertOwnedPlanarFaceCurvePartition3(input:PlanarFaceCurvePartition3):void {
+ if(!ownedCurvePartitions.has(input))throw new RangeError('Expected a factory-created planar curve partition');
+}
 /** Partition a validated planar face by bounded coplanar native curves.
  * Finite intervals are retained; artificial vertical decomposition edges remain.
  * This is a face subdivision, not a material Boolean or solid certificate.
@@ -75,7 +79,8 @@ export function partitionPlanarFaceByCurves3(input:PreparedPlanarFace3,inputCurv
  for(const curve of cutCurves)if(!curveOnSurface3(curve,{kind:'plane',plane:base.surface}))throw new RangeError('Every cut curve must lie entirely on the planar face support');
  const partition=arrangePlanarFace3(base,[],[],cutCurves);
  const cells=Object.freeze(partition.cells.map(({side,cylinderSides,planeSides,...cell})=>Object.freeze(cell)));
- return Object.freeze({base:partition.base,frame:partition.frame,cutCurves,cells,sewn:partition.sewn,events:partition.events});
+ const result=Object.freeze({base:partition.base,frame:partition.frame,cutCurves,cells,sewn:partition.sewn,events:partition.events});
+ ownedCurvePartitions.add(result);return result;
 }
 function arrangePlanarFace3(input:PreparedPlanarFace3,inputCutters:readonly Cylinder3[],inputPlanes:readonly Plane3[],inputCurves:readonly Curve3[]):Omit<PlanarFaceCylinderPartition3,'cutter'> {
  const cutters=Object.freeze(inputCutters.map(c=>cylinder3(c.axis,c.radiusSquared)));

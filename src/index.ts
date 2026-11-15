@@ -315,3 +315,9 @@ export type {PlanarCurveFaceCell3,PlanarFaceCurvePartition3} from './geometry/pl
 
 export {surfaceGermSides3} from './geometry/surface-germ3.js';
 export type {SurfaceGermSides3} from './geometry/surface-germ3.js';
+
+export {classifyPlanarPartitionSurfaces3} from './geometry/planar-cell-surface3.js';
+export type {PlanarCellSurfaceClassification3,PlanarPartitionSurfaceClassification3} from './geometry/planar-cell-surface3.js';
+
+export {classifyPlanarPartitionMaterial3} from './geometry/planar-cell-material3.js';
+export type {PlanarCellMaterialClassification3,PlanarPartitionMaterialClassification3} from './geometry/planar-cell-material3.js';

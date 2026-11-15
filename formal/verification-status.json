@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "aa83b404521ab801d31db998dd002982003b8ef3e47f018c96f14e56317bf802",
+    "src/index.ts": "a6c52b7025606b17bd6c7b24d1dc3f5a7d6dccce3134fcd70101126bd69c3ae9",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -114,7 +114,7 @@
     "src/geometry/cylinder-face-finite-cylinder3.ts": "018d343bd22bb1a43afaebee3cb004ddf100c3c2821fdba7bee2f7c6beae10df",
     "src/geometry/cylinder-cell-plane-partition3.ts": "e4a46c2bb64e9142eedc8acb38550b8092cbbb6bfc225862c9856704b6fa225c",
     "src/geometry/planar-face-finite-cylinder3.ts": "481d2bc479ae77c9988a865c1afed8fe314632118744e828cf55c107885b7a51",
-    "src/geometry/planar-face-cylinder-partition3.ts": "8ffe29d6c912c12656b7d2851bd14b6da573e55acca821e84fa2a734916adedb",
+    "src/geometry/planar-face-cylinder-partition3.ts": "45e7d0d72eebb883e406a9556b11ce255bb27d8cc1aad20c18e8b598aa280b7c",
     "src/geometry/finite-cylinder-boolean3.ts": "e353bf087e5a66b921503222fb781f435e995304b9e72b1593d4ceac4f45679e",
     "src/record/brep-curve3.ts": "72c9a4214f4dca2c4dbfe3973df8b7849c3f2205d941a8c4cfc067f01d9bcb2d",
     "src/convert/brep-curve3.ts": "74b669ff9004c955f72184168448f4f90af104ac45af048d2c404c15823a8057",
@@ -147,7 +147,9 @@
     "src/ops/volume-moments3.ts": "ded0d7b1dde710a2926120668cfbd18d59937f2aa0c83202c1fd9f7058ea0598",
     "src/convert/circular-extrude-material3.ts": "06d7c29aa6f1638467291db5a8a200d828da634fc4d569b9f9ee3d4fbc01b40b",
     "src/geometry/curve-noding3.ts": "31b35a7aa77f0574709609e55d72f404d4ae7e27979924bdccf97911d6a3376a",
-    "src/geometry/surface-germ3.ts": "62b49c36415bdd62e63dee36dfa40237799bcb4a12b3cd462fa546c4415d1d58"
+    "src/geometry/surface-germ3.ts": "62b49c36415bdd62e63dee36dfa40237799bcb4a12b3cd462fa546c4415d1d58",
+    "src/geometry/planar-cell-surface3.ts": "d9a503eafa910917d3e2ec74d109482902ab559c83c50cad17a4ab8a020e153f",
+    "src/geometry/planar-cell-material3.ts": "df680c3bff339177408bb0812d8ac2a1b2e34a11e0691a9354c2a7eb31f07269"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
