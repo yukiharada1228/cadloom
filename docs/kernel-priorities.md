@@ -494,3 +494,7 @@ supported disk. The 35 prior constructed/planar/mixed/contact cases all passed
 in one invocation (148,461 ms). Build, strict typing and the existing scoped
 133-declaration audit passed. This does not mechanically prove the new adapter
 or complete general curved-product/analytic/NURBS support.
+
+The latest complete non-hard source82 snapshot, including all seven new circular
+cases and the updated arc-line rejection case, is now running. Its result is
+pending; the preceding source79 pass does not substitute for this later gate.

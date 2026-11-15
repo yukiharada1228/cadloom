@@ -51,4 +51,5 @@ audit passed. General arc-line loops and loops switching between different circl
 supports remain explicitly unsupported: they are not replaced with whole disks.
 General curved mass/area, general analytic/NURBS Booleans and complete contact
 coverage remain incomplete. The parent straight-product snapshot passed 867
-non-hard cases; a new complete snapshot is a separate gate for this adapter.
+non-hard cases. A complete non-hard snapshot including all seven new circular
+cases is now running and remains a separate gate for this adapter.
