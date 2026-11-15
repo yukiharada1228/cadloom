@@ -45,22 +45,7 @@ export function classifyPlanarPartitionSurfaces3(source:PlanarFaceCurvePartition
    default:throw new RangeError('Unknown analytic surface kind');
   }
  }));
- const chart=chartGeometry(source.base),[U,V]=duals(chart.frame),one=new Rational(1n);
- function bounded(line:AlgebraicLine3):Curve3 {
-  const p=pointInPlaneFrame3(chart.frame,line.origin)!;
-  const dx=dot3(U,line.direction),dy=dot3(V,line.direction),axis=dx.sign()!==0?'x':'y',rate=axis==='x'?dx:dy;
-  const lo=(axis==='x'?chart.xMin:chart.yMin).sub(one),hi=(axis==='x'?chart.xMax:chart.yMax).add(one);
-  const at=(q:Rational)=>algebraicLinePoint3(line,AlgebraicReal.fromRational(q).sub(p[axis]).affine(one.div(rate)));
-  return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(at(lo),at(hi))});
- }
- const zeros=surfaces.map((s):readonly Curve3[]|null=>{
-  if(s.kind==='plane'){
-   const hit=intersectPlanes3(source.base.surface,s.plane);
-   return hit.kind==='coincident'?null:hit.kind==='line'?[bounded(algebraicLine3(hit.line.origin,hit.line.direction))]:[];
-  }
-  const hit=intersectPlaneCylinder3(source.base.surface,s.cylinder);
-  return hit.kind==='ellipse'?[Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(hit.ellipse)})]:hit.kind==='lines'?hit.lines.map(l=>bounded(l.line)):[];
- });
+ const zeros=planarPartitionSupportCurves3(source,surfaces);
  const cells=Object.freeze(source.cells.map(cell=>Object.freeze(surfaces.map((surface,i):PlanarCellSurfaceClassification3=>{
   const curves=zeros[i]!;
   if(curves===null)return Object.freeze({kind:'contained',sides:surfaceGermSides3(cell.sample,source.base.normal,surface)});
@@ -82,4 +67,27 @@ export function classifyPlanarPartitionSurfaces3(source:PlanarFaceCurvePartition
   return Object.freeze({kind:'constant',sign,sides:surfaceGermSides3(cell.sample,source.base.normal,surface)});
  }))));
  return Object.freeze({source,surfaces,cells});
+}
+
+/** Internal complete zero carriers for owned planar partitions. Null denotes
+ * coincident plane support. Line carriers extend beyond the entire base chart. */
+export function planarPartitionSupportCurves3(source:PlanarFaceCurvePartition3,surfaces:readonly Surface3[]):readonly (readonly Curve3[]|null)[] {
+ assertOwnedPlanarFaceCurvePartition3(source);
+ const chart=chartGeometry(source.base),[U,V]=duals(chart.frame),one=new Rational(1n);
+ function bounded(line:AlgebraicLine3):Curve3 {
+  const p=pointInPlaneFrame3(chart.frame,line.origin)!;
+  const dx=dot3(U,line.direction),dy=dot3(V,line.direction),axis=dx.sign()!==0?'x':'y',rate=axis==='x'?dx:dy;
+  const lo=(axis==='x'?chart.xMin:chart.yMin).sub(one),hi=(axis==='x'?chart.xMax:chart.yMax).add(one);
+  const at=(q:Rational)=>algebraicLinePoint3(line,AlgebraicReal.fromRational(q).sub(p[axis]).affine(one.div(rate)));
+  return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(at(lo),at(hi))});
+ }
+ const result=surfaces.map((s):readonly Curve3[]|null=>{
+  if(s.kind==='plane'){
+   const hit=intersectPlanes3(source.base.surface,s.plane);
+   return hit.kind==='coincident'?null:hit.kind==='line'?[bounded(algebraicLine3(hit.line.origin,hit.line.direction))]:[];
+  }
+  const hit=intersectPlaneCylinder3(source.base.surface,s.cylinder);
+  return hit.kind==='ellipse'?[Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(hit.ellipse)})]:hit.kind==='lines'?hit.lines.map(l=>bounded(l.line)):[];
+ });
+ return Object.freeze(result.map(curves=>curves===null?null:Object.freeze([...curves])));
 }

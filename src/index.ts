@@ -324,3 +324,6 @@ export type {PlanarCellMaterialClassification3,PlanarPartitionMaterialClassifica
 
 export {boundaryPlanarMaterialCells3} from './geometry/planar-material-cell-boundary3.js';
 export type {PlanarMaterialCellBoundary3} from './geometry/planar-material-cell-boundary3.js';
+
+export {refinePlanarMaterial3} from './geometry/refine-planar-material3.js';
+export type {RefinedPlanarMaterial3} from './geometry/refine-planar-material3.js';

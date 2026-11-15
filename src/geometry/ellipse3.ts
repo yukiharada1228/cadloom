@@ -1,3 +1,4 @@
+import {algebraicAxialPoint3} from './algebraic-axial-point3.js';
 import {cylinderIntersectionPointCylinders3} from './cylinder-cylinder3.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
@@ -10,7 +11,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,getPointParameterization3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicCoordinates3,algebraicPoint3,getPointParameterization3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -241,6 +242,21 @@ export function intersectAlgebraicSegmentEllipse3(input:import('./algebraic-segm
   const candidates=[getPointParameterization3(s),getPointParameterization3(t)].flatMap(data=>data&&dot3(data.direction,data.direction).sign()!==0?[line3(data.origin,data.direction)]:[]);
   for(const axis of axes){
     const fixed=axes.filter(k=>k!==axis);
+    if(fixed.every(k=>s[k].compare(t[k])===0)&&fixed.some(k=>s[k].rational===null)){
+      // A fixed algebraic offset still has a rational coordinate direction.
+      // Solve in that coordinate, not in an endpoint-to-endpoint parameter.
+      const direction=vector3(...axes.map(k=>k===axis?1n:0n) as [bigint,bigint,bigint]);
+      const anchor=algebraicCoordinates3(...axes.map(k=>k===axis?zero:s[k]) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);
+      const plane=ellipsePlane3(e),n=plane.normal,S=anchor.x.affine(n.x,plane.offset).add(anchor.y.affine(n.y)).add(anchor.z.affine(n.z)),rate=n[axis];
+      const at=(r:AlgebraicReal)=>algebraicAxialPoint3(anchor,direction,r),ascending=s[axis].compare(t[axis])<0,lo=ascending?s[axis]:t[axis],hi=ascending?t[axis]:s[axis];
+      const finite=(points:readonly AlgebraicCoordinates3[])=>Object.freeze(points.filter(p=>p[axis].compare(lo)>=0&&p[axis].compare(hi)<=0).sort((p,q)=>p[axis].compare(q[axis])*(ascending?1:-1)));
+      if(rate.sign()!==0){const p=at(S.affine(new Rational(-1n).div(rate)));return finite(pointOnEllipse3(p,e)?[p]:[]);}
+      if(S.sign()!==0)return Object.freeze([]);
+      const a=pointInPlaneFrame3(e.frame,anchor)!,[U,V]=duals(e),dx=U[axis],dy=V[axis],two=new Rational(2n),A=e.radiusVSquared.mul(dx.mul(dx)).add(e.radiusUSquared.mul(dy.mul(dy))),B=a.x.affine(e.radiusVSquared.mul(dx)).add(a.y.affine(e.radiusUSquared.mul(dy))).affine(two),C=a.x.mul(a.x).affine(e.radiusVSquared).add(a.y.mul(a.y).affine(e.radiusUSquared)).affine(1n,e.radiusUSquared.mul(e.radiusVSquared).neg()),disc=B.mul(B).sub(C.affine(A.mul(new Rational(4n)))),sign=disc.sign();
+      if(sign<0)return Object.freeze([]);
+      const root=disc.sqrt(),inverse=new Rational(1n).div(A.mul(two)),parameters=sign===0?[B.neg().affine(inverse)]:[B.neg().sub(root).affine(inverse),B.neg().add(root).affine(inverse)];
+      return finite(parameters.map(at));
+    }
     if(fixed.every(k=>s[k].rational!==null&&s[k].compare(t[k])===0)){
       candidates.push(line3(point3(...axes.map(k=>k===axis?new Rational(0n):s[k].rational!) as [Rational,Rational,Rational]),vector3(...axes.map(k=>k===axis?1n:0n) as [bigint,bigint,bigint])));
       break;

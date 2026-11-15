@@ -188,10 +188,11 @@
         "src/geometry/curve-noding3.ts",
         "src/geometry/planar-cell-surface3.ts",
         "src/geometry/planar-cell-material3.ts",
-        "src/geometry/planar-material-cell-boundary3.ts"
+        "src/geometry/planar-material-cell-boundary3.ts",
+        "src/geometry/refine-planar-material3.ts"
       ],
       "status": "partial",
-      "gap": "Finite-cylinder wall/cap partitions select and sew balanced native/SSI Boolean boundaries with supported common Body persistence. Shared bounded native curve events retain source indexes; upstream cuts feed native and mixed sewing. Finite coplanar lines/conic arcs now enter the common planar strip decomposition, including finite face sections and dangling endpoints. Artificial vertical edges remain. General curved face insertion, complete material-side certification, repeated general curved cuts and maximal consolidation remain incomplete. Owned open planar cells now undergo complete plane/cylinder support-zero checks before two-sided material evaluation and oriented boundary selection/sewing. A finite cylinder cap/wall reconstruction verifies closed incidence; general curved-side selection, global coverage and embedded solid adoption remain incomplete."
+      "gap": "Finite-cylinder wall/cap partitions select and sew balanced native/SSI Boolean boundaries with supported common Body persistence. Shared bounded native curve events retain source indexes; upstream cuts feed native and mixed sewing. Finite coplanar lines/conic arcs now enter the common planar strip decomposition, including finite face sections and dangling endpoints. Artificial vertical edges remain. General curved face insertion, complete material-side certification, repeated general curved cuts and maximal consolidation remain incomplete. Owned open planar cells now undergo complete plane/cylinder support-zero checks before two-sided material evaluation and oriented boundary selection/sewing. A finite cylinder cap/wall reconstruction verifies closed incidence; general curved-side selection, global coverage and embedded solid adoption remain incomplete. Missing planar support cuts can now be inserted automatically with reclassification and parent-cell provenance; generic curved refinement and full solid adoption remain incomplete."
     },
     {
       "id": "boolean",

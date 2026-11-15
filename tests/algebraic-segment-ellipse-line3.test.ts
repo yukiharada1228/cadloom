@@ -23,3 +23,14 @@ test('a point construction ray is not accepted as the segment support without ch
  // This diagonal is tangent at (-1/sqrt(2),1/sqrt(2)); the two construction rays are different.
  const points=check(s,1);assert.equal(points[0]!.x.sign(),-1);assert.equal(points[0]!.y.sign(),1);
 });
+test('an irrational fixed coordinate retains an endpoint contact without endpoint-field division',()=>{
+ const h=AlgebraicReal.fromRational('1/2').sqrt(),other=AlgebraicReal.fromRational('1/2').sqrt();
+ const s=algebraicSegment3(algebraicCoordinates3(h.neg(),-2n,0n),algebraicCoordinates3(h.neg(),other.neg(),0n));
+ const points=check(s,1);assert.equal(points[0]!.y.compare(h.neg()),0);
+ check(algebraicSegment3(algebraicCoordinates3(h,2n,1n),algebraicCoordinates3(h,3n,1n)),0);
+});
+test('an algebraically offset transverse coordinate line still intersects the ellipse plane exactly',()=>{
+ const h=AlgebraicReal.fromRational('1/2').sqrt();
+ const points=check(algebraicSegment3(algebraicCoordinates3(h,h,sqrt(2n).neg()),algebraicCoordinates3(h,h,sqrt(3n))),1);
+ assert.equal(points[0]!.z.sign(),0);assert.equal(points[0]!.x.compare(h),0);
+});
