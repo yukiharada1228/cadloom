@@ -1,8 +1,10 @@
 import type {Surface3} from './surface3.js';
+import type {Point3} from './point3.js';
+import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {curveEndpoints3,snapshotCurve3,pointOnCurve3} from './curve3.js';
 import type {Curve3} from './curve3.js';
 import {restrictAlgebraicSegment3,algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
-import {compareAlgebraicPoints3} from './algebraic-point3.js';
+import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import {ellipsesCoincide3,splitEllipticArc3} from './ellipse3.js';
 import {canonical,samePoint} from './planar-trim-utils3.js';
 import {sectionPieces,witness} from './cylinder-plane-split3.js';
@@ -10,7 +12,11 @@ import {buildBRepTopology3} from './brep-topology3.js';
 import type {BRepTopology3,BRepEdgeUse3} from './brep-topology3.js';
 
 export interface SewBRepFace3 {readonly surface:Surface3;readonly sense:1|-1;readonly loops:readonly (readonly Curve3[])[];}
-export interface SewBRepOptions3 {readonly requireClosed?:boolean;}
+export interface SewBRepOptions3 {
+ readonly requireClosed?:boolean;
+ /** Upstream intersection points; only cuts on supplied boundaries are used. */
+ readonly splitPoints?:readonly (Point3|AlgebraicCoordinates3)[];
+}
 export interface SewnBRep3 {
   readonly topology:BRepTopology3;
   /** Face → loop → original curve → oriented sewn edge uses. */
@@ -24,7 +30,8 @@ export interface SewnBRep3 {
  */
 export function sewBRepFaces3(input:readonly SewBRepFace3[],options:SewBRepOptions3={}):SewnBRep3 {
   if(options.requireClosed!==undefined&&typeof options.requireClosed!=='boolean')throw new TypeError('requireClosed must be boolean');
-  const prepared=input.map(face=>face.loops.map(loop=>loop.map(c=>sectionPieces(canonical(snapshotCurve3(c)))))),points=prepared.flat(3).flatMap(curveEndpoints3).sort(compareAlgebraicPoints3).filter((p,i,all)=>i===0||!samePoint(p,all[i-1]!)),edges:Curve3[]=[];
+  const splitPoints=(options.splitPoints??[]).map(snapshotExactPoint3);
+  const prepared=input.map(face=>face.loops.map(loop=>loop.map(c=>sectionPieces(canonical(snapshotCurve3(c)))))),points=[...prepared.flat(3).flatMap(curveEndpoints3),...splitPoints].sort(compareAlgebraicPoints3).filter((p,i,all)=>i===0||!samePoint(p,all[i-1]!)),edges:Curve3[]=[];
   const equalPiece=(a:Curve3,b:Curve3):1|-1|0=>{
     if(a.kind!==b.kind)return 0;const A=curveEndpoints3(a),B=curveEndpoints3(b),direction=samePoint(A[0],B[0])&&samePoint(A[1],B[1])?1:samePoint(A[0],B[1])&&samePoint(A[1],B[0])?-1:0;if(!direction)return 0;
     if(a.kind==='algebraic-segment'&&b.kind==='algebraic-segment')return direction;

@@ -309,3 +309,6 @@ export {planarBodyVolumeMoments3} from './ops/volume-moments3.js';
 
 export {curveNodingPoints3,collectCurveNodingEvents3} from './geometry/curve-noding3.js';
 export type {CurveNodingEvent3} from './geometry/curve-noding3.js';
+
+export {partitionPlanarFaceByCurves3} from './geometry/planar-face-cylinder-partition3.js';
+export type {PlanarCurveFaceCell3,PlanarFaceCurvePartition3} from './geometry/planar-face-cylinder-partition3.js';

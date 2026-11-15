@@ -19,13 +19,13 @@ import type {PlaneFrame3} from './plane-frame3.js';
 import {translatePlanarFace3} from './planar-face3.js';
 import type {PreparedPlanarFace3} from './planar-face3.js';
 import {intersectPlaneCylinder3} from './plane-cylinder3.js';
-import {curveEndpoints3,pointOnCurve3,reverseCurve3} from './curve3.js';
+import {snapshotCurve3,curveOnSurface3,curveEndpoints3,pointOnCurve3,reverseCurve3} from './curve3.js';
 import type {Curve3} from './curve3.js';
 import {algebraicSegment3} from './algebraic-segment3.js';
 import {ellipticArc3,fullEllipseArc3,locatePointInEllipse3} from './ellipse3.js';
 import type {Ellipse3} from './ellipse3.js';
 import {collectCurveNodingEvents3} from './curve-noding3.js';
-import {chartGeometry,duals,map,mapQ,uniqueReals,samePoint} from './planar-trim-utils3.js';
+import {canonical,chartGeometry,duals,map,mapQ,uniqueReals,samePoint} from './planar-trim-utils3.js';
 import {evaluatePlaneAtAlgebraicPoint3 as evaluate} from './algebraic-segment-plane3.js';
 import {sewBRepFaces3} from './sew-brep3.js';
 import type {SewnBRep3} from './sew-brep3.js';
@@ -56,7 +56,29 @@ export function partitionPlanarFaceByCylinder3(input:PreparedPlanarFace3,inputCu
 /** Exact simultaneous arrangement of all cylinder sections and plane cuts. */
 export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputCutters:readonly Cylinder3[],inputPlanes:readonly Plane3[]=[]):PlanarFaceCylinderPartition3 {
  if(!inputCutters.length)throw new RangeError("At least one cylinder cutter is required");
- const cutters=Object.freeze(inputCutters.map(c=>cylinder3(c.axis,c.radiusSquared))),cutter=cutters[0]!;
+ const partition=arrangePlanarFace3(input,inputCutters,inputPlanes,[]),result=Object.freeze({...partition,cutter:partition.cutters[0]!});
+ owned.add(result);return result;
+}
+/** Shared finite-curve strip representation; no cutter side is implied. */
+export type PlanarCurveFaceCell3=Omit<PlanarCylinderFaceCell3,'side'|'cylinderSides'|'planeSides'>;
+export interface PlanarFaceCurvePartition3 {
+ readonly base:PreparedPlanarFace3;readonly frame:PlaneFrame3;
+ readonly cutCurves:readonly Curve3[];readonly cells:readonly PlanarCurveFaceCell3[];
+ readonly sewn:SewnBRep3;readonly events:readonly AlgebraicCoordinates3[];
+}
+/** Partition a validated planar face by bounded coplanar native curves.
+ * Finite intervals are retained; artificial vertical decomposition edges remain.
+ * This is a face subdivision, not a material Boolean or solid certificate.
+ */
+export function partitionPlanarFaceByCurves3(input:PreparedPlanarFace3,inputCurves:readonly Curve3[]):PlanarFaceCurvePartition3 {
+ const base=translatePlanarFace3(input,vector3(0n,0n,0n)),cutCurves=Object.freeze(inputCurves.map(snapshotCurve3));
+ for(const curve of cutCurves)if(!curveOnSurface3(curve,{kind:'plane',plane:base.surface}))throw new RangeError('Every cut curve must lie entirely on the planar face support');
+ const partition=arrangePlanarFace3(base,[],[],cutCurves);
+ const cells=Object.freeze(partition.cells.map(({side,cylinderSides,planeSides,...cell})=>Object.freeze(cell)));
+ return Object.freeze({base:partition.base,frame:partition.frame,cutCurves,cells,sewn:partition.sewn,events:partition.events});
+}
+function arrangePlanarFace3(input:PreparedPlanarFace3,inputCutters:readonly Cylinder3[],inputPlanes:readonly Plane3[],inputCurves:readonly Curve3[]):Omit<PlanarFaceCylinderPartition3,'cutter'> {
+ const cutters=Object.freeze(inputCutters.map(c=>cylinder3(c.axis,c.radiusSquared)));
  const base=translatePlanarFace3(input,vector3(0n,0n,0n)),planes=Object.freeze(inputPlanes.map(p=>plane3(p.normal.x,p.normal.y,p.normal.z,p.offset))),original=chartGeometry(base),frame=original.frame,[DU,DV]=duals(frame),curves:Curve3[]=[...original.curves],known:AlgebraicCoordinates3[]=[];
  function lineCurve(line:AlgebraicLine3):Curve3 {
   const p=pointInPlaneFrame3(frame,line.origin)!;const dx=dot3(DU,line.direction),dy=dot3(DV,line.direction),coordinate=dx.sign()!==0?'x':'y',rate=coordinate==='x'?dx:dy,start=coordinate==='x'?original.xMin:original.yMin,end=coordinate==='x'?original.xMax:original.yMax;
@@ -66,6 +88,7 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
  if(section.kind==='ellipse')curves.push(Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(section.ellipse)}));else if(section.kind==='lines')for(const item of section.lines)curves.push(lineCurve(item.line));
  }
  for(const p of planes){const hit=intersectPlanes3(base.surface,p);if(hit.kind==='line')curves.push(lineCurve(algebraicLine3(hit.line.origin,hit.line.direction)));}
+ curves.push(...inputCurves.map(canonical));
  known.push(...collectCurveNodingEvents3(curves).map(event=>event.point));
  const full=new Map<Curve3,Curve3>();for(const c of curves)if(c.kind==='elliptic-arc')full.set(c,Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(c.arc.ellipse)}));
  // This carrier is used only for chart arithmetic; it confers no face ownership.
@@ -116,10 +139,10 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
   for(let j=0;j+1<hits.length;j++){
    const lo=hits[j]!,hi=hits[j+1]!,sample=snapshotExactPoint3(mapQ(frame,x.rational!,between(lo.y,hi.y)));if(base.locate(sample)!=='inside')continue;
    const lower=bound(lo.curve,x,lo.y),upper=bound(hi.curve,x,hi.y),bottom=graph(lower,left,right),top=graph(upper,left,right),[bl,br]=curveEndpoints3(bottom),[tl,tr]=curveEndpoints3(top),loop:Curve3[]=[bottom];if(!samePoint(br,tr))loop.push(Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(br,tr)}));loop.push(reverseCurve3(top));if(!samePoint(tl,bl))loop.push(Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(tl,bl)}));
-   const boundary=Object.freeze(dot3(base.normal,cross3(frame.u,frame.v)).sign()>0?loop:[...loop].reverse().map(reverseCurve3)),cylinderSides=Object.freeze(cutters.map(cylinder=>classifyPointToSurface3(sample,{kind:'cylinder',cylinder}))),side=cylinderSides[0]!,planeSides=Object.freeze(planes.map(p=>{const sign=evaluate(p,sample).sign();if(sign===0&&intersectPlanes3(base.surface,p).kind!=='coincident')throw new Error('Open planar cell contains an unpartitioned plane zero');return sign;}));if(cylinderSides.some(s=>s===0))throw new Error('A planar open cell lies on an unpartitioned cylinder zero');
+   const boundary=Object.freeze(dot3(base.normal,cross3(frame.u,frame.v)).sign()>0?loop:[...loop].reverse().map(reverseCurve3)),cylinderSides=Object.freeze(cutters.map(cylinder=>classifyPointToSurface3(sample,{kind:'cylinder',cylinder}))),side=cylinderSides[0]??0,planeSides=Object.freeze(planes.map(p=>{const sign=evaluate(p,sample).sign();if(sign===0&&intersectPlanes3(base.surface,p).kind!=='coincident')throw new Error('Open planar cell contains an unpartitioned plane zero');return sign;}));if(cylinderSides.some(s=>s===0))throw new Error('A planar open cell lies on an unpartitioned cylinder zero');
    const locate:PlanarCylinderFaceCell3['locate']=inputPoint=>{const p=snapshotExactPoint3(inputPoint),q=pointInPlaneFrame3(frame,p);if(q===null)return 'outside';const l=q.x.compare(left),r=q.x.compare(right);if(l<0||r>0)return 'outside';const a=compare(lower,p,q.x,q.y),b=compare(upper,p,q.x,q.y);return a<0||b>0?'outside':l===0||r===0||a===0||b===0?'boundary':'inside';};const cell=Object.freeze({left,right,lower,upper,side,cylinderSides,planeSides,sample,boundary,locate});if(locate(sample)!=='inside')throw new Error('Planar cell lacks an interior witness');cells.push(cell);
   }
  }
  if(!cells.length)throw new Error('A nonempty planar source produced no arrangement cells');
- const sewn=sewBRepFaces3(cells.map(c=>({surface:{kind:'plane' as const,plane:base.surface},sense:base.sense,loops:[c.boundary]}))),result=Object.freeze({base,frame,cutter,cutters,planes,cells:Object.freeze(cells),sewn,events:Object.freeze(known.filter((p,i,all)=>all.findIndex(q=>samePoint(p,q))===i&&base.locate(p)!=='outside'))});owned.add(result);return result;
+ const sewn=sewBRepFaces3(cells.map(c=>({surface:{kind:'plane' as const,plane:base.surface},sense:base.sense,loops:[c.boundary]})),{splitPoints:inputCurves.length?known:[]}),result=Object.freeze({base,frame,cutters,planes,cells:Object.freeze(cells),sewn,events:Object.freeze(known.filter((p,i,all)=>all.findIndex(q=>samePoint(p,q))===i&&base.locate(p)!=='outside'))});return result;
 }
