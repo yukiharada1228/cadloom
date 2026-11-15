@@ -336,3 +336,7 @@ export type {CylinderWallMaterialCell3,CylinderMaterialWallClassification3,Cylin
 
 export {boundaryMaterialSurfaces3} from './geometry/material-surface-boundary3.js';
 export type {MaterialSurfaceFaceOrigin3,MaterialSurfaceBoundaryOptions3,MaterialSurfaceBoundary3} from './geometry/material-surface-boundary3.js';
+
+export {prepareCylinderMaterialProgram3,assertOwnedCylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';
+export type {CylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';
+export {materialProgramOfBoundary3} from './geometry/cylinder-material-expression3.js';

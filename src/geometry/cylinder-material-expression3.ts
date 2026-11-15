@@ -4,7 +4,8 @@ import {assertOwnedClippedCylinderExpression3} from './clipped-cylinder-expressi
 import type {ClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
 import type {FiniteCylinderExpression3} from './finite-cylinder-expression3.js';
 import type {CylinderHalfSpace3} from './trimmed-cylinder3.js';
-import {assertOwnedFiniteCylinder3} from './finite-cylinder-boolean3.js';
+import {prepareCylinderMaterialProgram3} from './cylinder-material-program3.js';
+import type {CylinderMaterialProgram3,CylinderMaterialExpression3} from './cylinder-material-program3.js';
 import type {FiniteCylinder3} from './finite-cylinder-boolean3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -28,10 +29,7 @@ import type {SewnMixedBRep3} from './sew-mixed-brep3.js';
 import type {BooleanOperation} from './polygon-boolean.js';
 import type {CurveRegionLocation2} from './curve-boolean2.js';
 import type {Sign,Rational} from '../numeric/rational.js';
-export type CylinderMaterialExpression3=
- | {readonly kind:'cylinder';readonly cylinder:number}
- | {readonly kind:'halfspace';readonly halfspace:number}
- | {readonly kind:BooleanOperation;readonly first:CylinderMaterialExpression3;readonly second:CylinderMaterialExpression3};
+export type {CylinderMaterialExpression3} from './cylinder-material-program3.js';
 export type CylinderMaterialFaceOrigin3={readonly kind:'cylinder';readonly cylinder:number;readonly face:0|1|2;readonly cell:number}|{readonly kind:'halfspace';readonly halfspace:number;readonly cell:number};
 export interface CylinderMaterialFace3 {readonly surface:Surface3;readonly sense:1|-1;readonly orientation:1|-1;readonly boundary:readonly BRepCurve3[];readonly domain:CylinderFaceCell3|PlanarCylinderFaceCell3;readonly origin:CylinderMaterialFaceOrigin3;}
 export interface CylinderMaterialBoundary3 {
@@ -41,21 +39,15 @@ export interface CylinderMaterialBoundary3 {
  locate(point:Point3|AlgebraicCoordinates3):CurveRegionLocation2;
 }
 const owned=new WeakSet<CylinderMaterialBoundary3>();
-export function assertOwnedCylinderMaterialBoundary3(input:CylinderMaterialBoundary3):void {if(!owned.has(input))throw new RangeError('Expected a factory-created cylinder material boundary');}
-function snapshot(t:CylinderMaterialExpression3,n:number,m:number,active=new Set<object>()):CylinderMaterialExpression3 {
- if(t===null||typeof t!=='object'||active.has(t))throw new RangeError('Invalid or cyclic cylinder material expression');active.add(t);let result:CylinderMaterialExpression3;
- if(t.kind==='cylinder'){if(!Number.isSafeInteger(t.cylinder)||t.cylinder<0||t.cylinder>=n)throw new RangeError('Invalid material cylinder index');result=Object.freeze({kind:t.kind,cylinder:t.cylinder});}
- else if(t.kind==='halfspace'){if(!Number.isSafeInteger(t.halfspace)||t.halfspace<0||t.halfspace>=m)throw new RangeError('Invalid material halfspace index');result=Object.freeze({kind:t.kind,halfspace:t.halfspace});}
- else {if(!['union','intersection','difference','xor'].includes(t.kind))throw new RangeError('Unknown material expression operation');result=Object.freeze({kind:t.kind,first:snapshot(t.first,n,m,active),second:snapshot(t.second,n,m,active)});}active.delete(t);return result;
+const programs=new WeakMap<CylinderMaterialBoundary3,CylinderMaterialProgram3>();
+export function materialProgramOfBoundary3(input:CylinderMaterialBoundary3):CylinderMaterialProgram3 {
+ assertOwnedCylinderMaterialBoundary3(input);return programs.get(input)!;
 }
-/** Conservative Boolean range with every cylinder false and all planes unknown.
- * False upper bound proves that the material is bounded by the cylinder union.
- * Compositions of bounded operands always retain that certificate. */
-function exterior(t:CylinderMaterialExpression3):{lo:boolean;hi:boolean} {if(t.kind==='cylinder')return {lo:false,hi:false};if(t.kind==='halfspace')return {lo:false,hi:true};const a=exterior(t.first),b=exterior(t.second);switch(t.kind){case 'union':return {lo:a.lo||b.lo,hi:a.hi||b.hi};case 'intersection':return {lo:a.lo&&b.lo,hi:a.hi&&b.hi};case 'difference':return {lo:a.lo&&!b.hi,hi:a.hi&&!b.lo};case 'xor':return {lo:a.lo&&!b.hi||!a.hi&&b.lo,hi:a.hi&&!b.lo||!a.lo&&b.hi};}}
+export function assertOwnedCylinderMaterialBoundary3(input:CylinderMaterialBoundary3):void {if(!owned.has(input))throw new RangeError('Expected a factory-created cylinder material boundary');}
 /** A bounded Boolean of finite cylinders and negative-side halfspace predicates.
  * Halfspaces belong inside the expression, so each operand keeps its own cuts. */
 export function boundaryCylinderMaterialExpression3(input:readonly FiniteCylinder3[],inputPlanes:readonly Plane3[],tree:CylinderMaterialExpression3):CylinderMaterialBoundary3 {
- if(!input.length)throw new RangeError('At least one finite cylinder is required');input.forEach(assertOwnedFiniteCylinder3);const cylinders=Object.freeze([...input]),planes=Object.freeze(inputPlanes.map(p=>plane3(p.normal.x,p.normal.y,p.normal.z,p.offset))),expression=snapshot(tree,cylinders.length,planes.length);if(exterior(expression).hi)throw new RangeError('Material expression is not certified bounded by its finite cylinders');
+ const program=prepareCylinderMaterialProgram3(input,inputPlanes,tree),{cylinders,planes,expression}=program;
  const definitions=cylinders.map(c=>({cylinder:c.cylinder,lower:c.lower,upper:c.upper})),partitions=Object.freeze(cylinders.map(c=>Object.freeze({wall:partitionCylinderFaceByFiniteCylinders3(c.wall,definitions,planes),caps:Object.freeze(c.caps.map(cap=>partitionPlanarFaceByFiniteCylinders3(cap,definitions,planes)))}))),planePartitions=Object.freeze(planes.map(p=>partitionPlanarFaceByFiniteCylinders3(finiteCylinderPlaneDomain3(cylinders,p),definitions,planes))),faces:CylinderMaterialFace3[]=[];
  function add(domain:CylinderFaceCell3|PlanarCylinderFaceCell3,locations:readonly CurveRegionLocation2[],sides:readonly Sign[],surface:Surface3,normal:Vector3|null,sense:1|-1,priority:number,origin:CylinderMaterialFaceOrigin3){
   const minusC:boolean[]=[],plusC:boolean[]=[],minusP:boolean[]=[],plusP:boolean[]=[];
@@ -82,7 +74,7 @@ export function boundaryCylinderMaterialExpression3(input:readonly FiniteCylinde
    if(retry)continue;for(let i=0;i<planes.length;i++){const sign=ps[i]===0?dot3(planes[i]!.normal,v).sign():ps[i]!;if(sign===0){retry=true;break;}pv.push(sign<0);}if(!retry)return truth(expression,cv,pv)?'inside':'outside';
   }
  };
- const result=Object.freeze({cylinders,planes,expression,partitions,planePartitions,faces:frozenFaces,sewn,empty,manifold,locate});owned.add(result);return result;
+ const result=Object.freeze({cylinders,planes,expression,partitions,planePartitions,faces:frozenFaces,sewn,empty,manifold,locate});owned.add(result);programs.set(result,program);return result;
 }
 
 export type CylinderMaterialOperand3=ClippedCylinderExpression3|CylinderMaterialBoundary3;

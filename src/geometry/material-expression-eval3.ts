@@ -1,4 +1,4 @@
-import type {CylinderMaterialExpression3} from './cylinder-material-expression3.js';
+import type {CylinderMaterialExpression3} from './cylinder-material-program3.js';
 /** Internal evaluation of a factory-normalized material AST on strict side predicates. */
 export function evaluateCylinderMaterialExpression3(t:CylinderMaterialExpression3,c:readonly boolean[],p:readonly boolean[]):boolean {
  if(t.kind==='cylinder')return c[t.cylinder]!;
