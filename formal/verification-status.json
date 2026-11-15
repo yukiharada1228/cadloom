@@ -84,8 +84,8 @@
     "src/convert/body3.ts": "0c7ebd2d21698235c338ccd5888b267110f88532433e82f10b2a515b64ca0c23",
     "src/convert/exact3.ts": "a2f90ce6fc15317d35b0fe03124324b18f5d1d088fe06fff35df52e3830dc694",
     "src/record/body-document3.ts": "d32161c6b30fc12ecb6cbb10321fd3deeab42c56ae5b64de2f66166f8dacd949",
-    "src/model/body3.ts": "994082242c7a0496b112a9988b0c9a5d7eed32847f3e17ee792d79e2a62ae716",
-    "src/ops/body3.ts": "aff0e89dcd784c6e3447a623bf9dd9c84e27ca171a68919d66ef740dcf233071",
+    "src/model/body3.ts": "7418352ee26946bc53b5ca11a17c4febc59d31423b3f8e1edf099870ba96ea6a",
+    "src/ops/body3.ts": "2640282e4f93fba05e058bdd12dc1c2422437398254acd0f30dcf288e17a0a2d",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "bf554a7865790e7391da62adf73ae30d25c9942feeed6693a2fb7450167a475f",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
@@ -144,7 +144,8 @@
     "src/geometry/planar-material-boundary3.ts": "81552d4fd6e8feb03d4c783aee07101d07b8065cdae24201005c4b7ece33af28",
     "src/geometry/planar-material-chambers3.ts": "dc09e6062459541f2b07e5c770561cb06be9fcd0cbb91f29372e7bad39a5a8a8",
     "src/geometry/planar-volume-moments3.ts": "033f559934602ce51a1be297b54714b71bbae4e7460c2220a7ce51474feef185",
-    "src/ops/volume-moments3.ts": "ded0d7b1dde710a2926120668cfbd18d59937f2aa0c83202c1fd9f7058ea0598"
+    "src/ops/volume-moments3.ts": "ded0d7b1dde710a2926120668cfbd18d59937f2aa0c83202c1fd9f7058ea0598",
+    "src/convert/circular-extrude-material3.ts": "06d7c29aa6f1638467291db5a8a200d828da634fc4d569b9f9ee3d4fbc01b40b"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

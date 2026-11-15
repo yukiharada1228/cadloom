@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Rational,point2,point3,line3,cylinder3,circle2,fullCircleArc2,extrudeBody3,createCylinderBody3,booleanMixedBodies3,serializeBody3,restoreBody3,locateBody3,locateBodyFace3,planarBodyVolumeMoments3} from '../dist/index.js';
+import {Rational,point2,point3,line3,cylinder3,circle2,circularArc2,fullCircleArc2,extrudeBody3,createCylinderBody3,booleanMixedBodies3,serializeBody3,restoreBody3,locateBody3,locateBodyFace3,planarBodyVolumeMoments3} from '../dist/index.js';
 import type {Body3} from '../dist/index.js';
 const ring=(xy:readonly (readonly [bigint,bigint])[])=>{const p=xy.map(([x,y])=>point2(x,y));return p.map((start,i)=>({kind:'segment' as const,segment:{start,end:p[(i+1)%p.length]!}}));};
 function replay(body:Body3){const r=restoreBody3(serializeBody3(body));assert.deepEqual(r.record,body.record);assert.ok(r.topology.closedOrientedIncidence);assert.equal(r.topology.issues.length,0);r.faces.forEach((f,i)=>assert.equal(locateBodyFace3(r,i,f.sample),'inside'));for(const p of r.interiorSamples)assert.equal(locateBody3(r,p),'inside');return r;}
@@ -15,8 +15,8 @@ test('restored straight-profile Extrude with a through-hole intersects a real cy
  assert.equal(r.construction.kind,'cylinder-material-expression');assert.equal(r.topology.shells.length,1);assert.equal(r.interiorSamples.length,1);
  for(const [p,l] of [[point3(2n,2n,1n),'outside'],[point3('3/4',2n,1n),'inside'],[point3('1/2',2n,1n),'boundary'],[point3(1n,2n,1n),'boundary'],[point3('3/4','3/4',1n),'outside'],[point3('3/4',2n,0n),'boundary']] as const)assert.equal(locateBody3(r,p),l);assert.equal(serializeBody3(a),before);
 });
-test('curved-profile product Extrude remains explicitly unsupported by mixed Body lowering',()=>{
- const a=extrudeBody3([[{kind:'arc',arc:fullCircleArc2(circle2(point2(0n,0n),1n))}]],2n),b=createCylinderBody3(cylinder3(line3(point3(4n,0n),point3(0n,0n,1n)),1n),0n,2n),before=serializeBody3(a);assert.throws(()=>booleanMixedBodies3(a,b,'union'),/curved-profile Extrude/);assert.equal(serializeBody3(a),before);
+test('general arc-line product Extrude remains explicitly unsupported by mixed Body lowering',()=>{
+ const a=extrudeBody3([[{kind:'arc',arc:circularArc2(circle2(point2(0n,0n),1n),point2(1n,0n),point2(-1n,0n))},{kind:'segment',segment:{start:point2(-1n,0n),end:point2(1n,0n)}}]],2n),b=createCylinderBody3(cylinder3(line3(point3(4n,0n),point3(0n,0n,1n)),1n),0n,2n),before=serializeBody3(a);assert.throws(()=>booleanMixedBodies3(a,b,'union'),/full circular boundary loops/);assert.equal(serializeBody3(a),before);
 });
 test('reverse cylinder minus straight-profile Extrude recovers the planar tunnel with exact volume moments',()=>{
  const a=replay(extrudeBody3([ring([[0n,0n],[4n,0n],[4n,4n],[0n,4n]]),ring([[1n,1n],[1n,3n],[3n,3n],[3n,1n]])],2n,{fillRule:'nonzero'})),b=createCylinderBody3(cylinder3(line3(point3(2n,2n),point3(0n,0n,1n)),new Rational(9n,4n)),0n,2n),r=replay(booleanMixedBodies3(b,a,'difference'));

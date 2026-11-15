@@ -1,4 +1,5 @@
 import {boundaryPlanarMaterial3} from '../geometry/planar-material-boundary3.js';
+import {boundaryCircularExtrudeMaterial3} from '../convert/circular-extrude-material3.js';
 import {boundaryBoxMaterial3} from '../geometry/box-material3.js';
 import {boundaryCylinderMaterialExpression3,booleanCylinderMaterials3,clipCylinderMaterial3} from '../geometry/cylinder-material-expression3.js';
 import type {CylinderMaterialBoundary3,CylinderMaterialOperand3} from '../geometry/cylinder-material-expression3.js';
@@ -176,7 +177,7 @@ export function booleanMixedBodies3(first:Body3,second:Body3,operation:BooleanOp
 function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
  assertOwnedBody3(body);
  if(nativePlanarOperand3(body))return boundaryPlanarMaterial3(planarSourceOfBody3(body)??planarSolidFromBoundary3(body.topology));
- if(body.construction.kind==='extrude')throw new RangeError('Mixed Body Boolean does not yet support curved-profile Extrude operands');
+ if(body.construction.kind==='extrude')return boundaryCircularExtrudeMaterial3(body);
  if(body.construction.kind==='box'){const c=body.construction;return boundaryBoxMaterial3(decodeRationalPoint3(c.origin),c.size[0],c.size[1],c.size[2]);}
  const material=cylinderMaterialSourceOfBody3(body);if(material)return material;const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return clipped;const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return clipFiniteCylinderExpression3(cut.source,[cut.cut]);let source=finiteCylinderExpressionSourceOfBody3(body);const binary=finiteCylinderBooleanSourceOfBody3(body);if(!source&&binary)source=boundaryFiniteCylinderExpression3([binary.first,binary.second],{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}});if(source)return clipFiniteCylinderExpression3(source,[]);const c=cylinderSourceOfBody3(body),base=prepareFiniteCylinder3(c.cylinder,c.lower,c.upper);if(body.construction.kind==='cylinder')return boundaryCylinderMaterialExpression3([base],[],{kind:'cylinder',cylinder:0});return clipFiniteCylinderExpression3(boundaryFiniteCylinderExpression3([base],{kind:'operand',operand:0}),c.planes.map(plane=>({plane,side:-1 as const})));
 }

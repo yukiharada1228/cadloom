@@ -470,3 +470,27 @@ The 13 prior related mixed-Body/contact regression cases subsequently passed
 in one invocation (163,272 ms). The four new cases retain their successful
 results on the same unchanged source. A complete non-hard snapshot including
 the four new native Extrude cases is now running; its final result is pending.
+
+### Straight-product full regression completed
+
+The source79/straight-product snapshot passed all 867 non-hard tests in one
+invocation (625,112 ms), including the four new product cases and historical
+Body readers. This predates the circular-loop adapter and retained product source.
+
+### Actual circular-loop product Extrude lowering
+
+Retain the actual owned ExtrudedBRep3 in the Body model behind a private WeakMap.
+Use its normalized region and world z bounds, not recipe dimensions, to lower
+complete circular boundary loops. Every loop must have one circle support and
+pass an exact 2D XOR-with-full-disk coverage check. Balanced parity of the actual
+finite cylinders preserves normalized holes/islands/disconnected material.
+General arc-line loops and different-circle arc loops still reject explicitly.
+
+Seven new circular cases passed across five initial cases and two targeted
+checks (perpendicular non-unit-axis SSI and irrational radius/fractional height).
+The initial invocation also passed all four straight-product cases, with the
+negative case now checking a real semicircle/chord loop rather than the newly
+supported disk. The 35 prior constructed/planar/mixed/contact cases all passed
+in one invocation (148,461 ms). Build, strict typing and the existing scoped
+133-declaration audit passed. This does not mechanically prove the new adapter
+or complete general curved-product/analytic/NURBS support.

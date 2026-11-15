@@ -64,8 +64,10 @@ function publish(topology:BRepTopology3,locate:Location,domains:readonly FaceDom
   const document=readBodyDocument3({version:1,construction,body:record}),result=Object.freeze({record:rebuilt.geometry.record,geometry:rebuilt.geometry,topology:rebuilt.topology,construction:document.construction,interiorSamples:Object.freeze([...samples]),faces});states.set(result,{locate,cylinder,nativeTopology:rebuilt.topology,finiteCylinderBoolean:undefined,planar:material?.planar,faces:Object.freeze(faces.map(f=>(p:Point3|AlgebraicCoordinates3)=>f.locate(p)))});return result;
 }
 /** Internal adoption endpoints; public ops obtain the source from kernel factories. */
+const extrusionSources=new WeakMap<Body3,ExtrudedBRep3>();
+export function extrusionSourceOfBody3(body:Body3):ExtrudedBRep3|undefined {state(body);return extrusionSources.get(body);}
 export function adoptExtrudedBody3(source:ExtrudedBRep3,construction:BodyConstructionRecord3):Body3 {
-  assertOwnedExtrudedBRep3(source);return publish(source.topology,p=>source.locate(p),source.faces.map(f=>f.kind==='planar'?encodePlanarDomain3(f.face):encodeCylinderDomain3(f.face)),source.samples,construction);
+  assertOwnedExtrudedBRep3(source);const body=publish(source.topology,p=>source.locate(p),source.faces.map(f=>f.kind==='planar'?encodePlanarDomain3(f.face):encodeCylinderDomain3(f.face)),source.samples,construction);extrusionSources.set(body,source);return body;
 }
 export function adoptCylinderBody3(source:ClippedCylinderBRep3,construction:BodyConstructionRecord3):Body3 {
   assertOwnedClippedCylinder3(source);return publish(source.topology,p=>source.locate(p),source.faces.map(f=>f.kind==='planar'?encodeTrimmedPlanarDomain3(f.domain,f.component):encodeTrimmedCylinderDomain3(f.domain,f.component)),source.interiorSample?[snapshotExactPoint3(source.interiorSample)]:[],construction,undefined,source);
