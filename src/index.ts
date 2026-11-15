@@ -275,3 +275,6 @@ export {finiteCylinderExpressionSplitRegions3} from './geometry/finite-cylinder-
 export type {FiniteCylinderExpressionSplitRegions3} from './geometry/finite-cylinder-regions3.js';
 
 export {bodyFromCylinderExpressionSplit3} from './ops/body3.js';
+
+export {clipFiniteCylinderExpression3,refineClippedCylinderExpression3,assertOwnedClippedCylinderExpression3} from './geometry/clipped-cylinder-expression3.js';
+export type {ClippedCylinderExpressionFaceOrigin3,ClippedCylinderExpressionFace3,ClippedCylinderExpression3} from './geometry/clipped-cylinder-expression3.js';

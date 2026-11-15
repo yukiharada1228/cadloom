@@ -200,10 +200,11 @@
         "src/geometry/finite-cylinder-regions3.ts",
         "src/geometry/finite-cylinder-expression3.ts",
         "src/geometry/cylinder-expression-plane-section3.ts",
-        "src/geometry/cylinder-expression-plane-split3.ts"
+        "src/geometry/cylinder-expression-plane-split3.ts",
+        "src/geometry/clipped-cylinder-expression3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar materials and manifold finite-cylinder expressions support exact queries, shell/cavity regions, common Body adoption and replay-checked persistence. Uncut finite-cylinder Boolean/expression results are reusable operands. Single-plane expression cuts now adopt and replay common Bodies; repeated cuts, clipped leaves in later Booleans, broad contact coverage, maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned rational planar materials and manifold finite-cylinder expressions support exact queries, shell/cavity regions, common Body adoption and replay-checked persistence. Uncut expression results are reusable operands; single-plane cut Bodies adopt and replay. Repeated halfspace cuts now produce closed kernel boundary/material results, but their common Body persistence/adoption, clipped leaves in later Booleans, broad contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",

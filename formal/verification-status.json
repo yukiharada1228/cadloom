@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "a531c79b537fad737285cce024145ffaaa6a2c745ac88bf09b84c28c540bbc38",
+    "src/index.ts": "bfbb5509700e1f04403247cfe46188483b3bc09776b60e18e1cf16066295b57e",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -132,7 +132,8 @@
     "src/geometry/algebraic-axial-point3.ts": "0730efc8630307f768a6dc533751d95edca6485214bd4022bcecd23f435adfc3",
     "src/geometry/cylinder-expression-plane-section3.ts": "4f823bda9f86543f71d0a48e23f02e4b4c84ec9d2bd126bb8e6281b270158806",
     "src/geometry/cylinder-expression-plane-split3.ts": "1ad261f79affad5b03c522628a75e7cc18622c754e43cb281bd682a6b57929aa",
-    "src/convert/cylinder-expression-split3.ts": "5cdbc3fb9284f15caab84ba4980f5c9a8a69fc1cd5f403467e78fef67143c2db"
+    "src/convert/cylinder-expression-split3.ts": "5cdbc3fb9284f15caab84ba4980f5c9a8a69fc1cd5f403467e78fef67143c2db",
+    "src/geometry/clipped-cylinder-expression3.ts": "e7005ff75a735f8d49d20fdb45dd83b2653a94e71e7a24d5438438e49840f9e4"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

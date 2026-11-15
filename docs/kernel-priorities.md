@@ -142,3 +142,7 @@ Plane-cut expression children now export complete replayable wall, old-cap and n
 ### Common Body adoption for one-plane expression cuts
 
 Owned manifold split children now derive nesting/void roles and strict rational material samples, reuse fully bound geometry and adopt common Body3. The new `plane-cut-cylinder-expression` recipe replays original operands/tree and the kept plane side before comparing the entire ordered record. Closed and opened cavities, nested islands, empty children, SSI geometry and tampered recipes/region roles pass. An additional oblique cut crosses unequal perpendicular-cylinder SSI at four exactly checked shared vertices and replays both Bodies. See [invariants, validation and remaining reuse work](plane-cut-expression-body3.md). Repeated cuts and cut-child Boolean operands remain unsupported.
+
+### Repeated halfspace cuts at the kernel boundary layer
+
+Owned finite-cylinder expressions now intersect with ordered lists of halfspaces, and further cuts retain all earlier constraints. Wall source-cell provenance composes across refinements; original caps and every cut cap are noded by all planes. Duplicate caps select one representative, opposed/incompatible constraints produce empty regularized volume, and balanced nonmanifold incidence remains explicit. Independent reordered-cut grids, cap intersections, SSI cuts and a `10^-40` strip pass. See [construction and remaining Body integration](clipped-cylinder-expression3.md). Multi-cut Body persistence/adoption and unrelated clipped-leaf Booleans are not yet connected.
