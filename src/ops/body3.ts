@@ -1,3 +1,6 @@
+import type {PreparedPlanarSolid3} from '../geometry/planar-solid3.js';
+import {consolidatePlanarSolid3} from '../geometry/consolidate-planar-solid3.js';
+import {planarSolidWithFaceOrigins3} from '../convert/planar-body3.js';
 import {preparePlanarSolid3} from '../geometry/planar-solid3.js';
 import {booleanPlanarSolids3} from '../geometry/planar-solid-boolean3.js';
 import type {BooleanOperation} from '../geometry/polygon-boolean.js';
@@ -10,7 +13,7 @@ import type {CurveRegion2} from '../geometry/curve-boolean2.js';
 import {extrudeCurveRegionBRep3,extrudeBetweenBRep3} from '../geometry/extruded-brep3.js';
 import type {ExtrudeBRepOptions3} from '../geometry/extruded-brep3.js';
 import {clipCylinderBRep3} from '../geometry/clipped-cylinder-brep3.js';
-import {adoptExtrudedBody3,adoptCylinderBody3,assertOwnedBody3,adoptPlanarBody3,planarSourceOfBody3} from '../model/body3.js';
+import {adoptExtrudedBody3,adoptCylinderBody3,assertOwnedBody3,adoptPlanarBody3,planarSourceOfBody3,adoptConsolidatedPlanarBody3} from '../model/body3.js';
 import type {Body3} from '../model/body3.js';
 import {encodeRationalPoint3,decodeRationalPoint3} from '../convert/exact3.js';
 import {encodeBodyProfile3,decodeBodyProfile3} from '../convert/body-profile3.js';
@@ -38,6 +41,7 @@ export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);
 export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
+    case 'planar-consolidated':return replayConsolidated(construction.polygons.map(p=>p.map(decodeRationalPoint3))).body;
     case 'planar':return createPlanarBody3(construction.polygons.map(p=>p.map(decodeRationalPoint3)));
     case 'box':{const s=construction.size;return createBoxBody3(decodeRationalPoint3(construction.origin),s[0],s[1],s[2]);}
     case 'cylinder':return createCylinderBody3(cylinder3(line3(decodeRationalPoint3(construction.origin),decodeRationalPoint3(construction.direction)),construction.radiusSquared),construction.lower,construction.upper);
@@ -66,4 +70,24 @@ export function booleanPlanarBodies3(a:Body3,b:Body3,operation:BooleanOperation)
   const first=planarSourceOfBody3(a)??planarSolidFromBoundary3(a.topology),second=planarSourceOfBody3(b)??planarSolidFromBoundary3(b.topology),result=booleanPlanarSolids3(first,second,operation);
   if(!result.topology.closedOrientedIncidence||result.topology.issues.length)throw new RangeError('Common Body does not yet support nonmanifold contact results; use booleanPlanarSolids3 to retain this material');
   return createPlanarBody3(result.polygons);
+}
+
+export interface ConsolidatedPlanarBody3 {
+  readonly body:Body3;
+  /** Output face → immediate input Body face IDs. Not persistent feature history. */
+  readonly sourceFaces:readonly (readonly number[])[];
+  /** Immediate input Body face IDs whose pinched union was kept as valid patches. */
+  readonly retainedFaces:readonly number[];
+}
+function consolidatedBody(source:PreparedPlanarSolid3){
+  const merged=consolidatePlanarSolid3(source),body=adoptConsolidatedPlanarBody3(merged,{kind:'planar-consolidated',polygons:merged.source.polygons.map(p=>p.map(encodeRationalPoint3))});
+  return {merged,body};
+}
+function replayConsolidated(polygons:readonly (readonly Point3[])[]){return consolidatedBody(preparePlanarSolid3(polygons));}
+/** Merge connected coplanar cooriented rational planar faces, preserving holes,
+ * material, shell roles and immediate input-face correspondence.
+ */
+export function consolidatePlanarBody3(input:Body3):ConsolidatedPlanarBody3 {
+  assertOwnedBody3(input);const converted=planarSolidWithFaceOrigins3(input.topology),{merged,body}=consolidatedBody(converted.solid),unique=(ids:readonly number[])=>Object.freeze([...new Set(ids.map(id=>converted.faceOrigins[id]!))].sort((a,b)=>a-b));
+  return Object.freeze({body,sourceFaces:Object.freeze(merged.sourceFaces.map(unique)),retainedFaces:unique(merged.retainedFaces)});
 }

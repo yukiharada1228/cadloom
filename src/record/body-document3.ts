@@ -10,10 +10,12 @@ import type {RecordReadLimits3} from './schema.js';
 export type BodyConstructionRecord3=
  | {readonly kind:'box';readonly origin:RationalPointRecord3;readonly size:RationalPointRecord3}
  | {readonly kind:'cylinder';readonly origin:RationalPointRecord3;readonly direction:RationalPointRecord3;readonly radiusSquared:string;readonly lower:string;readonly upper:string}
+ | {readonly kind:'planar-consolidated';readonly polygons:readonly (readonly RationalPointRecord3[])[]}
  | {readonly kind:'planar';readonly polygons:readonly (readonly RationalPointRecord3[])[]}
  | {readonly kind:'extrude';readonly profile:readonly (readonly CurveRecord3[])[];readonly lower:string;readonly upper:string};
 export interface BodyDocument3 {readonly version:1;readonly construction:BodyConstructionRecord3;readonly body:BodyRecord3;}
 export const constructionSchema3=taggedSchema3({
+  'planar-consolidated':objectSchema3({kind:literalSchema3('planar-consolidated'),polygons:arraySchema3(arraySchema3(rationalPointSchema3,3))}),
   planar:objectSchema3({kind:literalSchema3('planar'),polygons:arraySchema3(arraySchema3(rationalPointSchema3,3))}),
   box:objectSchema3({kind:literalSchema3('box'),origin:rationalPointSchema3,size:rationalPointSchema3}),
   cylinder:objectSchema3({kind:literalSchema3('cylinder'),origin:rationalPointSchema3,direction:rationalPointSchema3,radiusSquared:rationalSchema3,lower:rationalSchema3,upper:rationalSchema3}),

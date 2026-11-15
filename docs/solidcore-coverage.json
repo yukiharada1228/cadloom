@@ -171,10 +171,11 @@
         "src/geometry/solid-boolean3.ts",
         "src/geometry/curve-boolean2.ts",
         "src/geometry/planar-solid-boolean3.ts",
-        "src/ops/body3.ts"
+        "src/ops/body3.ts",
+        "src/geometry/consolidate-planar-solid3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar material Booleans and manifold common Body save/replay are connected, including cavities, islands and algebraic point queries. Common Body contact-region support, face consolidation and general analytic/NURBS solid Booleans remain missing."
+      "gap": "Owned rational planar material Booleans, manifold common Body replay and coplanar face consolidation with holes/provenance are connected. Common Body contact-region support and general analytic/NURBS solid Booleans/consolidation remain missing."
     },
     {
       "id": "sweep",

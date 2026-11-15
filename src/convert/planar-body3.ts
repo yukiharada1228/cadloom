@@ -18,9 +18,9 @@ export function encodePlanarPolygonDomain3(polygon:readonly Point3[],normal:Poin
  * material geometry. Nonconvex faces and holes are decomposed exactly in charts;
  * curved edges/surfaces and nonrational vertices fail explicitly.
  */
-export function planarSolidFromBoundary3(t:BRepTopology3){
-  const polygons:Point3[][]=[];
-  for(const face of t.faces){
+export function planarSolidWithFaceOrigins3(t:BRepTopology3){
+  const polygons:Point3[][]=[],faceOrigins:number[]=[];
+  for(const [faceId,face] of t.faces.entries()){
     if(face.surface.kind!=='plane')throw new RangeError('Planar Body operations do not support curved surfaces');
     const plane=face.surface.plane,n=plane.normal,k=(['x','y','z'] as const).find(k=>n[k].sign()!==0)!,origin=point3(k==='x'?plane.offset.neg().div(n[k]):0n,k==='y'?plane.offset.neg().div(n[k]):0n,k==='z'?plane.offset.neg().div(n[k]):0n);
     const seed=n.x.sign()===0?point3(1n,0n):n.y.sign()===0?point3(0n,1n):point3(0n,0n,1n),v=cross3(n,seed),u=cross3(v,n),U=dot3(u,u),V=dot3(v,v);
@@ -31,9 +31,11 @@ export function planarSolidFromBoundary3(t:BRepTopology3){
       const q=subtract3(point3(p.x.rational,p.y.rational,p.z.rational),origin);return point2(dot3(q,u).div(U),dot3(q,v).div(V));
     }));
     const lift=(p:{x:Point3['x'];y:Point3['y']})=>point3(origin.x.add(u.x.mul(p.x)).add(v.x.mul(p.y)),origin.y.add(u.y.mul(p.x)).add(v.y.mul(p.y)),origin.z.add(u.z.mul(p.x)).add(v.z.mul(p.y)));
-    if(rings.length===1){const polygon=rings[0]!.map(lift);try{partitionConvexPolygonByPlanes3(polygon,[]);polygons.push(polygon);continue;}catch(error){if(!(error instanceof RangeError))throw error;}}
+    if(rings.length===1){const polygon=rings[0]!.map(lift);try{partitionConvexPolygonByPlanes3(polygon,[]);polygons.push(polygon);faceOrigins.push(faceId);continue;}catch(error){if(!(error instanceof RangeError))throw error;}}
     const mesh=triangulatePolygon(rings);
-    for(const ids of mesh.triangles){const p=ids.map(id=>lift(mesh.vertices[id]!));polygons.push(face.sense===1?p:p.reverse());}
+    for(const ids of mesh.triangles){const p=ids.map(id=>lift(mesh.vertices[id]!));polygons.push(face.sense===1?p:p.reverse());faceOrigins.push(faceId);}
   }
-  return preparePlanarSolid3(polygons);
+  return Object.freeze({solid:preparePlanarSolid3(polygons),faceOrigins:Object.freeze(faceOrigins)});
 }
+
+export function planarSolidFromBoundary3(t:BRepTopology3){return planarSolidWithFaceOrigins3(t).solid;}

@@ -188,3 +188,8 @@ export {booleanPlanarSolids3} from './geometry/planar-solid-boolean3.js';
 export type {PlanarSolidBooleanResult3,PlanarSolidBooleanOperand3,PlanarBooleanFaceSource3} from './geometry/planar-solid-boolean3.js';
 
 export {createPlanarBody3,booleanPlanarBodies3} from './ops/body3.js';
+
+export {consolidatePlanarSolid3} from './geometry/consolidate-planar-solid3.js';
+export type {ConsolidatedPlanarSolid3} from './geometry/consolidate-planar-solid3.js';
+export {consolidatePlanarBody3} from './ops/body3.js';
+export type {ConsolidatedPlanarBody3} from './ops/body3.js';

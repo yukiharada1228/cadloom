@@ -1243,7 +1243,7 @@ node examples/face-domain-record3.ts
 
 演算は正則化された材料を返します。面・辺・点だけの積集合は空ですが、体積を持つ成分同士の辺・頂点の接触は境界へ残します。接触で非多様体になる場合は`topology.issues`などに診断が現れます。この結果も材料演算の入力には使用できますが、接触を認めない`preparePlanarSolid3`への再入力とは条件が異なります。
 
-対象は有理座標の平面境界です。曲面・無理数頂点、共通Bodyへの採用、面の穴や非凸多角形への統合、一般のCADファイル互換は未対応です。内部の検証と照会には厳密な三角形分解を利用し、近似は導入しません。面の細分が増えるため、大規模形状への加速は今後の課題です。[構成と検証範囲](docs/proofs/planar-solid-booleans3.md)。
+対象は有理座標の平面境界です。曲面・無理数頂点、共通Bodyへの採用と同一平面の面統合は後述のAPIへ接続します。一般のCADファイル互換は未対応です。内部の検証と照会には厳密な三角形分解を利用し、近似は導入しません。面の細分が増えるため、大規模形状への加速は今後の課題です。[構成と検証範囲](docs/proofs/planar-solid-booleans3.md)。
 
 ## 平面ブーリアンと共通Bodyの保存・復元
 
@@ -1253,6 +1253,16 @@ node examples/face-domain-record3.ts
 
 材料と面の照会は`locateBody3`・`locateBodyFace3`へ統一します。平面Bodyも有理座標と代数的実数の座標に対応し、無理数の点を浮動小数点へ丸めません。
 
-共通Bodyへの採用は現在、埋め込まれた多様体境界に限ります。辺・頂点で接して非多様体になるブーリアン結果は、捨てたり修復したりせず拒否します。この材料を保持して演算する場合は`booleanPlanarSolids3`を使用します。共通Bodyの接触領域、一般曲面ブーリアン、面の統合は今後の開発です。[領域と復元の検証範囲](docs/proofs/planar-body3.md)。
+共通Bodyへの採用は現在、埋め込まれた多様体境界に限ります。辺・頂点で接して非多様体になるブーリアン結果は、捨てたり修復したりせず拒否します。この材料を保持して演算する場合は`booleanPlanarSolids3`を使用します。共通Bodyの接触領域、一般曲面ブーリアン、曲面の面統合は今後の開発です。[領域と復元の検証範囲](docs/proofs/planar-body3.md)。
 
 `npm run build && node examples/planar-body3.ts`で、空洞の保存・復元・再充填を実行し、`artifacts/planar-body3.json`へ保存します。
+
+## 同一平面上の面の統合
+
+`consolidatePlanarBody3(body)`は同じ支持平面・同じ物理法線方向を持つ面を、連結した有界面へ統合します。内部の分割線と不要な同一直線上の頂点を除き、非凸な外周・穴・離れた成分を維持します。戻り値の`body`は保存・復元・再演算できる共通Bodyで、`sourceFaces[outputFace]`は直前の入力Bodyの面IDを返します。この由来対応は編集履歴としては保存しません。
+
+`retainedFaces`は、境界が一点でつながるなど、一面にまとめると有効な面領域にならないため別々に残した入力面です。許容誤差で形状や穴を変更しません。対象は有理座標の平面材料で、一般曲面や非多様体材料の共通Bodyへの採用は引き続き対象外です。
+
+低水準では`consolidatePlanarSolid3(prepared)`が検証済み材料に対して`faces`・`sewn`・`sourceFaces`・`shellMap`・`retainedFaces`を返します。元の材料とシェルの役割を保ちますが、出力の面・辺・シェルIDは再構築されます。
+
+`npm run build && node examples/consolidate-planar-body3.ts`で、空洞付きの箱を60面から12面へ統合し、復元後にも空洞が残る例を実行できます。[構成・由来・検証範囲](docs/proofs/consolidate-planar-solid3.md)。

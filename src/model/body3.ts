@@ -1,3 +1,5 @@
+import {assertOwnedConsolidatedPlanarSolid3} from '../geometry/consolidate-planar-solid3.js';
+import type {ConsolidatedPlanarSolid3} from '../geometry/consolidate-planar-solid3.js';
 import type {Point3} from '../geometry/point3.js';
 import {snapshotExactPoint3} from '../geometry/algebraic-point3.js';
 import type {AlgebraicCoordinates3} from '../geometry/algebraic-point3.js';
@@ -61,4 +63,9 @@ export function planarSourceOfBody3(body:Body3):PreparedPlanarSolid3|undefined{r
 export function adoptPlanarBody3(source:PreparedPlanarSolid3,construction:BodyConstructionRecord3):Body3 {
   assertOwnedPlanarSolid3(source);const material=planarSolidRegions3(source),domains=source.polygons.map((p,i)=>{const s=source.topology.faces[i]!.surface;if(s.kind!=='plane')throw new Error('Planar Body has curved support');return encodePlanarPolygonDomain3(p,s.plane.normal);});
   return publish(source.topology,createExactPlanarLocator3(source.triangles),domains,material.samples.map(snapshotExactPoint3),construction,{regions:material.regions,planar:source});
+}
+
+export function adoptConsolidatedPlanarBody3(input:ConsolidatedPlanarSolid3,construction:BodyConstructionRecord3):Body3 {
+  assertOwnedConsolidatedPlanarSolid3(input);const source=input.source,material=planarSolidRegions3(source),regions=material.regions.map(r=>({shells:r.shells.map(id=>input.shellMap[id]!),void:r.void}));
+  return publish(input.sewn.topology,createExactPlanarLocator3(source.triangles),input.faces.map(encodePlanarDomain3),material.samples.map(snapshotExactPoint3),construction,{regions,planar:source});
 }
