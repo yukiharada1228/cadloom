@@ -194,3 +194,7 @@ Actual frozen frame factories now retain the validated normal and exact Gram inv
 ### Canonical planar carriers with guarded polarity
 
 The parity compiler now folds opposite plane orientations into one geometric carrier, representing the reversed side by difference within the same actual enclosing guard. All four chamber cases and a fifth regularized tetrahedron boundary/Body replay case pass, along with the scoped audit. The L source drops from 36 oriented plane entries to 21 geometric carriers; its general boundary construction remains in progress. See [semantics and verification scope](planar-material-carriers3.md). Parent frame runtime 922d358 passed all 831 non-hard and unchanged hard two-test integration gates.
+
+### Shared abscissa fields for rational line graphs
+
+Rational chart segments now construct fallback graph endpoints as a genuine affine image of the actual abscissa, preserving dependencies just as ellipse endpoints retain their shared quadratic source. General algebraic/vertical fallback and known-event priority remain. A regression fails on the prior runtime and passes after the change; all 35 connected cases and the scoped audit pass. The corrected broad/hard and L replay gates remain in progress. See [construction and validation scope](rational-planar-graph3.md).

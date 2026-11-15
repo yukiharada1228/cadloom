@@ -1,0 +1,11 @@
+# Preserve the abscissa field on rational planar line graphs
+
+A planar arrangement's fallback segment graph previously calculated an ordinate from its abscissa, then passed both through the generic two-parameter plane map. The coordinates were exact, but their dependence could be lost. Later ellipse support checks could consequently construct unnecessarily large independent-field resultants.
+
+When both actual segment endpoints have rational coordinates in the validated arrangement chart and their abscissae differ, their line is exactly `y = m*x + k`. The world chart `o + u*x + v*y` is therefore `o + v*k + (u + v*m)*x`. The graph point now uses this genuine affine construction with the actual abscissa as its single algebraic source. Coordinate defining degrees do not exceed that source's degree. No floating-point fit, tolerance or caller-provided line flag is used.
+
+The slope/intercept derive from the actual endpoint coordinates obtained through the partial inverse chart. The line constants are retained only within the arrangement call under its immutable canonical curve objects. Known event reuse remains first. Vertical or nonrational chart segments retain the existing complete fallback; this change does not infer a rational line from approximate coordinates or discard general algebraic input.
+
+A regression checks the synthetic line point `(sqrt(2), sqrt(2), 0)` on `y=x` at an unrelated circle event. It requires actual affine construction provenance, exact plane support and the coordinate-degree bound. The case fails on the preceding runtime because affine correlation is absent and passes on the corrected runtime. It does not assert a timing threshold or claim the old coordinates were numerically wrong. All 35 connected chart/partition/endpoint cases pass.
+
+Current source inventory/arithmetic correspondence and the existing 133-declaration scoped Lean audit passed. The new full non-hard suite and unchanged hard oblique integration are running. The reduced-L boundary trial on preceding af34fb3 has constructed 275 physical-support-only manifold faces and adopted a common Body; full replay and final membership checks remain running. The same fixture is also running on this new source. These partial boundary observations are not completion of general concave Body integration, nor a full TypeScript execution proof.
