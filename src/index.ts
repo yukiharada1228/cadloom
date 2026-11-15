@@ -244,3 +244,5 @@ export type {FiniteCylinderShellRegion3,FiniteCylinderBooleanRegions3} from './g
 export {createMixedFaceDomainDecoder3} from './convert/mixed-face-domain3.js';
 export {bodyFromFiniteCylinderBoolean3,booleanCylinderBodies3} from './ops/body3.js';
 export type {FiniteCylinderConstructionRecord3} from './record/body-document3.js';
+export {intersectCylinderIntersectionArcCylinder3,splitCylinderIntersectionArcByCylinder3} from './geometry/cylinder-intersection-cylinder3.js';
+export type {CylinderIntersectionArcCylinder3,CylinderIntersectionArcCylinderSplit3} from './geometry/cylinder-intersection-cylinder3.js';

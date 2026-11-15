@@ -92,3 +92,7 @@ Owned manifold two-cylinder Boolean boundaries now derive nesting forests, cavit
 ### Common owned curved Bodies
 
 Owned manifold two-cylinder Boolean results now adopt into the existing Body3 contract with derived shell/void regions, exact samples, complete mixed face binding, common queries and replay-checked construction documents. Native-only backends check ownership/backend explicitly. See [curved Body construction and limits](finite-cylinder-body3.md). General curved re-operation, arbitrary curved BRep import and nonmanifold Body material remain incomplete.
+
+### Third-cylinder events on existing SSI edges
+
+Owned cylinder SSI arcs now intersect and split against a third rational cylinder. Exact height elimination, separating circle charts and rational-univariate recovery retain tangent, exceptional height-fiber and overlap cases. See [derivation and scope](cylinder-ssi-cylinder3.md). Reusing curved Body results still requires multi-cutter face arrangements and material assembly; this intersection primitive alone does not enable chaining.

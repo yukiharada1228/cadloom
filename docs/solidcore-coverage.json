@@ -148,10 +148,11 @@
         "src/geometry/cylinder-cylinder3.ts",
         "src/geometry/cylinder-intersection-plane3.ts",
         "src/geometry/cylinder-intersection-support3.ts",
-        "src/geometry/cylinder-intersection-face3.ts"
+        "src/geometry/cylinder-intersection-face3.ts",
+        "src/geometry/cylinder-intersection-cylinder3.ts"
       ],
       "status": "partial",
-      "gap": "Owned bounded cylinder SSI graphs restrict exactly to both finite height/angular face domains, including algebraic angular endpoints and isolated contacts. Parallel/coincident face intersections, general NURBS SSI, oriented pcurves and persistent mixed Bodies remain incomplete."
+      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI intersection/splitting via correlated degree-at-most-eight algebraic recovery. Multi-cutter curved face arrangements, general higher-dimensional analytic/NURBS SSI and robust material assembly remain incomplete."
     },
     {
       "id": "split-and-stitch",

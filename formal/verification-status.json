@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "884c799f464d42dbb33bb155d5dadca48fb44f5391ff539b49c28e5bbde73586",
+    "src/index.ts": "8c19a3d429badd022fa7d5437adb1c67de638640230ae34c030ab3ca61cde7c4",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -107,7 +107,7 @@
     "src/geometry/cylinder-intersection-plane3.ts": "fd35a6b89e11c82e131a5ae438586e2dfae6e8a96e4e83536357f2c0bf6722ab",
     "src/geometry/brep-curve3.ts": "9158d8b4dbbb3898f7311efc6c23ad06b9d733ea231ac1bf15ff66de8e103224",
     "src/geometry/sew-mixed-brep3.ts": "ec891eb9f706b6537a5206bfbc7b655916aaa3ea8515433370aafb225d04048a",
-    "src/geometry/cylinder-intersection-support3.ts": "b97ce126a107b6c302ab6ac00aba7c2fa62f9ca3b3277215b65c2b0421fb130b",
+    "src/geometry/cylinder-intersection-support3.ts": "b1387f5657961e168fa40a5897b50e72f083bcd896d340850329efa59629f4c5",
     "src/geometry/cylinder-intersection-face3.ts": "fd7b490e9c3685c2ca3993b3345e001995ec12d11bc3e74451332241c1bcc1cd",
     "src/geometry/cylinder-coordinates3.ts": "4e8d8031ae7ff1c25616469f85a207aef2757b9f6424a1fbc599bc4312f5d132",
     "src/geometry/cylinder-face-cylinder-partition3.ts": "b2ec72896c6029d604ce5fa0a6a1a3eebf91bdaef13f4eadc15887388c2b3aa8",
@@ -124,7 +124,8 @@
     "src/convert/mixed-faces3.ts": "364404edbe82fed5dfccb284db9194b8652d7bd7439aecb1e9215c43731c4042",
     "src/convert/finite-cylinder-boolean3.ts": "026b7c97abbfa10860d02424e1427bafe35c4dacafc58b50316fb66ad1a291a0",
     "src/geometry/mixed-shell-ray3.ts": "d608cdd1246a688b68e48930c4b86b6581391af1a42747339f7c5c219a3ab914",
-    "src/geometry/finite-cylinder-regions3.ts": "513cf209b33c982a5141b079c5618a7ad522dc2187c1b50a529d83b7e6ea4a97"
+    "src/geometry/finite-cylinder-regions3.ts": "513cf209b33c982a5141b079c5618a7ad522dc2187c1b50a529d83b7e6ea4a97",
+    "src/geometry/cylinder-intersection-cylinder3.ts": "80b557b66b3927c5699b6ac9130eefe3f7716c17e9581c655b762f3de22c0ffd"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -333,6 +334,7 @@
     "Planar cylinder-cut cell records replay complete conic/plane partitions and select strict interior witnesses. Owned finite-cylinder Boolean export includes all selected wall/cap domains and orientation provenance in common BodyRecord; mixed face binding validates their boundaries. Runtime checks/tests are not new machine refinement proofs; shell/material validity, owned Body3 adoption and chained curved Booleans remain incomplete.",
     "Factory-restored mixed faces support exact bounded rational forward-ray hits with multiplicity and explicit edge/vertex/contained-support degeneracy. Closed locally manifold shell parity queries return boundary, regular parity or retry, without mesh/epsilon or a global shell embedding/material certificate. Runtime tests are not new machine refinement proofs; shell nesting and owned curved Body adoption remain incomplete.",
     "Owned manifold finite-cylinder Boolean regions derive strict rational side witnesses, shell containment forests, cavity coorientation and material/void records from exact full-line scans and constructive support-partition provenance. Documented embedding/termination arguments and runtime checks are not new machine refinement proofs. Arbitrary imported shell certification, common curved Body3 adoption and chained curved operands remain incomplete. Restoration retains regenerated SSI endpoint provenance only after exact equality and scopes definition-only replay caches to one batch; individual witness/orientation/boundary checks remain active.",
-    "Owned manifold two-finite-cylinder Boolean results adopt into common Body3 with derived regions/samples, mixed bounded face binding, common material/face queries and replay-checked construction documents. Common topology/domain types include the mixed backend; native-only operations check actual backend ownership. Exact point comparison includes rational-map/biparametric charts. Runtime tests are not whole-program refinement proofs; arbitrary curved import, chained curved operands and nonmanifold Body material remain incomplete."
+    "Owned manifold two-finite-cylinder Boolean results adopt into common Body3 with derived regions/samples, mixed bounded face binding, common material/face queries and replay-checked construction documents. Common topology/domain types include the mixed backend; native-only operations check actual backend ownership. Exact point comparison includes rational-map/biparametric charts. Runtime tests are not whole-program refinement proofs; arbitrary curved import, chained curved operands and nonmanifold Body material remain incomplete.",
+    "Owned cylinder SSI arcs intersect/split against a third rational cylinder through height elimination, generic separating circle charts, degree-at-most-eight root certificates and correlated rational-univariate coordinate recovery, with whole-fiber/overlap/tangent cases. Documented algebraic/termination arguments and executable tests are not new machine refinement proofs. Multi-cutter face refinement, material assembly and reusable curved Boolean operands remain incomplete."
   ]
 }

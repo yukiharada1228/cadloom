@@ -1370,3 +1370,11 @@ node examples/face-domain-record3.ts
 追加の平面で切った円柱や、前回の曲面ブーリアン結果を入力にする操作には、対応する分割処理が必要です。非多様体の接触を持つ結果は共通Bodyへ取り込まず、下位APIで保持します。[対応範囲と構築の検証](docs/finite-cylinder-body3.md)。
 
 `npm run build && node examples/finite-cylinder-body3.ts`で、交線を含むBodyの生成・保存・復元と共通の内外判定を実行できます。
+
+### 円柱交線と第三の円柱
+
+`intersectCylinderIntersectionArcCylinder3(arc, cylinder)`は、所有権付きの円柱交線と第三の円柱の全交点、または交線全体の重なりを求めます。`splitCylinderIntersectionArcByCylinder3`は、その交点で分割し、各開区間の円柱内外の符号を返します。接点や除算できない高さの特例も厳密に扱います。
+
+既存の交線で囲まれた面を、新しい円柱で分割するための土台です。曲面Bodyを再演算するには、この処理を複数の切断面の分割・材料選択へ接続する必要があります。[計算の導出と対応範囲](docs/cylinder-ssi-cylinder3.md)。
+
+`npm run build && node examples/cylinder-ssi-cylinder3.ts`で、3本の円柱の8交点と交線の分割を実行できます。
