@@ -366,3 +366,23 @@ A fresh isolated build and complete non-hard snapshot of current kernel source
 have now started their own full invocation. That result and the explicit
 retained 21-plane resource example remain pending. Review source hashes matched
 the current manifest; that is artifact bookkeeping, not an equivalence proof.
+
+### Native planar pair dispatch and regularized contacts
+
+The four contact fixtures on the original material path passed: union cancels
+an opposed internal bounded face, intersection removes a zero-thickness strip,
+difference retains the proper boundary, and raw XOR diagnoses a nonmanifold edge
+while rejecting manifold Body adoption. All strict and seam queries and replay
+checks passed (533,247 ms under concurrent work).
+
+The common API now selects the existing native planar Boolean kernel when both
+operands carry actual owned planar sources. The native recipe is preserved on
+that path; other supported pairs retain mixed-material recipes. Five targeted
+cases passed through the new dispatch: the same three manifold operations,
+nonmanifold XOR rejection/immutable inputs, and native replay followed by real
+cylinder composition. Build, strict typing and the existing scoped audit passed.
+No kernel topology/geometry algorithms were replaced or weakened, and no
+caller-provided certificate selects this branch. The raw mixed XOR implementation
+is unchanged and retains its preceding pass. The earlier full source68 snapshot
+and explicit 21-plane resource run remain independently live; they do not cover
+this later dispatch change.

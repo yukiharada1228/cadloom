@@ -158,11 +158,13 @@ export function clipCylinderExpressionBody3(body:Body3,halfspaces:readonly Cylin
 }
 
 export function bodyFromCylinderMaterial3(source:CylinderMaterialBoundary3):Body3 {return adoptCylinderMaterialBody3(source);}
-/** Boolean composition for owned planar, box and cylinder-family Bodies. Results use
- * the replayable mixed material recipe and require manifold material. */
+/** Boolean composition for owned planar, box and cylinder-family Bodies.
+ * Planar pairs use the native planar kernel; other supported pairs use the mixed
+ * material recipe. Both paths require manifold material and support replay. */
 export function booleanMixedBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
  assertOwnedBody3(first);assertOwnedBody3(second);
  if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown mixed Body operation');
+ if(planarSourceOfBody3(first)&&planarSourceOfBody3(second))return booleanPlanarBodies3(first,second,operation);
  return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
 }
 /** Source conversion is restricted to actual owned planar/box/cylinder backends. */

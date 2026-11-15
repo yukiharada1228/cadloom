@@ -1,7 +1,8 @@
 # Regularized contact between concave planar operands
 
-Status: four new execution cases are running; standalone strict typing passed.
-No kernel source changes are included in this fixture milestone.
+Status: the initial four mixed-material contact fixtures passed. Native planar
+pair dispatch is now implemented; five targeted dispatch/reuse cases, build,
+standalone strict typing and the existing scoped 133-declaration audit passed.
 
 Use the closed extruded L material A with z in [0,2] and planar footprint
 ([0,2] × [0,1]) ∪ ([0,1] × [1,2]). Let B be A translated by (1,0,0).
@@ -34,6 +35,28 @@ manifold material and must reject this result; the test does not repair or drop
 a sector to obtain a manifold shape. This is an explicit lower-layer versus
 Body contract, not a claim that all Boolean results must be manifold.
 
-These are requirements for the currently running fixtures, not completed
-verification results or a general proof of all contact configurations. Broader
-mixed contacts and analytic/NURBS Booleans remain incomplete.
+The original four mixed-material cases passed in one invocation (533,247 ms
+under concurrent work). They establish the regularized geometry and lower raw
+nonmanifold contract on the original path.
+
+The common Boolean API now delegates pairs of actual owned planar sources to
+`booleanPlanarBodies3`, preserving native planar construction and replay. Other
+supported operand pairs retain the mixed-material path. The same union,
+intersection and difference geometry fixtures passed through this dispatch,
+alongside native XOR rejection/unchanged inputs and a replayed native result
+subsequently intersected with a real cylinder. Those five cases passed in one
+invocation (30,187 ms), with build, strict typing and the existing scoped audit.
+The raw mixed-material XOR fixture was not rerun in that targeted invocation;
+its implementation is unchanged. These elapsed times are observations from
+different concurrent workloads, not a controlled speedup benchmark.
+
+The direct dispatch selects an existing checked planar algorithm rather than
+introducing auxiliary cylinder intersections for two planar operands. The
+Body construction recipe for that pair is now `planar`; consumers should use
+the checked Body interface and its actual construction variant. The reuse test
+verifies the native result can still enter the real cylinder/material backend.
+
+This is focused verification, not a proof of all contact configurations or of
+TypeScript execution. The previously launched broad/resource jobs use earlier
+isolated builds and retain their original scope. Broader mixed contacts and
+analytic/NURBS Booleans remain incomplete.
