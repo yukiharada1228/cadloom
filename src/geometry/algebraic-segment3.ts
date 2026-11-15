@@ -13,10 +13,13 @@ export function algebraicSegment3(start:Point3|AlgebraicCoordinates3,end:Point3|
 export function pointOnAlgebraicSegment3(inputPoint:Point3|AlgebraicCoordinates3,input:AlgebraicSegment3):boolean {
   const s=algebraicSegment3(input.start,input.end),p=snapshotExactPoint3(inputPoint),axes=['x','y','z'] as const,k=axes.find(k=>s.start[k].compare(s.end[k])!==0);
   if(k===undefined)return compareAlgebraicPoints3(p,s.start)===0;
-  const forward=s.start[k].compare(s.end[k])<0,lo=forward?s.start[k]:s.end[k],hi=forward?s.end[k]:s.start[k];
-  if(p[k].compare(lo)<0||p[k].compare(hi)>0)return false;
+  // Reject mismatched fixed coordinates and every coordinate interval before
+  // forming cross products of unrelated algebraic fields.
+  const varying=axes.filter(j=>s.start[j].compare(s.end[j])!==0);
+  for(const j of axes){const order=s.start[j].compare(s.end[j]);if(order===0){if(p[j].compare(s.start[j])!==0)return false;}else {const lo=order<0?s.start[j]:s.end[j],hi=order<0?s.end[j]:s.start[j];if(p[j].compare(lo)<0||p[j].compare(hi)>0)return false;}}
+  if(varying.length===1)return true;
   const d=subtractAlgebraicPoints3(s.end,s.start),q=subtractAlgebraicPoints3(p,s.start);
-  return axes.every(j=>j===k||q[j].mul(d[k]).compare(q[k].mul(d[j]))===0);
+  return varying.every(j=>j===k||q[j].mul(d[k]).compare(q[k].mul(d[j]))===0);
 }
 /** Internal whole-segment support predicate, not an endpoint-only cylinder test. */
 export function algebraicSegmentOnSurface3(input:AlgebraicSegment3,inputSurface:Surface3):boolean {

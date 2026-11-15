@@ -10,6 +10,7 @@ import {algebraicCoordinates3,algebraicPoint3,snapshotExactPoint3,getPointParame
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {classifyPointToSurface3} from './surface3.js';
 import {plane3} from './plane3.js';
+import {evaluatePlaneAtAlgebraicPoint3 as evaluate} from './algebraic-segment-plane3.js';
 
 /** Injective affine chart p = origin + x*u + y*v; not required to be orthonormal.
  * A local circle can therefore map to an ellipse in 3D.
@@ -33,7 +34,7 @@ export function mapPlanePoint3(input:PlaneFrame3,inputPoint:Point2|AlgebraicCoor
   return algebraicCoordinates3(component('x'),component('y'),component('z'));
 }
 function linear(point:AlgebraicCoordinates3,v:Vector3,offset=zero):AlgebraicReal {
-  return point.x.affine(v.x,offset).add(point.y.affine(v.y)).add(point.z.affine(v.z));
+  return evaluate({normal:v,offset},point);
 }
 /** Returns chart coordinates only if the point lies in the supporting plane.
  * This is a partial inverse, not a projection of off-plane points.

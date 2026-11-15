@@ -172,10 +172,12 @@
         "src/geometry/cylinder-intersection-face3.ts",
         "src/geometry/cylinder-face-cylinder-partition3.ts",
         "src/geometry/cylinder-cell-plane-partition3.ts",
-        "src/geometry/cylinder-face-finite-cylinder3.ts"
+        "src/geometry/cylinder-face-finite-cylinder3.ts",
+        "src/geometry/planar-face-cylinder-partition3.ts",
+        "src/geometry/planar-face-finite-cylinder3.ts"
       ],
       "status": "partial",
-      "gap": "Cylinder/SSI native strip faces refine repeatedly by rational planes with embedded constant/SSI/plane bounds, ordered signs and immediate provenance. Finite-cylinder side/cap constraints classify source-wall face cells against filled material. Cutter planar cap construction, arbitrary additional curved cutters, maximal consolidation, common mixed Body persistence and material Boolean shell certification remain incomplete."
+      "gap": "Cylinder walls and native planar caps now partition/classify against finite cylinders. Planar conic/segment arrangements retain exact graph domains, orientation, shared uses and cap-coincident boundary patches. Arbitrary further curved cutters, maximal consolidation, two-operand material face selection, shell certification and persistent common mixed Body adoption remain incomplete."
     },
     {
       "id": "boolean",

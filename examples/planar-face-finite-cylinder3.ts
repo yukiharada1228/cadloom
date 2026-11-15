@@ -1,0 +1,4 @@
+import {point3,line3,cylinder3,circle3,prepareCircularFace3,partitionPlanarFaceByFiniteCylinder3} from '../dist/index.js';
+const origin=point3(0n,0n),face=prepareCircularFace3(circle3(origin,point3(0n,0n,1n),1n)),cutter=cylinder3(line3(origin,point3(1n,0n,0n)),'1/4'),result=partitionPlanarFaceByFiniteCylinder3(face,cutter,'-1/2','1/2'),p=result.partition;
+// Surface-cell diagnostic, not a persistent Body record or material shell.
+console.log(JSON.stringify({cells:p.cells.length,inside:result.materialLocations.filter(s=>s==='inside').length,outside:result.materialLocations.filter(s=>s==='outside').length,coincidentCap:result.materialLocations.filter(s=>s==='boundary').length,vertices:p.sewn.topology.vertices.length,edges:p.sewn.topology.edges.length,openBoundaryEdges:p.sewn.topology.issues.filter(i=>i.kind==='boundary-edge').length,otherIssues:p.sewn.topology.issues.filter(i=>i.kind!=='boundary-edge')},null,2));

@@ -9,13 +9,13 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {planeFrame3,pointInPlaneFrame3} from './plane-frame3.js';
 import type {PlaneFrame3} from './plane-frame3.js';
-import {line3,intersectLineSurface3} from './surface3.js';
+import {line3,intersectLineSurface3,classifyPointToSurface3} from './surface3.js';
 import type {Line3} from './surface3.js';
 import type {PointLocation} from './polygon-location.js';
 
@@ -43,7 +43,13 @@ function localSign(p:AlgebraicCoordinates2,e:Ellipse3):Sign {
 }
 /** Location in the closed planar ellipse disk; off-plane points are outside. */
 export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,input:Ellipse3):PointLocation {
-  const e=snapshot(input),p=pointInPlaneFrame3(e.frame,inputPoint);if(p===null)return 'outside';const sign=localSign(p,e);return sign===0?'boundary':sign<0?'inside':'outside';
+  const e=snapshot(input),point=snapshotExactPoint3(inputPoint),rational=getRationalParameterization3(point);
+  if(rational){
+    if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
+    const [U,V]=duals(e),X=rationalPointLinearNumerator3(rational,U,dot3(U,e.frame.origin).neg()),Y=rationalPointLinearNumerator3(rational,V,dot3(V,e.frame.origin).neg()),W=rational.denominator,sign=rational.parameter.signOf(X.mul(X).scale(e.radiusVSquared).add(Y.mul(Y).scale(e.radiusUSquared)).sub(W.mul(W).scale(e.radiusUSquared.mul(e.radiusVSquared))));
+    return sign===0?'boundary':sign<0?'inside':'outside';
+  }
+  const p=pointInPlaneFrame3(e.frame,point);if(p===null)return 'outside';const sign=localSign(p,e);return sign===0?'boundary':sign<0?'inside':'outside';
 }
 export function pointOnEllipse3(p:Point3|AlgebraicCoordinates3,e:Ellipse3):boolean{return locatePointInEllipse3(p,e)==='boundary';}
 function duals(e:Ellipse3):readonly [Vector3,Vector3] {
@@ -152,6 +158,7 @@ export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordin
     const phase=(p:AlgebraicCoordinates2,q:Rational)=>{
       const X=q.mul(new Rational(-sx)),Y=one.sub(q).mul(new Rational(sy)),data=getPointParameterization2(p);
       if(data)return data.parameter.signOf(new Polynomial([data.origin.x.mul(X).add(data.origin.y.mul(Y)),data.direction.x.mul(X).add(data.direction.y.mul(Y))]));
+      const source=p===s?piece.start:piece.end;if(getRationalParameterization3(source)){const [U,V]=duals(e),n=vector3(U.x.mul(X).add(V.x.mul(Y)),U.y.mul(X).add(V.y.mul(Y)),U.z.mul(X).add(V.z.mul(Y)));return classifyPointToSurface3(source,{kind:'plane',plane:plane3(n.x,n.y,n.z,dot3(n,f.origin).neg())});}
       return p.x.affine(X).add(p.y.affine(Y)).sign();
     };
     // Either endpoint may have the smaller phase, independently of traversal.
@@ -194,15 +201,16 @@ export function intersectEllipses3(inputA:Ellipse3,inputB:Ellipse3):EllipseEllip
       if(x.signOf(L)!==0){
         // Evaluate each world coordinate as one rational function of x;
         // no independent conjugate Cartesian product is introduced.
-        const component=(k:'x'|'y'|'z')=>x.rationalFunction(L.scale(a.frame.origin[k]).add(X.mul(L).scale(a.frame.u[k])).sub(M.scale(a.frame.v[k])),L);
-        points.push(snapshotExactPoint3({x:component('x'),y:component('y'),z:component('z')}));
+        const numerators=(['x','y','z'] as const).map(k=>L.scale(a.frame.origin[k]).add(X.mul(L).scale(a.frame.u[k])).sub(M.scale(a.frame.v[k]))) as [Polynomial,Polynomial,Polynomial];
+        points.push(algebraicRationalPoint3(x,numerators,L));
       }else if(x.signOf(M)===0){
         if(radial===0)points.push(algebraicPoint3(a.frame.origin,a.frame.u,x));
         else {
           const y=x.rationalFunction(R).sqrt();
           for(const Y of [y.neg(),y]){
-            const component=(k:'x'|'y'|'z')=>x.affine(a.frame.u[k],a.frame.origin[k]).add(Y.affine(a.frame.v[k]));
-            points.push(snapshotExactPoint3({x:component('x'),y:component('y'),z:component('z')}));
+            if(x.rational!==null)points.push(algebraicPoint3(point3(a.frame.origin.x.add(a.frame.u.x.mul(x.rational)),a.frame.origin.y.add(a.frame.u.y.mul(x.rational)),a.frame.origin.z.add(a.frame.u.z.mul(x.rational))),a.frame.v,Y));
+            else if(Y.rational!==null)points.push(algebraicPoint3(point3(a.frame.origin.x.add(a.frame.v.x.mul(Y.rational)),a.frame.origin.y.add(a.frame.v.y.mul(Y.rational)),a.frame.origin.z.add(a.frame.v.z.mul(Y.rational))),a.frame.u,x));
+            else points.push(algebraicBiparametricPoint3(a.frame.origin,a.frame.u,x,a.frame.v,Y));
           }
         }
       }

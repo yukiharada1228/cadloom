@@ -1334,3 +1334,11 @@ node examples/face-domain-record3.ts
 平面の再切断、斜めの四次交点、既存交線との楕円の共有、接線・交差なしにも対応します。人工的な母線分割は残します。切断円柱の平面キャップの分割・共通Bodyへの採用・立体ブーリアンの組み立ては未実装です。[構成と検証範囲](docs/proofs/cylinder-cell-plane-partition3.md)。
 
 `npm run build && node examples/cylinder-face-finite-cylinder3.ts`で、端面を含む有限円柱に対する面片の分類を実行できます。
+
+### 平面キャップを有限円柱で分割する
+
+`partitionPlanarFaceByCylinder3(face, cutter, planes?)`は、所有された平面領域を円柱の断面と任意の有理平面群で分割します。円・楕円・線分を近似せず、交点と極値で単調な面片を構築します。穴、傾いた楕円面、代数的な矩形境界にも対応します。`cells[]`には厳密な`locate`、円柱側の`side`、全平面の`planeSides`、向き付きの`boundary`があります。
+
+`partitionPlanarFaceByFiniteCylinder3(face, cutter, lower, upper)`は二つの端面も加え、面片の開いた内部の所属を`materialLocations`へ返します。一致する端面のパッチは`boundary`として残します。これで円柱側面と平面キャップの両方を有限円柱に対して分割・分類できます。両方の立体から面片を選び、閉じた材料境界へ接続する処理と共通Bodyへの採用は残っています。[構成と検証範囲](docs/proofs/planar-face-cylinder-partition3.md)。
+
+`npm run build && node examples/planar-face-finite-cylinder3.ts`でキャップの分割例を実行できます。

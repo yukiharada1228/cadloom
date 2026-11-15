@@ -214,3 +214,7 @@ export {partitionCylinderFaceCellsByPlane3,assertOwnedCylinderFacePlanePartition
 export type {CylinderFacePlanePartition3} from './geometry/cylinder-cell-plane-partition3.js';
 export {partitionCylinderFaceByFiniteCylinder3,assertOwnedCylinderFaceFiniteCylinderPartition3} from './geometry/cylinder-face-finite-cylinder3.js';
 export type {CylinderFaceFiniteCylinderPartition3} from './geometry/cylinder-face-finite-cylinder3.js';
+export {partitionPlanarFaceByCylinder3,assertOwnedPlanarFaceCylinderPartition3} from './geometry/planar-face-cylinder-partition3.js';
+export type {PlanarVerticalBound3,PlanarCylinderFaceCell3,PlanarFaceCylinderPartition3} from './geometry/planar-face-cylinder-partition3.js';
+export {partitionPlanarFaceByFiniteCylinder3,assertOwnedPlanarFaceFiniteCylinderPartition3} from './geometry/planar-face-finite-cylinder3.js';
+export type {PlanarFaceFiniteCylinderPartition3} from './geometry/planar-face-finite-cylinder3.js';
