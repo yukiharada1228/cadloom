@@ -1,3 +1,7 @@
+import {plane3} from './plane3.js';
+import {snapshotExactPoint3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
+import type {AlgebraicCoordinates3} from './algebraic-point3.js';
+import type {Point3} from './point3.js';
 import {assertOwnedFiniteCylinder3} from './finite-cylinder-boolean3.js';
 import type {FiniteCylinder3} from './finite-cylinder-boolean3.js';
 import {partitionCylinderFaceByFiniteCylinders3} from './cylinder-face-finite-cylinder3.js';
@@ -6,9 +10,9 @@ import {partitionPlanarFaceByFiniteCylinders3} from './planar-face-finite-cylind
 import type {PlanarFaceFiniteCylindersPartition3} from './planar-face-finite-cylinder3.js';
 import type {CylinderFaceCell3} from './cylinder-face-cylinder-partition3.js';
 import type {PlanarCylinderFaceCell3} from './planar-face-cylinder-partition3.js';
-import {surfacesCoincide3} from './surface3.js';
+import {surfacesCoincide3,classifyPointToSurface3} from './surface3.js';
 import type {Surface3} from './surface3.js';
-import {dot3} from './point3.js';
+import {dot3,point3,cross3} from './point3.js';
 import {nativeBRepCurve3,reverseBRepCurve3} from './brep-curve3.js';
 import type {BRepCurve3} from './brep-curve3.js';
 import {sewMixedBRepFaces3} from './sew-mixed-brep3.js';
@@ -56,4 +60,19 @@ export function boundaryFiniteCylinderExpression3(input:readonly FiniteCylinder3
  });
  const sewn=sewMixedBRepFaces3(faces.map(f=>({surface:f.surface,sense:f.sense,loops:[f.boundary]})));for(const edge of sewn.topology.edges)if(edge.coedges.length<2||edge.coedges.reduce((sum,id)=>sum+sewn.topology.coedges[id]!.direction,0)!==0)throw new Error('Cylinder expression boundary has an unbalanced edge');
  const empty=faces.length===0,result=Object.freeze({operands,expression,partitions,faces:Object.freeze(faces),sewn,empty,manifold:empty||sewn.topology.closedOrientedIncidence});owned.add(result);return result;
+}
+
+/** Regularized material membership, including points on discarded primitive
+ * boundaries. Generic symbolic infinitesimal directions require no epsilon. */
+export function locateFiniteCylinderExpression3(source:FiniteCylinderExpressionBoundary3,input:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
+ assertOwnedFiniteCylinderExpressionBoundary3(source);if(source.empty)return 'outside';const p=snapshotExactPoint3(input);if(source.faces.some(f=>f.domain.locate(p)!=='outside'))return 'boundary';
+ for(let k=0n;;k++){
+  const v=point3(1n,k,k*k),values:boolean[]=[];let retry=false;
+  for(const primitive of source.operands){
+   const c=primitive.cylinder,d=c.axis.direction,o=c.axis.origin,D=dot3(d,d),dv=dot3(d,v),n=point3(v.x.mul(D).sub(d.x.mul(dv)),v.y.mul(D).sub(d.y.mul(dv)),v.z.mul(D).sub(d.z.mul(dv)));let radial=classifyPointToSurface3(p,{kind:'cylinder',cylinder:c});
+   if(radial===0){radial=signLinearAlgebraicPoint3(p,n,dot3(n,o).neg());if(radial===0){const cross=cross3(d,v);if(dot3(cross,cross).sign()===0){retry=true;break;}radial=1;}}
+   const cap=(t:typeof primitive.lower)=>{const normal=d,offset=dot3(d,o).add(D.mul(t)).neg(),sign=classifyPointToSurface3(p,{kind:'plane',plane:plane3(normal.x,normal.y,normal.z,offset)});return sign===0?dv.sign():sign;},lo=cap(primitive.lower),hi=cap(primitive.upper);if(lo===0||hi===0){retry=true;break;}values.push(radial<0&&lo>0&&hi<0);
+  }
+  if(!retry)return evaluate(source.expression,values)?'inside':'outside';
+ }
 }

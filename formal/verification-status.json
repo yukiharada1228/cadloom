@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "30a672958de800b1983d3a00a98e46c3cd109f365ca62615c28337d1d95d0da0",
+    "src/index.ts": "f80c3ca988169940161d9782674f1ca81f31ae3181d38aaaa02b5afa97fb9d38",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -83,9 +83,9 @@
     "src/convert/geometry3.ts": "27bd3114d8821c9a30ce7161b8e7774a1ba0225dc85c71390223203c6e2ef75d",
     "src/convert/body3.ts": "6a928f480faf35040410e68175a44f04ea8509230fddd0c71544a1c6bd9c2588",
     "src/convert/exact3.ts": "819907e5bc68f80ec9bb45574d1f3d40f6d9b3894124203ed3677258771336ca",
-    "src/record/body-document3.ts": "71a18d2bb08de8cd37340baeeb58fb15b042ce1bb892f6c0e6d5da59d8dd5b18",
-    "src/model/body3.ts": "a1f9ff6ad50fbf767348aa5050117dc988004a74507beae42f7191933238de0f",
-    "src/ops/body3.ts": "b0c825de5b38ac87ed2275b62cba94f98903d1bf599af2b12d2ca323bcc838bf",
+    "src/record/body-document3.ts": "37725f586d0c9a4756778e12a0407186ad450a487a25df9cb02187a2873cf4bc",
+    "src/model/body3.ts": "423400d330a7f1ecd18ee37b0ef98d098e810c833aab362bce371f32815d6328",
+    "src/ops/body3.ts": "a6acce1c5fd527c6ecc531a2ce4b152c2315d441f0d46ac3b3e50bf3c7524ab1",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "bf554a7865790e7391da62adf73ae30d25c9942feeed6693a2fb7450167a475f",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
@@ -127,7 +127,7 @@
     "src/geometry/finite-cylinder-regions3.ts": "8376182dafc175e64a052cbbb3a81d47a85a8c9b2547960e01dd413bdb6ae5f5",
     "src/geometry/cylinder-intersection-cylinder3.ts": "80b557b66b3927c5699b6ac9130eefe3f7716c17e9581c655b762f3de22c0ffd",
     "src/geometry/cylinder-cell-refinement3.ts": "8586b5e7771198a69845f5268474c711e6e0d84b35e08db61c3532cbb45c74f6",
-    "src/geometry/finite-cylinder-expression3.ts": "489c8c014b5a5348e69e77bb9bd0de4fce5c653de42b3d14ab8db198337c3840",
+    "src/geometry/finite-cylinder-expression3.ts": "0e0fe7950298283c1c5c26ffbc8847abc2d9b02853195c3132814e6e2de8e313",
     "src/convert/finite-cylinder-expression3.ts": "4114952d90062f809d339eefd7931f7017df415d1e6dee073ca27675ef05e574"
   },
   "checkedTheorems": [
@@ -342,6 +342,7 @@
     "Owned cylinder face cells overlay repeated native cylinder/plane arrangements with complete old/new bound events, inherited side vectors and source-cell provenance; ordered refined-domain records replay and bind whole boundaries. Verified same-fiber affine reflection, RUR discriminants, genuine SSI point support identities and certified interval linear/quadratic sign filters preserve exactness while avoiding unnecessary field extensions. Runtime tests and documented constructions are not new machine refinement proofs; multi-cutter planar caps, material assembly and reusable curved Body operands remain incomplete.",
     "Finite-cylinder expression boundaries use complete primitive-face arrangements and Boolean evaluation of exact two-sided membership vectors, with coincident-support checks and balanced-edge sewing. Executable regressions and documented constructions are not a machine proof. General oblique/contact regression coverage, common Body adoption, expression persistence and regularized material point location remain incomplete.",
     "Owned finite-cylinder expression boundaries export selected wall and cap definitions through common BodyRecord and restore complete oriented domains via existing mixed face binding. Caller-supplied region roles do not establish shell/material validity. This is executable serialization validation, not a machine proof, common Body adoption or editable expression replay.",
-    "Owned manifold cylinder-expression regions share the constructive exact full-line shell forest algorithm with two-cylinder Booleans. Candidate side witnesses on primitive boundaries retry; expression truth and shell coorientation validate material/void roles. Documented constructions and executable regressions are not a machine proof or arbitrary imported-shell certification. Common Body adoption and editable expression recipe replay remain incomplete."
+    "Owned manifold cylinder-expression regions share the constructive exact full-line shell forest algorithm with two-cylinder Booleans. Candidate side witnesses on primitive boundaries retry; expression truth and shell coorientation validate material/void roles. Documented constructions and executable regressions are not a machine proof or arbitrary imported-shell certification. Common Body adoption and editable expression recipe replay remain incomplete.",
+    "Owned manifold finite-cylinder expression Bodies use derived regions, mixed face binding, exact symbolic-infinitesimal regularized point queries and normalized expression recipe replay. Previous binary/expression Bodies are reusable operands after restoration; ordered record equivalence checks regenerated material. Documented constructions and executable tests are not a machine proof. Plane-clipped leaves, arbitrary curved import, general oblique/contact coverage and broader analytic/NURBS Booleans remain incomplete."
   ]
 }

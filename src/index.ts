@@ -260,3 +260,5 @@ export type {FiniteCylinderExpression3,FiniteCylinderExpressionFace3,FiniteCylin
 export {bodyRecordFromFiniteCylinderExpression3} from './convert/finite-cylinder-expression3.js';
 export {finiteCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
 export type {FiniteCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
+export {bodyFromFiniteCylinderExpression3} from './ops/body3.js';
+export {locateFiniteCylinderExpression3} from './geometry/finite-cylinder-expression3.js';

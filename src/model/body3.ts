@@ -1,8 +1,10 @@
+import {assertOwnedFiniteCylinderExpressionBoundary3,locateFiniteCylinderExpression3} from '../geometry/finite-cylinder-expression3.js';
+import type {FiniteCylinderExpressionBoundary3} from '../geometry/finite-cylinder-expression3.js';
 import type {Curve3} from '../geometry/curve3.js';
 import type {BRepCurve3} from '../geometry/brep-curve3.js';
 import type {DecodedMixedFaceDomain3} from '../convert/mixed-face-domain3.js';
 import {restoreMixedBRepFaces3} from '../convert/mixed-faces3.js';
-import {finiteCylinderBooleanRegions3} from '../geometry/finite-cylinder-regions3.js';
+import {finiteCylinderExpressionRegions3,finiteCylinderBooleanRegions3} from '../geometry/finite-cylinder-regions3.js';
 import {assertOwnedFiniteCylinderBoolean3} from '../geometry/finite-cylinder-boolean3.js';
 import type {FiniteCylinderBoolean3,FiniteCylinder3} from '../geometry/finite-cylinder-boolean3.js';
 import {encodeRationalPoint3} from '../convert/exact3.js';
@@ -41,7 +43,7 @@ export interface Body3 {
   readonly interiorSamples:readonly AlgebraicCoordinates3[];readonly faces:readonly (DecodedFaceDomain3|DecodedMixedFaceDomain3)[];
 }
 type Location=(point:Point3|AlgebraicCoordinates3)=>CurveRegionLocation2;
-const states=new WeakMap<Body3,{locate:Location;faces:readonly Location[];planar:PreparedPlanarSolid3|undefined;cylinder:ClippedCylinderBRep3|undefined;nativeTopology:BRepTopology3|undefined;finiteCylinderBoolean:FiniteCylinderBoolean3|undefined}>();
+const states=new WeakMap<Body3,{locate:Location;faces:readonly Location[];planar:PreparedPlanarSolid3|undefined;cylinder:ClippedCylinderBRep3|undefined;nativeTopology:BRepTopology3|undefined;finiteCylinderBoolean:FiniteCylinderBoolean3|undefined;finiteCylinderExpression?:FiniteCylinderExpressionBoundary3}>();
 function state(body:Body3){const data=states.get(body);if(!data)throw new RangeError('Operation requires a factory-created Body');return data;}
 export function assertOwnedBody3(body:Body3):void {state(body);}
 export function locateBody3(body:Body3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2{return state(body).locate(point);}
@@ -91,4 +93,13 @@ export function adoptFiniteCylinderBooleanBody3(source:FiniteCylinderBoolean3):B
  if(!topology.closedOrientedIncidence||topology.issues.length||samples.length!==material.regions.slice(1).filter(r=>!r.void).length||samples.some(p=>source.locate(p)!=='inside'))throw new Error('Curved Body representation invariant failed');
  const document=readBodyDocument3({version:1,construction:{kind:'finite-cylinder-boolean',first:primitive(source.first),second:primitive(source.second),operation:source.operation},body:material.record}),result=Object.freeze({record:geometry.record,geometry,topology,construction:document.construction,interiorSamples:samples,faces});
  states.set(result,{locate:p=>source.locate(p),faces:Object.freeze(faces.map(f=>(p:Point3|AlgebraicCoordinates3)=>f.locate(p))),planar:undefined,cylinder:undefined,nativeTopology:undefined,finiteCylinderBoolean:source});return result;
+}
+
+export function finiteCylinderExpressionSourceOfBody3(body:Body3):FiniteCylinderExpressionBoundary3|undefined{return state(body).finiteCylinderExpression;}
+export function finiteCylinderBooleanSourceOfBody3(body:Body3):FiniteCylinderBoolean3|undefined{return state(body).finiteCylinderBoolean;}
+export function adoptFiniteCylinderExpressionBody3(source:FiniteCylinderExpressionBoundary3):Body3 {
+ assertOwnedFiniteCylinderExpressionBoundary3(source);const material=finiteCylinderExpressionRegions3(source),restored=restoreMixedBRepFaces3(material.record),geometry=restored.boundary.geometry,topology=restored.boundary.topology,faces=restored.faces,samples=Object.freeze(material.materialSamples.map(snapshotExactPoint3)),locate:Location=p=>locateFiniteCylinderExpression3(source,p),primitive=(p:FiniteCylinder3)=>({origin:encodeRationalPoint3(p.cylinder.axis.origin),direction:encodeRationalPoint3(p.cylinder.axis.direction),radiusSquared:p.cylinder.radiusSquared.toString(),lower:p.lower.toString(),upper:p.upper.toString()});
+ if(!topology.closedOrientedIncidence||topology.issues.length||samples.length!==material.regions.slice(1).filter(r=>!r.void).length||samples.some(p=>locate(p)!=='inside'))throw new Error('Cylinder expression Body representation invariant failed');
+ const document=readBodyDocument3({version:1,construction:{kind:'finite-cylinder-expression',operands:source.operands.map(primitive),expression:source.expression},body:material.record}),result=Object.freeze({record:geometry.record,geometry,topology,construction:document.construction,interiorSamples:samples,faces});
+ states.set(result,{locate,faces:Object.freeze(faces.map(f=>(p:Point3|AlgebraicCoordinates3)=>f.locate(p))),planar:undefined,cylinder:undefined,nativeTopology:undefined,finiteCylinderBoolean:undefined,finiteCylinderExpression:source});return result;
 }

@@ -1,3 +1,7 @@
+import {boundaryFiniteCylinderExpression3} from '../geometry/finite-cylinder-expression3.js';
+import type {FiniteCylinderExpressionBoundary3,FiniteCylinderExpression3} from '../geometry/finite-cylinder-expression3.js';
+import type {FiniteCylinder3} from '../geometry/finite-cylinder-boolean3.js';
+import {adoptFiniteCylinderExpressionBody3,finiteCylinderExpressionSourceOfBody3,finiteCylinderBooleanSourceOfBody3} from '../model/body3.js';
 import {prepareFiniteCylinder3,booleanFiniteCylinders3} from '../geometry/finite-cylinder-boolean3.js';
 import type {FiniteCylinderBoolean3} from '../geometry/finite-cylinder-boolean3.js';
 import {adoptFiniteCylinderBooleanBody3,nativeTopologyOfBody3,cylinderSourceOfBody3} from '../model/body3.js';
@@ -47,6 +51,7 @@ export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);
 export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
+    case 'finite-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper));return bodyFromFiniteCylinderExpression3(boundaryFiniteCylinderExpression3(operands,construction.expression));}
     case 'finite-cylinder-boolean':{const cylinder=(p:typeof construction.first)=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper);return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(cylinder(construction.first),cylinder(construction.second),construction.operation));}
     case 'planar-consolidated':return replayConsolidated(construction.polygons.map(p=>p.map(decodeRationalPoint3))).body;
     case 'planar':return createPlanarBody3(construction.polygons.map(p=>p.map(decodeRationalPoint3)));
@@ -114,9 +119,14 @@ export function bodyFromClippedCylinder3(source:ClippedCylinderBRep3):Body3 {
 
 /** Adopt an owned manifold two-cylinder Boolean into the common Body contract. */
 export function bodyFromFiniteCylinderBoolean3(source:FiniteCylinderBoolean3):Body3 {return adoptFiniteCylinderBooleanBody3(source);}
-/** Primitive finite-cylinder Body operands only; clipping constraints and prior
- * curved Boolean results require their own complete partition backends. */
+/** Cylinder primitives and previously constructed cylinder-expression Bodies.
+ * Plane-clipped cylinders require their own expression leaf backend. */
 export function booleanCylinderBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
  const primitive=(body:Body3)=>{const s=cylinderSourceOfBody3(body);if(s.planes.length!==2)throw new RangeError('Cylinder Body Boolean requires an unclipped finite cylinder');return prepareFiniteCylinder3(s.cylinder,s.lower,s.upper);};
- return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(primitive(first),primitive(second),operation));
+ const parts=(body:Body3):{operands:readonly FiniteCylinder3[];expression:FiniteCylinderExpression3}|null=>{const expression=finiteCylinderExpressionSourceOfBody3(body);if(expression)return expression;const binary=finiteCylinderBooleanSourceOfBody3(body);return binary?{operands:[binary.first,binary.second],expression:{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}}}:null;},a=parts(first),b=parts(second);
+ if(!a&&!b)return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(primitive(first),primitive(second),operation));
+ const operands:FiniteCylinder3[]=[],ids=new Map<FiniteCylinder3,number>();
+ const remap=(part:{operands:readonly FiniteCylinder3[];expression:FiniteCylinderExpression3}):FiniteCylinderExpression3=>{const indices=part.operands.map(p=>{let id=ids.get(p);if(id===undefined){id=operands.length;ids.set(p,id);operands.push(p);}return id;}),walk=(t:FiniteCylinderExpression3):FiniteCylinderExpression3=>t.kind==='operand'?{kind:'operand',operand:indices[t.operand]!}:{kind:t.kind,first:walk(t.first),second:walk(t.second)};return walk(part.expression);},leaf=(body:Body3)=>({operands:[primitive(body)],expression:{kind:'operand' as const,operand:0}});
+ const expression:FiniteCylinderExpression3={kind:operation,first:remap(a??leaf(first)),second:remap(b??leaf(second))};return bodyFromFiniteCylinderExpression3(boundaryFiniteCylinderExpression3(operands,expression));
 }
+export function bodyFromFiniteCylinderExpression3(source:FiniteCylinderExpressionBoundary3):Body3 {return adoptFiniteCylinderExpressionBody3(source);}
