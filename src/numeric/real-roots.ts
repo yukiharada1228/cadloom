@@ -67,7 +67,7 @@ function integerSquareRoot(n:bigint):bigint {
  * Refinement never mutates existing certificates. No floating-point approximation
  * is used. Arithmetic uses exact polynomial elimination and interval branch selection.
  */
-const realInstances=new WeakSet<AlgebraicReal>(),comparisons=new WeakMap<AlgebraicReal,WeakMap<AlgebraicReal,Sign>>();
+const realInstances=new WeakSet<AlgebraicReal>(),comparisons=new WeakMap<AlgebraicReal,WeakMap<AlgebraicReal,Sign>>(),refinements=new WeakMap<AlgebraicReal,AlgebraicReal>();
 export class AlgebraicReal {
   private constructor(readonly polynomial:Polynomial,readonly lower:Rational,readonly upper:Rational){Object.freeze(this);realInstances.add(this);}
   /** Null means not yet represented as a rational point, not a proof of irrationality. */
@@ -107,10 +107,11 @@ export class AlgebraicReal {
   }
   refine():AlgebraicReal {
     if(this.rational!==null)return this;
+    const known=refinements.get(this);if(known)return known;
     const mid=this.lower.add(this.upper).div(new Rational(2n)),value=this.polynomial.evaluate(mid).sign();
-    if(value===0)return new AlgebraicReal(this.polynomial,mid,mid);
-    return value===this.polynomial.evaluate(this.lower).sign()?
+    const result=value===0?new AlgebraicReal(this.polynomial,mid,mid):value===this.polynomial.evaluate(this.lower).sign()?
       new AlgebraicReal(this.polynomial,mid,this.upper):new AlgebraicReal(this.polynomial,this.lower,mid);
+    if(realInstances.has(this))refinements.set(this,result);return result;
   }
   /** Recover an exact rational root, even from a nonminimal certificate.
    * Acceptance checks the polynomial and isolating interval; otherwise an
@@ -209,7 +210,8 @@ export class AlgebraicReal {
     const simple=rationalCase();if(simple!==null)return simple;
     const polynomial=(operation==='sum'?sumElimination(a.polynomial,b.polynomial):productElimination(a.polynomial,b.polynomial)).squareFree();
     if(polynomial.degree<=0)throw new Error('Algebraic operation has no defining polynomial');
-    let candidates=[...AlgebraicReal.isolate(polynomial)];
+    if(polynomial.degree===1)return AlgebraicReal.fromRational(polynomial.coefficient(0).neg().div(polynomial.coefficient(1)));
+    const sequence=sturmSequence(polynomial),certificate=sequence[0]!;
     while(true){
       const exact=rationalCase();if(exact!==null)return exact;
       let lower:Rational,upper:Rational;
@@ -218,12 +220,16 @@ export class AlgebraicReal {
         const products=[a.lower.mul(b.lower),a.lower.mul(b.upper),a.upper.mul(b.lower),a.upper.mul(b.upper)].sort((x,y)=>x.compare(y));
         lower=products[0]!;upper=products[3]!;
       }
-      // Keep every candidate whose certificate may contain a value in the image
-      // interval. The actual result is never discarded; refine until unique.
-      candidates=candidates.filter(c=>c.lower.compare(upper)<=0&&c.upper.compare(lower)>=0);
-      if(candidates.length===0)throw new Error('Algebraic image interval lost all candidate roots');
-      if(candidates.length===1)return candidates[0]!;
-      candidates=candidates.map(c=>c.refine());
+      // Isolate only the represented sum/product, not every conjugate. The
+      // padded enclosure strictly contains the actual value and converges to
+      // it under operand refinement, even when the operands are dependent.
+      const padding=upper.sub(lower).add(a.upper.sub(a.lower)).add(b.upper.sub(b.lower)),lo=lower.sub(padding),hi=upper.add(padding);
+      if(certificate.evaluate(lo).sign()!==0&&certificate.evaluate(hi).sign()!==0){const count=countOpen(sequence,lo,hi);if(count===0)throw new Error('Algebraic image interval lost its represented root');if(count===1){
+        // Preserve canonical zero: a unique represented root in this interval
+        // is exactly zero when zero is itself a root inside the interval.
+        if(certificate.coefficient(0).sign()===0&&lo.sign()<0&&hi.sign()>0)return AlgebraicReal.fromRational(0n);
+        return new AlgebraicReal(certificate,lo,hi);
+      }}
       if(a.upper.sub(a.lower).compare(b.upper.sub(b.lower))>=0)a=a.refine();else b=b.refine();
     }
   }
