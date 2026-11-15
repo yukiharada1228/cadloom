@@ -25,3 +25,6 @@ test('shared-source lexicographic order and equality retain x/y/z priority and e
  for(const v of [point3(1n,-100n,-100n),point3(0n,1n,-100n),point3(0n,0n,1n),point3(-1n,100n,100n),O]){const b=translateAlgebraicPoint3(a,v),first=[v.x,v.y,v.z].find(c=>c.sign()!==0),expected=first?-first.sign():0;assert.equal(compareAlgebraicPoints3(a,b),expected);assert.equal(algebraicPointsEqual3(a,b),expected===0);assert.equal(compareAlgebraicPoints3(b,a),expected===0?0:-expected);}
  const same=algebraicQuadraticPoint3(r,[T.neg(),P(),P()],vector3(0n,-1n),P(3n),P(-1n));assert.equal(compareAlgebraicPoints3(a,same),0);assert.equal(algebraicPointsEqual3(a,same),true);
 });
+test('equivalent independently restored source roots compare through the same real field',()=>{
+ const same=r.refine(),other=algebraicQuadraticPoint3(same,N,vector3(0n,1n),P(3n));assert.notEqual(same,r);assert.equal(compareAlgebraicPoints3(a,other),0);assert.equal(compareLinearPoints3(a,other,vector3(1n,1n)),0);const nonminimal=AlgebraicReal.fromIsolatingInterval(P(6n,0n,-5n,0n,1n),'7/5','3/2'),again=algebraicQuadraticPoint3(nonminimal,N,vector3(0n,1n),P(3n));assert.equal(compareAlgebraicPoints3(a,again),0);
+});

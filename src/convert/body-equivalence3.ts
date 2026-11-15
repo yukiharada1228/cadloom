@@ -13,7 +13,7 @@ export function constructionRecordsAgree3(a:BodyRecord3,b:BodyRecord3):boolean {
     if(typeof x==='string'&&typeof y==='string')return rational.test(x)&&rational.test(y)?Rational.parse(x).equals(Rational.parse(y)):false;
     if(x===null||y===null||typeof x!=='object'||typeof y!=='object')return false;
     if(Array.isArray(x)||Array.isArray(y))return Array.isArray(x)&&Array.isArray(y)&&x.length===y.length&&x.every((v,i)=>same(v,y[i]));
-    const X=x as Record<string,unknown>,Y=y as Record<string,unknown>,point=(k:unknown)=>k==='affine'||k==='coordinates'||k==='rational-map'||k==='biparametric',real=(k:unknown)=>k==='root'||k==='rational';
+    const X=x as Record<string,unknown>,Y=y as Record<string,unknown>,point=(k:unknown)=>k==='affine'||k==='coordinates'||k==='rational-map'||k==='biparametric'||k==='quadratic-map',real=(k:unknown)=>k==='root'||k==='rational';
     if(point(X.kind)&&point(Y.kind))return compareAlgebraicPoints3(decodeExactPoint3(x as ExactPointRecord3),decodeExactPoint3(y as ExactPointRecord3))===0;
     if(real(X.kind)&&real(Y.kind))return decodeExactReal3(x as ExactRealRecord3).compare(decodeExactReal3(y as ExactRealRecord3))===0;
     const keys=Object.keys(X);return keys.length===Object.keys(Y).length&&keys.every(k=>Object.hasOwn(Y,k)&&same(X[k],Y[k]));

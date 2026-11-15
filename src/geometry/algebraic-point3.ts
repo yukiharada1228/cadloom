@@ -172,7 +172,7 @@ function linearSource3(p:AlgebraicCoordinates3,n:Vector3):LinearSource3|undefine
 /** Compare inside one actual shared source field before making image values.
  * Different parameters/radicands leave the complete general path unchanged. */
 function compareCommonLinearSource3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3,n:Vector3):Sign|undefined {
- const A=linearSource3(a,n),B=linearSource3(b,n);if(!A||!B||A.parameter!==B.parameter||A.radicand&&B.radicand&&!A.radicand.equals(B.radicand))return undefined;
+ const A=linearSource3(a,n),B=linearSource3(b,n);if(!A||!B||A.radicand&&B.radicand&&!A.radicand.equals(B.radicand)||A.parameter!==B.parameter&&A.parameter.compare(B.parameter)!==0)return undefined;
  const numerator=A.numerator.mul(B.denominator).sub(B.numerator.mul(A.denominator)),radicand=A.radicand??B.radicand,coefficient=B.denominator.scale(A.coefficient).sub(A.denominator.scale(B.coefficient)),sign=radicand?A.parameter.signQuadratic(numerator,coefficient,radicand):A.parameter.signOf(numerator);
  return sign===0?0:sign*A.parameter.signOf(A.denominator)*A.parameter.signOf(B.denominator) as Sign;
 }

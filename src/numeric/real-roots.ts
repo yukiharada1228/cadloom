@@ -76,6 +76,15 @@ export class AlgebraicReal {
     const value=exactRational(input);
     return new AlgebraicReal(new Polynomial([value.neg(),1n]),value,value);
   }
+  /** Restore only after proving one root in the strict open interval. No
+   * unrelated conjugate intervals need to be isolated to certify this root. */
+  static fromIsolatingInterval(polynomial:Polynomial,lower:ExactInput,upper:ExactInput):AlgebraicReal {
+    const lo=exactRational(lower),hi=exactRational(upper);if(polynomial.degree<1||lo.compare(hi)>=0)throw new RangeError('Invalid unique-root certificate');
+    const sequence=sturmSequence(polynomial),p=sequence[0]!;if(p.evaluate(lo).sign()===0||p.evaluate(hi).sign()===0||countOpen(sequence,lo,hi)!==1)throw new RangeError('Invalid unique-root certificate');
+    if(p.degree===1)return AlgebraicReal.fromRational(p.coefficient(0).neg().div(p.coefficient(1)));
+    if(p.coefficient(0).sign()===0&&lo.sign()<0&&hi.sign()>0)return AlgebraicReal.fromRational(0n);
+    return new AlgebraicReal(p,lo,hi);
+  }
   static isolate(input:Polynomial):readonly AlgebraicReal[] {
     const sequence=sturmSequence(input),p=sequence[0]!;
     if(p.degree===0)return Object.freeze([]);

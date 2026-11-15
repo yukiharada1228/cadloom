@@ -33,7 +33,9 @@ export interface DecodedBodyGeometry3 {
  * face domains, shell connectivity/embedding, void containment or solid validity.
  */
 export function decodeBodyGeometry3(input:unknown,limits:RecordReadLimits3={}):DecodedBodyGeometry3 {
-  const record=readBodyRecord3(input,limits),vertices=Object.freeze(record.vertices.map(decodeExactPoint3)),curves=Object.freeze(record.curves.map(c=>c.kind==='cylinder-ssi'?decodeBRepCurveRecord3(c) as Extract<BRepCurve3,{kind:'cylinder-ssi'}>:decodeCurveRecord3(c))),surfaces=Object.freeze(record.surfaces.map(decodeSurfaceRecord3));
+  const record=readBodyRecord3(input,limits),vertices=Object.freeze(record.vertices.map(decodeExactPoint3)),hints=new Map<number,AlgebraicCoordinates3[]>();
+  for(const e of record.edges){let points=hints.get(e.curve);if(!points){points=[];hints.set(e.curve,points);}for(const id of [e.start,e.end])if(!points.includes(vertices[id]!))points.push(vertices[id]!);}
+  const curves=Object.freeze(record.curves.map((c,i)=>c.kind==='cylinder-ssi'?decodeBRepCurveRecord3(c,limits,hints.get(i)) as Extract<BRepCurve3,{kind:'cylinder-ssi'}>:decodeCurveRecord3(c))),surfaces=Object.freeze(record.surfaces.map(decodeSurfaceRecord3));
   const xy={kind:'plane' as const,plane:plane3(0n,0n,1n,0n)};
   for(const loop of record.loops)for(const u of loop.uses)if(u.pcurve!==undefined){const c=curves[u.pcurve]!;if(c.kind==='cylinder-ssi'||(c.kind==='nurbs'?nurbsCurveSpans3(c.curve).some(s=>s.z.degree>=0):!curveOnSurface3(c,xy)))throw new RangeError('A pcurve must lie in local (u,v,0) coordinates');}
   return Object.freeze({record,vertices,curves,surfaces});

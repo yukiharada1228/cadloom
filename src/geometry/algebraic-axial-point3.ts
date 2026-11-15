@@ -17,8 +17,9 @@ function direction(input:Vector3):Vector3 {const d=vector3(input.x,input.y,input
 /** Read-only provenance from actual coordinate construction, never public flags. */
 const derived=new WeakMap<AlgebraicCoordinates3,readonly AlgebraicAxialCoordinates3[]>();
 function decompositions(point:AlgebraicCoordinates3):readonly AlgebraicAxialCoordinates3[] {
- const known=derived.get(point);if(known)return known;const result:AlgebraicAxialCoordinates3[]=[],a=getPointParameterization3(point),b=getBiparameterization3(point);
+ const known=derived.get(point);if(known)return known;const result:AlgebraicAxialCoordinates3[]=[],a=getPointParameterization3(point),b=getBiparameterization3(point),q=getQuadraticParameterization3(point);
  if(a&&dot3(a.direction,a.direction).sign()!==0)result.push(Object.freeze({base:algebraicCoordinates3(a.origin.x,a.origin.y,a.origin.z),direction:a.direction}));
+ if(q&&dot3(q.coefficients,q.coefficients).sign()!==0)result.push(Object.freeze({base:algebraicRationalPoint3(q.parameter,q.numerators,q.denominator),direction:q.coefficients}));
  if(b){if(dot3(b.v,b.v).sign()!==0)result.push(Object.freeze({base:algebraicPoint3(b.origin,b.u,b.s),direction:b.v}));if(dot3(b.u,b.u).sign()!==0)result.push(Object.freeze({base:algebraicPoint3(b.origin,b.v,b.t),direction:b.u}));}const frozen=Object.freeze(result);derived.set(point,frozen);return frozen;
 }
 export function getAlgebraicAxialCoordinates3(point:AlgebraicCoordinates3,wanted?:Vector3):AlgebraicAxialCoordinates3|undefined {const own=axial.get(point);return own&&(!wanted||parallel(own.direction,wanted))?own:decompositions(point).find(a=>!wanted||parallel(a.direction,wanted));}
