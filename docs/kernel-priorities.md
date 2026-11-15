@@ -189,4 +189,8 @@ The parity compiler now derives a direct vertex fan from each already validated 
 
 ### Reuse validated plane inverse charts
 
-Actual frozen frame factories now retain the validated normal and exact Gram inverse constants; inverse/null results reuse only actual immutable snapshotted points. Mutable/copied frame and point inputs still revalidate. All 34 connected cases, all 831 non-hard regressions and the scoped audit pass. See [invariants and pending hard/boundary gates](plane-frame-projection-reuse3.md). This preserves exact membership and affine provenance without tolerance or public certification flags.
+Actual frozen frame factories now retain the validated normal and exact Gram inverse constants; inverse/null results reuse only actual immutable snapshotted points. Mutable/copied frame and point inputs still revalidate. All 34 connected cases, all 831 non-hard regressions and the scoped audit pass. See [invariants and boundary verification scope](plane-frame-projection-reuse3.md). This preserves exact membership and affine provenance without tolerance or public certification flags.
+
+### Canonical planar carriers with guarded polarity
+
+The parity compiler now folds opposite plane orientations into one geometric carrier, representing the reversed side by difference within the same actual enclosing guard. All four chamber cases and a fifth regularized tetrahedron boundary/Body replay case pass, along with the scoped audit. The L source drops from 36 oriented plane entries to 21 geometric carriers; its general boundary construction remains in progress. See [semantics and verification scope](planar-material-carriers3.md). Parent frame runtime 922d358 passed all 831 non-hard and unchanged hard two-test integration gates.

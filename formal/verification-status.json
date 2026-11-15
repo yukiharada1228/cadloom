@@ -140,7 +140,7 @@
     "src/convert/cylinder-material3.ts": "61e7a2eec116319b55cfc0d0c060398c9244a3735e9ec52385d25e62953c37cd",
     "src/geometry/box-material3.ts": "53ecb636a14aed1097c1e24aa323d15fa4c25e9052b0c539df0aade0143db0cc",
     "src/geometry/convex-planar-material3.ts": "db232ad7371f0721ff9f422cb7dd4d2b497100bf1c14581d0b6c7d1d045709f1",
-    "src/geometry/planar-material-program3.ts": "f34fa8c0ca702255c719ec72dcf853912239450d23eb4f291e2744a6d0ab40d5"
+    "src/geometry/planar-material-program3.ts": "32af3855502d17dc158637db906b0dce1de372a9a15e052891cd0657aea4bcaa"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

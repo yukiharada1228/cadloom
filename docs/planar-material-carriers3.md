@@ -1,0 +1,11 @@
+# Canonical geometric carriers with guarded polarity
+
+The planar parity compiler now stores one canonical plane for both orientations of a geometric carrier. Its first nonzero normal coefficient is normalized to positive one. A tetrahedron's negative-side predicate uses the plane leaf directly when its orientation agrees. When it is reversed, the predicate becomes `difference(guard, planeLeaf)`, where `guard` is the same actual finite cylinder that strictly contains every coned tetrahedron.
+
+Away from the carrier plane, reversing its equation swaps its strict negative/positive sides. Inside the guard, subtracting the negative side gives exactly the required positive side. Outside the guard the outer conjunction is false. Thus every open material chamber is unchanged, while opposite internal cone faces share a carrier instead of asking the arrangement engine to construct it twice. The existing balanced XOR tree and conservative boundedness certificate remain.
+
+The program continues to denote the regularized closure of its true open chambers. A closed-halfspace NOT at the plane itself is not used as a boundary classifier. Actual boundary selection still evaluates material on both sides of the carrier, so internal cone planes cancel and reversed physical faces keep the appropriate orientation. This is a construction argument, not a new Lean theorem.
+
+The same L source retains 28 tetrahedra while its plane table decreases from 36 oriented entries to 21 geometric carriers. This is a representation-size observation, not a controlled timing benchmark. General concave BRep construction is running on that reduced program and remains unverified.
+
+All four existing strict-chamber compiler tests pass on the new representation. A fifth test constructs the tetrahedron's actual manifold boundary, checks that only original supporting planes survive and reversed face orientations exist, then adopts, serializes and restores the Body. It checks interior points on internal fan planes, exterior points, physical faces and the original vertex. The existing 133-declaration scoped source/Lean audit passes; the rewrite and whole TypeScript execution are not machine-proved here. Parent runtime 922d358 passed its own 831 non-hard and unchanged hard two-test integration gates. The entire broad run was not repeated for this compiler-only change.
