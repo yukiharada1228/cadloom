@@ -295,3 +295,5 @@ export {bodyFromCylinderMaterial3} from './ops/body3.js';
 export {boundaryBoxMaterial3} from './geometry/box-material3.js';
 
 export {booleanMixedBodies3} from './ops/body3.js';
+
+export {boundaryConvexPlanarMaterial3} from './geometry/convex-planar-material3.js';

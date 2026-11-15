@@ -166,3 +166,7 @@ Clipped cylinder-family operands now compose through common Body Boolean dispatc
 ### Native Box / cylinder common Body composition
 
 `booleanMixedBodies3` connects actual owned/restored native boxes to cylinder-family operands, retaining local cuts through complete material-recipe replay and further operations. The cylinder-specific API keeps its earlier family contract. See [invariants and validation](box-cylinder-body3.md). General polyhedral/curved interoperability, transformed boxes, contact promotion and NURBS remain incomplete.
+
+### Convex planar boundary lowering
+
+Owned convex single-shell rational polyhedra now lower to their outward supporting halfspaces in the bounded plane/cylinder material backend. Every source vertex must lie in every negative halfspace; existing exact embedding/orientation certification and strict auxiliary guard containment are retained. Four-support tetrahedron replay agrees with 343 independent rational simplex points; concave, disconnected and copied inputs reject. See [construction and validation scope](convex-planar-material3.md). Native general-planar Body dispatch, nonconvex/void decomposition and maximal coplanar consolidation remain incomplete.
