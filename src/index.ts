@@ -341,3 +341,6 @@ export {prepareCylinderMaterialProgram3,assertOwnedCylinderMaterialProgram3} fro
 export type {CylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';
 export {materialProgramOfBoundary3} from './geometry/cylinder-material-expression3.js';
 export type {CylinderMaterialDefinition3} from './geometry/cylinder-material-expression3.js';
+
+export {encodePlanarCurveCellDomain3} from './convert/mixed-face-domain3.js';
+export type {PlanarCurveCellDomainRecord3} from './record/face-domain3.js';

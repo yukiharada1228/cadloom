@@ -1,3 +1,6 @@
+import {partitionPlanarFaceByCurves3,assertOwnedPlanarFaceCurvePartition3} from '../geometry/planar-face-cylinder-partition3.js';
+import type {PlanarFaceCurvePartition3} from '../geometry/planar-face-cylinder-partition3.js';
+import type {PlanarCurveCellDomainRecord3} from '../record/face-domain3.js';
 import {refineCylinderFaceCells3,assertOwnedCylinderFaceRefinement3} from '../geometry/cylinder-cell-refinement3.js';
 import type {CylinderFaceRefinement3,CylinderFaceRefinementInput3} from '../geometry/cylinder-cell-refinement3.js';
 import {partitionPlanarFaceByCylinders3,partitionPlanarFaceByCylinder3,assertOwnedPlanarFaceCylinderPartition3} from '../geometry/planar-face-cylinder-partition3.js';
@@ -6,7 +9,7 @@ import {readFaceDomainRecord3} from '../record/face-domain3.js';
 import type {CylinderCellDomainRecord3,PlanarCellDomainRecord3,PlanarMultiCellDomainRecord3,RefinedCylinderCellDomainRecord3} from '../record/face-domain3.js';
 import {decodeCylinderDomain3,encodeCylinderDomain3,encodePlanarDomain3,decodePlanarDomain3,decodeFaceDomain3} from './face-domain3.js';
 import {encodeRationalPoint3,decodeRationalPoint3,encodeExactPoint3,decodeExactPoint3} from './exact3.js';
-import {decodeSurfaceRecord3,encodeSurfaceRecord3,decodeCurveRecord3} from './geometry3.js';
+import {decodeSurfaceRecord3,encodeSurfaceRecord3,decodeCurveRecord3,encodeCurveRecord3} from './geometry3.js';
 import {line3,cylinder3} from '../geometry/surface3.js';
 import type {Surface3} from '../geometry/surface3.js';
 import {plane3} from '../geometry/plane3.js';
@@ -20,6 +23,13 @@ import type {BRepCurve3} from '../geometry/brep-curve3.js';
 import type {DecodedFaceDomain3} from './face-domain3.js';
 type Partition=CylinderFaceCylinderPartition3|CylinderFacePlanePartition3;
 export interface DecodedMixedFaceDomain3 extends Omit<DecodedFaceDomain3,'boundary'> {readonly boundary:readonly (readonly BRepCurve3[])[];}
+/** Store definitions and a strict witness; never trust a serialized cell index. */
+export function encodePlanarCurveCellDomain3(input:PlanarFaceCurvePartition3,cell:number,orientation:1|-1=1):PlanarCurveCellDomainRecord3 {
+ assertOwnedPlanarFaceCurvePartition3(input);
+ if(!Number.isSafeInteger(cell)||cell<0||cell>=input.cells.length)throw new RangeError('Invalid planar curve partition cell');
+ if(orientation!==1&&orientation!==-1)throw new RangeError('Invalid face orientation');
+ return Object.freeze({kind:'planar-curve-partition-cell',base:encodePlanarDomain3(input.base),curves:Object.freeze(input.cutCurves.map(encodeCurveRecord3)),sample:encodeExactPoint3(input.cells[cell]!.sample),orientation});
+}
 export function encodeCylinderCellDomain3(input:Partition,cell:number,orientation:1|-1=1):CylinderCellDomainRecord3 {
  const refined='planes' in input;if(refined)assertOwnedCylinderFacePlanePartition3(input);else assertOwnedCylinderFaceCylinderPartition3(input);
  if(!Number.isSafeInteger(cell)||cell<0||cell>=input.cells.length)throw new RangeError('Invalid cylinder partition cell');if(orientation!==1&&orientation!==-1)throw new RangeError('Invalid face orientation');
@@ -43,9 +53,19 @@ export function decodeMixedFaceDomain3(input:unknown):DecodedMixedFaceDomain3 {r
 /** Definition-only caches live for this explicit batch; witness selection and
  * orientation are validated separately for every decoded face. */
 export function createMixedFaceDomainDecoder3() {
+ const curvePartitions=new Map<string,PlanarFaceCurvePartition3>();
  const planarPartitions=new Map<string,PlanarFaceCylinderPartition3>(),cylinderPartitions=new Map<string,Partition>(),refinedPartitions=new Map<string,CylinderFaceRefinementInput3>();
  return (input:unknown):DecodedMixedFaceDomain3=>{
  const record=readFaceDomainRecord3(input);
+ if(record.kind==='planar-curve-partition-cell'){
+  const {sample:_sample,orientation:_orientation,...definition}=record,key=JSON.stringify(definition);
+  let partition=curvePartitions.get(key);
+  if(!partition){partition=partitionPlanarFaceByCurves3(decodePlanarDomain3(record.base),record.curves.map(c=>{const curve=decodeCurveRecord3(c);if(curve.kind==='nurbs')throw new RangeError('Planar curve cells do not support NURBS cuts');return curve;}));curvePartitions.set(key,partition);}
+  const witness=decodeExactPoint3(record.sample),cells=partition.cells.filter(c=>c.locate(witness)==='inside');
+  if(cells.length!==1)throw new RangeError('Planar curve cell witness must select exactly one strict interior cell');
+  const cell=cells[0]!,loop=cell.boundary.map(nativeBRepCurve3),boundary=record.orientation===1?loop:loop.reverse().map(reverseBRepCurve3);
+  return Object.freeze({record,surface:Object.freeze({kind:'plane',plane:partition.base.surface}),sense:partition.base.sense*record.orientation as 1|-1,boundary:Object.freeze([Object.freeze(boundary)]),sample:cell.sample,locate:cell.locate});
+ }
  if(record.kind==='cylinder-refined-cell'){
   const {sample:_sample,orientation:_orientation,...definition}=record,key=JSON.stringify(definition);let partition=refinedPartitions.get(key);if(!partition){const c=record.cutter;partition=partitionCylinderFaceByCylinder3(decodeCylinderDomain3(record.base),cylinder3(line3(decodeRationalPoint3(c.origin),decodeRationalPoint3(c.direction)),c.radiusSquared));for(const cut of record.cuts){const surface=decodeSurfaceRecord3(cut);if(surface.kind==='nurbs')throw new RangeError('Refined cylinder cells support only planes and circular cylinders');partition=refineCylinderFaceCells3(partition,surface);}refinedPartitions.set(key,partition);}
   const witness=decodeExactPoint3(record.sample),cells=partition.cells.filter(c=>c.locate(witness)==='inside');if(cells.length!==1)throw new RangeError('Refined cylinder witness must select exactly one strict interior cell');const cell=cells[0]!,boundary=record.orientation===1?cell.boundary:Object.freeze([...cell.boundary].reverse().map(reverseBRepCurve3));return Object.freeze({record,surface:Object.freeze({kind:'cylinder',cylinder:partition.base.surface}),sense:partition.base.sense*record.orientation as 1|-1,boundary:Object.freeze([boundary]),sample:cell.sample,locate:cell.locate});
