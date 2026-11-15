@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "1a05a7321528b5459ae76380015e2224125329bc436f44748f25cf05aa17a267",
+    "src/index.ts": "e45292a60b89d2d034ce63ab53414d08ea10f404ae5bde58a591b8238c47910f",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -94,7 +94,8 @@
     "src/geometry/face-domain-binding3.ts": "24f3bc3634c5473ba5b46d1da906cd56b2fb61ff16f926ef14abbf3869f65010",
     "src/convert/face-domain3.ts": "7bcb4c7f46f91e3ce4017c986b2a1b7f588500aaa27f3d20e9a07bdb9ed2fe69",
     "src/convert/native-faces3.ts": "61ddc80df45fc5720860e96adea0a849c0bbe99d9947df790a41eef0743d6afa",
-    "src/geometry/convex-polygon-plane-arrangement3.ts": "5a7e666a795f9d2713fab1df0c8dfe4db4337e6563be1e6d0faa654181d11e6a"
+    "src/geometry/convex-polygon-plane-arrangement3.ts": "5a7e666a795f9d2713fab1df0c8dfe4db4337e6563be1e6d0faa654181d11e6a",
+    "src/geometry/planar-brep-partition3.ts": "a7f8aaaf1ac30d41dc47345a77a686a95e41ba5a67bd022baaf69aca5add7184"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -281,6 +282,7 @@
     "Exact numeric/geometry codecs, immutable versioned Body records, structural references/loop ownership, input budgets and per-definition geometry restoration use executable tests and documented contracts, not machine verification of TypeScript. Record roles, closed incidence and successful geometry decoding do not certify geometry/topology agreement, face domains, shell/void embedding or material solid validity; a trusted common Body importer remains future work.",
     "Native boundary reconstruction checks exact endpoints, whole-edge surface support, vertex welding and shell face partitions. Common owned Box/Cylinder/vertical-extrusion Bodies use existing constructive provenance, exact classifiers and checked common records. Save/load replays supported constructions and compares exact ordered data; these are executable tests and documented arguments, not new machine proofs or arbitrary BRep face/shell/void certification.",
     "Portable analytic face-domain definitions reconstruct validated bounded domains, reselect trim components by strict witnesses, check coincident physical support orientation and bind complete oriented boundaries with one use from each comparison side. Common Body face queries use reconstructed definitions. These are documented arguments and executable checks, not machine proofs; global face/shell intersections, void containment, independent pcurves/parameter ranges and arbitrary NURBS face import remain outside scope.",
-    "Convex rational planar polygon subdivision uses input convexity/planarity checks and exact halfspace clipping, tested against independent halfplane vertex enumeration and geometric invariants; no machine-verified TypeScript refinement or general BRep Boolean certification is claimed."
+    "Convex rational planar polygon subdivision uses input convexity/planarity checks and exact halfspace clipping, tested against independent halfplane vertex enumeration and geometric invariants; no machine-verified TypeScript refinement or general BRep Boolean certification is claimed.",
+    "Rational convex planar polygon-soup subdivision, shared-edge sewing and source face/edge/cutting-plane provenance use documented constructions and executable coverage/incidence/volume tests, not machine-verified TypeScript. Closed oriented incidence does not establish global embedding, shell nesting, material classification, safe common Body adoption or general BRep Boolean validity."
   ]
 }

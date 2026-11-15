@@ -1218,3 +1218,11 @@ node examples/face-domain-record3.ts
 `partitionConvexPolygonByPlanes3(vertices, planes)`は有理座標の凸な平面多角形を複数の平面で分割します。三角形化の対角線を追加せず、各片の`polygon`、入力平面順の内部符号`signs`、厳密な内部点`witness`を返します。切断境界は両側に含まれ、面全体と一致する平面の符号は0です。入力の向きと同一直線上を前進する境界頂点を保持します。
 
 非平面・非凸・自己交差・後戻り・重複頂点・面積0の境界を拒否します。穴や曲線辺は対象外です。これはB-repの面分割に向けた基礎処理で、共有辺の更新や立体の成立を認定するAPIではありません。[構成と検証範囲](docs/proofs/convex-polygon-plane-arrangement3.md)。
+
+## 平面B-rep境界の分割と共有辺
+
+`partitionPlanarBRepFaces3(polygons, planes, {requireClosed: true})`は、有理座標の凸な平面多角形群を分割し、境界の端点をそろえて共通の辺・コエッジ・面・シェルへ接続します。各多角形の頂点順が面の法線方向を定めます。
+
+`cells`の番号は`sewn.topology.faces`の番号と一致します。各片は`sourceFace`と切断平面順の`signs`を保持し、`edgeOrigins`は共有辺から各片の境界、元の面・辺、辺全体を含む切断平面、使用方向への対応を返します。切断で新設された辺の`sourceEdge`は`null`です。`cells.map(c => c.polygon)`を再入力してさらに分割できます。その場合の由来は直前の入力への対応です。
+
+`requireClosed`は閉じた向き付き多様体の接続を検査します。入力は多角形群であり、自己交差のない立体や空洞の成立は認定しません。指定していない面間交差を自動発見する処理、非凸面・穴・曲線面、共通Bodyへの採用と一般ブーリアンは今後の開発です。[構成と検証範囲](docs/proofs/planar-brep-partition3.md)。

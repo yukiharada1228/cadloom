@@ -180,3 +180,5 @@ export type {NativeBRepFaces3} from './convert/native-faces3.js';
 
 export {partitionConvexPolygonByPlanes3} from './geometry/convex-polygon-plane-arrangement3.js';
 export type {ConvexPolygonPlaneCell3} from './geometry/convex-polygon-plane-arrangement3.js';
+export {partitionPlanarBRepFaces3} from './geometry/planar-brep-partition3.js';
+export type {PlanarBRepCell3,PlanarBRepEdgeOrigin3,PartitionedPlanarBRep3} from './geometry/planar-brep-partition3.js';
