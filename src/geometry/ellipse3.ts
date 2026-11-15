@@ -10,7 +10,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,getPointParameterization3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -236,6 +236,22 @@ export function intersectAlgebraicSegmentEllipse3(input:import('./algebraic-segm
   if(same(s,t))return Object.freeze(pointOnEllipse3(s,e)?[s]:[]);
   const axes=['x','y','z'] as const;
   if(axes.every(k=>s[k].rational!==null&&t[k].rational!==null))return Object.freeze(intersectSegmentEllipse3(segment3(point3(s.x.rational!,s.y.rational!,s.z.rational!),point3(t.x.rational!,t.y.rational!,t.z.rational!)),e).map(h=>h.point));
+  // Endpoints can occupy unrelated algebraic fields while their supporting
+  // line has a rational definition. Prove that line before combining fields.
+  const candidates=[getPointParameterization3(s),getPointParameterization3(t)].flatMap(data=>data&&dot3(data.direction,data.direction).sign()!==0?[line3(data.origin,data.direction)]:[]);
+  for(const axis of axes){
+    const fixed=axes.filter(k=>k!==axis);
+    if(fixed.every(k=>s[k].rational!==null&&s[k].compare(t[k])===0)){
+      candidates.push(line3(point3(...axes.map(k=>k===axis?new Rational(0n):s[k].rational!) as [Rational,Rational,Rational]),vector3(...axes.map(k=>k===axis?1n:0n) as [bigint,bigint,bigint])));
+      break;
+    }
+  }
+  for(const line of candidates){
+    const d=line.direction,n=cross3(d,d.y.sign()!==0||d.z.sign()!==0?vector3(1n,0n,0n):vector3(0n,1n,0n)),m=cross3(d,n);
+    if(![s,t].every(p=>[n,m].every(normal=>signLinearAlgebraicPoint3(p,normal,dot3(normal,line.origin).neg())===0)))continue;
+    const axis=axes.find(k=>d[k].sign()!==0)!,ascending=s[axis].compare(t[axis])<0,lo=ascending?s[axis]:t[axis],hi=ascending?t[axis]:s[axis];
+    return Object.freeze(intersectLineEllipse3(line,e).map(h=>h.point).filter(p=>p[axis].compare(lo)>=0&&p[axis].compare(hi)<=0).sort((p,q)=>p[axis].compare(q[axis])*(ascending?1:-1)));
+  }
   const plane=ellipsePlane3(e),value=(p:AlgebraicCoordinates3)=>p.x.affine(plane.normal.x,plane.offset).add(p.y.affine(plane.normal.y)).add(p.z.affine(plane.normal.z)),S=value(s),T=value(t);
   const at=(r:AlgebraicReal)=>snapshotExactPoint3({x:s.x.add(t.x.sub(s.x).mul(r)),y:s.y.add(t.y.sub(s.y).mul(r)),z:s.z.add(t.z.sub(s.z).mul(r))});
   if(S.sign()!==0||T.sign()!==0){
