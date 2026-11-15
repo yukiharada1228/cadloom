@@ -106,7 +106,7 @@
     "src/geometry/cylinder-cylinder3.ts": "50d5ec919623035489a7fb23e0d97a908e8ee7ccc4125dfa7c3c8e8b227c20a4",
     "src/geometry/cylinder-intersection-plane3.ts": "fd35a6b89e11c82e131a5ae438586e2dfae6e8a96e4e83536357f2c0bf6722ab",
     "src/geometry/brep-curve3.ts": "9158d8b4dbbb3898f7311efc6c23ad06b9d733ea231ac1bf15ff66de8e103224",
-    "src/geometry/sew-mixed-brep3.ts": "e6f93b7c9a7563545f84ee6a7c189f6e331ad7e876e753e1ecaeda1f5a4d854e",
+    "src/geometry/sew-mixed-brep3.ts": "780fab03e7eb2da73cd95268b2f858404e13ed2e477e96c6d647c9f0b0b657e4",
     "src/geometry/cylinder-intersection-support3.ts": "b1387f5657961e168fa40a5897b50e72f083bcd896d340850329efa59629f4c5",
     "src/geometry/cylinder-intersection-face3.ts": "fd7b490e9c3685c2ca3993b3345e001995ec12d11bc3e74451332241c1bcc1cd",
     "src/geometry/cylinder-coordinates3.ts": "2350437bb6ca914915cb8eb39bbd716596ff7753a9b19e59fb22b50c21393695",

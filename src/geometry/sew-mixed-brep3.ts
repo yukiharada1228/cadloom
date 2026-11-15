@@ -42,11 +42,15 @@ function sameSupport(a:BRepCurve3,b:BRepCurve3):boolean {
 export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewBRepOptions3={}):SewnMixedBRep3 {
   if(options.requireClosed!==undefined&&typeof options.requireClosed!=='boolean')throw new TypeError('requireClosed must be boolean');
   const prepared=input.map(f=>f.loops.map(loop=>loop.map(c=>{const p=snapshotBRepCurve3(c);return p.kind==='native'?sectionPieces(canonical(p.curve)).map(nativeBRepCurve3):[p];}))),points=preferredPoints(prepared.flat(3).flatMap(brepCurveEndpoints3)),edges:BRepCurve3[]=[];
+  // Prepared and split curves are owned immutable snapshots. Reuse the exact
+  // witness only within this sewing call; no caller-mutable keys escape it.
+  const samples=new Map<BRepCurve3,AlgebraicCoordinates3>();
+  function sampled(curve:BRepCurve3):AlgebraicCoordinates3 {let point=samples.get(curve);if(!point){point=sample(curve);samples.set(curve,point);}return point;}
   function equal(a:BRepCurve3,b:BRepCurve3):1|-1|0 {
     const A=brepCurveEndpoints3(a),B=brepCurveEndpoints3(b),direction=samePoint(A[0],B[0])&&samePoint(A[1],B[1])?1:samePoint(A[0],B[1])&&samePoint(A[1],B[0])?-1:0;
     if(!direction||!sameSupport(a,b))return 0;
     if(a.kind==='native'&&b.kind==='native'&&a.curve.kind==='algebraic-segment'&&b.curve.kind==='algebraic-segment')return direction;
-    return pointOnBRepCurve3(sample(a),b)&&pointOnBRepCurve3(sample(b),a)?direction:0;
+    return pointOnBRepCurve3(sampled(a),b)&&pointOnBRepCurve3(sampled(b),a)?direction:0;
   }
   const sourceUses=Object.freeze(prepared.map(loops=>Object.freeze(loops.map(loop=>Object.freeze(loop.map(primitives=>{
     const uses:BRepEdgeUse3[]=[];
@@ -59,7 +63,7 @@ export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewBR
         const s=primitive.curve.segment,axis=(['x','y','z'] as const).find(k=>s.start[k].compare(s.end[k])!==0);if(axis===undefined)throw new RangeError('Sewn edges must have positive extent');const direction=s.start[axis].compare(s.end[axis])<0?1:-1,cut=points.filter(p=>pointOnAlgebraicSegment3(p,s)).sort((a,b)=>a[axis].compare(b[axis])*direction);
         pieces=cut.slice(0,-1).map((p,i)=>nativeBRepCurve3({kind:'algebraic-segment',segment:restrictAlgebraicSegment3(s,p,cut[i+1]!)}));
       }else throw new Error('Unexpected canonical mixed sewing curve');
-      for(const c of pieces){let edge=edges.findIndex(e=>equal(c,e)!==0),direction:1|-1=1;if(edge<0){edge=edges.length;edges.push(c);}else direction=equal(c,edges[edge]!) as 1|-1;uses.push(Object.freeze({edge,direction}));}
+      for(const c of pieces){let direction:1|-1=1;let edge=edges.findIndex(e=>{const match=equal(c,e);if(match===0)return false;direction=match;return true;});if(edge<0){edge=edges.length;edges.push(c);}uses.push(Object.freeze({edge,direction}));}
     }
     return Object.freeze(uses);
   }))))));
