@@ -1,4 +1,4 @@
-import {algebraicAxialPoint3} from './algebraic-axial-point3.js';
+import {algebraicAxialPoint3,commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
 import {cylinderIntersectionPointCylinders3} from './cylinder-cylinder3.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
@@ -231,31 +231,36 @@ export function intersectEllipses3(inputA:Ellipse3,inputB:Ellipse3):EllipseEllip
   return points.length?Object.freeze({kind:'points',points:Object.freeze(points)}):Object.freeze({kind:'none'});
 }
 
+/** A verified rational direction avoids endpoint-field interpolation. */
+function intersectSupportedSegmentEllipse(s:AlgebraicCoordinates3,t:AlgebraicCoordinates3,anchor:AlgebraicCoordinates3,direction:Vector3,e:Ellipse3):readonly AlgebraicCoordinates3[] {
+ const axes=['x','y','z'] as const,axis=axes.find(k=>direction[k].sign()!==0)!,ascending=s[axis].compare(t[axis])<0,lo=ascending?s[axis]:t[axis],hi=ascending?t[axis]:s[axis];
+ const finite=(points:readonly AlgebraicCoordinates3[])=>Object.freeze(points.filter(p=>p[axis].compare(lo)>=0&&p[axis].compare(hi)<=0).sort((p,q)=>p[axis].compare(q[axis])*(ascending?1:-1)));
+ if(axes.every(k=>anchor[k].rational!==null))return finite(intersectLineEllipse3(line3(point3(anchor.x.rational!,anchor.y.rational!,anchor.z.rational!),direction),e).map(h=>h.point));
+ const plane=ellipsePlane3(e),n=plane.normal,rate=dot3(n,direction),at=(r:AlgebraicReal)=>algebraicAxialPoint3(anchor,direction,r);
+ if(rate.sign()!==0){const S=anchor.x.affine(n.x,plane.offset).add(anchor.y.affine(n.y)).add(anchor.z.affine(n.z)),p=at(S.affine(new Rational(-1n).div(rate)));return finite(pointOnEllipse3(p,e)?[p]:[]);}
+ if(signLinearAlgebraicPoint3(anchor,n,plane.offset)!==0)return Object.freeze([]);
+ const a=pointInPlaneFrame3(e.frame,anchor)!,[U,V]=duals(e),dx=dot3(U,direction),dy=dot3(V,direction),two=new Rational(2n),A=e.radiusVSquared.mul(dx.mul(dx)).add(e.radiusUSquared.mul(dy.mul(dy))),B=a.x.affine(e.radiusVSquared.mul(dx)).add(a.y.affine(e.radiusUSquared.mul(dy))).affine(two),C=a.x.mul(a.x).affine(e.radiusVSquared).add(a.y.mul(a.y).affine(e.radiusUSquared)).affine(1n,e.radiusUSquared.mul(e.radiusVSquared).neg()),disc=B.mul(B).sub(C.affine(A.mul(new Rational(4n)))),sign=disc.sign();
+ if(sign<0)return Object.freeze([]);
+ const root=disc.sqrt(),inverse=new Rational(1n).div(A.mul(two)),parameters=sign===0?[B.neg().affine(inverse)]:[B.neg().sub(root).affine(inverse),B.neg().add(root).affine(inverse)];
+ return finite(parameters.map(at));
+}
 /** Finite intersection with a closed segment whose endpoints may be algebraic. */
 export function intersectAlgebraicSegmentEllipse3(input:import('./algebraic-segment3.js').AlgebraicSegment3,inputEllipse:Ellipse3):readonly AlgebraicCoordinates3[] {
   const e=snapshot(inputEllipse),s=snapshotExactPoint3(input.start),t=snapshotExactPoint3(input.end),zero=AlgebraicReal.fromRational(0n),one=AlgebraicReal.fromRational(1n);
   if(same(s,t))return Object.freeze(pointOnEllipse3(s,e)?[s]:[]);
   const axes=['x','y','z'] as const;
   if(axes.every(k=>s[k].rational!==null&&t[k].rational!==null))return Object.freeze(intersectSegmentEllipse3(segment3(point3(s.x.rational!,s.y.rational!,s.z.rational!),point3(t.x.rational!,t.y.rational!,t.z.rational!)),e).map(h=>h.point));
+  const support=commonAlgebraicAxialLine3(s,t);
+  if(support)return intersectSupportedSegmentEllipse(s,t,support.base,support.direction,e);
   // Endpoints can occupy unrelated algebraic fields while their supporting
   // line has a rational definition. Prove that line before combining fields.
   const candidates=[getPointParameterization3(s),getPointParameterization3(t)].flatMap(data=>data&&dot3(data.direction,data.direction).sign()!==0?[line3(data.origin,data.direction)]:[]);
   for(const axis of axes){
     const fixed=axes.filter(k=>k!==axis);
     if(fixed.every(k=>s[k].compare(t[k])===0)&&fixed.some(k=>s[k].rational===null)){
-      // A fixed algebraic offset still has a rational coordinate direction.
-      // Solve in that coordinate, not in an endpoint-to-endpoint parameter.
       const direction=vector3(...axes.map(k=>k===axis?1n:0n) as [bigint,bigint,bigint]);
       const anchor=algebraicCoordinates3(...axes.map(k=>k===axis?zero:s[k]) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);
-      const plane=ellipsePlane3(e),n=plane.normal,S=anchor.x.affine(n.x,plane.offset).add(anchor.y.affine(n.y)).add(anchor.z.affine(n.z)),rate=n[axis];
-      const at=(r:AlgebraicReal)=>algebraicAxialPoint3(anchor,direction,r),ascending=s[axis].compare(t[axis])<0,lo=ascending?s[axis]:t[axis],hi=ascending?t[axis]:s[axis];
-      const finite=(points:readonly AlgebraicCoordinates3[])=>Object.freeze(points.filter(p=>p[axis].compare(lo)>=0&&p[axis].compare(hi)<=0).sort((p,q)=>p[axis].compare(q[axis])*(ascending?1:-1)));
-      if(rate.sign()!==0){const p=at(S.affine(new Rational(-1n).div(rate)));return finite(pointOnEllipse3(p,e)?[p]:[]);}
-      if(S.sign()!==0)return Object.freeze([]);
-      const a=pointInPlaneFrame3(e.frame,anchor)!,[U,V]=duals(e),dx=U[axis],dy=V[axis],two=new Rational(2n),A=e.radiusVSquared.mul(dx.mul(dx)).add(e.radiusUSquared.mul(dy.mul(dy))),B=a.x.affine(e.radiusVSquared.mul(dx)).add(a.y.affine(e.radiusUSquared.mul(dy))).affine(two),C=a.x.mul(a.x).affine(e.radiusVSquared).add(a.y.mul(a.y).affine(e.radiusUSquared)).affine(1n,e.radiusUSquared.mul(e.radiusVSquared).neg()),disc=B.mul(B).sub(C.affine(A.mul(new Rational(4n)))),sign=disc.sign();
-      if(sign<0)return Object.freeze([]);
-      const root=disc.sqrt(),inverse=new Rational(1n).div(A.mul(two)),parameters=sign===0?[B.neg().affine(inverse)]:[B.neg().sub(root).affine(inverse),B.neg().add(root).affine(inverse)];
-      return finite(parameters.map(at));
+      return intersectSupportedSegmentEllipse(s,t,anchor,direction,e);
     }
     if(fixed.every(k=>s[k].rational!==null&&s[k].compare(t[k])===0)){
       candidates.push(line3(point3(...axes.map(k=>k===axis?new Rational(0n):s[k].rational!) as [Rational,Rational,Rational]),vector3(...axes.map(k=>k===axis?1n:0n) as [bigint,bigint,bigint])));

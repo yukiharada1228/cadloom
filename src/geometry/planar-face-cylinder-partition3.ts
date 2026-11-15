@@ -1,3 +1,4 @@
+import {certifyAlgebraicAxialPair3,commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
 import {Polynomial} from '../numeric/polynomial.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
@@ -138,12 +139,21 @@ function arrangePlanarFace3(input:PreparedPlanarFace3,inputCutters:readonly Cyli
   }
   return map(frame,x,value(b,x));
  }
- function graph(b:PlanarVerticalBound3,left:AlgebraicReal,right:AlgebraicReal):Curve3 {const start=point(b,left),end=point(b,right);if(b.kind==='segment')return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(start,end)});const orientation=dot3(cross3(b.ellipse.frame.u,b.ellipse.frame.v),cross3(frame.u,frame.v)).sign(),direction=orientation*(b.branch===-1?1:-1)>0?'ccw':'cw';return Object.freeze({kind:'elliptic-arc',arc:ellipticArc3(b.ellipse,start,end,{direction})});}
+ function graph(b:PlanarVerticalBound3,left:AlgebraicReal,right:AlgebraicReal):Curve3 {const start=point(b,left),end=point(b,right);if(b.kind==='segment'){
+  const rational=rationalGraph(b.curve);
+  if(rational){const anchor=point3(frame.origin.x.add(frame.v.x.mul(rational.offset)),frame.origin.y.add(frame.v.y.mul(rational.offset)),frame.origin.z.add(frame.v.z.mul(rational.offset))),direction=point3(frame.u.x.add(frame.v.x.mul(rational.slope)),frame.u.y.add(frame.v.y.mul(rational.slope)),frame.u.z.add(frame.v.z.mul(rational.slope)));certifyAlgebraicAxialPair3(start,end,anchor,direction);}
+  else {const support=commonAlgebraicAxialLine3(b.curve.segment.start,b.curve.segment.end);if(support)certifyAlgebraicAxialPair3(start,end,support.base,support.direction);}
+  return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(start,end)});
+ }const orientation=dot3(cross3(b.ellipse.frame.u,b.ellipse.frame.v),cross3(frame.u,frame.v)).sign(),direction=orientation*(b.branch===-1?1:-1)>0?'ccw':'cw';return Object.freeze({kind:'elliptic-arc',arc:ellipticArc3(b.ellipse,start,end,{direction})});}
+ function vertical(start:AlgebraicCoordinates3,end:AlgebraicCoordinates3,x:AlgebraicReal):Curve3 {
+  certifyAlgebraicAxialPair3(start,end,map(frame,x,AlgebraicReal.fromRational(0n)),frame.v);
+  return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(start,end)});
+ }
  for(let i=0;i+1<cuts.length;i++){
   const left=cuts[i]!,right=cuts[i+1]!,x=AlgebraicReal.fromRational(between(left,right)),hits=arranged.flatMap(curve=>g.slice(curve,x).map(y=>({curve,y}))).sort((a,b)=>a.y.compare(b.y)).filter((p,i,all)=>i===0||p.y.compare(all[i-1]!.y)!==0);
   for(let j=0;j+1<hits.length;j++){
    const lo=hits[j]!,hi=hits[j+1]!,sample=snapshotExactPoint3(mapQ(frame,x.rational!,between(lo.y,hi.y)));if(base.locate(sample)!=='inside')continue;
-   const lower=bound(lo.curve,x,lo.y),upper=bound(hi.curve,x,hi.y),bottom=graph(lower,left,right),top=graph(upper,left,right),[bl,br]=curveEndpoints3(bottom),[tl,tr]=curveEndpoints3(top),loop:Curve3[]=[bottom];if(!samePoint(br,tr))loop.push(Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(br,tr)}));loop.push(reverseCurve3(top));if(!samePoint(tl,bl))loop.push(Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(tl,bl)}));
+   const lower=bound(lo.curve,x,lo.y),upper=bound(hi.curve,x,hi.y),bottom=graph(lower,left,right),top=graph(upper,left,right),[bl,br]=curveEndpoints3(bottom),[tl,tr]=curveEndpoints3(top),loop:Curve3[]=[bottom];if(!samePoint(br,tr))loop.push(vertical(br,tr,right));loop.push(reverseCurve3(top));if(!samePoint(tl,bl))loop.push(vertical(tl,bl,left));
    const boundary=Object.freeze(dot3(base.normal,cross3(frame.u,frame.v)).sign()>0?loop:[...loop].reverse().map(reverseCurve3)),cylinderSides=Object.freeze(cutters.map(cylinder=>classifyPointToSurface3(sample,{kind:'cylinder',cylinder}))),side=cylinderSides[0]??0,planeSides=Object.freeze(planes.map(p=>{const sign=evaluate(p,sample).sign();if(sign===0&&intersectPlanes3(base.surface,p).kind!=='coincident')throw new Error('Open planar cell contains an unpartitioned plane zero');return sign;}));if(cylinderSides.some(s=>s===0))throw new Error('A planar open cell lies on an unpartitioned cylinder zero');
    const locate:PlanarCylinderFaceCell3['locate']=inputPoint=>{const p=snapshotExactPoint3(inputPoint),q=pointInPlaneFrame3(frame,p);if(q===null)return 'outside';const l=q.x.compare(left),r=q.x.compare(right);if(l<0||r>0)return 'outside';const a=compare(lower,p,q.x,q.y),b=compare(upper,p,q.x,q.y);return a<0||b>0?'outside':l===0||r===0||a===0||b===0?'boundary':'inside';};const cell=Object.freeze({left,right,lower,upper,side,cylinderSides,planeSides,sample,boundary,locate});if(locate(sample)!=='inside')throw new Error('Planar cell lacks an interior witness');cells.push(cell);
   }

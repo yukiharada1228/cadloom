@@ -8,7 +8,7 @@ import type {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3,vector3,dot3,cross3} from './point3.js';
 import type {Point3,Vector3} from './point3.js';
 import type {Plane3} from './plane3.js';
-import {snapshotExactPoint3,getQuadraticParameterization3,affineQuadraticPoint3,getPointParameterization3,getRationalParameterization3,getBiparameterization3,rationalPointLinearNumerator3,algebraicPoint3,algebraicCoordinates3,algebraicRationalPoint3,algebraicBiparametricPoint3,translateAlgebraicPoint3} from './algebraic-point3.js';
+import {snapshotExactPoint3,compareLinearPoints3,getQuadraticParameterization3,affineQuadraticPoint3,getPointParameterization3,getRationalParameterization3,getBiparameterization3,rationalPointLinearNumerator3,algebraicPoint3,algebraicCoordinates3,algebraicRationalPoint3,algebraicBiparametricPoint3,translateAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 export interface AlgebraicAxialCoordinates3 {readonly base:AlgebraicCoordinates3;readonly direction:Vector3;}
 const axial=new WeakMap<AlgebraicCoordinates3,AlgebraicAxialCoordinates3>(),axes=['x','y','z'] as const,zero=new Rational(0n),one=new Rational(1n);
@@ -24,6 +24,28 @@ function decompositions(point:AlgebraicCoordinates3):readonly AlgebraicAxialCoor
 }
 export function getAlgebraicAxialCoordinates3(point:AlgebraicCoordinates3,wanted?:Vector3):AlgebraicAxialCoordinates3|undefined {const own=axial.get(point);return own&&(!wanted||parallel(own.direction,wanted))?own:decompositions(point).find(a=>!wanted||parallel(a.direction,wanted));}
 export function getAlgebraicAxialDirections3(point:AlgebraicCoordinates3):readonly Vector3[] {const own=axial.get(point);return Object.freeze([...(own?[own]:[]),...decompositions(point)].map(a=>a.direction).filter((d,i,all)=>all.findIndex(e=>parallel(d,e))===i));}
+const linePairs=new WeakMap<AlgebraicCoordinates3,WeakMap<AlgebraicCoordinates3,AlgebraicAxialCoordinates3>>();
+/** Register a line only after both immutable endpoints pass two independent
+ * rational normal equations. Internal chart builders supply the actual anchor. */
+export function certifyAlgebraicAxialPair3(inputStart:AlgebraicCoordinates3,inputEnd:AlgebraicCoordinates3,inputBase:AlgebraicCoordinates3|Point3,inputDirection:Vector3):void {
+ const start=snapshotExactPoint3(inputStart),end=snapshotExactPoint3(inputEnd),base=snapshotExactPoint3(inputBase),d=direction(inputDirection),n=cross3(d,d.y.sign()!==0||d.z.sign()!==0?vector3(1n,0n,0n):vector3(0n,1n,0n)),m=cross3(d,n);
+ if(![start,end].every(p=>[n,m].every(normal=>compareLinearPoints3(p,base,normal)===0)))throw new RangeError('Axial pair endpoints must lie on the supplied line');
+ const proof=Object.freeze({base,direction:d});
+ for(const [a,b] of [[start,end],[end,start]] as const){let map=linePairs.get(a);if(!map){map=new WeakMap();linePairs.set(a,map);}map.set(b,proof);}
+}
+/** Internal common line recovered only from actual point-construction records.
+ * Equal projections onto two independent rational normals prove that the two
+ * construction lines coincide; an arbitrary endpoint sample is not a proof. */
+export function commonAlgebraicAxialLine3(inputStart:AlgebraicCoordinates3,inputEnd:AlgebraicCoordinates3):AlgebraicAxialCoordinates3|null {
+ const start=snapshotExactPoint3(inputStart),end=snapshotExactPoint3(inputEnd),known=linePairs.get(start)?.get(end);
+ if(known)return known;
+ for(const d of getAlgebraicAxialDirections3(start)){
+  const a=getAlgebraicAxialCoordinates3(start,d),b=getAlgebraicAxialCoordinates3(end,d);if(!a||!b)continue;
+  const n=cross3(d,d.y.sign()!==0||d.z.sign()!==0?vector3(1n,0n,0n):vector3(0n,1n,0n)),m=cross3(d,n);
+  if([n,m].every(normal=>compareLinearPoints3(a.base,b.base,normal)===0))return Object.freeze({base:a.base,direction:d});
+ }
+ return null;
+}
 /** Construct q+t*d, retaining the exact line decomposition even when q and t
  * require several different algebraic source fields. */
 export function algebraicAxialPoint3(input:Point3|AlgebraicCoordinates3,inputDirection:Vector3,t:AlgebraicReal):AlgebraicCoordinates3 {

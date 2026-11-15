@@ -1,6 +1,7 @@
+import {commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3,vector3,cross3,dot3} from './point3.js';
-import {algebraicCoordinates3,compareAlgebraicPoints3,subtractAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicCoordinates3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,subtractAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
 import type {AlgebraicSegment3} from './algebraic-segment3.js';
@@ -23,6 +24,33 @@ export function support(c:Curve3):Ellipse3|null {
   return null;
 }
 export function segmentCross(a:AlgebraicSegment3,b:AlgebraicSegment3):readonly AlgebraicCoordinates3[] {
+  // Reject disjoint finite intervals before creating any composite field.
+  for(const k of axes){const aa=a.start[k].compare(a.end[k])<=0?[a.start[k],a.end[k]] as const:[a.end[k],a.start[k]] as const,bb=b.start[k].compare(b.end[k])<=0?[b.start[k],b.end[k]] as const:[b.end[k],b.start[k]] as const;if(aa[1].compare(bb[0])<0||bb[1].compare(aa[0])<0)return [];}
+  const support=(s:AlgebraicSegment3)=>{
+    const known=commonAlgebraicAxialLine3(s.start,s.end);if(known)return known;
+    if(axes.every(k=>s.start[k].rational!==null&&s.end[k].rational!==null)){
+      const d=vector3(...axes.map(k=>s.end[k].rational!.sub(s.start[k].rational!)) as Parameters<typeof vector3>);
+      if(dot3(d,d).sign()!==0)return {base:s.start,direction:d};
+    }
+    return null;
+  };
+  const first=support(a),second=support(b);
+  if(first&&second){
+    const onLine=(p:AlgebraicCoordinates3,line:NonNullable<typeof first>)=>{
+      const d=line.direction,n=cross3(d,d.y.sign()!==0||d.z.sign()!==0?vector3(1n,0n,0n):vector3(0n,1n,0n)),m=cross3(d,n);
+      if(axes.every(k=>line.base[k].rational!==null)){const o=point3(line.base.x.rational!,line.base.y.rational!,line.base.z.rational!);return [n,m].every(normal=>signLinearAlgebraicPoint3(p,normal,dot3(normal,o).neg())===0);}
+      return [n,m].every(normal=>compareLinearPoints3(p,line.base,normal)===0);
+    };
+    const inBounds=(p:AlgebraicCoordinates3,s:AlgebraicSegment3,d:typeof first.direction)=>{const k=axes.find(k=>d[k].sign()!==0)!,ascending=s.start[k].compare(s.end[k])<=0,lo=ascending?s.start[k]:s.end[k],hi=ascending?s.end[k]:s.start[k];return p[k].compare(lo)>=0&&p[k].compare(hi)<=0;};
+    const cross=cross3(first.direction,second.direction);
+    if(dot3(cross,cross).sign()===0){
+      if(!onLine(a.start,second))return [];
+      return [a.start,a.end,b.start,b.end].filter(p=>inBounds(p,a,first.direction)&&inBounds(p,b,second.direction));
+    }
+    // A nonparallel pair has at most one meeting point. Existing boundary
+    // endpoints retain their source fields instead of being reconstructed.
+    for(const [segment,other,line] of [[a,b,second],[b,a,first]] as const)for(const p of [segment.start,segment.end])if(inBounds(p,other,line.direction)&&onLine(p,line))return [p];
+  }
   const A=subtractAlgebraicPoints3(a.end,a.start),B=subtractAlgebraicPoints3(b.end,b.start),q=subtractAlgebraicPoints3(b.start,a.start),pairs=[['x','y'],['y','z'],['z','x']] as const;
   for(const [i,j] of pairs){
     const det=A[i].mul(B[j]).sub(A[j].mul(B[i]));if(det.sign()===0)continue;
