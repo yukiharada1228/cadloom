@@ -340,3 +340,4 @@ export type {MaterialSurfaceFaceOrigin3,MaterialSurfaceBoundaryOptions3,Material
 export {prepareCylinderMaterialProgram3,assertOwnedCylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';
 export type {CylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';
 export {materialProgramOfBoundary3} from './geometry/cylinder-material-expression3.js';
+export type {CylinderMaterialDefinition3} from './geometry/cylinder-material-expression3.js';

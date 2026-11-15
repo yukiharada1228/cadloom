@@ -4,7 +4,7 @@ import {assertOwnedClippedCylinderExpression3} from './clipped-cylinder-expressi
 import type {ClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
 import type {FiniteCylinderExpression3} from './finite-cylinder-expression3.js';
 import type {CylinderHalfSpace3} from './trimmed-cylinder3.js';
-import {prepareCylinderMaterialProgram3} from './cylinder-material-program3.js';
+import {prepareCylinderMaterialProgram3,assertOwnedCylinderMaterialProgram3} from './cylinder-material-program3.js';
 import type {CylinderMaterialProgram3,CylinderMaterialExpression3} from './cylinder-material-program3.js';
 import type {FiniteCylinder3} from './finite-cylinder-boolean3.js';
 import {plane3} from './plane3.js';
@@ -42,6 +42,12 @@ const owned=new WeakSet<CylinderMaterialBoundary3>();
 const programs=new WeakMap<CylinderMaterialBoundary3,CylinderMaterialProgram3>();
 export function materialProgramOfBoundary3(input:CylinderMaterialBoundary3):CylinderMaterialProgram3 {
  assertOwnedCylinderMaterialBoundary3(input);return programs.get(input)!;
+}
+/** Accept only a genuine definition or the program retained by a genuine boundary. */
+export type CylinderMaterialDefinition3=CylinderMaterialProgram3|CylinderMaterialBoundary3;
+export function resolveCylinderMaterialProgram3(input:CylinderMaterialDefinition3):CylinderMaterialProgram3 {
+ if(owned.has(input as CylinderMaterialBoundary3))return materialProgramOfBoundary3(input as CylinderMaterialBoundary3);
+ assertOwnedCylinderMaterialProgram3(input);return input;
 }
 export function assertOwnedCylinderMaterialBoundary3(input:CylinderMaterialBoundary3):void {if(!owned.has(input))throw new RangeError('Expected a factory-created cylinder material boundary');}
 /** A bounded Boolean of finite cylinders and negative-side halfspace predicates.
