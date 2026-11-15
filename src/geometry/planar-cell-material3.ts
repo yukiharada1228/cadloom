@@ -15,6 +15,10 @@ export interface PlanarPartitionMaterialClassification3 {
  readonly supports:PlanarPartitionSurfaceClassification3;
  readonly cells:readonly PlanarCellMaterialClassification3[];
 }
+const owned=new WeakSet<PlanarPartitionMaterialClassification3>();
+export function assertOwnedPlanarPartitionMaterialClassification3(input:PlanarPartitionMaterialClassification3):void {
+ if(!owned.has(input))throw new RangeError('Expected a factory-created planar material classification');
+}
 function truth(t:CylinderMaterialExpression3,c:readonly boolean[],p:readonly boolean[]):boolean {
  if(t.kind==='cylinder')return c[t.cylinder]!;
  if(t.kind==='halfspace')return p[t.halfspace]!;
@@ -44,5 +48,5 @@ export function classifyPlanarPartitionMaterial3(source:PlanarFaceCurvePartition
   const minus=evaluate('minus'),plus=evaluate('plus');
   return Object.freeze({kind:'classified',minus,plus,orientation:minus===plus?null:minus?1:-1});
  }));
- return Object.freeze({source,material,supports,cells});
+ const result=Object.freeze({source,material,supports,cells});owned.add(result);return result;
 }
