@@ -1,3 +1,6 @@
+import {plane3} from '../geometry/plane3.js';
+import type {CylinderHalfSpace3} from '../geometry/trimmed-cylinder3.js';
+import type {ClippedCylinderBRep3} from '../geometry/clipped-cylinder-brep3.js';
 import type {PreparedPlanarSolid3} from '../geometry/planar-solid3.js';
 import {consolidatePlanarSolid3} from '../geometry/consolidate-planar-solid3.js';
 import {planarSolidWithFaceOrigins3} from '../convert/planar-body3.js';
@@ -44,6 +47,7 @@ function replay(construction:BodyConstructionRecord3):Body3 {
     case 'planar-consolidated':return replayConsolidated(construction.polygons.map(p=>p.map(decodeRationalPoint3))).body;
     case 'planar':return createPlanarBody3(construction.polygons.map(p=>p.map(decodeRationalPoint3)));
     case 'box':{const s=construction.size;return createBoxBody3(decodeRationalPoint3(construction.origin),s[0],s[1],s[2]);}
+    case 'clipped-cylinder':return createClippedCylinderBody3(cylinder3(line3(decodeRationalPoint3(construction.origin),decodeRationalPoint3(construction.direction)),construction.radiusSquared),construction.lower,construction.upper,construction.halfspaces.map(h=>({plane:plane3(h.normal[0],h.normal[1],h.normal[2],h.offset),side:h.side})));
     case 'cylinder':return createCylinderBody3(cylinder3(line3(decodeRationalPoint3(construction.origin),decodeRationalPoint3(construction.direction)),construction.radiusSquared),construction.lower,construction.upper);
     case 'extrude':return adoptExtrusion(extrudeBetweenBRep3(decodeBodyProfile3(construction.profile),construction.lower,construction.upper));
   }
@@ -90,4 +94,16 @@ function replayConsolidated(polygons:readonly (readonly Point3[])[]){return cons
 export function consolidatePlanarBody3(input:Body3):ConsolidatedPlanarBody3 {
   assertOwnedBody3(input);const converted=planarSolidWithFaceOrigins3(input.topology),{merged,body}=consolidatedBody(converted.solid),unique=(ids:readonly number[])=>Object.freeze([...new Set(ids.map(id=>converted.faceOrigins[id]!))].sort((a,b)=>a-b));
   return Object.freeze({body,sourceFaces:Object.freeze(merged.sourceFaces.map(unique)),retainedFaces:unique(merged.retainedFaces)});
+}
+
+/** Finite circular cylinder intersected with rational plane halfspaces. */
+export function createClippedCylinderBody3(cylinder:Cylinder3,lower:ExactInput,upper:ExactInput,halfspaces:readonly CylinderHalfSpace3[]=[]):Body3 {
+  return bodyFromClippedCylinder3(clipCylinderBRep3(cylinder,lower,upper,halfspaces));
+}
+/** Internal conversion of owned geometry. All normalized inequalities, including
+ * inactive or infeasibility-producing constraints, are persisted for replay.
+ */
+export function bodyFromClippedCylinder3(source:ClippedCylinderBRep3):Body3 {
+  const c=source.cylinder;
+  return adoptCylinderBody3(source,{kind:'clipped-cylinder',origin:encodeRationalPoint3(c.axis.origin),direction:encodeRationalPoint3(c.axis.direction),radiusSquared:c.radiusSquared.toString(),lower:source.lower.toString(),upper:source.upper.toString(),halfspaces:source.planes.map(p=>({normal:encodeRationalPoint3(p.normal),offset:p.offset.toString(),side:-1}))});
 }

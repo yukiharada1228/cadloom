@@ -1,14 +1,16 @@
+import type {HalfSpaceRecord3} from './face-domain3.js';
 import {bodySchema3,readBodyRecord3} from './body3.js';
 import type {BodyRecord3} from './body3.js';
 import {curveSchema3} from './geometry3.js';
 import type {CurveRecord3} from './geometry3.js';
 import {rationalPointSchema3} from './exact3.js';
 import type {RationalPointRecord3} from './exact3.js';
-import {RecordReader3,objectSchema3,taggedSchema3,literalSchema3,arraySchema3,rationalSchema3} from './schema.js';
+import {RecordReader3,objectSchema3,taggedSchema3,literalSchema3,arraySchema3,rationalSchema3,directionSchema3} from './schema.js';
 import type {RecordReadLimits3} from './schema.js';
 
 export type BodyConstructionRecord3=
  | {readonly kind:'box';readonly origin:RationalPointRecord3;readonly size:RationalPointRecord3}
+ | {readonly kind:'clipped-cylinder';readonly origin:RationalPointRecord3;readonly direction:RationalPointRecord3;readonly radiusSquared:string;readonly lower:string;readonly upper:string;readonly halfspaces:readonly HalfSpaceRecord3[]}
  | {readonly kind:'cylinder';readonly origin:RationalPointRecord3;readonly direction:RationalPointRecord3;readonly radiusSquared:string;readonly lower:string;readonly upper:string}
  | {readonly kind:'planar-consolidated';readonly polygons:readonly (readonly RationalPointRecord3[])[]}
  | {readonly kind:'planar';readonly polygons:readonly (readonly RationalPointRecord3[])[]}
@@ -18,6 +20,7 @@ export const constructionSchema3=taggedSchema3({
   'planar-consolidated':objectSchema3({kind:literalSchema3('planar-consolidated'),polygons:arraySchema3(arraySchema3(rationalPointSchema3,3))}),
   planar:objectSchema3({kind:literalSchema3('planar'),polygons:arraySchema3(arraySchema3(rationalPointSchema3,3))}),
   box:objectSchema3({kind:literalSchema3('box'),origin:rationalPointSchema3,size:rationalPointSchema3}),
+  'clipped-cylinder':objectSchema3({kind:literalSchema3('clipped-cylinder'),origin:rationalPointSchema3,direction:rationalPointSchema3,radiusSquared:rationalSchema3,lower:rationalSchema3,upper:rationalSchema3,halfspaces:arraySchema3(objectSchema3({normal:rationalPointSchema3,offset:rationalSchema3,side:directionSchema3}))}),
   cylinder:objectSchema3({kind:literalSchema3('cylinder'),origin:rationalPointSchema3,direction:rationalPointSchema3,radiusSquared:rationalSchema3,lower:rationalSchema3,upper:rationalSchema3}),
   extrude:objectSchema3({kind:literalSchema3('extrude'),profile:arraySchema3(arraySchema3(curveSchema3,1)),lower:rationalSchema3,upper:rationalSchema3}),
 });

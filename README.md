@@ -1266,3 +1266,15 @@ node examples/face-domain-record3.ts
 低水準では`consolidatePlanarSolid3(prepared)`が検証済み材料に対して`faces`・`sewn`・`sourceFaces`・`shellMap`・`retainedFaces`を返します。元の材料とシェルの役割を保ちますが、出力の面・辺・シェルIDは再構築されます。
 
 `npm run build && node examples/consolidate-planar-body3.ts`で、空洞付きの箱を60面から12面へ統合し、復元後にも空洞が残る例を実行できます。[構成・由来・検証範囲](docs/proofs/consolidate-planar-solid3.md)。
+
+## 円柱と平面半空間のBodyを切断・再接続する
+
+`createClippedCylinderBody3(cylinder, lower, upper, halfspaces)`は有限の円柱と有理平面半空間の共通部分を共通Bodyへ構築します。各半空間は`{plane, side: -1 | 1}`で、平面評価値がその側になる領域を残します。上下限は非単位長の軸も許す軸パラメータです。空になる条件も保存し、復元時に再計算します。
+
+`splitCylinderBodyByPlane3(body, plane)`は`createCylinderBody3`または上記の構築・復元で得たBodyを負側・正側の閉じた子Bodyへ分けます。`kind`は`split`・`touching`・`disjoint`・`empty`を区別します。体積のない側は正則化して空のBodyとし、接触だけを新しい切断面として返しません。
+
+真の分割では`shared`が共通の有界面、その両側の面ID、共有辺と子Bodyのコエッジへの対応、面内の所属判定を保持します。`negativeFaceOrigins`・`positiveFaceOrigins`は直前の親Bodyの面IDへ対応し、新しい切断面だけが`null`です。子Bodyを`serializeBody3`／`restoreBody3`で保存・復元して、さらに切断できます。円柱壁・円弧・楕円弧・無理数の端点を近似メッシュへ置き換えません。
+
+`rejoinCylinderBodySplit3(split)`は所有された分割の対になる内部面を除き、外側の境界を独立に再接続して元の材料Bodyを返します。任意の立体同士の和ではなく、この分割の逆操作です。分割の対応表そのものは永続化せず、個別に復元した子からの再結合は未対応です。
+
+対象は構築来歴のある凸な円柱・平面半空間の族で、任意のBodyや円柱同士・一般曲面のブーリアンではありません。`npm run build && node examples/cylinder-body-split3.ts`で斜めの切断、保存復元、再切断と再接続を実行できます。[構成と検証範囲](docs/proofs/cylinder-body-split3.md)。

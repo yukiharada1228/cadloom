@@ -193,3 +193,6 @@ export {consolidatePlanarSolid3} from './geometry/consolidate-planar-solid3.js';
 export type {ConsolidatedPlanarSolid3} from './geometry/consolidate-planar-solid3.js';
 export {consolidatePlanarBody3} from './ops/body3.js';
 export type {ConsolidatedPlanarBody3} from './ops/body3.js';
+export {createClippedCylinderBody3} from './ops/body3.js';
+export {splitCylinderBodyByPlane3,rejoinCylinderBodySplit3} from './ops/cylinder-body-split3.js';
+export type {CylinderBodyPlaneSplit3,RejoinedCylinderBodySplit3} from './ops/cylinder-body-split3.js';

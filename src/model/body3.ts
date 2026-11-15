@@ -33,7 +33,7 @@ export interface Body3 {
   readonly interiorSamples:readonly AlgebraicCoordinates3[];readonly faces:readonly DecodedFaceDomain3[];
 }
 type Location=(point:Point3|AlgebraicCoordinates3)=>CurveRegionLocation2;
-const states=new WeakMap<Body3,{locate:Location;faces:readonly Location[];planar:PreparedPlanarSolid3|undefined}>();
+const states=new WeakMap<Body3,{locate:Location;faces:readonly Location[];planar:PreparedPlanarSolid3|undefined;cylinder:ClippedCylinderBRep3|undefined}>();
 function state(body:Body3){const data=states.get(body);if(!data)throw new RangeError('Operation requires a factory-created Body');return data;}
 export function assertOwnedBody3(body:Body3):void {state(body);}
 export function locateBody3(body:Body3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2{return state(body).locate(point);}
@@ -41,21 +41,21 @@ export function locateBody3(body:Body3,point:Point3|AlgebraicCoordinates3):Curve
 export function locateBodyFace3(body:Body3,face:number,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
   const s=state(body);if(!Number.isSafeInteger(face)||face<0||face>=s.faces.length)throw new RangeError('Invalid Body face index');return s.faces[face]!(point);
 }
-function publish(topology:BRepTopology3,locate:Location,domains:readonly FaceDomainRecord3[],samples:readonly AlgebraicCoordinates3[],construction:BodyConstructionRecord3,material?:{regions:readonly BodyRegionRecord3[];planar:PreparedPlanarSolid3}):Body3 {
+function publish(topology:BRepTopology3,locate:Location,domains:readonly FaceDomainRecord3[],samples:readonly AlgebraicCoordinates3[],construction:BodyConstructionRecord3,material?:{regions:readonly BodyRegionRecord3[];planar:PreparedPlanarSolid3},cylinder?:ClippedCylinderBRep3):Body3 {
   // Region roles follow constructive product/convex provenance or validated
   // polygonal shell nesting, never arbitrary caller-provided incidence flags.
   const ids=topology.shells.map((_,i)=>i),regions=material?.regions??[{shells:ids,void:false},...ids.map(i=>({shells:[i],void:false}))],raw=bodyRecordFromTopology3(topology,regions);
   if(domains.length!==raw.faces.length)throw new Error('Constructed face-domain table is incomplete');
   const record=readBodyRecord3({...raw,faces:raw.faces.map((f,i)=>({...f,domain:domains[i]!}))}),restored=restoreNativeBRepFaces3(record),rebuilt=restored.boundary,faces=restored.faces;
   if(!rebuilt.topology.closedOrientedIncidence||rebuilt.topology.issues.length||faces.length!==record.faces.length||samples.length!==regions.slice(1).filter(r=>!r.void).length||samples.some(p=>locate(p)!=='inside'))throw new Error('Constructed Body representation invariant failed');
-  const document=readBodyDocument3({version:1,construction,body:record}),result=Object.freeze({record:rebuilt.geometry.record,geometry:rebuilt.geometry,topology:rebuilt.topology,construction:document.construction,interiorSamples:Object.freeze([...samples]),faces});states.set(result,{locate,planar:material?.planar,faces:Object.freeze(faces.map(f=>(p:Point3|AlgebraicCoordinates3)=>f.locate(p)))});return result;
+  const document=readBodyDocument3({version:1,construction,body:record}),result=Object.freeze({record:rebuilt.geometry.record,geometry:rebuilt.geometry,topology:rebuilt.topology,construction:document.construction,interiorSamples:Object.freeze([...samples]),faces});states.set(result,{locate,cylinder,planar:material?.planar,faces:Object.freeze(faces.map(f=>(p:Point3|AlgebraicCoordinates3)=>f.locate(p)))});return result;
 }
 /** Internal adoption endpoints; public ops obtain the source from kernel factories. */
 export function adoptExtrudedBody3(source:ExtrudedBRep3,construction:BodyConstructionRecord3):Body3 {
   assertOwnedExtrudedBRep3(source);return publish(source.topology,p=>source.locate(p),source.faces.map(f=>f.kind==='planar'?encodePlanarDomain3(f.face):encodeCylinderDomain3(f.face)),source.samples,construction);
 }
 export function adoptCylinderBody3(source:ClippedCylinderBRep3,construction:BodyConstructionRecord3):Body3 {
-  assertOwnedClippedCylinder3(source);return publish(source.topology,p=>source.locate(p),source.faces.map(f=>f.kind==='planar'?encodeTrimmedPlanarDomain3(f.domain,f.component):encodeTrimmedCylinderDomain3(f.domain,f.component)),source.interiorSample?[snapshotExactPoint3(source.interiorSample)]:[],construction);
+  assertOwnedClippedCylinder3(source);return publish(source.topology,p=>source.locate(p),source.faces.map(f=>f.kind==='planar'?encodeTrimmedPlanarDomain3(f.domain,f.component):encodeTrimmedCylinderDomain3(f.domain,f.component)),source.interiorSample?[snapshotExactPoint3(source.interiorSample)]:[],construction,undefined,source);
 }
 
 /** Internal accessor: ownership is checked even when no planar cache exists. */
@@ -68,4 +68,9 @@ export function adoptPlanarBody3(source:PreparedPlanarSolid3,construction:BodyCo
 export function adoptConsolidatedPlanarBody3(input:ConsolidatedPlanarSolid3,construction:BodyConstructionRecord3):Body3 {
   assertOwnedConsolidatedPlanarSolid3(input);const source=input.source,material=planarSolidRegions3(source),regions=material.regions.map(r=>({shells:r.shells.map(id=>input.shellMap[id]!),void:r.void}));
   return publish(input.sewn.topology,createExactPlanarLocator3(source.triangles),input.faces.map(encodePlanarDomain3),material.samples.map(snapshotExactPoint3),construction,{regions,planar:source});
+}
+
+/** Internal family dispatch preserves constructive ownership through restoration. */
+export function cylinderSourceOfBody3(body:Body3):ClippedCylinderBRep3 {
+  const cylinder=state(body).cylinder;if(!cylinder)throw new RangeError('Operation requires a cylinder/halfspace Body construction');return cylinder;
 }
