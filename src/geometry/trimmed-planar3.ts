@@ -18,7 +18,7 @@ import {curveEndpoints3,pointOnCurve3,curveOnSurface3,snapshotCurve3} from './cu
 import type {Curve3} from './curve3.js';
 import {translatePlanarFace3} from './planar-face3.js';
 import type {PreparedPlanarFace3} from './planar-face3.js';
-import {segmentCross} from './planar-cylinder-intersection3.js';
+import {segmentCross} from './curve-noding3.js';
 import {witness,splitBoundary,traceLoops} from './cylinder-plane-split3.js';
 import {chartGeometry,verticalPieces,duals,map,mapQ,real,uniqueReals,samePoint,zero,one,two} from './planar-trim-utils3.js';
 import type {CurveRegionLocation2} from './curve-boolean2.js';

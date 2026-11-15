@@ -1,13 +1,12 @@
-import {Rational} from '../numeric/rational.js';
-import {AlgebraicReal} from '../numeric/real-roots.js';
-import {point3,vector3,cross3,dot3} from './point3.js';
-import {algebraicCoordinates3,compareAlgebraicPoints3,subtractAlgebraicPoints3} from './algebraic-point3.js';
+import {support,segmentCross} from './curve-noding3.js';
+export {support,segmentCross} from './curve-noding3.js';
+import {vector3} from './point3.js';
+import {algebraicCoordinates3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
 import type {AlgebraicSegment3} from './algebraic-segment3.js';
-import {ellipse3,intersectEllipses3,intersectLineEllipse3,intersectAlgebraicSegmentEllipse3,pointOnEllipticArc3,splitEllipticArc3,interiorPointOnEllipticArc3} from './ellipse3.js';
+import {intersectEllipses3,intersectLineEllipse3,intersectAlgebraicSegmentEllipse3,pointOnEllipticArc3,splitEllipticArc3,interiorPointOnEllipticArc3} from './ellipse3.js';
 import type {Ellipse3} from './ellipse3.js';
-import {planeFrame3} from './plane-frame3.js';
 import {curveEndpoints3,pointOnCurve3} from './curve3.js';
 import type {Curve3} from './curve3.js';
 import {translatePlanarFace3} from './planar-face3.js';
@@ -18,32 +17,11 @@ import type {CylinderFaceSection3} from './cylinder-face-section3.js';
 
 const axes=['x','y','z'] as const;
 const same=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>compareAlgebraicPoints3(p,q)===0;
-export function support(c:Curve3):Ellipse3|null {
-  if(c.kind==='elliptic-arc')return c.arc.ellipse;
-  if(c.kind==='planar-arc'){
-    const f=c.arc.frame,C=c.arc.arc.circle.center,r=c.arc.arc.circle.radiusSquared;
-    return ellipse3(planeFrame3(point3(f.origin.x.add(f.u.x.mul(C.x)).add(f.v.x.mul(C.y)),f.origin.y.add(f.u.y.mul(C.x)).add(f.v.y.mul(C.y)),f.origin.z.add(f.u.z.mul(C.x)).add(f.v.z.mul(C.y))),f.u,f.v),r,r);
-  }
-  if(c.kind==='circular-arc'){
-    const circle=c.arc.circle,n=circle.normal,u=n.y.sign()!==0||n.z.sign()!==0?cross3(n,vector3(1n,0n,0n)):cross3(n,vector3(0n,1n,0n)),v=cross3(n,u);
-    return ellipse3(planeFrame3(circle.center,u,v),circle.radiusSquared.div(dot3(u,u)),circle.radiusSquared.div(dot3(v,v)));
-  }
-  return null;
-}
 function ellipseBoundary(e:Ellipse3,b:Curve3):readonly AlgebraicCoordinates3[] {
   if(b.kind==='line')return intersectLineEllipse3(b.interval.line,e).filter(h=>pointOnCurve3(h.point,b)).map(h=>h.point);
   if(b.kind==='algebraic-segment')return intersectAlgebraicSegmentEllipse3(b.segment,e);
   const hit=intersectEllipses3(e,support(b)!);
   return hit.kind==='points'?hit.points.filter(p=>pointOnCurve3(p,b)):hit.kind==='coincident'?curveEndpoints3(b):[];
-}
-export function segmentCross(a:AlgebraicSegment3,b:AlgebraicSegment3):readonly AlgebraicCoordinates3[] {
-  const A=subtractAlgebraicPoints3(a.end,a.start),B=subtractAlgebraicPoints3(b.end,b.start),q=subtractAlgebraicPoints3(b.start,a.start),pairs=[['x','y'],['y','z'],['z','x']] as const;
-  for(const [i,j] of pairs){
-    const det=A[i].mul(B[j]).sub(A[j].mul(B[i]));if(det.sign()===0)continue;
-    const t=q[i].mul(B[j]).sub(q[j].mul(B[i])).div(det),p=algebraicCoordinates3(...axes.map(k=>a.start[k].add(A[k].mul(t))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);
-    return pointOnAlgebraicSegment3(p,a)&&pointOnAlgebraicSegment3(p,b)?[p]:[];
-  }
-  return [a.start,a.end,b.start,b.end].filter(p=>pointOnAlgebraicSegment3(p,a)&&pointOnAlgebraicSegment3(p,b));
 }
 function segmentBoundary(s:AlgebraicSegment3,b:Curve3):readonly AlgebraicCoordinates3[] {
   const e=support(b);if(e)return intersectAlgebraicSegmentEllipse3(s,e).filter(p=>pointOnCurve3(p,b));

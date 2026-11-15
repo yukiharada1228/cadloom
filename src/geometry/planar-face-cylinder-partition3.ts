@@ -22,9 +22,9 @@ import {intersectPlaneCylinder3} from './plane-cylinder3.js';
 import {curveEndpoints3,pointOnCurve3,reverseCurve3} from './curve3.js';
 import type {Curve3} from './curve3.js';
 import {algebraicSegment3} from './algebraic-segment3.js';
-import {ellipticArc3,fullEllipseArc3,intersectEllipses3,intersectAlgebraicSegmentEllipse3,locatePointInEllipse3} from './ellipse3.js';
+import {ellipticArc3,fullEllipseArc3,locatePointInEllipse3} from './ellipse3.js';
 import type {Ellipse3} from './ellipse3.js';
-import {support,segmentCross} from './planar-cylinder-intersection3.js';
+import {collectCurveNodingEvents3} from './curve-noding3.js';
 import {chartGeometry,duals,map,mapQ,uniqueReals,samePoint} from './planar-trim-utils3.js';
 import {evaluatePlaneAtAlgebraicPoint3 as evaluate} from './algebraic-segment-plane3.js';
 import {sewBRepFaces3} from './sew-brep3.js';
@@ -47,11 +47,6 @@ export interface PlanarFaceCylinderPartition3 {
 const owned=new WeakSet<PlanarFaceCylinderPartition3>();
 export function assertOwnedPlanarFaceCylinderPartition3(input:PlanarFaceCylinderPartition3):void {if(!owned.has(input))throw new RangeError('Expected a factory-created planar cylinder partition');}
 function between(lower:AlgebraicReal,upper:AlgebraicReal):Rational {let a=lower,b=upper;while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}return a.upper.add(b.lower).div(two);}
-function crossings(a:Curve3,b:Curve3):readonly AlgebraicCoordinates3[]{
- if(a.kind==='algebraic-segment'&&b.kind==='algebraic-segment')return segmentCross(a.segment,b.segment);
- const A=support(a),B=support(b);if(A&&B){const hit=intersectEllipses3(A,B);return hit.kind==='points'?hit.points.filter(p=>pointOnCurve3(p,a)&&pointOnCurve3(p,b)):hit.kind==='coincident'?[...curveEndpoints3(a),...curveEndpoints3(b)].filter(p=>pointOnCurve3(p,a)&&pointOnCurve3(p,b)):[];}
- const segment=a.kind==='algebraic-segment'?a:b,ellipse=A??B;if(segment.kind!=='algebraic-segment'||!ellipse)throw new Error('Unexpected canonical planar curve');return intersectAlgebraicSegmentEllipse3(segment.segment,ellipse).filter(p=>pointOnCurve3(p,a)&&pointOnCurve3(p,b));
-}
 /** Vertical native-conic arrangement in an owned planar face. Complete events
  * split embedded strip cells; artificial vertical cuts remain in the result.
  */
@@ -71,7 +66,7 @@ export function partitionPlanarFaceByCylinders3(input:PreparedPlanarFace3,inputC
  if(section.kind==='ellipse')curves.push(Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(section.ellipse)}));else if(section.kind==='lines')for(const item of section.lines)curves.push(lineCurve(item.line));
  }
  for(const p of planes){const hit=intersectPlanes3(base.surface,p);if(hit.kind==='line')curves.push(lineCurve(algebraicLine3(hit.line.origin,hit.line.direction)));}
- for(let i=0;i<curves.length;i++){known.push(...curveEndpoints3(curves[i]!));for(let j=0;j<i;j++)known.push(...crossings(curves[i]!,curves[j]!));}
+ known.push(...collectCurveNodingEvents3(curves).map(event=>event.point));
  const full=new Map<Curve3,Curve3>();for(const c of curves)if(c.kind==='elliptic-arc')full.set(c,Object.freeze({kind:'elliptic-arc',arc:fullEllipseArc3(c.arc.ellipse)}));
  // This carrier is used only for chart arithmetic; it confers no face ownership.
  const g=chartGeometry({...base,boundary:[[...curves,...full.values()]]}),arranged=g.curves.slice(0,curves.length),fullFor=new Map<Curve3,Curve3>();let extra=curves.length;curves.forEach((c,i)=>{if(full.has(c))fullFor.set(arranged[i]!,g.curves[extra++]!);});for(const c of arranged)known.push(...g.extrema(c));

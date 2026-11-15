@@ -306,3 +306,6 @@ export type {PlanarChamberProgram3} from './geometry/planar-material-chambers3.j
 export {planarVolumeMoments3} from './geometry/planar-volume-moments3.js';
 export type {PlanarVolumeMoments3,RationalMatrix3} from './geometry/planar-volume-moments3.js';
 export {planarBodyVolumeMoments3} from './ops/volume-moments3.js';
+
+export {curveNodingPoints3,collectCurveNodingEvents3} from './geometry/curve-noding3.js';
+export type {CurveNodingEvent3} from './geometry/curve-noding3.js';
