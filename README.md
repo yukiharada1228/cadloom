@@ -1191,3 +1191,24 @@ const restored = restoreBody3(saved); // 構築し直して保存レコードと
 npm run build
 node examples/constructed-body3.ts
 ```
+
+## 保存レコードから面領域を復元する
+
+新しく生成するBodyは、各面に`domain`を保存します。平面の外周・穴、代数的数の矩形境界、楕円、
+円柱面の範囲、平面半空間でトリムした成分を復元し、レコードの辺と全区間で照合します。
+
+```ts
+const restoredFaces = restoreNativeBRepFaces3(body.record);
+const face = restoredFaces.faces[0];
+face.locate(face.sample); // 'inside'
+body.faces; // 同じ手順で復元・照合した面領域
+```
+
+この結果は有界な面の検証であり、面同士の交差やシェル・空洞の成立を認定するものではありません。
+独立したpcurve・parameterBoundsの対応検証と一般NURBS面の変換は、引き続き別のバックエンドが必要です。
+[領域定義・境界の照合・互換性](docs/face-domain-record3.md)を参照してください。
+
+```sh
+npm run build
+node examples/face-domain-record3.ts
+```

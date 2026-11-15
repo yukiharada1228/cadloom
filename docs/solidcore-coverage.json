@@ -60,10 +60,11 @@
         "src/record/body3.ts",
         "src/record/geometry3.ts",
         "src/record/exact3.ts",
-        "src/record/schema.ts"
+        "src/record/schema.ts",
+        "src/record/face-domain3.ts"
       ],
       "status": "partial",
-      "gap": "Versioned exact geometry/topology/region records and structural validation exist. Complete imported face domains, general unbounded support restrictions and geometric Body certification remain missing."
+      "gap": "Versioned exact geometry/topology/region records and supported analytic bounded face definitions exist. General NURBS/procedural domains and independent pcurve correspondence remain missing."
     },
     {
       "id": "topology",
@@ -86,10 +87,13 @@
         "src/convert/body3.ts",
         "src/convert/native-boundary3.ts",
         "src/convert/body-profile3.ts",
-        "src/convert/body-equivalence3.ts"
+        "src/convert/body-equivalence3.ts",
+        "src/convert/face-domain3.ts",
+        "src/convert/native-faces3.ts",
+        "src/geometry/face-domain-binding3.ts"
       ],
       "status": "partial",
-      "gap": "Exact geometry decoding, checked native boundary reconstruction and supported construction replay exist. Arbitrary face-domain/void certification and NURBS boundary conversion remain missing."
+      "gap": "Supported analytic face domains reconstruct from raw records and bind complete oriented boundaries. Arbitrary face/shell embedding, void containment, independent pcurves and NURBS face conversion remain missing."
     },
     {
       "id": "ops",

@@ -1,3 +1,5 @@
+import {faceDomainSchema3} from './face-domain3.js';
+import type {FaceDomainRecord3} from './face-domain3.js';
 import {RecordReader3,objectSchema3,taggedSchema3,arraySchema3,literalSchema3,indexSchema3,directionSchema3,booleanSchema3,recordError3} from './schema.js';
 import type {RecordReadLimits3} from './schema.js';
 import {realSchema3,pointSchema3} from './exact3.js';
@@ -8,7 +10,7 @@ import type {CurveRecord3,SurfaceRecord3} from './geometry3.js';
 export interface BodyEdgeRecord3 {readonly curve:number;readonly start:number;readonly end:number;}
 export interface BodyEdgeUseRecord3 {readonly edge:number;readonly direction:1|-1;/** If present, a local (u,v,0) curve traversed with this use. */readonly pcurve?:number;}
 export interface BodyLoopRecord3 {readonly uses:readonly BodyEdgeUseRecord3[];}
-export interface BodyFaceRecord3 {readonly surface:number;readonly sense:1|-1;readonly loops:readonly number[];readonly parameterBounds?:readonly [ExactRealRecord3,ExactRealRecord3,ExactRealRecord3,ExactRealRecord3];}
+export interface BodyFaceRecord3 {readonly surface:number;readonly sense:1|-1;readonly loops:readonly number[];readonly parameterBounds?:readonly [ExactRealRecord3,ExactRealRecord3,ExactRealRecord3,ExactRealRecord3];readonly domain?:FaceDomainRecord3;}
 export type BodyShellRecord3=
  | {readonly kind:'faces';readonly faces:readonly {readonly face:number;readonly direction:1|-1}[];readonly wires:readonly number[]}
  | {readonly kind:'wire';readonly edges:readonly number[]}
@@ -31,7 +33,7 @@ const indices=arraySchema3(indexSchema3),useSchema=objectSchema3({edge:indexSche
   wire:objectSchema3({kind:literalSchema3('wire'),edges:arraySchema3(indexSchema3,1)}),
   vertex:objectSchema3({kind:literalSchema3('vertex'),vertex:indexSchema3}),
 });
-export const bodySchema3=objectSchema3({version:literalSchema3(1),units:literalSchema3('mm'),coordinates:literalSchema3('right-handed-z-up'),curves:arraySchema3(curveSchema3),surfaces:arraySchema3(surfaceSchema3),vertices:arraySchema3(pointSchema3),edges:arraySchema3(objectSchema3({curve:indexSchema3,start:indexSchema3,end:indexSchema3})),loops:arraySchema3(objectSchema3({uses:arraySchema3(useSchema,1)})),faces:arraySchema3(objectSchema3({surface:indexSchema3,sense:directionSchema3,loops:indices},{parameterBounds:arraySchema3(realSchema3,4,4)})),shells:arraySchema3(shellSchema),regions:arraySchema3(objectSchema3({shells:indices,void:booleanSchema3}),1)});
+export const bodySchema3=objectSchema3({version:literalSchema3(1),units:literalSchema3('mm'),coordinates:literalSchema3('right-handed-z-up'),curves:arraySchema3(curveSchema3),surfaces:arraySchema3(surfaceSchema3),vertices:arraySchema3(pointSchema3),edges:arraySchema3(objectSchema3({curve:indexSchema3,start:indexSchema3,end:indexSchema3})),loops:arraySchema3(objectSchema3({uses:arraySchema3(useSchema,1)})),faces:arraySchema3(objectSchema3({surface:indexSchema3,sense:directionSchema3,loops:indices},{parameterBounds:arraySchema3(realSchema3,4,4),domain:faceDomainSchema3})),shells:arraySchema3(shellSchema),regions:arraySchema3(objectSchema3({shells:indices,void:booleanSchema3}),1)});
 /** Strict, immutable JSON/data snapshot. No geometry evaluation or body certification. */
 export function readBodyRecord3(input:unknown,limits:RecordReadLimits3={}):BodyRecord3 {
   const b=bodySchema3(input,'body',new RecordReader3(limits)) as unknown as BodyRecord3;

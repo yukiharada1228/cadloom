@@ -18,5 +18,8 @@ export function constructionRecordsAgree3(a:BodyRecord3,b:BodyRecord3):boolean {
     if(real(X.kind)&&real(Y.kind))return decodeExactReal3(x as ExactRealRecord3).compare(decodeExactReal3(y as ExactRealRecord3))===0;
     const keys=Object.keys(X);return keys.length===Object.keys(Y).length&&keys.every(k=>Object.hasOwn(Y,k)&&same(X[k],Y[k]));
   };
-  return same(a,b);
+  // Version-1 construction documents predating explicit domains are still
+  // checked against every field they stored. Missing domains are regenerated.
+  const expected={...b,faces:b.faces.map((f,i)=>{if(a.faces[i]?.domain!==undefined)return f;const {domain,...legacy}=f;return legacy;})};
+  return same(a,expected);
 }

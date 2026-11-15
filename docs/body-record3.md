@@ -29,7 +29,7 @@ weld coincident points or reorder faces.
 | vertices | Exact coordinate triples or registered rational affine parameterizations |
 | edges | Curve index and oriented start/end vertex indices |
 | loops | Ordered edge uses with directions; optional local pcurve indices |
-| faces | Surface index, sense, loop indices, optional exact parameter bounds |
+| faces | Surface index, sense, loop indices, optional exact parameter bounds and supported analytic domain definitions |
 | shells | Face uses with direction and optional embedded wires, a wire graph, or an isolated vertex |
 | regions | Shell indices and a declared void flag; index 0 is infinite and never void |
 
@@ -92,9 +92,10 @@ value does not imply byte-for-byte equality after re-encoding decoded geometry.
 
 `bodyRecordFromTopology3` exports existing native boundary tables. Callers must
 provide region declarations explicitly: closed incidence is not used to guess
-material or void semantics. The original face domain objects and their runtime
-certificates are not serialized by this boundary exporter. It is not a native
-Body save/load operation yet.
+material or void semantics. The original face domain objects and their runtime certificates are not
+serialized by this low-level boundary exporter. Common Body creation separately
+adds [portable face definitions](face-domain-record3.md) and validates their
+boundary binding. The exporter alone is not a material Body save/load operation.
 
 ## Input budgets
 

@@ -171,3 +171,9 @@ export type {BodyDocument3,BodyConstructionRecord3} from './record/body-document
 export {locateBody3,locateBodyFace3} from './model/body3.js';
 export type {Body3} from './model/body3.js';
 export {createBoxBody3,createCylinderBody3,extrudeBody3,bodyDocument3,serializeBody3,restoreBody3} from './ops/body3.js';
+export {readFaceDomainRecord3} from './record/face-domain3.js';
+export type {FaceDomainRecord3,PlanarDomainRecord3,CylinderDomainRecord3,CircleSupportRecord3,EllipseSupportRecord3,HalfSpaceRecord3} from './record/face-domain3.js';
+export {encodePlanarDomain3,encodeCylinderDomain3,encodeTrimmedPlanarDomain3,encodeTrimmedCylinderDomain3,decodeFaceDomain3} from './convert/face-domain3.js';
+export type {DecodedFaceDomain3} from './convert/face-domain3.js';
+export {restoreNativeBRepFaces3} from './convert/native-faces3.js';
+export type {NativeBRepFaces3} from './convert/native-faces3.js';

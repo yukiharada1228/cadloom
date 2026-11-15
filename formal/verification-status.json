@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "02f77f03be5270f087920744116594c618a5ee26d9f6ce59eeba184b242526a1",
+    "src/index.ts": "caa7abbaf29ab188fc7bcd5871f649953d53c6b6f448b77a58d9690a5adf2fbc",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -77,19 +77,23 @@
     "src/geometry/nurbs-trim-regularity3.ts": "71f9a50ed069e55d486851b59b8b648b8f89feb99172ba694070427ab0acbb04",
     "src/geometry/nurbs-trim-seams3.ts": "409364c9ec1d8b5bc944744f22aceda154e576f494a5a5092bd94cf4e2743919",
     "src/record/schema.ts": "766ec3787acaba44901fec58aed701b7f25c31a9986c10c50da2c4cd2ad06f3b",
-    "src/record/geometry3.ts": "8a40ac9a500c9e202bb82da953a096d87983ff5d9a7590255647588c782347f7",
-    "src/record/body3.ts": "0a6cc04bcf012cf5d307cd6e6273a6e0e340dbbc2bac918752f80610eda7c987",
+    "src/record/geometry3.ts": "22cbd7629f6c6df0706b9779902f216ed5ae01da9886e1271d1c87b72f0eaf32",
+    "src/record/body3.ts": "54f2571698e8da46c761dd58ab8ac27ffb694f0e788cc021334aaee2d770a520",
     "src/record/exact3.ts": "4d079d13dfbf28e94b58fd6a0694c0eabdb9dacd2571664c7223f86526649146",
     "src/convert/geometry3.ts": "27bd3114d8821c9a30ce7161b8e7774a1ba0225dc85c71390223203c6e2ef75d",
     "src/convert/body3.ts": "1fcbff8081db898c3d24b015f69bb70eaa4152b00fa63600c35c05c42493d980",
     "src/convert/exact3.ts": "c3f52a51e8277f3e97d5f20e960a63a3a5ae9573e71cbbb90d7d6391e681f6b4",
     "src/record/body-document3.ts": "6acb03fb3ff7dba49ca3b572e4ffe6ebf2f932e0ded7300e6cef3e68980e55c6",
-    "src/model/body3.ts": "81de3719e5691ad34aa0cbc64da51417845532dcf52221e0aa7ec2798ae961da",
+    "src/model/body3.ts": "6bbcfbedca0123180a56691e51b6f9c4591b3191cd8d9abd6dc0736847226293",
     "src/ops/body3.ts": "522b537ebee2d8a2958070ef256dc92a1a55d13c0a0b6579ccfaae35bfd54f88",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "62dc8f630181a3d046cd96c2b56b0c3904f5d54ee511bcd62a33afbe3342b3d3",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
-    "src/convert/body-equivalence3.ts": "d0dbd72b1d611bbb860788b58b248516f60637c053a87ef5e13c17afcaa45afe"
+    "src/convert/body-equivalence3.ts": "ef5e9b8d57c3dfb99597ea96ad60d7da4b5640565323e6402c8ec5e230fb1622",
+    "src/record/face-domain3.ts": "b9716044892a57a1dacc6e321341c3438ac0b147fb8a75c2ca0654c2ecbf6913",
+    "src/geometry/face-domain-binding3.ts": "24f3bc3634c5473ba5b46d1da906cd56b2fb61ff16f926ef14abbf3869f65010",
+    "src/convert/face-domain3.ts": "7bcb4c7f46f91e3ce4017c986b2a1b7f588500aaa27f3d20e9a07bdb9ed2fe69",
+    "src/convert/native-faces3.ts": "61ddc80df45fc5720860e96adea0a849c0bbe99d9947df790a41eef0743d6afa"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -274,6 +278,7 @@
     "Exact restriction of one-sided singular loci to validated NURBS parameter domains, complete boundary event noding, retained implicit subintervals and whole-patch/domain region intersections use documented arguments and independent fixtures, not machine verification of TypeScript. Rank regularity includes all incident closed patches and does not imply positional seam continuity, G1/C1 matching, global embedding, spatial face validity or solid validity.",
     "Trim-restricted positional, shared-coordinate C1 and cooriented nondegenerate tangent-plane seam matching use complete algebraic boundary/predicate event partitions, documented arguments and independent fixtures, not machine verification of TypeScript. These are conditions on adjacent closed seam sides only; empty retained seams pass vacuously and no interior rank, global injectivity, spatial face or solid certificate follows.",
     "Exact numeric/geometry codecs, immutable versioned Body records, structural references/loop ownership, input budgets and per-definition geometry restoration use executable tests and documented contracts, not machine verification of TypeScript. Record roles, closed incidence and successful geometry decoding do not certify geometry/topology agreement, face domains, shell/void embedding or material solid validity; a trusted common Body importer remains future work.",
-    "Native boundary reconstruction checks exact endpoints, whole-edge surface support, vertex welding and shell face partitions. Common owned Box/Cylinder/vertical-extrusion Bodies use existing constructive provenance, exact classifiers and checked common records. Save/load replays supported constructions and compares exact ordered data; these are executable tests and documented arguments, not new machine proofs or arbitrary BRep face/shell/void certification."
+    "Native boundary reconstruction checks exact endpoints, whole-edge surface support, vertex welding and shell face partitions. Common owned Box/Cylinder/vertical-extrusion Bodies use existing constructive provenance, exact classifiers and checked common records. Save/load replays supported constructions and compares exact ordered data; these are executable tests and documented arguments, not new machine proofs or arbitrary BRep face/shell/void certification.",
+    "Portable analytic face-domain definitions reconstruct validated bounded domains, reselect trim components by strict witnesses, check coincident physical support orientation and bind complete oriented boundaries with one use from each comparison side. Common Body face queries use reconstructed definitions. These are documented arguments and executable checks, not machine proofs; global face/shell intersections, void containment, independent pcurves/parameter ranges and arbitrary NURBS face import remain outside scope."
   ]
 }

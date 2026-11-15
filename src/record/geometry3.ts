@@ -15,13 +15,14 @@ export type SurfaceRecord3=
  | {readonly kind:'plane';readonly normal:RationalPointRecord3;readonly offset:string}
  | {readonly kind:'cylinder';readonly origin:RationalPointRecord3;readonly direction:RationalPointRecord3;readonly radiusSquared:string}
  | {readonly kind:'nurbs';readonly degreeU:number;readonly degreeV:number;readonly points:readonly (readonly RationalPointRecord3[])[];readonly weights:readonly (readonly string[])[];readonly knotsU:readonly string[];readonly knotsV:readonly string[]};
-const frameSchema=objectSchema3({origin:rationalPointSchema3,u:rationalPointSchema3,v:rationalPointSchema3}),rationalList=arraySchema3(rationalSchema3),arc={start:pointSchema3,end:pointSchema3,direction:literalSchema3('cw','ccw'),full:booleanSchema3};
+export const frameSchema3=objectSchema3({origin:rationalPointSchema3,u:rationalPointSchema3,v:rationalPointSchema3});
+const rationalList=arraySchema3(rationalSchema3),arc={start:pointSchema3,end:pointSchema3,direction:literalSchema3('cw','ccw'),full:booleanSchema3};
 export const curveSchema3:Schema3=taggedSchema3({
   line:objectSchema3({kind:literalSchema3('line'),origin:rationalPointSchema3,direction:rationalPointSchema3,start:realSchema3,end:realSchema3}),
   segment:objectSchema3({kind:literalSchema3('segment'),start:pointSchema3,end:pointSchema3}),
   circle:objectSchema3({kind:literalSchema3('circle'),center:rationalPointSchema3,normal:rationalPointSchema3,radiusSquared:rationalSchema3,...arc}),
-  ellipse:objectSchema3({kind:literalSchema3('ellipse'),frame:frameSchema,radiusUSquared:rationalSchema3,radiusVSquared:rationalSchema3,...arc}),
-  'planar-circle':objectSchema3({kind:literalSchema3('planar-circle'),frame:frameSchema,center:arraySchema3(rationalSchema3,2,2),radiusSquared:rationalSchema3,...arc}),
+  ellipse:objectSchema3({kind:literalSchema3('ellipse'),frame:frameSchema3,radiusUSquared:rationalSchema3,radiusVSquared:rationalSchema3,...arc}),
+  'planar-circle':objectSchema3({kind:literalSchema3('planar-circle'),frame:frameSchema3,center:arraySchema3(rationalSchema3,2,2),radiusSquared:rationalSchema3,...arc}),
   nurbs:objectSchema3({kind:literalSchema3('nurbs'),degree:indexSchema3,points:arraySchema3(rationalPointSchema3),weights:rationalList,knots:rationalList}),
 });
 export const surfaceSchema3:Schema3=taggedSchema3({
