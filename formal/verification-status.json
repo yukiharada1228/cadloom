@@ -91,7 +91,7 @@
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
     "src/convert/body-equivalence3.ts": "97499913268a1444b925c0fd5189155a3395301be9bcdfa4a4df6de2ff461724",
     "src/record/face-domain3.ts": "95b8710b26e26d72d1146e040f076df56e720aaaa77d524536d50da11ff57f21",
-    "src/geometry/face-domain-binding3.ts": "24f3bc3634c5473ba5b46d1da906cd56b2fb61ff16f926ef14abbf3869f65010",
+    "src/geometry/face-domain-binding3.ts": "5eaf4379d3f4a4fefe8151b21be6260c24c6a9920d8ec35cb03570008e0b9e8e",
     "src/convert/face-domain3.ts": "fc6c4d0e4d75d8cdd2cb6aa6a2d3d5df733bceece7ff5a549865a78a14872c35",
     "src/convert/native-faces3.ts": "2786cf78c6e0d20e3392865bab6d817e68faf3170a833925c48caf06620fc290",
     "src/geometry/convex-polygon-plane-arrangement3.ts": "5a7e666a795f9d2713fab1df0c8dfe4db4337e6563be1e6d0faa654181d11e6a",

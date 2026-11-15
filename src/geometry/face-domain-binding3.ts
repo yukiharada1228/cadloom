@@ -1,4 +1,5 @@
-import {surfacesCoincide3,normalToSurface3} from './surface3.js';
+import {surfacesCoincide3,classifyPointToSurface3} from './surface3.js';
+import {dot3} from './point3.js';
 import type {Surface3} from './surface3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {reverseCurve3} from './curve3.js';
@@ -7,7 +8,13 @@ import {sewBRepFaces3} from './sew-brep3.js';
 
 /** Exact coorientation on coincident regular analytic supports. */
 export function faceSupportsAgree3(a:Surface3,aSense:1|-1,b:Surface3,bSense:1|-1,sample:AlgebraicCoordinates3):boolean {
-  if(!surfacesCoincide3(a,b))return false;const n=normalToSurface3(sample,a),m=normalToSurface3(sample,b),dot=n.x.mul(m.x).add(n.y.mul(m.y)).add(n.z.mul(m.z));return dot.sign()*aSense*bSense===1;
+  if(!surfacesCoincide3(a,b))return false;
+  if(classifyPointToSurface3(sample,a)!==0||classifyPointToSurface3(sample,b)!==0)throw new RangeError('Surface normal requires a point on the surface');
+  // Coincident regular cylinders have the same radial vector r. Their
+  // normals are |d_a|²*r and |d_b|²*r, with strictly positive dot product.
+  if(a.kind==='cylinder'&&b.kind==='cylinder')return aSense*bSense===1;
+  if(a.kind==='plane'&&b.kind==='plane')return dot3(a.plane.normal,b.plane.normal).sign()*aSense*bSense===1;
+  return false;
 }
 /** Complete oriented boundary-set matching after common endpoint noding.
  * The first boundary comes from a validated embedded analytic face domain.
