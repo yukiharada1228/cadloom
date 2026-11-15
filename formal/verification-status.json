@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "e6346cb69118b3dcead12c9ef649d5a96a1a27e00edc4c5943d8544420eceb92",
+    "src/index.ts": "30a672958de800b1983d3a00a98e46c3cd109f365ca62615c28337d1d95d0da0",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -124,7 +124,7 @@
     "src/convert/mixed-faces3.ts": "364404edbe82fed5dfccb284db9194b8652d7bd7439aecb1e9215c43731c4042",
     "src/convert/finite-cylinder-boolean3.ts": "026b7c97abbfa10860d02424e1427bafe35c4dacafc58b50316fb66ad1a291a0",
     "src/geometry/mixed-shell-ray3.ts": "d608cdd1246a688b68e48930c4b86b6581391af1a42747339f7c5c219a3ab914",
-    "src/geometry/finite-cylinder-regions3.ts": "513cf209b33c982a5141b079c5618a7ad522dc2187c1b50a529d83b7e6ea4a97",
+    "src/geometry/finite-cylinder-regions3.ts": "8376182dafc175e64a052cbbb3a81d47a85a8c9b2547960e01dd413bdb6ae5f5",
     "src/geometry/cylinder-intersection-cylinder3.ts": "80b557b66b3927c5699b6ac9130eefe3f7716c17e9581c655b762f3de22c0ffd",
     "src/geometry/cylinder-cell-refinement3.ts": "8586b5e7771198a69845f5268474c711e6e0d84b35e08db61c3532cbb45c74f6",
     "src/geometry/finite-cylinder-expression3.ts": "489c8c014b5a5348e69e77bb9bd0de4fce5c653de42b3d14ab8db198337c3840",
@@ -341,6 +341,7 @@
     "Owned cylinder SSI arcs intersect/split against a third rational cylinder through height elimination, generic separating circle charts, degree-at-most-eight root certificates and correlated rational-univariate coordinate recovery, with whole-fiber/overlap/tangent cases. Documented algebraic/termination arguments and executable tests are not new machine refinement proofs. Multi-cutter face refinement, material assembly and reusable curved Boolean operands remain incomplete.",
     "Owned cylinder face cells overlay repeated native cylinder/plane arrangements with complete old/new bound events, inherited side vectors and source-cell provenance; ordered refined-domain records replay and bind whole boundaries. Verified same-fiber affine reflection, RUR discriminants, genuine SSI point support identities and certified interval linear/quadratic sign filters preserve exactness while avoiding unnecessary field extensions. Runtime tests and documented constructions are not new machine refinement proofs; multi-cutter planar caps, material assembly and reusable curved Body operands remain incomplete.",
     "Finite-cylinder expression boundaries use complete primitive-face arrangements and Boolean evaluation of exact two-sided membership vectors, with coincident-support checks and balanced-edge sewing. Executable regressions and documented constructions are not a machine proof. General oblique/contact regression coverage, common Body adoption, expression persistence and regularized material point location remain incomplete.",
-    "Owned finite-cylinder expression boundaries export selected wall and cap definitions through common BodyRecord and restore complete oriented domains via existing mixed face binding. Caller-supplied region roles do not establish shell/material validity. This is executable serialization validation, not a machine proof, common Body adoption or editable expression replay."
+    "Owned finite-cylinder expression boundaries export selected wall and cap definitions through common BodyRecord and restore complete oriented domains via existing mixed face binding. Caller-supplied region roles do not establish shell/material validity. This is executable serialization validation, not a machine proof, common Body adoption or editable expression replay.",
+    "Owned manifold cylinder-expression regions share the constructive exact full-line shell forest algorithm with two-cylinder Booleans. Candidate side witnesses on primitive boundaries retry; expression truth and shell coorientation validate material/void roles. Documented constructions and executable regressions are not a machine proof or arbitrary imported-shell certification. Common Body adoption and editable expression recipe replay remain incomplete."
   ]
 }

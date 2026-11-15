@@ -258,3 +258,5 @@ export type {CylinderFaceFiniteCylindersPartition3} from './geometry/cylinder-fa
 export {boundaryFiniteCylinderExpression3,assertOwnedFiniteCylinderExpressionBoundary3} from './geometry/finite-cylinder-expression3.js';
 export type {FiniteCylinderExpression3,FiniteCylinderExpressionFace3,FiniteCylinderExpressionBoundary3} from './geometry/finite-cylinder-expression3.js';
 export {bodyRecordFromFiniteCylinderExpression3} from './convert/finite-cylinder-expression3.js';
+export {finiteCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
+export type {FiniteCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
