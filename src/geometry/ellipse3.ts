@@ -11,7 +11,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicCoordinates3,algebraicPoint3,getPointParameterization3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicCoordinates3,algebraicQuadraticPoint3,algebraicPoint3,getPointParameterization3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -239,6 +239,15 @@ function intersectSupportedSegmentEllipse(s:AlgebraicCoordinates3,t:AlgebraicCoo
  const plane=ellipsePlane3(e),n=plane.normal,rate=dot3(n,direction),at=(r:AlgebraicReal)=>algebraicAxialPoint3(anchor,direction,r);
  if(rate.sign()!==0){const S=anchor.x.affine(n.x,plane.offset).add(anchor.y.affine(n.y)).add(anchor.z.affine(n.z)),p=at(S.affine(new Rational(-1n).div(rate)));return finite(pointOnEllipse3(p,e)?[p]:[]);}
  if(signLinearAlgebraicPoint3(anchor,n,plane.offset)!==0)return Object.freeze([]);
+ const rational=getRationalParameterization3(anchor),affine=getPointParameterization3(anchor);
+ if(rational||affine){
+  const parameter=rational?.parameter??affine!.parameter,W=rational?.denominator??new Polynomial([1n]),numerator=(k:typeof axes[number])=>new Polynomial([affine!.origin[k],affine!.direction[k]]);
+  const N:readonly [Polynomial,Polynomial,Polynomial]=rational?.numerators??[numerator('x'),numerator('y'),numerator('z')];
+  const [U,V]=duals(e),linear=(normal:Vector3)=>N.reduce((sum,p,i)=>sum.add(p.scale(normal[axes[i]!])),W.scale(dot3(normal,e.frame.origin).neg())),X=linear(U),Y=linear(V),dx=dot3(U,direction),dy=dot3(V,direction),two=new Rational(2n),A=e.radiusVSquared.mul(dx.mul(dx)).add(e.radiusUSquared.mul(dy.mul(dy))),B=X.scale(e.radiusVSquared.mul(dx)).add(Y.scale(e.radiusUSquared.mul(dy))).scale(two),C=X.mul(X).scale(e.radiusVSquared).add(Y.mul(Y).scale(e.radiusUSquared)).sub(W.mul(W).scale(e.radiusUSquared.mul(e.radiusVSquared))),K=B.mul(B).sub(C.scale(A.mul(new Rational(4n)))),sign=parameter.signOf(K);
+  if(sign<0)return Object.freeze([]);
+  const D=W.scale(A.mul(two)),numerators=N.map((p,i)=>p.scale(A.mul(two)).sub(B.scale(direction[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],branches=sign===0?[1n]:[-1n,1n];
+  return finite(branches.map(branch=>algebraicQuadraticPoint3(parameter,numerators,vector3(direction.x.mul(new Rational(branch)),direction.y.mul(new Rational(branch)),direction.z.mul(new Rational(branch))),K,D)));
+ }
  const a=pointInPlaneFrame3(e.frame,anchor)!,[U,V]=duals(e),dx=dot3(U,direction),dy=dot3(V,direction),two=new Rational(2n),A=e.radiusVSquared.mul(dx.mul(dx)).add(e.radiusUSquared.mul(dy.mul(dy))),B=a.x.affine(e.radiusVSquared.mul(dx)).add(a.y.affine(e.radiusUSquared.mul(dy))).affine(two),C=a.x.mul(a.x).affine(e.radiusVSquared).add(a.y.mul(a.y).affine(e.radiusUSquared)).affine(1n,e.radiusUSquared.mul(e.radiusVSquared).neg()),disc=B.mul(B).sub(C.affine(A.mul(new Rational(4n)))),sign=disc.sign();
  if(sign<0)return Object.freeze([]);
  const root=disc.sqrt(),inverse=new Rational(1n).div(A.mul(two)),parameters=sign===0?[B.neg().affine(inverse)]:[B.neg().sub(root).affine(inverse),B.neg().add(root).affine(inverse)];

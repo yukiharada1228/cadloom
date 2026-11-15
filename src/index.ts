@@ -327,3 +327,6 @@ export type {PlanarMaterialCellBoundary3} from './geometry/planar-material-cell-
 
 export {refinePlanarMaterial3} from './geometry/refine-planar-material3.js';
 export type {RefinedPlanarMaterial3} from './geometry/refine-planar-material3.js';
+
+export {boundaryPlanarMaterialSurfaces3} from './geometry/planar-material-surfaces3.js';
+export type {PlanarMaterialSupportOrigin3,PlanarMaterialSurface3,PlanarMaterialSurfaces3} from './geometry/planar-material-surfaces3.js';

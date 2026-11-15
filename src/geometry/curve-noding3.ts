@@ -1,4 +1,5 @@
-import {commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
+import {plane3} from './plane3.js';
+import {commonAlgebraicAxialLine3,projectAlgebraicPointAlongDirection3} from './algebraic-axial-point3.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3,vector3,cross3,dot3} from './point3.js';
 import {algebraicCoordinates3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,subtractAlgebraicPoints3} from './algebraic-point3.js';
@@ -50,6 +51,15 @@ export function segmentCross(a:AlgebraicSegment3,b:AlgebraicSegment3):readonly A
     // A nonparallel pair has at most one meeting point. Existing boundary
     // endpoints retain their source fields instead of being reconstructed.
     for(const [segment,other,line] of [[a,b,second],[b,a,first]] as const)for(const p of [segment.start,segment.end])if(inBounds(p,other,line.direction)&&onLine(p,line))return [p];
+    const firstQ=axes.every(k=>first.base[k].rational!==null),secondQ=axes.every(k=>second.base[k].rational!==null);
+    if(firstQ||secondQ){
+      if(compareLinearPoints3(first.base,second.base,cross)!==0)return [];
+      const source=firstQ?second:first,target=firstQ?first:second,pairs=[['x','y'],['y','z'],['z','x']] as const;
+      const [i,j]=pairs.find(([i,j])=>source.direction[i].mul(target.direction[j]).sub(source.direction[j].mul(target.direction[i])).sign()!==0)!;
+      const normal=vector3(...axes.map(k=>k===i?target.direction[j]:k===j?target.direction[i].neg():0n) as Parameters<typeof vector3>),origin=point3(target.base.x.rational!,target.base.y.rational!,target.base.z.rational!);
+      const point=projectAlgebraicPointAlongDirection3(source.base,source.direction,plane3(normal.x,normal.y,normal.z,dot3(normal,origin).neg()));
+      return inBounds(point,a,first.direction)&&inBounds(point,b,second.direction)?[point]:[];
+    }
   }
   const A=subtractAlgebraicPoints3(a.end,a.start),B=subtractAlgebraicPoints3(b.end,b.start),q=subtractAlgebraicPoints3(b.start,a.start),pairs=[['x','y'],['y','z'],['z','x']] as const;
   for(const [i,j] of pairs){
