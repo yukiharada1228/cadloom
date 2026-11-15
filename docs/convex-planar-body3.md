@@ -1,0 +1,9 @@
+# Convex planar Body operands in mixed Booleans
+
+`booleanMixedBodies3` now accepts actual owned planar and consolidated-planar Bodies in addition to native boxes and cylinder-family backends. The planar getter returns the actual factory-prepared source retained in private Body state. This source must pass the convex single-shell support checks before material construction; public tags, copied state and approximate meshes do not grant a conversion path.
+
+Restored planar/consolidated Bodies reconstruct their own validated planar source before this dispatch. Consolidated input retains the same actual material even if its stored source has additional coplanar subdivisions; the new result derives domains and regions independently and uses the complete existing material-expression construction recipe. This does not promise preservation of input face IDs or feature history.
+
+The cylinder-specific Boolean entry point rejects planar operands consistently, including when its other operand is a previously clipped/material Body. The mixed entry point handles convex planar sources. Nonconvex, void and disconnected planar material still requires a decomposition and rejects instead of silently replacing it with its convex hull. General extrusion conversion, transformed native-box tags and NURBS operands remain incomplete. Balanced nonmanifold results still cannot acquire common Body ownership.
+
+The new connected tests cover all four operations on restored disjoint tetrahedron/cylinder Bodies, complete result replay and input preservation; a genuine overlapping tetrahedron/cylinder intersection with curved and planar boundaries; restored consolidated material; and concave/disconnected/copied/invalid-operation rejection. The full non-hard run and scoped audit are in progress; final evidence will be recorded on completion.

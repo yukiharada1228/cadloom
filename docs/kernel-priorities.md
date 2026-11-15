@@ -170,3 +170,7 @@ Clipped cylinder-family operands now compose through common Body Boolean dispatc
 ### Convex planar boundary lowering
 
 Owned convex single-shell rational polyhedra now lower to their outward supporting halfspaces in the bounded plane/cylinder material backend. Every source vertex must lie in every negative halfspace; existing exact embedding/orientation certification and strict auxiliary guard containment are retained. Four-support tetrahedron replay agrees with 343 independent rational simplex points; concave, disconnected and copied inputs reject. See [construction and validation scope](convex-planar-material3.md). Native general-planar Body dispatch, nonconvex/void decomposition and maximal coplanar consolidation remain incomplete.
+
+### Convex planar common Body operands
+
+`booleanMixedBodies3` now lowers actual planar/consolidated Body backends through the owned convex supporting-halfspace bridge. Restored Bodies reestablish source ownership; cylinder-specific dispatch consistently rejects planar inputs. See [contract and validation scope](convex-planar-body3.md). Concave/void/multi-shell decomposition, broader native extrusion conversion and analytic/NURBS parity remain incomplete.
