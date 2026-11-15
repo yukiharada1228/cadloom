@@ -47,6 +47,22 @@ export function assertOwnedPlanarSolid3(input:PreparedPlanarSolid3):void {
  */
 export function preparePlanarSolid3(input:readonly (readonly Point3[])[]):PreparedPlanarSolid3 {
   const boundary=partitionPlanarBRepFaces3(input,[],{requireClosed:true}),topology=boundary.sewn.topology;
+  const {polygons,triangles,triangleFaces}=decomposePlanarBoundary3(boundary);
+  const solid=prepareSolid3(triangles),assigned=new Set<number>();
+  const shells=Object.freeze(solid.shells.map(shell=>{
+    const faces=Object.freeze([...new Set(shell.faces.map(id=>triangleFaces[id]!))].sort((a,b)=>a-b));
+    const shellId=topology.faces[faces[0]!]!.shell,expected=topology.shells[shellId]!.faces;
+    if(assigned.has(shellId)||faces.length!==expected.length||faces.some((id,i)=>id!==expected[i]))throw new Error('Polygon and triangle shell partitions disagree');
+    assigned.add(shellId);return Object.freeze({faces,depth:shell.depth,signedVolume:shell.signedVolume});
+  }));
+  if(assigned.size!==topology.shells.length)throw new Error('A polygon shell was lost during exact decomposition');
+  const result=Object.freeze({boundary,topology,polygons,triangles:Object.freeze(triangles),triangleFaces:Object.freeze(triangleFaces),shells,volume:solid.volume,locate:solid.locate});
+  owned.add(result);return result;
+}
+
+/** Internal exact decomposition shared by material validation and Boolean results. */
+export function decomposePlanarBoundary3(boundary:PartitionedPlanarBRep3){
+  const topology=boundary.sewn.topology;
   const polygons=Object.freeze(topology.faces.map(face=>{
     if(face.loops.length!==1)throw new Error('Convex planar face must have exactly one boundary loop');
     return Object.freeze(topology.loops[face.loops[0]!]!.coedges.map(id=>{
@@ -61,14 +77,5 @@ export function preparePlanarSolid3(input:readonly (readonly Point3[])[]):Prepar
     const center=point3(sum.x.div(count),sum.y.div(count),sum.z.div(count));
     polygon.forEach((a,i)=>{triangles.push(triangle3(center,a,polygon[(i+1)%polygon.length]!));triangleFaces.push(face);});
   });
-  const solid=prepareSolid3(triangles),assigned=new Set<number>();
-  const shells=Object.freeze(solid.shells.map(shell=>{
-    const faces=Object.freeze([...new Set(shell.faces.map(id=>triangleFaces[id]!))].sort((a,b)=>a-b));
-    const shellId=topology.faces[faces[0]!]!.shell,expected=topology.shells[shellId]!.faces;
-    if(assigned.has(shellId)||faces.length!==expected.length||faces.some((id,i)=>id!==expected[i]))throw new Error('Polygon and triangle shell partitions disagree');
-    assigned.add(shellId);return Object.freeze({faces,depth:shell.depth,signedVolume:shell.signedVolume});
-  }));
-  if(assigned.size!==topology.shells.length)throw new Error('A polygon shell was lost during exact decomposition');
-  const result=Object.freeze({boundary,topology,polygons,triangles:Object.freeze(triangles),triangleFaces:Object.freeze(triangleFaces),shells,volume:solid.volume,locate:solid.locate});
-  owned.add(result);return result;
+  return {polygons,triangles:Object.freeze(triangles),triangleFaces:Object.freeze(triangleFaces)};
 }

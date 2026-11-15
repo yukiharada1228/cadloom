@@ -184,3 +184,5 @@ export {partitionPlanarBRepFaces3} from './geometry/planar-brep-partition3.js';
 export type {PlanarBRepCell3,PlanarBRepEdgeOrigin3,PartitionedPlanarBRep3} from './geometry/planar-brep-partition3.js';
 export {preparePlanarSolid3} from './geometry/planar-solid3.js';
 export type {PreparedPlanarSolid3,PlanarSolidShell3} from './geometry/planar-solid3.js';
+export {booleanPlanarSolids3} from './geometry/planar-solid-boolean3.js';
+export type {PlanarSolidBooleanResult3,PlanarSolidBooleanOperand3,PlanarBooleanFaceSource3} from './geometry/planar-solid-boolean3.js';

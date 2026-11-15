@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "6af526342031ac5470eefd83f3fd4e7815fa087d9425c2bc84fc0e0cf540df61",
+    "src/index.ts": "d05de6bf6874ef31ca4b000bfb0723155127d1bc824ca25c141f259aa583bb0a",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -96,7 +96,8 @@
     "src/convert/native-faces3.ts": "61ddc80df45fc5720860e96adea0a849c0bbe99d9947df790a41eef0743d6afa",
     "src/geometry/convex-polygon-plane-arrangement3.ts": "5a7e666a795f9d2713fab1df0c8dfe4db4337e6563be1e6d0faa654181d11e6a",
     "src/geometry/planar-brep-partition3.ts": "a7f8aaaf1ac30d41dc47345a77a686a95e41ba5a67bd022baaf69aca5add7184",
-    "src/geometry/planar-solid3.ts": "917d9be0c4a1b1da5eb75621166a00171162733669dae31467562e656480db5a"
+    "src/geometry/planar-solid3.ts": "2042db4f6bc1fff906320b5dd22e545793c9bf352ee2542994b11b95c573aee7",
+    "src/geometry/planar-solid-boolean3.ts": "25e09df8503edd57ca575270237631dcd8b3839f30a02f79176462ef902895ed"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -285,6 +286,7 @@
     "Portable analytic face-domain definitions reconstruct validated bounded domains, reselect trim components by strict witnesses, check coincident physical support orientation and bind complete oriented boundaries with one use from each comparison side. Common Body face queries use reconstructed definitions. These are documented arguments and executable checks, not machine proofs; global face/shell intersections, void containment, independent pcurves/parameter ranges and arbitrary NURBS face import remain outside scope.",
     "Convex rational planar polygon subdivision uses input convexity/planarity checks and exact halfspace clipping, tested against independent halfplane vertex enumeration and geometric invariants; no machine-verified TypeScript refinement or general BRep Boolean certification is claimed.",
     "Rational convex planar polygon-soup subdivision, shared-edge sewing and source face/edge/cutting-plane provenance use documented constructions and executable coverage/incidence/volume tests, not machine-verified TypeScript. Closed oriented incidence does not establish global embedding, shell nesting, material classification, safe common Body adoption or general BRep Boolean validity.",
-    "Convex rational planar polygon shells are sewn and decomposed exactly for existing triangle embedding, shell nesting, orientation, volume and rational point-query checks. Polygon/triangle shell partitions are checked for equality. These are documented constructions and executable tests, not a new machine proof, curved/algebraic BRep certification, common Body adoption or general BRep Boolean implementation."
+    "Convex rational planar polygon shells are sewn and decomposed exactly for existing triangle embedding, shell nesting, orientation, volume and rational point-query checks. Polygon/triangle shell partitions are checked for equality. These are documented constructions and executable tests, not a new machine proof, curved/algebraic BRep certification, common Body adoption or general BRep Boolean implementation.",
+    "Owned rational planar material Booleans use exact polygon/support/boundary-line arrangements, coplanar extreme-vertex deduplication, support-separated side samples, shared-edge balance and exact triangle embedding checks. Face provenance, chainable contact material, volume and rational queries are executably tested, not machine-proved TypeScript. Common Body adoption, curved/algebraic faces and general CAD equivalence remain unimplemented."
   ]
 }
