@@ -15,3 +15,5 @@ Constructive finite-cylinder region analysis still performs the complete initial
 The connected 25-test group passed against an isolated source-35 build, including old-document replay, binary/expression cavities, face binding, strict region references, rejected copied ownership and actual reuse of geometry/topology/faces. Mutation of caller region arrays does not affect the result. The historical 74-face fixture also confirms that replacement preserves all non-region tables. Broader regression and the unchanged oblique integration are separate gates. No new Lean theorem or full TypeScript execution proof is claimed.
 
 The existing scoped Lean audit passed all 133 declared theorems after updating the reviewed source manifest. These declarations do not prove this new runtime reuse path.
+
+The full source-35 broad suite subsequently passed all 767 tests outside the unchanged two-test hard oblique file in one isolated invocation (103913 ms). This includes the historical fixture and both new certificate/reuse tests. The unchanged source-35 hard integration remains live; no measured speedup or complete latest-source oblique result is established by the broad suite.
