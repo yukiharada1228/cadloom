@@ -238,6 +238,6 @@ concave L Body. The latter checked all 275 face samples, topology/material
 regions, 64 independent strict points and nine seam/bounded-boundary cases.
 The full suite took 952,600 ms under concurrent workloads; this is not a
 controlled performance comparison. The retained-Body experiment constructed
-275 manifold faces and adopted the Body; its replay and the separate oblique
-two-case integration remain running. These results precede the new public
+275 manifold faces and adopted the Body; its replay remains running. The unchanged separate oblique two-case
+integration passed both tests in 943,842 ms under concurrent workloads. These results precede the new public
 planar boundary wrapper, whose own five focused cases passed separately.
