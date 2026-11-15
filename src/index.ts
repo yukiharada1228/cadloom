@@ -299,4 +299,5 @@ export {booleanMixedBodies3} from './ops/body3.js';
 export {boundaryConvexPlanarMaterial3} from './geometry/convex-planar-material3.js';
 
 export {compilePlanarMaterial3} from './geometry/planar-material-program3.js';
+export {boundaryPlanarMaterial3} from './geometry/planar-material-boundary3.js';
 export type {PlanarMaterialProgram3} from './geometry/planar-material-program3.js';

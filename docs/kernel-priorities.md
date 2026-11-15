@@ -213,3 +213,15 @@ alive; it does not establish a bounded-memory guarantee. The focused numeric,
 root, endpoint and inverse-chart checks passed 21 tests. Broad regressions and
 the retained-Body L-shaped serialization/replay experiment are still running;
 the earlier default-heap failures must not be reported as resolved yet.
+
+### General planar material boundary entry point
+
+`boundaryPlanarMaterial3` connects an actual owned prepared planar solid to the
+existing bounded parity compiler and complete material partition/sewing backend.
+It returns the raw boundary with its manifold certificate; common Body adoption
+continues to use the existing checked material adapter. It does not change the
+convex-only native planar dispatch in `booleanMixedBodies3`. The compiler supports
+concavity and nested/disconnected shells, but large boundary construction and
+retained-Body replay remain resource gates. The four chamber/compiler cases and
+the existing tetrahedron full-boundary/replay case now exercise the public entry
+point where appropriate; that focused run is pending.

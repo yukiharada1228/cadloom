@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "416fe23f3e63c1327090a98cb72d857d443b99a69929abbc45d38825760887f7",
+    "src/index.ts": "8f2344929140e00204d4bb44c89d668189a1e097a5f246910addcd73201c1a03",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -140,7 +140,8 @@
     "src/convert/cylinder-material3.ts": "61e7a2eec116319b55cfc0d0c060398c9244a3735e9ec52385d25e62953c37cd",
     "src/geometry/box-material3.ts": "53ecb636a14aed1097c1e24aa323d15fa4c25e9052b0c539df0aade0143db0cc",
     "src/geometry/convex-planar-material3.ts": "db232ad7371f0721ff9f422cb7dd4d2b497100bf1c14581d0b6c7d1d045709f1",
-    "src/geometry/planar-material-program3.ts": "32af3855502d17dc158637db906b0dce1de372a9a15e052891cd0657aea4bcaa"
+    "src/geometry/planar-material-program3.ts": "32af3855502d17dc158637db906b0dce1de372a9a15e052891cd0657aea4bcaa",
+    "src/geometry/planar-material-boundary3.ts": "46a837405f5803104633faa1d7e29f28a1d94588e7d1aef7c5f5828c81155de2"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
