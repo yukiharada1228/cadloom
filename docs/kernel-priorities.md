@@ -223,5 +223,9 @@ continues to use the existing checked material adapter. It does not change the
 convex-only native planar dispatch in `booleanMixedBodies3`. The compiler supports
 concavity and nested/disconnected shells, but large boundary construction and
 retained-Body replay remain resource gates. The four chamber/compiler cases and
-the existing tetrahedron full-boundary/replay case now exercise the public entry
-point where appropriate; that focused run is pending.
+the existing tetrahedron full-boundary/replay case all passed (five tests). The
+tetrahedron case uses the public entry point, checks actual physical supports and
+manifold incidence, rejects copied ownership, and adopts/serializes/restores the
+Body with exact inside/outside/boundary queries. The build and existing scoped
+133-declaration audit passed. This does not establish large concave replay or
+full TypeScript execution verification.
