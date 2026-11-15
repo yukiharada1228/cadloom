@@ -4,7 +4,7 @@ import type {Plane3} from './plane3.js';
 import {cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js';
 import type {Surface3,Cylinder3} from './surface3.js';
 import type {Sign} from '../numeric/rational.js';
-import {compareAlgebraicPoints3,getRationalParameterization3,getPointParameterization3,getBiparameterization3} from './algebraic-point3.js';
+import {algebraicPointsEqual3,getRationalParameterization3,getPointParameterization3,getBiparameterization3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {pointOnArc3,splitCircularArc3,interiorPointOnArc3,intersectCirclePlane3} from './circle3.js';
 import {cylinderCoordinates3} from './cylinder-coordinates3.js';
@@ -29,7 +29,7 @@ function metadata(input:CylinderFaceRefinementInput3){
  if('planes' in input){assertOwnedCylinderFacePlanePartition3(input);return {cuts:input.planes.map(plane=>Object.freeze({kind:'plane' as const,plane})),cutters:[input.cutter],cylinderSides:input.cells.map(c=>[c.side]),planes:input.planes,planeSides:input.planeSides};}
  assertOwnedCylinderFaceCylinderPartition3(input);return {cuts:[],cutters:[input.cutter],cylinderSides:input.cells.map(c=>[c.side]),planes:[],planeSides:input.cells.map(()=>[] as Sign[])};
 }
-const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>compareAlgebraicPoints3(a,b)===0;
+const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>algebraicPointsEqual3(a,b);
 /** Overlay a new complete cylinder/plane height arrangement with owned existing
  * embedded strip cells, preserving prior signs and immediate source-cell IDs.
  * Both kinds of returned refinements may be used by this same API again. */

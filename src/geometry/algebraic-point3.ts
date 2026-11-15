@@ -13,6 +13,7 @@ export interface AlgebraicPoint3 extends AlgebraicCoordinates3 {
 }
 type Parameterization3=Readonly<Pick<AlgebraicPoint3,'origin'|'direction'|'parameter'>>;
 const parameters=new WeakMap<AlgebraicCoordinates3,Parameterization3>();
+const coordinateForms3=[['x',point3(1n,0n)],['y',point3(0n,1n)],['z',point3(0n,0n,1n)]] as const;
 // Factory coordinate records are already deeply immutable. Preserve their identity
 // so construction-specific weak registries survive internal snapshots.
 const coordinatePoints=new WeakSet<AlgebraicCoordinates3>();
@@ -40,7 +41,7 @@ export function algebraicPointsEqual3(a:AlgebraicCoordinates3,b:AlgebraicCoordin
 }
 export function compareAlgebraicPoints3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
   if(a===b)return 0;
-  return a.x.compare(b.x)||a.y.compare(b.y)||a.z.compare(b.z);
+  for(const [k,n] of coordinateForms3){const common=compareCommonLinearSource3(a,b,n),sign=common??a[k].compare(b[k]);if(sign!==0)return sign;}return 0;
 }
 /** Rational translation preserving only factory-recorded affine correlation. */
 export function translateAlgebraicPoint3(input:Point3|AlgebraicCoordinates3,translation:Vector3):AlgebraicCoordinates3 {
@@ -162,8 +163,21 @@ export function compareLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:
 
 /** Exact comparison of two rational linear projections, without constructing
  * independent algebraic images when rational intervals already separate them. */
+interface LinearSource3 {readonly parameter:AlgebraicReal;readonly numerator:Polynomial;readonly denominator:Polynomial;readonly coefficient:Rational;readonly radicand:Polynomial|null;}
+function linearSource3(p:AlgebraicCoordinates3,n:Vector3):LinearSource3|undefined {
+ const zero=new Rational(0n),quadratic=quadraticParameters.get(p);if(quadratic){const v=quadraticPointLinearParts3(quadratic,n);return {...quadratic,numerator:v.numerator,coefficient:v.coefficient};}
+ const rational=rationalParameters.get(p);if(rational)return {...rational,numerator:rationalPointLinearNumerator3(rational,n,zero),coefficient:zero,radicand:null};
+ const affine=parameters.get(p);if(affine)return {parameter:affine.parameter,numerator:new Polynomial([dot3(n,affine.origin),dot3(n,affine.direction)]),denominator:new Polynomial([1n]),coefficient:zero,radicand:null};return undefined;
+}
+/** Compare inside one actual shared source field before making image values.
+ * Different parameters/radicands leave the complete general path unchanged. */
+function compareCommonLinearSource3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3,n:Vector3):Sign|undefined {
+ const A=linearSource3(a,n),B=linearSource3(b,n);if(!A||!B||A.parameter!==B.parameter||A.radicand&&B.radicand&&!A.radicand.equals(B.radicand))return undefined;
+ const numerator=A.numerator.mul(B.denominator).sub(B.numerator.mul(A.denominator)),radicand=A.radicand??B.radicand,coefficient=B.denominator.scale(A.coefficient).sub(A.denominator.scale(B.coefficient)),sign=radicand?A.parameter.signQuadratic(numerator,coefficient,radicand):A.parameter.signOf(numerator);
+ return sign===0?0:sign*A.parameter.signOf(A.denominator)*A.parameter.signOf(B.denominator) as Sign;
+}
 export function compareLinearPoints3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3,n:Vector3):Sign {
- if(a===b)return 0;const axes=['x','y','z'] as const,active=axes.filter(k=>n[k].sign()!==0);if(!active.length)return 0;if(active.length===1){const k=active[0]!;const sign=a[k].compare(b[k]);return sign===0?0:sign*n[k].sign() as Sign;}let A=axes.map(k=>a[k]),B=axes.map(k=>b[k]);const interval=(p:readonly AlgebraicReal[])=>{let lo=new Rational(0n),hi=new Rational(0n);axes.forEach((k,i)=>{const value=p[i]!,positive=n[k].sign()>=0;lo=lo.add((positive?value.lower:value.upper).mul(n[k]));hi=hi.add((positive?value.upper:value.lower).mul(n[k]));});return {lo,hi};};
+ if(a===b)return 0;const axes=['x','y','z'] as const,active=axes.filter(k=>n[k].sign()!==0);if(!active.length)return 0;const common=compareCommonLinearSource3(a,b,n);if(common!==undefined)return common;if(active.length===1){const k=active[0]!;const sign=a[k].compare(b[k]);return sign===0?0:sign*n[k].sign() as Sign;}let A=axes.map(k=>a[k]),B=axes.map(k=>b[k]);const interval=(p:readonly AlgebraicReal[])=>{let lo=new Rational(0n),hi=new Rational(0n);axes.forEach((k,i)=>{const value=p[i]!,positive=n[k].sign()>=0;lo=lo.add((positive?value.lower:value.upper).mul(n[k]));hi=hi.add((positive?value.upper:value.lower).mul(n[k]));});return {lo,hi};};
  for(let i=0;i<16;i++){const x=interval(A),y=interval(B);if(x.hi.compare(y.lo)<0)return -1;if(x.lo.compare(y.hi)>0)return 1;if(x.lo.compare(x.hi)===0&&y.lo.compare(y.hi)===0)return x.lo.compare(y.lo);A=A.map(p=>p.refine());B=B.map(p=>p.refine());}
  const affine=getPointParameterization3(b),rational=getRationalParameterization3(b),pair=getBiparameterization3(b),quadratic=getQuadraticParameterization3(b),zero=new Rational(0n),constant=quadratic?quadraticPointLinearValue3(quadratic,n):affine?affine.parameter.affine(dot3(n,affine.direction),dot3(n,affine.origin)):rational?rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,n,zero),rational.denominator):pair?pair.s.affine(dot3(n,pair.u),dot3(n,pair.origin)).add(pair.t.affine(dot3(n,pair.v))):b.x.affine(n.x).add(b.y.affine(n.y)).add(b.z.affine(n.z));return compareLinearAlgebraicPoint3(a,n,constant);
 }

@@ -37,7 +37,7 @@
     "src/geometry/curve-half-edges2.ts": "520e7700826dccb029c59c52323b2f8ed89aba04713ebecd2f034768dca234e0",
     "src/geometry/curve-faces2.ts": "05f02ea5d8ed14c3446c866b45771b2653a35b16ac49e3ce118ccc23a3c4286b",
     "src/geometry/curve-boolean2.ts": "158d75129dd99ea56f005496effac4e52c8d81590e141955e55d67ae977ae5be",
-    "src/geometry/algebraic-point3.ts": "1ea43de435d429fee8c395ca2ecf6b1229e5f91433aa907d60b64319b8c79428",
+    "src/geometry/algebraic-point3.ts": "78c89e639ee9a0cd5d9070bceea6746d551296a60f0b187f4e0ae3c9b0ed68fa",
     "src/geometry/surface3.ts": "ac60dcdd816cdc533d16bfeab987e3cac2c64a78799adc49fd7f551f85820ae3",
     "src/geometry/curve3.ts": "c21110a823c90aa3a199bf87fe86b7a38cd08cf555e3f6fad81b6e48148cf378",
     "src/geometry/circle3.ts": "7b4ff1a316c7bfe07b603afacc6d58c3986548be2d8acb9a8f43cbc52f78a9d5",
@@ -126,7 +126,7 @@
     "src/geometry/mixed-shell-ray3.ts": "d608cdd1246a688b68e48930c4b86b6581391af1a42747339f7c5c219a3ab914",
     "src/geometry/finite-cylinder-regions3.ts": "8376182dafc175e64a052cbbb3a81d47a85a8c9b2547960e01dd413bdb6ae5f5",
     "src/geometry/cylinder-intersection-cylinder3.ts": "80b557b66b3927c5699b6ac9130eefe3f7716c17e9581c655b762f3de22c0ffd",
-    "src/geometry/cylinder-cell-refinement3.ts": "8e154928158d454cf40a140caf580488ee0a13344c1381534d9a5175b3a2cd48",
+    "src/geometry/cylinder-cell-refinement3.ts": "05775f23165af0d30509b845a08018bac071c22dac023d5422b66b32deb2f544",
     "src/geometry/finite-cylinder-expression3.ts": "ccf405c581386d359b1f361befa0a43e92e99ce1cbace864ce490bfc03f59a9b",
     "src/convert/finite-cylinder-expression3.ts": "4114952d90062f809d339eefd7931f7017df415d1e6dee073ca27675ef05e574",
     "src/geometry/algebraic-axial-point3.ts": "09773723c40f03cdcaf4f04cf3a8938985d9ff6ae15181a1d0bbb964e45d72c9"
