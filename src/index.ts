@@ -265,3 +265,6 @@ export {locateFiniteCylinderExpression3} from './geometry/finite-cylinder-expres
 
 export {sectionFiniteCylinderExpression3,assertOwnedCylinderExpressionPlaneSection3} from './geometry/cylinder-expression-plane-section3.js';
 export type {CylinderExpressionSectionPatch3,CylinderExpressionPlaneSection3} from './geometry/cylinder-expression-plane-section3.js';
+
+export {splitFiniteCylinderExpressionByPlane3,assertOwnedCylinderExpressionPlaneSplit3} from './geometry/cylinder-expression-plane-split3.js';
+export type {CylinderExpressionSplitFaceOrigin3,CylinderExpressionSplitFace3,CylinderExpressionSplitChild3,CylinderExpressionSplitInterface3,CylinderExpressionPlaneSplit3} from './geometry/cylinder-expression-plane-split3.js';
