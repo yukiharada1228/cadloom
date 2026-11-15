@@ -5,7 +5,7 @@ import {AlgebraicReal,isolateRealRoots} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,algebraicPointsEqual3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -145,9 +145,10 @@ export type ArcDirection3='ccw'|'cw';
 export interface CircularArcOptions3 {readonly direction?:ArcDirection3;readonly fullCircle?:boolean;}
 export interface CircularArc3 {readonly circle:Circle3;readonly start:AlgebraicCoordinates3;readonly end:AlgebraicCoordinates3;readonly direction:ArcDirection3;readonly fullCircle:boolean;}
 export type ArcPointLocation3='outside'|'endpoint'|'interior';
-const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>compareAlgebraicPoints3(a,b)===0;
+const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>algebraicPointsEqual3(a,b);
 const flip=(direction:ArcDirection3):ArcDirection3=>direction==='ccw'?'cw':'ccw';
-function make(circle:Circle3,start:AlgebraicCoordinates3,end:AlgebraicCoordinates3,direction:ArcDirection3,fullCircle=false):CircularArc3{return Object.freeze({circle,start,end,direction,fullCircle});}
+const ownedArcs=new WeakSet<CircularArc3>();
+function make(circle:Circle3,start:AlgebraicCoordinates3,end:AlgebraicCoordinates3,direction:ArcDirection3,fullCircle=false):CircularArc3{const arc=Object.freeze({circle,start,end,direction,fullCircle});ownedArcs.add(arc);return arc;}
 export function circularArc3(input:Circle3,inputStart:CirclePointInput3,inputEnd:CirclePointInput3,options:CircularArcOptions3={}):CircularArc3 {
   const c=snapshot(input),start=snapshotExactPoint3(inputStart),end=snapshotExactPoint3(inputEnd),direction=options.direction??'ccw',full=options.fullCircle??false;
   if(direction!=='ccw'&&direction!=='cw')throw new RangeError('Unknown arc direction');
@@ -156,13 +157,13 @@ export function circularArc3(input:Circle3,inputStart:CirclePointInput3,inputEnd
   if(full&&!same(start,end))throw new RangeError('A full circle requires equal seam endpoints');
   return make(c,start,same(start,end)?start:end,direction,full&&c.radiusSquared.sign()>0);
 }
-function snapshotArc(arc:CircularArc3):CircularArc3{return circularArc3(arc.circle,arc.start,arc.end,{direction:arc.direction,fullCircle:arc.fullCircle});}
+export function snapshotCircularArc3(arc:CircularArc3):CircularArc3{if(ownedArcs.has(arc))return arc;return circularArc3(arc.circle,arc.start,arc.end,{direction:arc.direction,fullCircle:arc.fullCircle});}
 /** Full circle about any nonzero rational normal, including irrational axis lengths. */
 export function fullCircleArc3(input:Circle3,direction:ArcDirection3='ccw'):CircularArc3 {
   const c=snapshot(input),[u]=basis(c),t=AlgebraicReal.fromRational(c.radiusSquared.div(dot3(u,u))).sqrt(),seam=algebraicPoint3(c.center,u,t);
   return circularArc3(c,seam,seam,{direction,fullCircle:true});
 }
-export function reverseCircularArc3(input:CircularArc3):CircularArc3 {const a=snapshotArc(input);return make(a.circle,a.end,a.start,flip(a.direction),a.fullCircle);}
+export function reverseCircularArc3(input:CircularArc3):CircularArc3 {const a=snapshotCircularArc3(input);return make(a.circle,a.end,a.start,flip(a.direction),a.fullCircle);}
 function containsOnCircle(p:AlgebraicCoordinates3,arc:CircularArc3):boolean {
   if(arc.fullCircle)return true;if(same(arc.start,arc.end))return same(p,arc.start);
   const start=arc.direction==='ccw'?arc.start:arc.end,end=arc.direction==='ccw'?arc.end:arc.start;
@@ -177,7 +178,7 @@ export function containsCircularArcProjection3(input:CirclePointInput3,arc:Circu
  if(same(arc.start,arc.end))return against(arc.start)===0;const start=arc.direction==='ccw'?arc.start:arc.end,end=arc.direction==='ccw'?arc.end:arc.start,order=angleCompare(arc.circle,start,end),from=against(start),endToPoint=against(end),to=endToPoint===0?0:-endToPoint;return order<0?from<=0&&to<=0:from<=0||to<=0;
 }
 export function locatePointOnArc3(inputPoint:CirclePointInput3,input:CircularArc3):ArcPointLocation3 {
-  const p=snapshotExactPoint3(inputPoint),a=snapshotArc(input);
+  const p=snapshotExactPoint3(inputPoint),a=snapshotCircularArc3(input);
   if(!pointOnCircle3(p,a.circle)||!containsOnCircle(p,a))return 'outside';
   return !a.fullCircle&&(same(p,a.start)||same(p,a.end))?'endpoint':'interior';
 }
@@ -188,20 +189,20 @@ function orderAlong(arc:CircularArc3,a:AlgebraicCoordinates3,b:AlgebraicCoordina
   const c=angleCompare(arc.circle,a,b);return arc.direction==='ccw'?c:c===0?0:c===1?-1:1;
 }
 export function comparePointsOnArc3(input:CircularArc3,inputA:CirclePointInput3,inputB:CirclePointInput3):Sign {
-  const arc=snapshotArc(input),a=snapshotExactPoint3(inputA),b=snapshotExactPoint3(inputB);
+  const arc=snapshotCircularArc3(input),a=snapshotExactPoint3(inputA),b=snapshotExactPoint3(inputB);
   if(!pointOnArc3(a,arc)||!pointOnArc3(b,arc))throw new RangeError('Arc ordering requires points on the arc');return orderAlong(arc,a,b);
 }
 function unique(points:readonly AlgebraicCoordinates3[]):AlgebraicCoordinates3[]{return points.filter((p,i)=>points.findIndex(q=>same(p,q))===i);}
 export function splitCircularArc3(input:CircularArc3,inputCuts:readonly CirclePointInput3[]):readonly CircularArc3[] {
-  const arc=snapshotArc(input),cuts=inputCuts.map(snapshotExactPoint3);
+  const arc=snapshotCircularArc3(input),cuts=inputCuts.map(snapshotExactPoint3);
   if(cuts.some(p=>!pointOnArc3(p,arc)))throw new RangeError('Arc cut must lie on the arc');
   if(!arc.fullCircle&&same(arc.start,arc.end))return Object.freeze([arc]);
   const ordered=unique([arc.start,...cuts,arc.end]).sort((a,b)=>orderAlong(arc,a,b));if(ordered.length===1)return Object.freeze([arc]);
   const count=arc.fullCircle?ordered.length:ordered.length-1;
   return Object.freeze(Array.from({length:count},(_,i)=>make(arc.circle,ordered[i]!,ordered[(i+1)%ordered.length]!,arc.direction)));
 }
-export function intersectLineArc3(line:Line3,input:CircularArc3):readonly LineCircleHit3[] {const arc=snapshotArc(input);return Object.freeze(intersectLineCircle3(line,arc.circle).filter(h=>containsOnCircle(h.point,arc)));}
-export function intersectSegmentArc3(segment:Segment3,input:CircularArc3):readonly LineCircleHit3[] {const arc=snapshotArc(input);return Object.freeze(intersectSegmentCircle3(segment,arc.circle).filter(h=>containsOnCircle(h.point,arc)));}
+export function intersectLineArc3(line:Line3,input:CircularArc3):readonly LineCircleHit3[] {const arc=snapshotCircularArc3(input);return Object.freeze(intersectLineCircle3(line,arc.circle).filter(h=>containsOnCircle(h.point,arc)));}
+export function intersectSegmentArc3(segment:Segment3,input:CircularArc3):readonly LineCircleHit3[] {const arc=snapshotCircularArc3(input);return Object.freeze(intersectSegmentCircle3(segment,arc.circle).filter(h=>containsOnCircle(h.point,arc)));}
 export type ArcIntersection3=
  | {readonly kind:'none'}
  | {readonly kind:'points';readonly points:readonly AlgebraicCoordinates3[]}
@@ -210,7 +211,7 @@ export type ArcIntersection3=
  * Overlap arcs follow the first input's normal and traversal direction.
  */
 export function intersectArcs3(inputA:CircularArc3,inputB:CircularArc3):ArcIntersection3 {
-  const first=snapshotArc(inputA),originalSecond=snapshotArc(inputB),support=intersectCircles3(first.circle,originalSecond.circle);
+  const first=snapshotCircularArc3(inputA),originalSecond=snapshotCircularArc3(inputB),support=intersectCircles3(first.circle,originalSecond.circle);
   const resultPoints=(points:AlgebraicCoordinates3[]):ArcIntersection3=>points.length?Object.freeze({kind:'points',points:Object.freeze(points.sort((a,b)=>orderAlong(first,a,b)))}):Object.freeze({kind:'none'});
   if(support.kind==='none')return Object.freeze({kind:'none'});
   if(support.kind==='points')return resultPoints(support.points.filter(p=>containsOnCircle(p,first)&&containsOnCircle(p,originalSecond)));
@@ -230,8 +231,13 @@ export function intersectArcs3(inputA:CircularArc3,inputB:CircularArc3):ArcInter
 /** Exact open-arc witness. Dyadic slope bisection uses only rational linear
  * predicates at the endpoints; the returned point needs only a quadratic root.
  */
+const arcInteriorPoints=new WeakMap<CircularArc3,AlgebraicCoordinates3>();
 export function interiorPointOnArc3(input:CircularArc3):AlgebraicCoordinates3 {
-  const arc=snapshotArc(input);
+  const arc=snapshotCircularArc3(input),known=arcInteriorPoints.get(arc);if(known)return known;
+  const point=computeInteriorPointOnArc3(arc);arcInteriorPoints.set(arc,point);return point;
+}
+function computeInteriorPointOnArc3(input:CircularArc3):AlgebraicCoordinates3 {
+  const arc=snapshotCircularArc3(input);
   if(arc.fullCircle)return arc.start;
   if(same(arc.start,arc.end))throw new RangeError('A point arc has no open-arc interior');
   const c=arc.circle,[u,v]=basis(c),neg=(a:Vector3)=>vector3(a.x.neg(),a.y.neg(),a.z.neg()),pairs:readonly (readonly [Vector3,Vector3])[]=[[u,v],[v,neg(u)],[neg(u),neg(v)],[neg(v),u]];

@@ -7,9 +7,9 @@ import {algebraicPoint3,compareAlgebraicPoints3,snapshotExactPoint3,translateAlg
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {circularArc2,reverseCircularArc2,pointOnArc2} from './circular-arc2.js';
 import type {CircularArc2} from './circular-arc2.js';
-import {circle3,circularArc3,reverseCircularArc3,pointOnArc3,circlePlane3} from './circle3.js';
+import {circle3,circularArc3,snapshotCircularArc3,reverseCircularArc3,pointOnArc3,circlePlane3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {ellipse3,ellipsePlane3,ellipticArc3,reverseEllipticArc3,pointOnEllipticArc3} from './ellipse3.js';
+import {ellipse3,ellipsePlane3,ellipticArc3,snapshotEllipticArc3,reverseEllipticArc3,pointOnEllipticArc3} from './ellipse3.js';
 import type {EllipticArc3} from './ellipse3.js';
 import {algebraicSegment3,pointOnAlgebraicSegment3,algebraicSegmentOnSurface3} from './algebraic-segment3.js';
 import type {AlgebraicSegment3} from './algebraic-segment3.js';
@@ -43,13 +43,18 @@ export function planarArc3(inputFrame:PlaneFrame3,inputArc:CircularArc2):PlanarA
   return Object.freeze({frame,arc,start:mapPlanePoint3(frame,arc.start),end:mapPlanePoint3(frame,arc.end)});
 }
 /** Internal snapshot never trusts cached start/end fields from structural objects. */
+const curveSnapshots=new WeakSet<Curve3>();
 export function snapshotCurve3(curve:Curve3):Curve3 {
+  if(curveSnapshots.has(curve))return curve;
+  const result=copyCurve3(curve);curveSnapshots.add(result);return result;
+}
+function copyCurve3(curve:Curve3):Curve3 {
   switch(curve.kind){
-    case 'elliptic-arc':return Object.freeze({kind:'elliptic-arc',arc:ellipticArc3(curve.arc.ellipse,curve.arc.start,curve.arc.end,{direction:curve.arc.direction,fullEllipse:curve.arc.fullEllipse})});
+    case 'elliptic-arc':return Object.freeze({kind:'elliptic-arc',arc:snapshotEllipticArc3(curve.arc)});
     case 'algebraic-segment':return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(curve.segment.start,curve.segment.end)});
     case 'line':return Object.freeze({kind:'line',interval:lineInterval3(curve.interval.line,curve.interval.startParameter,curve.interval.endParameter)});
     case 'planar-arc':return Object.freeze({kind:'planar-arc',arc:planarArc3(curve.arc.frame,curve.arc.arc)});
-    case 'circular-arc':return Object.freeze({kind:'circular-arc',arc:circularArc3(curve.arc.circle,curve.arc.start,curve.arc.end,{direction:curve.arc.direction,fullCircle:curve.arc.fullCircle})});
+    case 'circular-arc':return Object.freeze({kind:'circular-arc',arc:snapshotCircularArc3(curve.arc)});
     default:throw new RangeError('Unknown 3D curve kind');
   }
 }

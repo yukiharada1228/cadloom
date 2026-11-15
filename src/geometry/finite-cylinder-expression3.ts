@@ -65,7 +65,11 @@ export function boundaryFiniteCylinderExpression3(input:readonly FiniteCylinder3
 /** Regularized material membership, including points on discarded primitive
  * boundaries. Generic symbolic infinitesimal directions require no epsilon. */
 export function locateFiniteCylinderExpression3(source:FiniteCylinderExpressionBoundary3,input:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
- assertOwnedFiniteCylinderExpressionBoundary3(source);if(source.empty)return 'outside';const p=snapshotExactPoint3(input);if(source.faces.some(f=>f.domain.locate(p)!=='outside'))return 'boundary';
+ assertOwnedFiniteCylinderExpressionBoundary3(source);if(source.empty)return 'outside';const p=snapshotExactPoint3(input),locations=source.operands.map(c=>c.locate(p));
+ // Every selected face lies on an operand boundary. Strict primitive locations
+ // therefore exclude every output face and determine regularized truth directly.
+ if(locations.every(l=>l!=='boundary'))return evaluate(source.expression,locations.map(l=>l==='inside'))?'inside':'outside';
+ if(source.faces.some(f=>f.domain.locate(p)!=='outside'))return 'boundary';
  for(let k=0n;;k++){
   const v=point3(1n,k,k*k),values:boolean[]=[];let retry=false;
   for(const primitive of source.operands){

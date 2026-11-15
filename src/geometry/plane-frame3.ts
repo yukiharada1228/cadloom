@@ -1,3 +1,4 @@
+import {algebraicPlanePoint3} from './algebraic-axial-point3.js';
 import {Rational} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {point2} from './point2.js';
@@ -27,12 +28,8 @@ function mapRational(frame:PlaneFrame3,p:Point2,direction=false):Point3 {
   const component=(k:typeof axes[number])=>frame.u[k].mul(p.x).add(frame.v[k].mul(p.y)).add(direction?zero:frame.origin[k]);
   return point3(component('x'),component('y'),component('z'));
 }
-export function mapPlanePoint3(input:PlaneFrame3,inputPoint:Point2|AlgebraicCoordinates2):AlgebraicCoordinates3 {
-  const frame=snapshotFrame(input),p=snapshotExactPoint2(inputPoint),data=getPointParameterization2(p);
-  if(data)return algebraicPoint3(mapRational(frame,data.origin),mapRational(frame,data.direction,true),data.parameter);
-  const component=(k:typeof axes[number])=>p.x.affine(frame.u[k],frame.origin[k]).add(p.y.affine(frame.v[k]));
-  return algebraicCoordinates3(component('x'),component('y'),component('z'));
-}
+export function mapPlanePoint3(input:PlaneFrame3,inputPoint:Point2|AlgebraicCoordinates2):AlgebraicCoordinates3 {return algebraicPlanePoint3(snapshotFrame(input),inputPoint);}
+
 function linear(point:AlgebraicCoordinates3,v:Vector3,offset=zero):AlgebraicReal {
   return evaluate({normal:v,offset},point);
 }

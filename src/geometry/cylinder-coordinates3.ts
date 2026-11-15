@@ -8,6 +8,12 @@ import {snapshotExactPoint3,getPointParameterization3,getBiparameterization3,get
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluatePlaneAtAlgebraicPoint3 as evaluate} from './algebraic-segment-plane3.js';
 const axes=['x','y','z'] as const;
+/** Axial height alone; unlike full coordinates this does not construct the
+ * radial projection, which can require unrelated high-degree root images. */
+export function cylinderHeight3(cylinder:Cylinder3,input:Point3|AlgebraicCoordinates3){
+ const p=snapshotExactPoint3(input),known=cylinderIntersectionPointCoordinates3(p,cylinder);if(known)return known.height;
+ const d=cylinder.axis.direction;return evaluate({normal:d,offset:dot3(d,cylinder.axis.origin).neg()},p).affine(new Rational(1n).div(dot3(d,d)));
+}
 /** Internal exact axial projection, retaining registered coordinate correlations.
  * Defined off the surface too; callers separately check cylinder membership.
  */

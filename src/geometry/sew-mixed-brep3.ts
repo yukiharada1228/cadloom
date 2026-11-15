@@ -1,7 +1,7 @@
 import type {Surface3} from './surface3.js';
 import {snapshotBRepCurve3,nativeBRepCurve3,cylinderIntersectionBRepCurve3,brepCurveEndpoints3,pointOnBRepCurve3,brepCurveOnSurface3,buildMixedBRepTopology3} from './brep-curve3.js';
 import type {BRepCurve3} from './brep-curve3.js';
-import {algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
+import {restrictAlgebraicSegment3,algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
 import {compareAlgebraicPoints3,getPointParameterization3,getRationalParameterization3,getBiparameterization3} from './algebraic-point3.js';
 import {ellipsesCoincide3,splitEllipticArc3} from './ellipse3.js';
 import {curveOnSurface3} from './curve3.js';
@@ -57,7 +57,7 @@ export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewBR
       }else if(primitive.curve.kind==='elliptic-arc')pieces=splitEllipticArc3(primitive.curve.arc,points.filter(p=>pointOnBRepCurve3(p,primitive))).map(arc=>nativeBRepCurve3({kind:'elliptic-arc',arc}));
       else if(primitive.curve.kind==='algebraic-segment'){
         const s=primitive.curve.segment,axis=(['x','y','z'] as const).find(k=>s.start[k].compare(s.end[k])!==0);if(axis===undefined)throw new RangeError('Sewn edges must have positive extent');const direction=s.start[axis].compare(s.end[axis])<0?1:-1,cut=points.filter(p=>pointOnAlgebraicSegment3(p,s)).sort((a,b)=>a[axis].compare(b[axis])*direction);
-        pieces=cut.slice(0,-1).map((p,i)=>nativeBRepCurve3({kind:'algebraic-segment',segment:algebraicSegment3(p,cut[i+1]!)}));
+        pieces=cut.slice(0,-1).map((p,i)=>nativeBRepCurve3({kind:'algebraic-segment',segment:restrictAlgebraicSegment3(s,p,cut[i+1]!)}));
       }else throw new Error('Unexpected canonical mixed sewing curve');
       for(const c of pieces){let edge=edges.findIndex(e=>equal(c,e)!==0),direction:1|-1=1;if(edge<0){edge=edges.length;edges.push(c);}else direction=equal(c,edges[edge]!) as 1|-1;uses.push(Object.freeze({edge,direction}));}
     }

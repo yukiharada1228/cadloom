@@ -1,7 +1,7 @@
 import type {Surface3} from './surface3.js';
 import {curveEndpoints3,snapshotCurve3,pointOnCurve3} from './curve3.js';
 import type {Curve3} from './curve3.js';
-import {algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
+import {restrictAlgebraicSegment3,algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
 import {compareAlgebraicPoints3} from './algebraic-point3.js';
 import {ellipsesCoincide3,splitEllipticArc3} from './ellipse3.js';
 import {canonical,samePoint} from './planar-trim-utils3.js';
@@ -37,7 +37,7 @@ export function sewBRepFaces3(input:readonly SewBRepFace3[],options:SewBRepOptio
       if(primitive.kind==='elliptic-arc')pieces=splitEllipticArc3(primitive.arc,points.filter(p=>pointOnCurve3(p,primitive))).map(arc=>snapshotCurve3({kind:'elliptic-arc',arc}));
       else if(primitive.kind==='algebraic-segment'){
         const s=primitive.segment,axis=(['x','y','z'] as const).find(k=>s.start[k].compare(s.end[k])!==0);if(axis===undefined)throw new RangeError('Sewn edges must have positive extent');const sign=s.start[axis].compare(s.end[axis])<0?1:-1,cut=points.filter(p=>pointOnAlgebraicSegment3(p,s)).sort((a,b)=>a[axis].compare(b[axis])*sign);
-        pieces=cut.slice(0,-1).map((p,i)=>snapshotCurve3({kind:'algebraic-segment',segment:algebraicSegment3(p,cut[i+1]!)}));
+        pieces=cut.slice(0,-1).map((p,i)=>snapshotCurve3({kind:'algebraic-segment',segment:restrictAlgebraicSegment3(s,p,cut[i+1]!)}));
       }else throw new Error('Unexpected canonical sewing curve');
       for(const c of pieces){let edge=edges.findIndex(e=>equalPiece(c,e)!==0),direction:1|-1=1;if(edge<0){edge=edges.length;edges.push(c);}else direction=equalPiece(c,edges[edge]!) as 1|-1;uses.push(Object.freeze({edge,direction}));}
     }

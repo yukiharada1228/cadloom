@@ -10,7 +10,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -40,11 +40,17 @@ function equation(o:Point2,d:Point2,e:Ellipse3):Polynomial {
 }
 function localSign(p:AlgebraicCoordinates2,e:Ellipse3):Sign {
   const data=getPointParameterization2(p);if(data)return data.parameter.signOf(equation(data.origin,data.direction,e));
-  return p.x.mul(p.x).affine(e.radiusVSquared).add(p.y.mul(p.y).affine(e.radiusUSquared)).affine(1n,e.radiusUSquared.mul(e.radiusVSquared).neg()).sign();
+  // Compare the two exact images directly: their sum need not be constructed
+  // in a larger compositum merely to determine its sign (including equality).
+  return p.x.mul(p.x).affine(e.radiusVSquared,e.radiusUSquared.mul(e.radiusVSquared).neg()).compare(p.y.mul(p.y).affine(e.radiusUSquared).neg());
 }
 /** Location in the closed planar ellipse disk; off-plane points are outside. */
 export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,input:Ellipse3):PointLocation {
   const e=snapshot(input),point=snapshotExactPoint3(inputPoint),rational=getRationalParameterization3(point);
+  const supports=cylinderIntersectionPointCylinders3(point);if(supports){
+    if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
+    for(const c of supports){const d=c.axis.direction,q=cross3(d,subtract3(e.frame.origin,c.axis.origin)),u=cross3(d,e.frame.u),v=cross3(d,e.frame.v),scale=dot3(u,u).mul(e.radiusUSquared);if(scale.sign()>0&&scale.compare(dot3(v,v).mul(e.radiusVSquared))===0&&dot3(q,u).sign()===0&&dot3(q,v).sign()===0&&dot3(u,v).sign()===0&&dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))).add(scale).sign()===0)return 'boundary';}
+  }
   if(rational){
     if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
     const [U,V]=duals(e),X=rationalPointLinearNumerator3(rational,U,dot3(U,e.frame.origin).neg()),Y=rationalPointLinearNumerator3(rational,V,dot3(V,e.frame.origin).neg()),W=rational.denominator,sign=rational.parameter.signOf(X.mul(X).scale(e.radiusVSquared).add(Y.mul(Y).scale(e.radiusUSquared)).sub(W.mul(W).scale(e.radiusUSquared.mul(e.radiusVSquared))));
@@ -52,10 +58,6 @@ export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,in
   }
   const pair=getBiparameterization3(point);if(pair){
     if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';const [U,V]=duals(e),delta=subtract3(pair.origin,e.frame.origin),q=point2(dot3(U,delta),dot3(V,delta)),a=point2(dot3(U,pair.u),dot3(V,pair.u)),b=point2(dot3(U,pair.v),dot3(V,pair.v)),inner=(a:Point2,b:Point2)=>a.x.mul(b.x).mul(e.radiusVSquared).add(a.y.mul(b.y).mul(e.radiusUSquared)),two=new Rational(2n),sign=signBiparametricQuadratic3(pair,inner(q,q).sub(e.radiusUSquared.mul(e.radiusVSquared)),inner(q,a).mul(two),inner(q,b).mul(two),inner(a,a),inner(a,b).mul(two),inner(b,b));return sign===0?'boundary':sign<0?'inside':'outside';
-  }
-  const supports=cylinderIntersectionPointCylinders3(point);if(supports){
-    if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
-    for(const c of supports){const d=c.axis.direction,q=cross3(d,subtract3(e.frame.origin,c.axis.origin)),u=cross3(d,e.frame.u),v=cross3(d,e.frame.v),scale=dot3(u,u).mul(e.radiusUSquared);if(scale.sign()>0&&scale.compare(dot3(v,v).mul(e.radiusVSquared))===0&&dot3(q,u).sign()===0&&dot3(q,v).sign()===0&&dot3(u,v).sign()===0&&dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))).add(scale).sign()===0)return 'boundary';}
   }
   const p=pointInPlaneFrame3(e.frame,point);if(p===null)return 'outside';const sign=localSign(p,e);return sign===0?'boundary':sign<0?'inside':'outside';
 }
@@ -94,14 +96,15 @@ export function intersectSegmentEllipse3(input:Segment3,e:Ellipse3):readonly Lin
 }
 export interface EllipticArcOptions3 {readonly direction?:'ccw'|'cw';readonly fullEllipse?:boolean;}
 export interface EllipticArc3 {readonly ellipse:Ellipse3;readonly start:AlgebraicCoordinates3;readonly end:AlgebraicCoordinates3;readonly direction:'ccw'|'cw';readonly fullEllipse:boolean;}
-const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>compareAlgebraicPoints3(a,b)===0;
-function make(e:Ellipse3,start:AlgebraicCoordinates3,end:AlgebraicCoordinates3,direction:'ccw'|'cw',fullEllipse=false):EllipticArc3{return Object.freeze({ellipse:e,start,end,direction,fullEllipse});}
+const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>algebraicPointsEqual3(a,b);
+const ownedArcs=new WeakSet<EllipticArc3>();
+function make(e:Ellipse3,start:AlgebraicCoordinates3,end:AlgebraicCoordinates3,direction:'ccw'|'cw',fullEllipse=false):EllipticArc3{const arc=Object.freeze({ellipse:e,start,end,direction,fullEllipse});ownedArcs.add(arc);return arc;}
 export function ellipticArc3(input:Ellipse3,inputStart:Point3|AlgebraicCoordinates3,inputEnd:Point3|AlgebraicCoordinates3,options:EllipticArcOptions3={}):EllipticArc3 {
   const e=snapshot(input),start=snapshotExactPoint3(inputStart),end=snapshotExactPoint3(inputEnd),direction=options.direction??'ccw',full=options.fullEllipse??false;
   if(direction!=='ccw'&&direction!=='cw')throw new RangeError('Unknown elliptic arc direction');if(typeof full!=='boolean')throw new TypeError('fullEllipse must be boolean');
   if(!pointOnEllipse3(start,e)||!pointOnEllipse3(end,e))throw new RangeError('Elliptic arc endpoints must lie on the ellipse');if(full&&!same(start,end))throw new RangeError('Full ellipse requires equal seam endpoints');return make(e,start,same(start,end)?start:end,direction,full);
 }
-function snapshotArc(a:EllipticArc3):EllipticArc3{return ellipticArc3(a.ellipse,a.start,a.end,{direction:a.direction,fullEllipse:a.fullEllipse});}
+export function snapshotEllipticArc3(a:EllipticArc3):EllipticArc3{if(ownedArcs.has(a))return a;return ellipticArc3(a.ellipse,a.start,a.end,{direction:a.direction,fullEllipse:a.fullEllipse});}
 export function fullEllipseArc3(input:Ellipse3,direction:'ccw'|'cw'='ccw'):EllipticArc3 {
   const e=snapshot(input),seam=algebraicPoint3(e.frame.origin,e.frame.u,AlgebraicReal.fromRational(e.radiusUSquared).sqrt());return ellipticArc3(e,seam,seam,{direction,fullEllipse:true});
 }
@@ -117,23 +120,23 @@ function contains(p:AlgebraicCoordinates3,a:EllipticArc3):boolean {
   const s=a.direction==='ccw'?a.start:a.end,e=a.direction==='ccw'?a.end:a.start,order=angleCompare(a.ellipse,s,e),from=angleCompare(a.ellipse,s,p),to=angleCompare(a.ellipse,p,e);return order<0?from<=0&&to<=0:from<=0||to<=0;
 }
 export function locatePointOnEllipticArc3(inputPoint:Point3|AlgebraicCoordinates3,input:EllipticArc3):'outside'|'endpoint'|'interior' {
-  const p=snapshotExactPoint3(inputPoint),a=snapshotArc(input);if(!pointOnEllipse3(p,a.ellipse)||!contains(p,a))return 'outside';return !a.fullEllipse&&(same(p,a.start)||same(p,a.end))?'endpoint':'interior';
+  const p=snapshotExactPoint3(inputPoint),a=snapshotEllipticArc3(input);if(!pointOnEllipse3(p,a.ellipse)||!contains(p,a))return 'outside';return !a.fullEllipse&&(same(p,a.start)||same(p,a.end))?'endpoint':'interior';
 }
 export function pointOnEllipticArc3(p:Point3|AlgebraicCoordinates3,a:EllipticArc3):boolean{return locatePointOnEllipticArc3(p,a)!=='outside';}
-export function reverseEllipticArc3(input:EllipticArc3):EllipticArc3 {const a=snapshotArc(input);return make(a.ellipse,a.end,a.start,a.direction==='ccw'?'cw':'ccw',a.fullEllipse);}
+export function reverseEllipticArc3(input:EllipticArc3):EllipticArc3 {const a=snapshotEllipticArc3(input);return make(a.ellipse,a.end,a.start,a.direction==='ccw'?'cw':'ccw',a.fullEllipse);}
 function orderAlong(a:EllipticArc3,p:AlgebraicCoordinates3,q:AlgebraicCoordinates3):Sign {
   const side=(p:AlgebraicCoordinates3)=>{const c=angleCompare(a.ellipse,a.start,p);return a.direction==='ccw'?(c<=0?0:1):(c>=0?0:1);},s=side(p),t=side(q);if(s!==t)return s<t?-1:1;const c=angleCompare(a.ellipse,p,q);return a.direction==='ccw'?c:c===0?0:c===1?-1:1;
 }
 export function comparePointsOnEllipticArc3(input:EllipticArc3,inputA:Point3|AlgebraicCoordinates3,inputB:Point3|AlgebraicCoordinates3):Sign {
-  const a=snapshotArc(input),p=snapshotExactPoint3(inputA),q=snapshotExactPoint3(inputB);if(!pointOnEllipticArc3(p,a)||!pointOnEllipticArc3(q,a))throw new RangeError('Arc order requires points on the elliptic arc');return orderAlong(a,p,q);
+  const a=snapshotEllipticArc3(input),p=snapshotExactPoint3(inputA),q=snapshotExactPoint3(inputB);if(!pointOnEllipticArc3(p,a)||!pointOnEllipticArc3(q,a))throw new RangeError('Arc order requires points on the elliptic arc');return orderAlong(a,p,q);
 }
 export function splitEllipticArc3(input:EllipticArc3,inputCuts:readonly (Point3|AlgebraicCoordinates3)[]):readonly EllipticArc3[] {
-  const a=snapshotArc(input),cuts=inputCuts.map(snapshotExactPoint3);if(cuts.some(p=>!pointOnEllipticArc3(p,a)))throw new RangeError('Elliptic cut must lie on the arc');if(!a.fullEllipse&&same(a.start,a.end))return Object.freeze([a]);
+  const a=snapshotEllipticArc3(input),cuts=inputCuts.map(snapshotExactPoint3);if(cuts.some(p=>!pointOnEllipticArc3(p,a)))throw new RangeError('Elliptic cut must lie on the arc');if(!a.fullEllipse&&same(a.start,a.end))return Object.freeze([a]);
   const points=[a.start,...cuts,a.end].filter((p,i,all)=>all.findIndex(q=>same(p,q))===i).sort((p,q)=>orderAlong(a,p,q));if(points.length===1)return Object.freeze([a]);
   return Object.freeze(Array.from({length:a.fullEllipse?points.length:points.length-1},(_,i)=>make(a.ellipse,points[i]!,points[(i+1)%points.length]!,a.direction)));
 }
-export function intersectLineEllipticArc3(line:Line3,input:EllipticArc3):readonly LineEllipseHit3[] {const a=snapshotArc(input);return Object.freeze(intersectLineEllipse3(line,a.ellipse).filter(h=>contains(h.point,a)));}
-export function intersectSegmentEllipticArc3(segment:Segment3,input:EllipticArc3):readonly LineEllipseHit3[] {const a=snapshotArc(input);return Object.freeze(intersectSegmentEllipse3(segment,a.ellipse).filter(h=>contains(h.point,a)));}
+export function intersectLineEllipticArc3(line:Line3,input:EllipticArc3):readonly LineEllipseHit3[] {const a=snapshotEllipticArc3(input);return Object.freeze(intersectLineEllipse3(line,a.ellipse).filter(h=>contains(h.point,a)));}
+export function intersectSegmentEllipticArc3(segment:Segment3,input:EllipticArc3):readonly LineEllipseHit3[] {const a=snapshotEllipticArc3(input);return Object.freeze(intersectSegmentEllipse3(segment,a.ellipse).filter(h=>contains(h.point,a)));}
 
 export type EllipsePlaneIntersection3=
  | {readonly kind:'none'}
@@ -148,7 +151,7 @@ export function intersectEllipsePlane3(inputEllipse:Ellipse3,inputPlane:Plane3):
 
 /** Exact open-arc witness from a rational ray in one chart quadrant. */
 export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordinates3 {
-  const a=snapshotArc(input);if(a.fullEllipse)return a.start;
+  const a=snapshotEllipticArc3(input);if(a.fullEllipse)return a.start;
   if(same(a.start,a.end))throw new RangeError('A point arc has no open interior');
   const e=a.ellipse,f=e.frame,one=new Rational(1n),two=new Rational(2n);
   const onRay=(x:Rational,y:Rational)=>{

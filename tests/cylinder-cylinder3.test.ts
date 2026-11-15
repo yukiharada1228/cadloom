@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Rational,point3,line3,cylinder3,intersectCylinders3,evaluateCylinderIntersectionArc3,pointOnCylinderIntersectionArc3,pointOnArc3,classifyPointToSurface3,algebraicLineOnSurface3,compareAlgebraicPoints3,AlgebraicReal,algebraicCoordinates3,pointOnCircle3,circle3,plane3,interiorPointOnArc3} from '../dist/index.js';
 import {algebraicBiparametricPoint3,snapshotExactPoint3} from '../dist/geometry/algebraic-point3.js';
+import {evaluateCylinderIntersectionFiber3} from '../dist/geometry/cylinder-cylinder3.js';
 import {evaluatePlaneAtAlgebraicPoint3} from '../dist/geometry/algebraic-segment-plane3.js';
 import type {Cylinder3,CylinderCylinderIntersection3,AlgebraicCoordinates3} from '../dist/index.js';
 const O=point3(0n,0n),Z=point3(0n,0n,1n),X=point3(1n,0n,0n),A=cylinder3(line3(O,Z),1n),B=cylinder3(line3(O,X),1n);
@@ -76,3 +77,14 @@ test('nearly parallel nonparallel axes keep finite short and very long branches 
  assert.ok(g.arcs.some(a=>a.sample.z.compare(AlgebraicReal.fromRational(10n**10n))>0));
  assert.ok(g.arcs.some(a=>a.sample.z.sign()!==0&&a.sample.z.compare(AlgebraicReal.fromRational('1/1000000'))<0&&a.sample.z.sign()>0));
 });
+
+ test('fiber recovery reuses owned endpoint and sample roots only after validating both supports',()=>{
+ const g=bounded(intersectCylinders3(A,cylinder3(line3(O,X),4n)));
+ for(const arc of g.arcs)for(const [q,expected] of [[arc.base.start,arc.start],[arc.base.end,arc.end],[arc.baseSample,arc.sample]] as const){
+  const other=g.arcs.find(a=>a.branch!==arc.branch&&pointOnArc3(q,a.base));assert.ok(other);
+  const opposite=evaluateCylinderIntersectionArc3(other,q);
+  assert.equal(evaluateCylinderIntersectionFiber3(arc,q,opposite),expected);
+  assert.equal(evaluateCylinderIntersectionFiber3(arc,q,algebraicCoordinates3(q.x,q.y,0n)),undefined);
+ }
+ const arc=g.arcs[0]!;assert.throws(()=>evaluateCylinderIntersectionFiber3({...arc},arc.baseSample,arc.sample),RangeError);
+ });

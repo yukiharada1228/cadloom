@@ -6,7 +6,7 @@ import {algebraicCoordinates2,algebraicPoint2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3} from './point3.js';
 import type {Point3,Vector3} from './point3.js';
-import {algebraicCoordinates3,algebraicPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicCoordinates3,algebraicPoint3,algebraicPointsEqual3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {planeFrame3,mapPlanePoint3,pointInPlaneFrame3} from './plane-frame3.js';
 import type {PlaneFrame3} from './plane-frame3.js';
@@ -21,7 +21,7 @@ import type {PreparedPlanarFace3} from './planar-face3.js';
 export const zero=new Rational(0n),one=new Rational(1n),two=new Rational(2n);
 export const real=(q:Rational|bigint)=>AlgebraicReal.fromRational(q);
 export const uniqueReals=(values:readonly AlgebraicReal[])=>values.filter((x,i,all)=>all.findIndex(y=>x.compare(y)===0)===i).sort((a,b)=>a.compare(b));
-export const samePoint=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>compareAlgebraicPoints3(p,q)===0;
+export const samePoint=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>algebraicPointsEqual3(p,q);
 export function canonical(c:Curve3):Curve3 {
   if(c.kind==='algebraic-segment'||c.kind==='elliptic-arc')return snapshotCurve3(c);
   if(c.kind==='line'){const [a,b]=curveEndpoints3(c);return snapshotCurve3({kind:'algebraic-segment',segment:algebraicSegment3(a,b)});}

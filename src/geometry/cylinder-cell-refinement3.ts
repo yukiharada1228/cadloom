@@ -1,4 +1,4 @@
-import {point3,dot3} from './point3.js';
+import {point3,dot3,cross3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
 import {cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js';
@@ -34,7 +34,20 @@ const same=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>compareAlgebraicPo
  * embedded strip cells, preserving prior signs and immediate source-cell IDs.
  * Both kinds of returned refinements may be used by this same API again. */
 export function refineCylinderFaceCells3(input:CylinderFaceRefinementInput3,cut:Surface3):CylinderFaceRefinement3 {
- const old=metadata(input),base=input.base,surface:Surface3=cut.kind==='cylinder'?Object.freeze({kind:'cylinder',cylinder:cylinder3(cut.cylinder.axis,cut.cylinder.radiusSquared)}):cut.kind==='plane'?Object.freeze({kind:'plane',plane:plane3(cut.plane.normal.x,cut.plane.normal.y,cut.plane.normal.z,cut.plane.offset)}):(()=>{throw new RangeError('Unsupported face cutter');})(),incoming=surface.kind==='cylinder'?partitionCylinderFaceByCylinder3(base,surface.cylinder):partitionCylinderFaceCellsByPlane3(partitionCylinderFaceByCylinder3(base,base.surface),surface.plane),points:AlgebraicCoordinates3[]=[...input.cells.flatMap(c=>c.boundary.flatMap(brepCurveEndpoints3)),...incoming.cells.flatMap(c=>c.boundary.flatMap(brepCurveEndpoints3))],boundPlanes=new Map<string,Plane3>(),sourceArcs=new Set<Extract<CylinderHeightBound3,{kind:'ssi'}>['arc']>(),incomingArcs=new Set<Extract<CylinderHeightBound3,{kind:'ssi'}>['arc']>();
+ const old=metadata(input),base=input.base,surface:Surface3=cut.kind==='cylinder'?Object.freeze({kind:'cylinder',cylinder:cylinder3(cut.cylinder.axis,cut.cylinder.radiusSquared)}):cut.kind==='plane'?Object.freeze({kind:'plane',plane:plane3(cut.plane.normal.x,cut.plane.normal.y,cut.plane.normal.z,cut.plane.offset)}):(()=>{throw new RangeError('Unsupported face cutter');})();
+ if(surface.kind==='plane'){
+  const p=surface.plane,reuse=(column:readonly Sign[]):CylinderFaceRefinement3=>{const result=Object.freeze({...input,cuts:Object.freeze([...old.cuts,surface]),source:input,sourceCells:Object.freeze(input.cells.map((_,i)=>i)),cutters:Object.freeze([...old.cutters]),cylinderSides:Object.freeze(old.cylinderSides.map(s=>Object.freeze([...s]))),planes:Object.freeze([...old.planes,p]),planeSides:Object.freeze(input.cells.map((_,i)=>Object.freeze([...old.planeSides[i]!,column[i]!])))});owned.add(result);return result;},duplicate=old.planes.findIndex(plane=>surfacesCoincide3({kind:'plane',plane},surface));
+  if(duplicate>=0){const factor=dot3(old.planes[duplicate]!.normal,p.normal).sign();if(factor===0)throw new Error('Coincident planes have orthogonal normals');return reuse(old.planeSides.map(s=>s[duplicate]===0?0:s[duplicate]!*factor as Sign));}
+  // A parallel normal gives a constant axial height. At/outside either base
+  // endpoint its zero set misses the open band, so no geometry changes.
+  const d=base.surface.axis.direction,cross=cross3(p.normal,d),a=dot3(p.normal,d),D=dot3(d,d),s=dot3(p.normal,base.surface.axis.origin).add(p.offset),ends=[s.add(a.mul(base.lower)),s.add(a.mul(base.upper))].sort((x,y)=>x.compare(y)),radialSquared=base.surface.radiusSquared.mul(dot3(p.normal,p.normal).sub(a.mul(a).div(D)));
+  // Exact support extrema enclose the entire closed angular band. Strict
+  // separation preserves every contact; tangent equality takes the full path.
+  if(ends[0]!.sign()>0&&ends[0]!.mul(ends[0]!).compare(radialSquared)>0)return reuse(input.cells.map(()=>1));
+  if(ends[1]!.sign()<0&&ends[1]!.mul(ends[1]!).compare(radialSquared)>0)return reuse(input.cells.map(()=>-1));
+  if(cross.x.sign()===0&&cross.y.sign()===0&&cross.z.sign()===0&&a.sign()!==0){const t=dot3(p.normal,base.surface.axis.origin).add(p.offset).neg().div(a);if(t.compare(base.lower)<=0||t.compare(base.upper)>=0){const sign=(t.compare(base.lower)<=0?a.sign():-a.sign()) as Sign;return reuse(input.cells.map(()=>sign));}}
+ }
+ const incoming=surface.kind==='cylinder'?partitionCylinderFaceByCylinder3(base,surface.cylinder):partitionCylinderFaceCellsByPlane3(partitionCylinderFaceByCylinder3(base,base.surface),surface.plane),points:AlgebraicCoordinates3[]=[...input.cells.flatMap(c=>c.boundary.flatMap(brepCurveEndpoints3)),...incoming.cells.flatMap(c=>c.boundary.flatMap(brepCurveEndpoints3))],boundPlanes=new Map<string,Plane3>(),sourceArcs=new Set<Extract<CylinderHeightBound3,{kind:'ssi'}>['arc']>(),incomingArcs=new Set<Extract<CylinderHeightBound3,{kind:'ssi'}>['arc']>();
  const asPlane=(b:Exclude<CylinderHeightBound3,{kind:'ssi'}>)=>b.kind==='plane'?b.plane:plane3(base.surface.axis.direction.x,base.surface.axis.direction.y,base.surface.axis.direction.z,dot3(base.surface.axis.direction,base.surface.axis.origin).add(dot3(base.surface.axis.direction,base.surface.axis.direction).mul(b.value)).neg());
  for(const c of input.cells)for(const b of [c.lower,c.upper]){if(b.kind==='ssi')sourceArcs.add(b.arc);else{const p=asPlane(b);boundPlanes.set([p.normal.x,p.normal.y,p.normal.z,p.offset].map(x=>x.toString()).join(','),p);}}
  for(const c of incoming.cells)for(const b of [c.lower,c.upper])if(b.kind==='ssi')incomingArcs.add(b.arc);

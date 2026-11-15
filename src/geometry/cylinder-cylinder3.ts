@@ -7,7 +7,7 @@ import {cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js
 import type {Cylinder3} from './surface3.js';
 import {circle3,fullCircleArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,intersectCircles3,containsCircularArcProjection3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
+import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluatePlaneAtAlgebraicPoint3} from './algebraic-segment-plane3.js';
 import {algebraicLine3} from './algebraic-line3.js';
@@ -59,7 +59,7 @@ interface Family {
 }
 const arcFamilies=new WeakMap<CylinderIntersectionArc3,Family>();
 const lifted=new WeakMap<AlgebraicCoordinates3,{family:Family;base:AlgebraicCoordinates3;branch:-1|0|1;height:AlgebraicReal}>();
-const same=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>compareAlgebraicPoints3(p,q)===0;
+const same=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>algebraicPointsEqual3(p,q);
 function discriminant(f:Family,q:AlgebraicCoordinates3):AlgebraicReal {
   const offset=dot3(f.n,f.second.axis.origin).neg(),data=getPointParameterization3(q);
   if(data){const c=dot3(f.n,data.origin).add(offset),d=dot3(f.n,data.direction);return data.parameter.rationalFunction(new Polynomial([f.a.mul(f.second.radiusSquared).sub(c.mul(c)).mul(f.E),c.mul(d).mul(new Rational(-2n)).mul(f.E),d.mul(d).neg().mul(f.E)]),new Polynomial([1n]));}
@@ -84,12 +84,25 @@ export function cylinderIntersectionPointCoordinates3(point:AlgebraicCoordinates
  const data=lifted.get(point);if(!data)return undefined;const source=data.family.first.axis,d=source.direction,target=cylinder.axis,normal=cross3(d,target.direction);if(dot3(normal,normal).sign()!==0)return undefined;
  const k=axes.find(k=>d[k].sign()!==0)!,ratio=target.direction[k].div(d[k]),shift=dot3(subtract3(target.origin,source.origin),d).div(dot3(d,d));return {base:shift.sign()===0?data.base:translateAlgebraicPoint3(data.base,scale(d,shift)),height:data.height.affine(one.div(ratio),shift.neg().div(ratio))};
 }
+/** Partial exact generator test for a genuine SSI point. A target on the
+ * second support needs only one radial component and the stored branch sign;
+ * no secondary projection or square-root coordinate image is constructed. */
+export function pointOnCylinderIntersectionGenerator3(point:AlgebraicCoordinates3,input:Cylinder3,inputAnchor:Point3|AlgebraicCoordinates3):boolean|undefined {
+ const data=lifted.get(point);if(!data)return undefined;const c=cylinder3(input.axis,input.radiusSquared),f=data.family,first=surfacesCoincide3({kind:'cylinder',cylinder:c},{kind:'cylinder',cylinder:f.first}),second=surfacesCoincide3({kind:'cylinder',cylinder:c},{kind:'cylinder',cylinder:f.second});if(!first&&!second)return undefined;const anchor=snapshotExactPoint3(inputAnchor);if(classifyPointToSurface3(anchor,{kind:'cylinder',cylinder:c})!==0)return false;
+ const d=c.axis.direction;if(first){const n=cross3(d,d.y.sign()!==0||d.z.sign()!==0?point3(1n,0n):point3(0n,1n)),m=cross3(d,n);return compareLinearPoints3(data.base,anchor,n)===0&&compareLinearPoints3(data.base,anchor,m)===0;}
+ const u=cross3(d,f.first.axis.direction),v=cross3(d,u);if(compareLinearPoints3(data.base,anchor,u)!==0)return false;const sign=signLinearAlgebraicPoint3(anchor,v,dot3(v,c.axis.origin).neg()),expected=data.branch===0?0:-data.branch;return sign===expected;
+}
+const secondaryBases=new WeakMap<AlgebraicCoordinates3,WeakMap<Cylinder3,AlgebraicCoordinates3>>();
 /** Internal radial projection using actual SSI support provenance. The returned
  * point is a coordinate construction, not an unchecked caller-supplied flag. */
 export function cylinderIntersectionPointBase3(point:AlgebraicCoordinates3,cylinder:Cylinder3):AlgebraicCoordinates3|undefined {
+ const cached=secondaryBases.get(point)?.get(cylinder);if(cached)return cached;
  const parallel=cylinderIntersectionPointCoordinates3(point,cylinder);if(parallel)return parallel.base;const data=lifted.get(point);if(!data||![data.family.first,data.family.second].some(c=>surfacesCoincide3({kind:'cylinder',cylinder:c},{kind:'cylinder',cylinder})))return undefined;
  const d=cylinder.axis.direction,o=cylinder.axis.origin,u=cross3(d,data.family.first.axis.direction),v=cross3(d,u),U=dot3(u,u),V=dot3(v,v);if(U.sign()===0||V.sign()===0)throw new Error('Parallel SSI projection missed its axial inverse');
- const alpha=linear(data.base,u,dot3(u,o).neg()).affine(one.div(U)),squared=alpha.rationalFunction(new Polynomial([cylinder.radiusSquared.div(V),0n,U.neg().div(V)])),sign=signLinearAlgebraicPoint3(point,v,dot3(v,o).neg());if(squared.sign()<0||(squared.sign()===0)!==(sign===0))throw new Error('Certified SSI radial projection has inconsistent signs');return affineTwo(o,u,alpha,v,squared.sqrt().affine(BigInt(sign)));
+ const alpha=linear(data.base,u,dot3(u,o).neg()).affine(one.div(U)),squared=alpha.rationalFunction(new Polynomial([cylinder.radiusSquared.div(V),0n,U.neg().div(V)])),sign=signLinearAlgebraicPoint3(point,v,dot3(v,o).neg());if(squared.sign()<0||(squared.sign()===0)!==(sign===0))throw new Error('Certified SSI radial projection has inconsistent signs');const base=affineTwo(o,u,alpha,v,squared.sqrt().affine(BigInt(sign)));
+ // Only the actual immutable support objects are cache keys. Mutable caller
+ // copies keep the complete uncached path, so changed frames cannot go stale.
+ if(cylinder===data.family.first||cylinder===data.family.second){let cache=secondaryBases.get(point);if(!cache){cache=new WeakMap();secondaryBases.set(point,cache);}cache.set(cylinder,base);}return base;
 }
 function family(arc:CylinderIntersectionArc3){const f=arcFamilies.get(arc);if(!f)throw new RangeError('Expected a factory-created cylinder intersection arc');return f;}
 /** Evaluate an owned algebraic SSI branch at a point on its base circular arc. */
@@ -98,12 +111,24 @@ export function evaluateCylinderIntersectionArc3(arc:CylinderIntersectionArc3,in
   if(same(q,arc.base.start))return arc.start;if(same(q,arc.base.end))return arc.end;if(same(q,arc.baseSample))return arc.sample;
   if(!pointOnArc3(q,arc.base))throw new RangeError('SSI parameter must lie on the base arc');return lift(f,q,arc.branch);
 }
+const projectionCache=new WeakMap<Family,WeakMap<AlgebraicCoordinates3,AlgebraicCoordinates3>>();
+const projectionForms=new WeakMap<Family,readonly {normal:Vector3;offset:Rational}[]>();
+/** Necessary interval test only: an overlap always falls through to the exact
+ * projection/equality check. No support membership follows from these bounds. */
+function projectionMayEqual(f:Family,p:AlgebraicCoordinates3,q:AlgebraicCoordinates3):boolean {
+ let forms=projectionForms.get(f);if(!forms){const d=f.first.axis.direction,o=f.first.axis.origin,t=dot3(d,o).div(f.D);forms=axes.map(k=>({normal:point3(...axes.map(j=>(k===j?one:zero).sub(d[k].mul(d[j]).div(f.D))) as [Rational,Rational,Rational]),offset:d[k].mul(t)}));projectionForms.set(f,forms);}
+ return forms.every((form,i)=>{let lo=form.offset,hi=form.offset;for(const k of axes){const a=form.normal[k],positive=a.sign()>=0;lo=lo.add(a.mul(positive?p[k].lower:p[k].upper));hi=hi.add(a.mul(positive?p[k].upper:p[k].lower));}const v=q[axes[i]!];return hi.compare(v.lower)>=0&&lo.compare(v.upper)<=0;});
+}
 /** Internal exact recovery from either known root of the same height fiber.
  * Both supports and the base projection are checked. The other root is a
  * rational affine reflection, so an existing RUR need not gain a new radical. */
 export function evaluateCylinderIntersectionFiber3(arc:CylinderIntersectionArc3,inputBase:AlgebraicCoordinates3,inputPoint:AlgebraicCoordinates3):AlgebraicCoordinates3|undefined {
- const f=family(arc),q=snapshotExactPoint3(inputBase),p=snapshotExactPoint3(inputPoint);if(!same(projectCylinderIntersectionBase3(arc,p),q))return undefined;if(!pointOnArc3(q,arc.base))throw new RangeError('SSI fiber must lie on its base interval');
+ const f=family(arc),q=snapshotExactPoint3(inputBase),p=snapshotExactPoint3(inputPoint);if(!projectionMayEqual(f,p,q)||!same(projectCylinderIntersectionBase3(arc,p),q))return undefined;if(!pointOnArc3(q,arc.base))throw new RangeError('SSI fiber must lie on its base interval');
  const registered=lifted.get(p),known=(c:Cylinder3)=>registered&&[registered.family.first,registered.family.second].some(s=>surfacesCoincide3({kind:'cylinder',cylinder:s},{kind:'cylinder',cylinder:c}));if(!known(f.first)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.first})!==0||!known(f.second)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0)return undefined;
+ // The validated fiber has one root on each selected sheet (one at a double
+ // root). Reuse the actual owned endpoint/sample rather than reconstructing
+ // its coordinates by reflecting an unrelated multivariate representation.
+ if(same(q,arc.base.start))return arc.start;if(same(q,arc.base.end))return arc.end;if(same(q,arc.baseSample))return arc.sample;
  const offset=dot3(f.m,f.second.axis.origin).neg(),sign=signLinearAlgebraicPoint3(p,f.m,offset);if(sign===0||sign===arc.branch)return p;
  const factor=new Rational(2n).div(f.a),d=f.first.axis.direction,rational=getRationalParameterization3(p),affine=getPointParameterization3(p),pair=getBiparameterization3(p),reflect=(v:Point3,vector=false)=>{const t=dot3(f.m,v).add(vector?zero:offset).mul(factor);return point3(...axes.map(k=>v[k].sub(d[k].mul(t))) as [Rational,Rational,Rational]);};let result:AlgebraicCoordinates3;
  if(rational){const T=rationalPointLinearNumerator3(rational,f.m,offset).scale(factor);result=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
@@ -117,8 +142,10 @@ export function pointOnCylinderIntersectionArc3(input:Point3|AlgebraicCoordinate
   const f=family(arc);
   if(input===arc.start||input===arc.end||input===arc.sample)return true;
   const registered=lifted.get(input as AlgebraicCoordinates3),p=snapshotExactPoint3(input);
-  if(same(p,arc.start)||same(p,arc.end))return true;
+  // The private family chart already specifies the exact point and sheet.
+  // Resolve it before comparing expensive independent coordinate images.
   if(registered?.family===f)return pointOnArc3(registered.base,arc.base)&&(registered.branch===0||registered.branch===arc.branch);
+  if(same(p,arc.start)||same(p,arc.end))return true;
   const known=(c:Cylinder3)=>registered&&[registered.family.first,registered.family.second].some(s=>surfacesCoincide3({kind:'cylinder',cylinder:s},{kind:'cylinder',cylinder:c}));
   if(!known(f.first)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.first})!==0)return false;
   if(!known(f.second)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0)return false;
@@ -128,7 +155,7 @@ export function pointOnCylinderIntersectionArc3(input:Point3|AlgebraicCoordinate
 /** Internal projection preserving certified rational/affine source fields. */
 export function projectCylinderIntersectionBase3(arc:CylinderIntersectionArc3,input:Point3|AlgebraicCoordinates3):AlgebraicCoordinates3 {
   const f=family(arc),registered=lifted.get(input as AlgebraicCoordinates3);
-  let q:AlgebraicCoordinates3,p=snapshotExactPoint3(input);
+  let q:AlgebraicCoordinates3,p=snapshotExactPoint3(input),cache=projectionCache.get(f);if(!cache){cache=new WeakMap();projectionCache.set(f,cache);}const cached=cache.get(p);if(cached)return cached;
   if(registered?.family===f)q=registered.base;
   else {const data=getPointParameterization3(p),pair=getBiparameterization3(p),rational=getRationalParameterization3(p),d=f.first.axis.direction,o=f.first.axis.origin,project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(f.D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
     if(rational){const T=rationalPointLinearNumerator3(rational,d,dot3(d,o).neg()).scale(one.div(f.D));q=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
@@ -139,7 +166,7 @@ export function projectCylinderIntersectionBase3(arc:CylinderIntersectionArc3,in
     }
     else {const t=linear(p,d,dot3(d,o).neg()).affine(one.div(f.D));q=algebraicCoordinates3(...axes.map(k=>p[k].sub(t.affine(d[k]))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
   }
-  return q;
+  cache.set(p,q);return q;
 }
 
 export function assertOwnedCylinderIntersectionArc3(arc:CylinderIntersectionArc3):void {family(arc);}

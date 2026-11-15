@@ -114,3 +114,7 @@ Owned manifold finite-cylinder expression boundaries now derive shell containmen
 ### Reusable finite-cylinder expression Bodies
 
 Common Body adoption now includes owned manifold cylinder expressions, derived material/void regions, exact regularized material queries and normalized expression recipe replay. Earlier binary and expression results can feed `booleanCylinderBodies3`, including after restoration. Discarded primitive boundaries use symbolic infinitesimal signs, not a numeric tolerance. See [construction and query argument](cylinder-expression-body3.md). Plane-clipped leaves, broader analytic/NURBS families, general oblique/contact coverage and maximal curved face consolidation remain incomplete.
+
+### Oblique-cylinder kernel validation in progress
+
+The next gate is a genuinely oblique three-cylinder expression, `A − (B ∩ C)`, including complete boundary sewing, independent quadratic material checks and common Body adoption. Work remains on exact-computation cost in this pipeline; the fixture is retained unchanged. Certified interval rejection, constructive line/source identities, immutable snapshot reuse and exact comparison reuse avoid repeated field expansion without changing the geometry. See [arguments, regression scope and unfinished integration gate](cylinder-expression-query-performance3.md). Passing smaller or earlier broad snapshots does not complete this gate. UI, feature history and additional primitive families are not the focus of this step.

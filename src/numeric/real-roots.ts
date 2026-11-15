@@ -67,8 +67,9 @@ function integerSquareRoot(n:bigint):bigint {
  * Refinement never mutates existing certificates. No floating-point approximation
  * is used. Arithmetic uses exact polynomial elimination and interval branch selection.
  */
+const realInstances=new WeakSet<AlgebraicReal>(),comparisons=new WeakMap<AlgebraicReal,WeakMap<AlgebraicReal,Sign>>();
 export class AlgebraicReal {
-  private constructor(readonly polynomial:Polynomial,readonly lower:Rational,readonly upper:Rational){Object.freeze(this);}
+  private constructor(readonly polynomial:Polynomial,readonly lower:Rational,readonly upper:Rational){Object.freeze(this);realInstances.add(this);}
   /** Null means not yet represented as a rational point, not a proof of irrationality. */
   get rational():Rational|null{return this.lower.equals(this.upper)?this.lower:null;}
   static fromRational(input:ExactInput):AlgebraicReal {
@@ -241,16 +242,20 @@ export class AlgebraicReal {
     const equation=Array.from({length:Math.max(n.degree,d.degree)+1},(_,i)=>new Polynomial([n.coefficient(i).neg(),d.coefficient(i)]));
     const image=resultantInParameter(sourcePolynomial.coefficients.map(c=>new Polynomial([c])),equation).squareFree();
     if(image.degree<=0)throw new Error('Rational algebraic image has no defining polynomial');
-    let candidates=[...AlgebraicReal.isolate(image)],root:AlgebraicReal=this;
+    if(image.degree===1)return AlgebraicReal.fromRational(image.coefficient(0).neg().div(image.coefficient(1)));
+    // Isolate the represented image locally. Globally isolating every image
+    // conjugate wastes work when other conjugates form extremely close pairs.
+    const sequence=sturmSequence(image),certificate=sequence[0]!;let root:AlgebraicReal=this;
     while(true){
       if(root.rational!==null)return AlgebraicReal.fromRational(n.evaluate(root.rational).div(d.evaluate(root.rational)));
       const [dl,du]=intervalValue(d,root.lower,root.upper);
       if(dl.sign()*du.sign()<=0){root=root.refine();continue;}
-      const [nl,nu]=intervalValue(n,root.lower,root.upper),bounds=[nl.div(dl),nl.div(du),nu.div(dl),nu.div(du)].sort((a,b)=>a.compare(b));
-      candidates=candidates.filter(c=>c.lower.compare(bounds[3]!)<=0&&c.upper.compare(bounds[0]!)>=0);
-      if(!candidates.length)throw new Error('Rational image lost all candidates');
-      if(candidates.length===1)return candidates[0]!;
-      candidates=candidates.map(c=>c.refine());root=root.refine();
+      const [nl,nu]=intervalValue(n,root.lower,root.upper),bounds=[nl.div(dl),nl.div(du),nu.div(dl),nu.div(du)].sort((a,b)=>a.compare(b)),padding=bounds[3]!.sub(bounds[0]!).add(root.upper.sub(root.lower)),lo=bounds[0]!.sub(padding),hi=bounds[3]!.add(padding);
+      // Positive padding places the actual image strictly inside. Nonroot
+      // endpoints and exactly one open root give the usual sign-changing
+      // certificate required by refine(), with no approximate selection.
+      if(certificate.evaluate(lo).sign()!==0&&certificate.evaluate(hi).sign()!==0){const count=countOpen(sequence,lo,hi);if(count===0)throw new Error('Rational image lost its represented root');if(count===1)return new AlgebraicReal(certificate,lo,hi);}
+      root=root.refine();
     }
   }
   /** Exact sign of another polynomial evaluated at this root, including equality. */
@@ -270,6 +275,18 @@ export class AlgebraicReal {
     }
   }
   compare(other:AlgebraicReal):Sign {
+    if(this===other)return 0;
+    const cached=comparisons.get(this)?.get(other);if(cached!==undefined)return cached;
+    const result=this.compareUncached(other);
+    // Genuine instances and their polynomial/rational certificates are deeply
+    // immutable. A repeated comparison has the same exact result forever.
+    if(realInstances.has(this)&&realInstances.has(other)){
+      let forward=comparisons.get(this);if(!forward){forward=new WeakMap();comparisons.set(this,forward);}forward.set(other,result);
+      let reverse=comparisons.get(other);if(!reverse){reverse=new WeakMap();comparisons.set(other,reverse);}reverse.set(this,result===0?0:-result as Sign);
+    }
+    return result;
+  }
+  private compareUncached(other:AlgebraicReal):Sign {
     let a:AlgebraicReal=this,b=other;
     if(a.rational!==null&&b.rational!==null)return a.rational.compare(b.rational);
     if(a.upper.compare(b.lower)<=0)return -1;

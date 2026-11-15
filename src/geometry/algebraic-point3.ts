@@ -31,16 +31,27 @@ export function algebraicPoint3(origin:Point3,direction:Vector3,parameter:Algebr
 export function snapshotExactPoint3(point:Point3|AlgebraicCoordinates3):AlgebraicCoordinates3 {
   if(coordinatePoints.has(point as AlgebraicCoordinates3))return point as AlgebraicCoordinates3;
   const data=parameters.get(point as AlgebraicCoordinates3);
-  return data?algebraicPoint3(data.origin,data.direction,data.parameter):algebraicCoordinates3(point.x,point.y,point.z);
+  return data?point as AlgebraicCoordinates3:algebraicCoordinates3(point.x,point.y,point.z);
+}
+/** Exact equality with a necessary box-separation filter. Unlike lexicographic
+ * ordering, equality may reject on any disjoint coordinate before refining x. */
+export function algebraicPointsEqual3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):boolean {
+ if(a===b)return true;for(const k of ['x','y','z'] as const)if(a[k].upper.compare(b[k].lower)<0||b[k].upper.compare(a[k].lower)<0)return false;return compareAlgebraicPoints3(a,b)===0;
 }
 export function compareAlgebraicPoints3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
+  if(a===b)return 0;
   return a.x.compare(b.x)||a.y.compare(b.y)||a.z.compare(b.z);
 }
 /** Rational translation preserving only factory-recorded affine correlation. */
 export function translateAlgebraicPoint3(input:Point3|AlgebraicCoordinates3,translation:Vector3):AlgebraicCoordinates3 {
   const p=snapshotExactPoint3(input),v=vector3(translation.x,translation.y,translation.z),data=parameters.get(p),rational=rationalParameters.get(p),pair=biparameters.get(p);
   if(data)return algebraicPoint3(point3(data.origin.x.add(v.x),data.origin.y.add(v.y),data.origin.z.add(v.z)),data.direction,data.parameter);
-  if(rational)return algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.add(rational.denominator.scale(v[(['x','y','z'] as const)[i]!]))) as [Polynomial,Polynomial,Polynomial],rational.denominator);
+  if(rational){
+    // Each coordinate image is already certified. Rational translation shifts
+    // its polynomial directly; do not eliminate the source parameter again.
+    const point=algebraicCoordinates3(p.x.affine(1n,v.x),p.y.affine(1n,v.y),p.z.affine(1n,v.z)),numerators=rational.numerators.map((N,i)=>N.add(rational.denominator.scale(v[(['x','y','z'] as const)[i]!]))) as [Polynomial,Polynomial,Polynomial];
+    rationalParameters.set(point,Object.freeze({parameter:rational.parameter,numerators:Object.freeze(numerators),denominator:rational.denominator}));return point;
+  }
   if(pair)return algebraicBiparametricPoint3(point3(pair.origin.x.add(v.x),pair.origin.y.add(v.y),pair.origin.z.add(v.z)),pair.u,pair.s,pair.v,pair.t);
   return algebraicCoordinates3(p.x.affine(1n,v.x),p.y.affine(1n,v.y),p.z.affine(1n,v.z));
 }
@@ -66,6 +77,16 @@ export function getBiparameterization3(p:AlgebraicCoordinates3):Biparameterizati
 export function signBiparametricQuadratic3(p:Biparameterization3,c:Rational,a:Rational,b:Rational,A:Rational,B:Rational,C:Rational):Sign {
   if(b.sign()===0&&B.sign()===0&&C.sign()===0)return p.s.signOf(new Polynomial([c,a,A]));
   if(a.sign()===0&&A.sign()===0&&B.sign()===0)return p.t.signOf(new Polynomial([c,b,C]));
+  // Enclose the polynomial before constructing a field containing both roots.
+  // Dependency only widens these intervals; unresolved signs use the complete
+  // calculation below, including all cancellations and exact zeros.
+  type Bounds=readonly [Rational,Rational];
+  const mul=(x:Bounds,y:Bounds):Bounds=>{const v=[x[0].mul(y[0]),x[0].mul(y[1]),x[1].mul(y[0]),x[1].mul(y[1])].sort((a,b)=>a.compare(b));return [v[0]!,v[3]!];};
+  let s=p.s,t=p.t;for(let i=0;i<8;i++){
+    const S:Bounds=[s.lower,s.upper],T:Bounds=[t.lower,t.upper],terms:readonly [Rational,Bounds][]=[[a,S],[b,T],[A,mul(S,S)],[B,mul(S,T)],[C,mul(T,T)]];let lo=c,hi=c;
+    for(const [coefficient,v] of terms){if(coefficient.sign()>=0){lo=lo.add(coefficient.mul(v[0]));hi=hi.add(coefficient.mul(v[1]));}else{lo=lo.add(coefficient.mul(v[1]));hi=hi.add(coefficient.mul(v[0]));}}
+    if(lo.sign()>0)return 1;if(hi.sign()<0)return -1;if(lo.sign()===0&&hi.sign()===0)return 0;s=s.refine();t=t.refine();
+  }
   const base=p.s.rationalFunction(new Polynomial([c,a,A])),linear=b.sign()!==0||B.sign()!==0?p.s.affine(B,b).mul(p.t):null,quadratic=C.sign()!==0?p.t.rationalFunction(new Polynomial([0n,0n,C])):null;
   if(!linear)return quadratic?base.compare(quadratic.neg()):base.sign();
   if(!quadratic)return base.compare(linear.neg());
@@ -117,7 +138,7 @@ export function compareLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:
 /** Exact comparison of two rational linear projections, without constructing
  * independent algebraic images when rational intervals already separate them. */
 export function compareLinearPoints3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3,n:Vector3):Sign {
- if(compareAlgebraicPoints3(a,b)===0)return 0;const axes=['x','y','z'] as const;let A=axes.map(k=>a[k]),B=axes.map(k=>b[k]);const interval=(p:readonly AlgebraicReal[])=>{let lo=new Rational(0n),hi=new Rational(0n);axes.forEach((k,i)=>{const value=p[i]!,positive=n[k].sign()>=0;lo=lo.add((positive?value.lower:value.upper).mul(n[k]));hi=hi.add((positive?value.upper:value.lower).mul(n[k]));});return {lo,hi};};
+ if(a===b)return 0;const axes=['x','y','z'] as const,active=axes.filter(k=>n[k].sign()!==0);if(!active.length)return 0;if(active.length===1){const k=active[0]!;const sign=a[k].compare(b[k]);return sign===0?0:sign*n[k].sign() as Sign;}let A=axes.map(k=>a[k]),B=axes.map(k=>b[k]);const interval=(p:readonly AlgebraicReal[])=>{let lo=new Rational(0n),hi=new Rational(0n);axes.forEach((k,i)=>{const value=p[i]!,positive=n[k].sign()>=0;lo=lo.add((positive?value.lower:value.upper).mul(n[k]));hi=hi.add((positive?value.upper:value.lower).mul(n[k]));});return {lo,hi};};
  for(let i=0;i<16;i++){const x=interval(A),y=interval(B);if(x.hi.compare(y.lo)<0)return -1;if(x.lo.compare(y.hi)>0)return 1;if(x.lo.compare(x.hi)===0&&y.lo.compare(y.hi)===0)return x.lo.compare(y.lo);A=A.map(p=>p.refine());B=B.map(p=>p.refine());}
  const affine=getPointParameterization3(b),rational=getRationalParameterization3(b),pair=getBiparameterization3(b),zero=new Rational(0n),constant=affine?affine.parameter.affine(dot3(n,affine.direction),dot3(n,affine.origin)):rational?rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,n,zero),rational.denominator):pair?pair.s.affine(dot3(n,pair.u),dot3(n,pair.origin)).add(pair.t.affine(dot3(n,pair.v))):b.x.affine(n.x).add(b.y.affine(n.y)).add(b.z.affine(n.z));return compareLinearAlgebraicPoint3(a,n,constant);
 }
