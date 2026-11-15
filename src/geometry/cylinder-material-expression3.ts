@@ -98,3 +98,8 @@ export function booleanCylinderMaterials3(a:CylinderMaterialOperand3,b:CylinderM
 export function clipCylinderMaterial3(input:CylinderMaterialOperand3,halfspaces:readonly CylinderHalfSpace3[]):CylinderMaterialBoundary3 {
  const p=parts(input),planes=[...p.planes];let expression=p.expression;for(const h of halfspaces){if(h.side!==-1&&h.side!==1)throw new RangeError('Halfspace side must be -1 or 1');const v=plane3(h.plane.normal.x,h.plane.normal.y,h.plane.normal.z,h.plane.offset),n=v.normal,plane=h.side===-1?v:plane3(n.x.neg(),n.y.neg(),n.z.neg(),v.offset.neg()),halfspace=planes.length;planes.push(plane);expression={kind:'intersection',first:expression,second:{kind:'halfspace',halfspace}};}return boundaryCylinderMaterialExpression3(p.cylinders,planes,expression);
 }
+
+/** Internal strict witness classifier; primitive-boundary cases must retry. */
+export function strictCylinderMaterialLocation3(source:CylinderMaterialBoundary3,p:Point3):'inside'|'outside'|null {
+ assertOwnedCylinderMaterialBoundary3(source);const c=source.cylinders.map(v=>v.locate(p)),planes=source.planes.map(plane=>classifyPointToSurface3(p,{kind:'plane',plane}));return c.includes('boundary')||planes.includes(0)?null:truth(source.expression,c.map(v=>v==='inside'),planes.map(v=>v<0))?'inside':'outside';
+}

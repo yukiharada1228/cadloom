@@ -95,7 +95,8 @@
         "src/convert/mixed-faces3.ts",
         "src/convert/mixed-face-domain3.ts",
         "src/convert/cylinder-expression-split3.ts",
-        "src/convert/clipped-cylinder-expression3.ts"
+        "src/convert/clipped-cylinder-expression3.ts",
+        "src/convert/cylinder-material3.ts"
       ],
       "status": "partial",
       "gap": "Supported native/mixed analytic face domains reconstruct from raw records and bind complete oriented boundaries, including both plane-cut cylinder-expression children. Arbitrary imported face/shell embedding, void containment, independent pcurves and NURBS face conversion remain missing."
@@ -206,7 +207,7 @@
         "src/geometry/cylinder-material-expression3.ts"
       ],
       "status": "partial",
-      "gap": "Owned planar and finite-cylinder material supports exact queries, shell regions and common Body replay, including repeated halfspace clipping. A new bounded cylinder/plane predicate backend composes operand-local clipped materials into reusable exact closed kernel boundaries. Its common Body persistence/region adoption/Boolean dispatch, broader contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned planar and finite-cylinder material supports exact queries, shell regions and common Body replay, including repeated halfspace clipping. Bounded cylinder/plane predicates now preserve operand-local cuts through common Body Booleans, derived regions, complete domain persistence and replay/reuse. Nonmanifold material remains lower-level only. Planar/box-versus-cylinder dispatch, broader contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",
