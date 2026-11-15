@@ -49,7 +49,7 @@ export function encodeTrimmedPlanarDomain3(face:PreparedTrimmedPlanar3,component
 export function encodeTrimmedCylinderDomain3(face:PreparedTrimmedCylinder3,component:number):FaceDomainRecord3 {
   if(!Number.isSafeInteger(component)||component<0||component>=face.components.length)throw new RangeError('Invalid cylinder component');return Object.freeze({kind:'trimmed-cylinder',base:encodeCylinderDomain3(face.base),halfspaces:planes(face.halfspaces),sample:encodeExactPoint3(face.components[component]!.sample)});
 }
-function planar(d:PlanarDomainRecord3):PreparedPlanarFace3 {
+export function decodePlanarDomain3(d:PlanarDomainRecord3):PreparedPlanarFace3 {
   switch(d.kind){
     case 'chart':return preparePlanarFace3(unframe(d.frame),decodeBodyProfile3(d.rings),d.sense);
     case 'rectangle':return prepareRectangleFace3(unframe(d.frame),decodeExactReal3(d.uMin),decodeExactReal3(d.uMax),decodeExactReal3(d.vMin),decodeExactReal3(d.vMax),d.sense);
@@ -70,14 +70,14 @@ export interface DecodedFaceDomain3 {
  * or any surrounding shell. Trim components are selected by strict membership.
  */
 export function decodeFaceDomain3(input:unknown):DecodedFaceDomain3 {
-  const record=readFaceDomainRecord3(input);if(record.kind==='cylinder-partition-cell')throw new RangeError('Cylinder partition cells require the mixed face domain decoder');let surface:Surface3,sense:1|-1,boundary:readonly (readonly Curve3[])[],sample:AlgebraicCoordinates3,locate:DecodedFaceDomain3['locate'];
+  const record=readFaceDomainRecord3(input);if(record.kind==='cylinder-partition-cell'||record.kind==='planar-partition-cell')throw new RangeError('Partition cells require the mixed face domain decoder');let surface:Surface3,sense:1|-1,boundary:readonly (readonly Curve3[])[],sample:AlgebraicCoordinates3,locate:DecodedFaceDomain3['locate'];
   if(record.kind==='trimmed-planar'||record.kind==='trimmed-cylinder'){
-    const isPlanar=record.kind==='trimmed-planar',base=isPlanar?planar(record.base):cylinder(record.base),region=isPlanar?prepareTrimmedPlanar3(base as PreparedPlanarFace3,unplanes(record.halfspaces)):prepareTrimmedCylinder3(base as PreparedCylinderFace3,unplanes(record.halfspaces)),witness=decodeExactPoint3(record.sample),components=region.components.filter(c=>c.locate(witness)==='inside');
+    const isPlanar=record.kind==='trimmed-planar',base=isPlanar?decodePlanarDomain3(record.base):cylinder(record.base),region=isPlanar?prepareTrimmedPlanar3(base as PreparedPlanarFace3,unplanes(record.halfspaces)):prepareTrimmedCylinder3(base as PreparedCylinderFace3,unplanes(record.halfspaces)),witness=decodeExactPoint3(record.sample),components=region.components.filter(c=>c.locate(witness)==='inside');
     if(components.length!==1)throw new RangeError('Trim domain witness must select exactly one strict interior component');const c=components[0]!;if(c.loops===null)throw new RangeError('Trim component has ambiguous boundary loops');
     surface=isPlanar?{kind:'plane',plane:(base as PreparedPlanarFace3).surface}:{kind:'cylinder',cylinder:(base as PreparedCylinderFace3).surface};sense=base.sense;
     boundary=Object.freeze(c.loops.map(loop=>Object.freeze(loop.map(u=>u.direction===1?region.edges[u.edge]!:reverseCurve3(region.edges[u.edge]!)))));sample=c.sample;locate=p=>c.locate(p);
   }else if(record.kind==='cylinder-product'){
     const f=cylinder(record);surface={kind:'cylinder',cylinder:f.surface};sense=f.sense;boundary=f.boundary;sample=f.sample;locate=p=>f.locate(p);
-  }else {const f=planar(record);surface={kind:'plane',plane:f.surface};sense=f.sense;boundary=f.boundary;sample=f.sample;locate=p=>f.locate(p);}
+  }else {const f=decodePlanarDomain3(record);surface={kind:'plane',plane:f.surface};sense=f.sense;boundary=f.boundary;sample=f.sample;locate=p=>f.locate(p);}
   return Object.freeze({record,surface:Object.freeze(surface),sense,boundary,sample,locate});
 }

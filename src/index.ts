@@ -232,3 +232,6 @@ export type {DecodedMixedFaceDomain3} from './convert/mixed-face-domain3.js';
 export type {CylinderCellDomainRecord3} from './record/face-domain3.js';
 export {restoreMixedBRepFaces3} from './convert/mixed-faces3.js';
 export type {MixedBRepFaces3} from './convert/mixed-faces3.js';
+export {encodePlanarCellDomain3} from './convert/mixed-face-domain3.js';
+export type {PlanarCellDomainRecord3} from './record/face-domain3.js';
+export {bodyRecordFromFiniteCylinderBoolean3} from './convert/finite-cylinder-boolean3.js';

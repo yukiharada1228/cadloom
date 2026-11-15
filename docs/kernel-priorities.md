@@ -76,3 +76,7 @@ The existing BodyRecord now carries cylinder SSI edges, and the mixed boundary r
 ### Persistent SSI-bounded cylinder faces
 
 Cylinder/plane partition wall cells now have common domain records selected by strict interior witnesses after complete partition replay. Mixed face restoration binds entire oriented native/SSI domain boundaries to common serialized uses. See [domain reconstruction and limits](cylinder-cell-domain-records3.md). Planar cylinder-cut face records, global shell/material validation and owned Body3 adoption remain outstanding.
+
+### Complete cylinder Boolean face persistence
+
+Planar cylinder-cut cells now have replay-validated common domain records. Owned finite-cylinder Boolean results export every selected wall/cap domain, including reversed cut faces, into common BodyRecord tables. See [planar domains and full face tables](planar-cell-domain-records3.md). Global shell/material validation and owned Body3 adoption remain the next integration requirement; curved Boolean results are not yet new operands.
