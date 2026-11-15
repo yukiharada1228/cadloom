@@ -336,3 +336,19 @@ keeping its negative-orientation assertion, and add a separate unified convex
 API fixture with four supports, copy rejection and exact Body replay/membership.
 The two targeted cases are running; this is not yet an all-green focused gate.
 No kernel implementation was changed to address that test routing mismatch.
+
+The explicit canonical-cone targeted case passed, preserving its negative-face
+orientation check and full Body replay. The added public convex API case first
+exposed an incorrect exact face-count assertion: the existing four-support
+backend legitimately returns six face fragments. Replace that assumption with
+the exact set of four physical halfspace supports and verify every rational face
+sample on the independent prepared source boundary. Its complete adoption/replay
+and membership case then passed (8,303 ms). All 18 current distinct focused cases
+are covered by successes across the initial 16 passes and these two targeted
+reruns; this is not one all-green 18-case invocation. Kernel source was unchanged
+through the fixture corrections.
+
+The prior boundary-API broad run remains live specifically in the historical
+275-face reader and the eight-case chamber test file; both have increasing CPU
+time. The explicit retained 21-plane resource example is independently still
+restoring. No completed broad/resource result is inferred from elapsed time.

@@ -21,7 +21,8 @@ test('canonical carrier polarity cancels internal tetrahedron planes and replays
 
 test('public planar boundary selects exact outward convex supports and retains checked Body replay',async()=>{
  const {boundaryPlanarMaterial3,bodyFromCylinderMaterial3,restoreBody3,serializeBody3,locateBody3,surfacesCoincide3}=await import('../dist/index.js'),O=point3(0n,0n),X=point3(1n,0n),Y=point3(0n,1n),Z=point3(0n,0n,1n),source=preparePlanarSolid3([[O,Y,X],[O,X,Z],[O,Z,Y],[X,Y,Z]]),raw=boundaryPlanarMaterial3(source);
- assert.ok(raw.manifold);assert.equal(raw.planes.length,4);assert.equal(raw.faces.length,4);assert.ok(raw.faces.every(f=>f.origin.kind==='halfspace'&&source.topology.faces.some(g=>surfacesCoincide3(g.surface,f.surface))));assert.throws(()=>boundaryPlanarMaterial3({...source}),/factory/);
+ assert.ok(raw.manifold);assert.equal(raw.planes.length,4);assert.deepEqual([...new Set(raw.faces.map(f=>f.origin.kind==='halfspace'?f.origin.halfspace:-1))].sort(),[0,1,2,3]);assert.ok(raw.faces.every(f=>f.origin.kind==='halfspace'&&source.topology.faces.some(g=>surfacesCoincide3(g.surface,f.surface))));assert.throws(()=>boundaryPlanarMaterial3({...source}),/factory/);
+ for(const f of raw.faces){const p=f.domain.sample;assert.ok(p.x.rational&&p.y.rational&&p.z.rational);assert.equal(source.locate(point3(p.x.rational,p.y.rational,p.z.rational)),'boundary');}
  const original=bodyFromCylinderMaterial3(raw),body=restoreBody3(serializeBody3(original));assert.ok(body.topology.closedOrientedIncidence);assert.equal(body.topology.issues.length,0);
  for(const [p,l] of [[point3('1/4','1/4','1/4'),'inside'],[point3('1/2','1/2','1/2'),'outside'],[point3(0n,'1/4','1/4'),'boundary'],[point3('1/4','1/4','1/2'),'boundary'],[O,'boundary']] as const)assert.equal(locateBody3(body,p),l);for(const p of body.interiorSamples)assert.equal(locateBody3(body,p),'inside');assert.equal(locateBody3(original,point3('1/4','1/4','1/4')),'inside');
 });
