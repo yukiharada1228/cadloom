@@ -29,7 +29,8 @@ The reversed result is the square tunnel [1,3]² × [0,2]: exact volume 8, centr
 An irrelevant outer cylinder-wall point remains outside that planar result.
 
 Build, standalone strict typing and the existing scoped 133-declaration audit
-passed. The 13 existing related mixed-Body/contact regression cases are still
+passed. All 13 existing related mixed-Body/contact regression cases passed in one
+invocation (163,272 ms). A complete non-hard snapshot of this source is now
 running. The parent moment snapshot passed all 863 non-hard tests; that predates
 this later dispatch change. This is focused coverage, not full curved-product
 lowering, complete contact coverage or TypeScript execution verification.

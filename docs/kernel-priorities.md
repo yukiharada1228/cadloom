@@ -465,3 +465,8 @@ Extrude producing a rational planar tunnel with independently checked volume,
 centroid and central inertia. Build, strict typing and the existing scoped audit
 passed. The 13 prior mixed-Body/contact cases are still running; no later broad
 source pass is claimed. See straight-extrude-mixed-body3.md for accepted inputs.
+
+The 13 prior related mixed-Body/contact regression cases subsequently passed
+in one invocation (163,272 ms). The four new cases retain their successful
+results on the same unchanged source. A complete non-hard snapshot including
+the four new native Extrude cases is now running; its final result is pending.
