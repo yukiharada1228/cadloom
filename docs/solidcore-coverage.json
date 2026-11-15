@@ -132,10 +132,11 @@
         "src/geometry/nurbs-surface-boundary3.ts",
         "src/geometry/nurbs-trim-regularity3.ts",
         "src/geometry/nurbs-trim-seams3.ts",
-        "src/geometry/cylinder-intersection-plane3.ts"
+        "src/geometry/cylinder-intersection-plane3.ts",
+        "src/geometry/cylinder-cell-refinement3.ts"
       ],
       "status": "partial",
-      "gap": "Parameter-domain/lifted-boundary regularity checks and exact rational-halfspace trimming of algebraic cylinder SSI graphs exist. Arbitrary angular/curved face boundaries, embedded spatial NURBS face validity and shared edge/pcurve binding remain incomplete."
+      "gap": "Owned cylinder walls support reusable interleaved plane/cylinder height arrangements, complete SSI crossing events, exact side/provenance vectors and ordered bounded-domain replay. Native and earlier NURBS trims remain partial; multi-cutter planar caps, arbitrary NURBS face topology and general curved material assembly remain incomplete."
     },
     {
       "id": "intersect",

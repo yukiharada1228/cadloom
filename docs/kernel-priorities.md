@@ -96,3 +96,7 @@ Owned manifold two-cylinder Boolean results now adopt into the existing Body3 co
 ### Third-cylinder events on existing SSI edges
 
 Owned cylinder SSI arcs now intersect and split against a third rational cylinder. Exact height elimination, separating circle charts and rational-univariate recovery retain tangent, exceptional height-fiber and overlap cases. See [derivation and scope](cylinder-ssi-cylinder3.md). Reusing curved Body results still requires multi-cutter face arrangements and material assembly; this intersection primitive alone does not enable chaining.
+
+### Reusable multi-cutter cylinder wall arrangements
+
+Owned SSI/plane-bounded cylinder cells now refine repeatedly by native cylinders and planes, retaining all prior side vectors, immediate cell provenance, complete mixed boundaries and ordered domain persistence. Exact same-fiber reflection and source-aware interval/projection predicates prevent unnecessary algebraic field expansion. See [overlay proof and scope](cylinder-cell-refinement3.md). Multi-cutter planar cap arrangements and material/Body assembly are still required before curved Boolean results become reusable operands.

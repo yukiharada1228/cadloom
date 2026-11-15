@@ -113,3 +113,11 @@ export function compareLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:
  let refined=terms;for(let i=0;i<16;i++){const lo=refined.reduce((sum,p)=>sum.add(p.lower),offset),hi=refined.reduce((sum,p)=>sum.add(p.upper),offset);if(lo.sign()>0)return 1;if(hi.sign()<0)return -1;if(lo.sign()===0&&hi.sign()===0)return 0;refined=refined.map(p=>p.refine());}
  return terms.slice(0,-1).reduce((sum,t)=>sum.add(t),AlgebraicReal.fromRational(offset)).compare(terms[terms.length-1]!.neg());
 }
+
+/** Exact comparison of two rational linear projections, without constructing
+ * independent algebraic images when rational intervals already separate them. */
+export function compareLinearPoints3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3,n:Vector3):Sign {
+ if(compareAlgebraicPoints3(a,b)===0)return 0;const axes=['x','y','z'] as const;let A=axes.map(k=>a[k]),B=axes.map(k=>b[k]);const interval=(p:readonly AlgebraicReal[])=>{let lo=new Rational(0n),hi=new Rational(0n);axes.forEach((k,i)=>{const value=p[i]!,positive=n[k].sign()>=0;lo=lo.add((positive?value.lower:value.upper).mul(n[k]));hi=hi.add((positive?value.upper:value.lower).mul(n[k]));});return {lo,hi};};
+ for(let i=0;i<16;i++){const x=interval(A),y=interval(B);if(x.hi.compare(y.lo)<0)return -1;if(x.lo.compare(y.hi)>0)return 1;if(x.lo.compare(x.hi)===0&&y.lo.compare(y.hi)===0)return x.lo.compare(y.lo);A=A.map(p=>p.refine());B=B.map(p=>p.refine());}
+ const affine=getPointParameterization3(b),rational=getRationalParameterization3(b),pair=getBiparameterization3(b),zero=new Rational(0n),constant=affine?affine.parameter.affine(dot3(n,affine.direction),dot3(n,affine.origin)):rational?rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,n,zero),rational.denominator):pair?pair.s.affine(dot3(n,pair.u),dot3(n,pair.origin)).add(pair.t.affine(dot3(n,pair.v))):b.x.affine(n.x).add(b.y.affine(n.y)).add(b.z.affine(n.z));return compareLinearAlgebraicPoint3(a,n,constant);
+}

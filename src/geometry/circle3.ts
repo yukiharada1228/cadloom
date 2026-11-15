@@ -5,7 +5,7 @@ import {AlgebraicReal,isolateRealRoots} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,compareAlgebraicPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -132,10 +132,9 @@ function coordinate(circle:Circle3,p:AlgebraicCoordinates3,axis:Vector3):Algebra
  */
 function angleCompare(circle:Circle3,a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
   if(circle.radiusSquared.sign()===0)return 0;
-  const [u,v]=basis(circle),ax=coordinate(circle,a,u),bx=coordinate(circle,b,u);
-  const half=(p:AlgebraicCoordinates3,x:AlgebraicReal)=>{const y=signLinearAlgebraicPoint3(p,v,dot3(circle.center,v).neg());return y>0||y===0&&x.sign()>=0?0:1;};
-  const ha=half(a,ax),hb=half(b,bx);if(ha!==hb)return ha<hb?-1:1;
-  const comparison=ax.compare(bx);return ha===0?comparison===0?0:comparison===1?-1:1:comparison;
+  const [u,v]=basis(circle),half=(p:AlgebraicCoordinates3)=>{const y=signLinearAlgebraicPoint3(p,v,dot3(circle.center,v).neg());return y>0||y===0&&signLinearAlgebraicPoint3(p,u,dot3(circle.center,u).neg())>=0?0:1;};
+  const ha=half(a),hb=half(b);if(ha!==hb)return ha<hb?-1:1;
+  const comparison=compareLinearPoints3(a,b,u);return ha===0?comparison===0?0:comparison===1?-1:1:comparison;
 }
 export function comparePointsAroundCircle3(input:Circle3,inputA:CirclePointInput3,inputB:CirclePointInput3):Sign {
   const c=snapshot(input),a=snapshotExactPoint3(inputA),b=snapshotExactPoint3(inputB);

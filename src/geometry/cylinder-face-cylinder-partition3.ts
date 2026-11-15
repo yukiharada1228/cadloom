@@ -15,9 +15,9 @@ import type {PreparedCylinderFace3} from './cylinder-face3.js';
 import {cylinderCoordinates3} from './cylinder-coordinates3.js';
 import {circle3,circularArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,locatePointOnArc3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {snapshotExactPoint3,algebraicPoint3,algebraicCoordinates3,algebraicBiparametricPoint3,getPointParameterization3,compareAlgebraicPoints3,translateAlgebraicPoint3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,getBiparameterization3} from './algebraic-point3.js';
+import {snapshotExactPoint3,algebraicPoint3,algebraicCoordinates3,algebraicBiparametricPoint3,getPointParameterization3,compareAlgebraicPoints3,translateAlgebraicPoint3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,getBiparameterization3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
-import {intersectCylinders3,evaluateCylinderIntersectionArc3,splitCylinderIntersectionArc3} from './cylinder-cylinder3.js';
+import {intersectCylinders3,evaluateCylinderIntersectionArc3,splitCylinderIntersectionArc3,evaluateCylinderIntersectionFiber3} from './cylinder-cylinder3.js';
 import type {CylinderIntersectionArc3,CylinderCylinderIntersection3} from './cylinder-cylinder3.js';
 import {clipCylinderIntersectionByHalfspaces3} from './cylinder-intersection-plane3.js';
 import {algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
@@ -61,8 +61,8 @@ export function height(base:PreparedCylinderFace3,bound:CylinderHeightBound3,q:A
  */
 function compareBound(base:PreparedCylinderFace3,bound:CylinderHeightBound3,p:AlgebraicCoordinates3,t:AlgebraicReal):Sign {
  if(bound.kind==='constant')return t.compare(AlgebraicReal.fromRational(bound.value));
- if(bound.kind==='plane'){const sign=evaluate(bound.plane,p).sign();return sign===0?0:sign*dot3(bound.plane.normal,base.surface.axis.direction).sign() as Sign;}
- const arc=bound.arc,d=arc.first.axis.direction,e=arc.second.axis.direction,E=dot3(e,e),ed=dot3(e,d),m=point3(d.x.mul(E).sub(e.x.mul(ed)),d.y.mul(E).sub(e.y.mul(ed)),d.z.mul(E).sub(e.z.mul(ed))),vertex=evaluate({normal:m,offset:dot3(m,arc.second.axis.origin).neg()},p).sign(),value=classifyPointToSurface3(p,{kind:'cylinder',cylinder:arc.second});
+ if(bound.kind==='plane'){const sign=signLinearAlgebraicPoint3(p,bound.plane.normal,bound.plane.offset);return sign===0?0:sign*dot3(bound.plane.normal,base.surface.axis.direction).sign() as Sign;}
+ const arc=bound.arc,d=arc.first.axis.direction,e=arc.second.axis.direction,E=dot3(e,e),ed=dot3(e,d),m=point3(d.x.mul(E).sub(e.x.mul(ed)),d.y.mul(E).sub(e.y.mul(ed)),d.z.mul(E).sub(e.z.mul(ed))),vertex=signLinearAlgebraicPoint3(p,m,dot3(m,arc.second.axis.origin).neg()),value=classifyPointToSurface3(p,{kind:'cylinder',cylinder:arc.second});
  return arc.branch===-1?vertex>0?1:value===0?0:value>0?-1:1:vertex<0?-1:value===0?0:value>0?1:-1;
 }
 function projectToPlane(base:PreparedCylinderFace3,plane:Plane3,input:AlgebraicCoordinates3):AlgebraicCoordinates3 {
@@ -75,8 +75,8 @@ function projectToPlane(base:PreparedCylinderFace3,plane:Plane3,input:AlgebraicC
 }
 function boundPoint(base:PreparedCylinderFace3,bound:CylinderHeightBound3,q:AlgebraicCoordinates3):AlgebraicCoordinates3 {return bound.kind==='ssi'?evaluateCylinderIntersectionArc3(bound.arc,q):bound.kind==='plane'?projectToPlane(base,bound.plane,q):at(base,q,AlgebraicReal.fromRational(bound.value));}
 /** Restrict an owned SSI height boundary to a refined angular chart. */
-export function restrictCylinderHeightBound3(bound:CylinderHeightBound3,angular:CircularArc3):CylinderHeightBound3 {
- if(bound.kind!=='ssi')return bound;const q=interiorPointOnArc3(angular),arcs=splitCylinderIntersectionArc3(bound.arc,[angular.start,angular.end].map(p=>evaluateCylinderIntersectionArc3(bound.arc,p))),arc=arcs.find(a=>pointOnArc3(q,a.base));if(!arc)throw new Error('SSI bound misses refined angular cell');return Object.freeze({kind:'ssi',arc});
+export function restrictCylinderHeightBound3(bound:CylinderHeightBound3,angular:CircularArc3,points:readonly AlgebraicCoordinates3[]=[]):CylinderHeightBound3 {
+ if(bound.kind!=='ssi')return bound;const endpoint=(q:AlgebraicCoordinates3)=>{for(const p of points){const result=evaluateCylinderIntersectionFiber3(bound.arc,q,p);if(result)return result;}return evaluateCylinderIntersectionArc3(bound.arc,q);},q=interiorPointOnArc3(angular),arcs=splitCylinderIntersectionArc3(bound.arc,[angular.start,angular.end].map(endpoint)),arc=arcs.find(a=>pointOnArc3(q,a.base));if(!arc)throw new Error('SSI bound misses refined angular cell');return Object.freeze({kind:'ssi',arc});
 }
 function generatorBoundary(base:PreparedCylinderFace3,start:AlgebraicCoordinates3,end:AlgebraicCoordinates3,contacts:readonly AlgebraicCoordinates3[]):BRepCurve3[] {
  if(same(start,end))return [];const segment=algebraicSegment3(start,end),direction=cylinderCoordinates3(base.surface,start).height.compare(cylinderCoordinates3(base.surface,end).height)<0?1:-1,points=[start,end,...contacts.filter(p=>pointOnAlgebraicSegment3(p,segment))].filter((p,i,all)=>all.findIndex(q=>same(p,q))===i).sort((a,b)=>cylinderCoordinates3(base.surface,a).height.compare(cylinderCoordinates3(base.surface,b).height)*direction);

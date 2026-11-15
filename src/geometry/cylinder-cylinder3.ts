@@ -63,6 +63,7 @@ const same=(p:AlgebraicCoordinates3,q:AlgebraicCoordinates3)=>compareAlgebraicPo
 function discriminant(f:Family,q:AlgebraicCoordinates3):AlgebraicReal {
   const offset=dot3(f.n,f.second.axis.origin).neg(),data=getPointParameterization3(q);
   if(data){const c=dot3(f.n,data.origin).add(offset),d=dot3(f.n,data.direction);return data.parameter.rationalFunction(new Polynomial([f.a.mul(f.second.radiusSquared).sub(c.mul(c)).mul(f.E),c.mul(d).mul(new Rational(-2n)).mul(f.E),d.mul(d).neg().mul(f.E)]),new Polynomial([1n]));}
+  const rational=getRationalParameterization3(q);if(rational){const L=rationalPointLinearNumerator3(rational,f.n,offset),W=rational.denominator.mul(rational.denominator);return rational.parameter.rationalFunction(W.scale(f.a.mul(f.second.radiusSquared).mul(f.E)).sub(L.mul(L).scale(f.E)),W);}
   const L=linear(q,f.n,offset);return L.mul(L).affine(f.E.neg(),f.a.mul(f.second.radiusSquared).mul(f.E));
 }
 function lift(f:Family,q:AlgebraicCoordinates3,branch:-1|1):AlgebraicCoordinates3 {
@@ -96,6 +97,20 @@ export function evaluateCylinderIntersectionArc3(arc:CylinderIntersectionArc3,in
   const f=family(arc),q=snapshotExactPoint3(input);
   if(same(q,arc.base.start))return arc.start;if(same(q,arc.base.end))return arc.end;if(same(q,arc.baseSample))return arc.sample;
   if(!pointOnArc3(q,arc.base))throw new RangeError('SSI parameter must lie on the base arc');return lift(f,q,arc.branch);
+}
+/** Internal exact recovery from either known root of the same height fiber.
+ * Both supports and the base projection are checked. The other root is a
+ * rational affine reflection, so an existing RUR need not gain a new radical. */
+export function evaluateCylinderIntersectionFiber3(arc:CylinderIntersectionArc3,inputBase:AlgebraicCoordinates3,inputPoint:AlgebraicCoordinates3):AlgebraicCoordinates3|undefined {
+ const f=family(arc),q=snapshotExactPoint3(inputBase),p=snapshotExactPoint3(inputPoint);if(!same(projectCylinderIntersectionBase3(arc,p),q))return undefined;if(!pointOnArc3(q,arc.base))throw new RangeError('SSI fiber must lie on its base interval');
+ const registered=lifted.get(p),known=(c:Cylinder3)=>registered&&[registered.family.first,registered.family.second].some(s=>surfacesCoincide3({kind:'cylinder',cylinder:s},{kind:'cylinder',cylinder:c}));if(!known(f.first)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.first})!==0||!known(f.second)&&classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0)return undefined;
+ const offset=dot3(f.m,f.second.axis.origin).neg(),sign=signLinearAlgebraicPoint3(p,f.m,offset);if(sign===0||sign===arc.branch)return p;
+ const factor=new Rational(2n).div(f.a),d=f.first.axis.direction,rational=getRationalParameterization3(p),affine=getPointParameterization3(p),pair=getBiparameterization3(p),reflect=(v:Point3,vector=false)=>{const t=dot3(f.m,v).add(vector?zero:offset).mul(factor);return point3(...axes.map(k=>v[k].sub(d[k].mul(t))) as [Rational,Rational,Rational]);};let result:AlgebraicCoordinates3;
+ if(rational){const T=rationalPointLinearNumerator3(rational,f.m,offset).scale(factor);result=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
+ else if(affine)result=algebraicPoint3(reflect(affine.origin),reflect(affine.direction,true),affine.parameter);
+ else if(pair)result=algebraicBiparametricPoint3(reflect(pair.origin),reflect(pair.u,true),pair.s,reflect(pair.v,true),pair.t);
+ else {result=algebraicCoordinates3(...axes.map(k=>{const terms=axes.map(j=>({value:p[j],coefficient:(j===k?one:zero).sub(d[k].mul(f.m[j]).mul(factor))})).filter(t=>t.coefficient.sign()!==0);return terms.reduce((sum,t)=>sum.add(t.value.affine(t.coefficient)),AlgebraicReal.fromRational(d[k].mul(offset).mul(factor).neg()));}) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
+ const height=linear(result,d,dot3(d,f.first.axis.origin).neg()).affine(one.div(f.D));lifted.set(result,{family:f,base:q,branch:arc.branch,height});return result;
 }
 /** Exact branch membership, including shared critical endpoints. */
 export function pointOnCylinderIntersectionArc3(input:Point3|AlgebraicCoordinates3,arc:CylinderIntersectionArc3):boolean {

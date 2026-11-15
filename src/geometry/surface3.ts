@@ -1,3 +1,4 @@
+import {cylinderIntersectionPointCylinders3} from './cylinder-cylinder3.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
 import {Polynomial,exactRational} from '../numeric/polynomial.js';
@@ -50,15 +51,24 @@ function linear(point:AlgebraicCoordinates3,normal:Vector3,offset:Rational):Alge
   const pair=getBiparameterization3(point);if(pair)return pair.s.affine(dot3(normal,pair.u),dot3(normal,pair.origin).add(offset)).add(pair.t.affine(dot3(normal,pair.v)));
   return point.x.affine(normal.x,offset).add(point.y.affine(normal.y)).add(point.z.affine(normal.z));
 }
+/** Certified interval separation is only a fast sign filter. Exact zero and
+ * unresolved close cases retain the complete algebraic fallback below. */
+function cylinderIntervalSign(point:AlgebraicCoordinates3,cylinder:Cylinder3):Sign|undefined {
+ type Interval=readonly [Rational,Rational];const zero=new Rational(0n),d=cylinder.axis.direction,o=cylinder.axis.origin,offset=cylinder.radiusSquared.mul(dot3(d,d)),scale=(v:Interval,s:Rational):Interval=>s.sign()<0?[v[1].mul(s),v[0].mul(s)]:[v[0].mul(s),v[1].mul(s)],sub=(a:Interval,b:Interval):Interval=>[a[0].sub(b[1]),a[1].sub(b[0])],square=(v:Interval):Interval=>{const a=v[0].mul(v[0]),b=v[1].mul(v[1]);return v[0].sign()>=0?[a,b]:v[1].sign()<=0?[b,a]:[zero,a.compare(b)>0?a:b];};let values=[point.x,point.y,point.z];
+ for(let i=0;i<16;i++){const q=values.map((p,j)=>[p.lower.sub(o[(['x','y','z'] as const)[j]!]),p.upper.sub(o[(['x','y','z'] as const)[j]!])] as Interval),cross=[sub(scale(q[2]!,d.y),scale(q[1]!,d.z)),sub(scale(q[0]!,d.z),scale(q[2]!,d.x)),sub(scale(q[1]!,d.x),scale(q[0]!,d.y))].map(square),lo=cross.reduce((s,p)=>s.add(p[0]),offset.neg()),hi=cross.reduce((s,p)=>s.add(p[1]),offset.neg());if(lo.sign()>0)return 1;if(hi.sign()<0)return -1;if(lo.sign()===0&&hi.sign()===0)return 0;values=values.map(p=>p.refine());}return undefined;
+}
 /** Plane's oriented side, or cylinder's inside/on/outside sign. */
 export function classifyPointToSurface3(inputPoint:Point3|AlgebraicCoordinates3,inputSurface:Surface3):Sign {
   const point=snapshotExactPoint3(inputPoint),surface=snapshotSurface(inputSurface),data=getPointParameterization3(point);
+  // Only actual factory-generated SSI provenance supplies this support identity.
+  if(surface.kind==='cylinder'&&cylinderIntersectionPointCylinders3(point)?.some(c=>surfacesCoincide3({kind:'cylinder',cylinder:c},surface)))return 0;
   if(data)return data.parameter.signOf(equation(data.origin,data.direction,surface));
   const rational=getRationalParameterization3(point);
   if(surface.kind==='plane')return signLinearAlgebraicPoint3(point,surface.plane.normal,surface.plane.offset);
   const c=surface.cylinder,d=c.axis.direction,o=c.axis.origin;
   if(rational){const q=rational.numerators.map((N,i)=>N.sub(rational.denominator.scale(o[(['x','y','z'] as const)[i]!]))),x=q[2]!.scale(d.y).sub(q[1]!.scale(d.z)),y=q[0]!.scale(d.z).sub(q[2]!.scale(d.x)),z=q[1]!.scale(d.x).sub(q[0]!.scale(d.y));return rational.parameter.signOf(x.mul(x).add(y.mul(y)).add(z.mul(z)).sub(rational.denominator.mul(rational.denominator).scale(c.radiusSquared.mul(dot3(d,d)))));}
   const pair=getBiparameterization3(point);if(pair){const q=cross3(d,subtract3(pair.origin,o)),u=cross3(d,pair.u),v=cross3(d,pair.v);return signBiparametricQuadratic3(pair,dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))),dot3(q,u).mul(two),dot3(q,v).mul(two),dot3(u,u),dot3(u,v).mul(two),dot3(v,v));}
+  const separated=cylinderIntervalSign(point,c);if(separated!==undefined)return separated;
   const q=algebraicCoordinates3(point.x.affine(1n,o.x.neg()),point.y.affine(1n,o.y.neg()),point.z.affine(1n,o.z.neg()));
   const x=q.z.affine(d.y).sub(q.y.affine(d.z)),y=q.x.affine(d.z).sub(q.z.affine(d.x)),z=q.y.affine(d.x).sub(q.x.affine(d.y));
   return x.mul(x).add(y.mul(y)).add(z.mul(z)).affine(1n,c.radiusSquared.mul(dot3(d,d)).neg()).sign();

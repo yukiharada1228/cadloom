@@ -246,3 +246,7 @@ export {bodyFromFiniteCylinderBoolean3,booleanCylinderBodies3} from './ops/body3
 export type {FiniteCylinderConstructionRecord3} from './record/body-document3.js';
 export {intersectCylinderIntersectionArcCylinder3,splitCylinderIntersectionArcByCylinder3} from './geometry/cylinder-intersection-cylinder3.js';
 export type {CylinderIntersectionArcCylinder3,CylinderIntersectionArcCylinderSplit3} from './geometry/cylinder-intersection-cylinder3.js';
+export {refineCylinderFaceCells3,partitionCylinderFaceCellsByCylinder3,assertOwnedCylinderFaceRefinement3} from './geometry/cylinder-cell-refinement3.js';
+export type {CylinderFaceRefinement3,CylinderFaceRefinementInput3} from './geometry/cylinder-cell-refinement3.js';
+export {encodeRefinedCylinderCellDomain3} from './convert/mixed-face-domain3.js';
+export type {RefinedCylinderCellDomainRecord3} from './record/face-domain3.js';

@@ -10,7 +10,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,signBiparametricQuadratic3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -106,9 +106,8 @@ export function fullEllipseArc3(input:Ellipse3,direction:'ccw'|'cw'='ccw'):Ellip
   const e=snapshot(input),seam=algebraicPoint3(e.frame.origin,e.frame.u,AlgebraicReal.fromRational(e.radiusUSquared).sqrt());return ellipticArc3(e,seam,seam,{direction,fullEllipse:true});
 }
 function angleCompare(e:Ellipse3,a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
-  const A=pointInPlaneFrame3(e.frame,a)!,B=pointInPlaneFrame3(e.frame,b)!;
-  const half=(p:AlgebraicCoordinates2)=>{const y=p.y.sign();return y>0||y===0&&p.x.sign()>=0?0:1;},ha=half(A),hb=half(B);if(ha!==hb)return ha<hb?-1:1;
-  const c=A.x.compare(B.x);return ha===0?c===0?0:c===1?-1:1:c;
+  const [u,v]=duals(e),half=(p:AlgebraicCoordinates3)=>{const y=signLinearAlgebraicPoint3(p,v,dot3(e.frame.origin,v).neg());return y>0||y===0&&signLinearAlgebraicPoint3(p,u,dot3(e.frame.origin,u).neg())>=0?0:1;},ha=half(a),hb=half(b);if(ha!==hb)return ha<hb?-1:1;
+  const c=compareLinearPoints3(a,b,u);return ha===0?c===0?0:c===1?-1:1:c;
 }
 export function comparePointsAroundEllipse3(input:Ellipse3,inputA:Point3|AlgebraicCoordinates3,inputB:Point3|AlgebraicCoordinates3):Sign {
   const e=snapshot(input),a=snapshotExactPoint3(inputA),b=snapshotExactPoint3(inputB);if(!pointOnEllipse3(a,e)||!pointOnEllipse3(b,e))throw new RangeError('Angular order requires points on the ellipse');return angleCompare(e,a,b);

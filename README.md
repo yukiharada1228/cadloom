@@ -1378,3 +1378,11 @@ node examples/face-domain-record3.ts
 既存の交線で囲まれた面を、新しい円柱で分割するための土台です。曲面Bodyを再演算するには、この処理を複数の切断面の分割・材料選択へ接続する必要があります。[計算の導出と対応範囲](docs/cylinder-ssi-cylinder3.md)。
 
 `npm run build && node examples/cylinder-ssi-cylinder3.ts`で、3本の円柱の8交点と交線の分割を実行できます。
+
+### 円柱面の繰り返し分割
+
+`partitionCylinderFaceCellsByCylinder3(partition, cylinder)`は、交線で囲まれた既存の円柱面を、新しい円柱でさらに分割します。続く円柱・平面の切断には`refineCylinderFaceCells3(partition, surface)`を使えます。以前の切断の符号と、直前のどの面片から分かれたかを保持します。
+
+`encodeRefinedCylinderCellDomain3`で切断順序と内部点を保存でき、共通の面復元処理が境界全体との一致を検査します。立体の再演算には、平面の端面の分割と材料選択・殻の組み立てを接続する必要があります。[構成と検証範囲](docs/cylinder-cell-refinement3.md)。
+
+`npm run build && node examples/cylinder-cell-refinement3.ts`で、円柱・平面による繰り返し分割と、全ての面領域の保存復元を実行できます。
