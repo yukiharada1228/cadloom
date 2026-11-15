@@ -241,3 +241,16 @@ controlled performance comparison. The retained-Body experiment constructed
 275 manifold faces and adopted the Body; its replay remains running. The unchanged separate oblique two-case
 integration passed both tests in 943,842 ms under concurrent workloads. These results precede the new public
 planar boundary wrapper, whose own five focused cases passed separately.
+
+### Reproducible retained planar Body resource gate
+
+`node examples/planar-material-replay.ts` (after building) reproduces the
+275-face concave L through the public boundary API at the default heap. It emits
+JSON time/memory checkpoints, validates physical supporting planes and rational
+face samples, adopts/serializes/restores the Body, then checks all restored face
+samples, 64 independent strict points and nine seam/bounded-boundary cases.
+Post-restoration accesses keep the original prepared source, raw boundary, Body
+and serialized document observable throughout replay. The example passed syntax
+and standalone strict TypeScript checks. Its complete resource run has not yet
+been launched: the preceding same-input prototype is still being observed, so
+no second competing warm replay is started merely to obtain a new process.
