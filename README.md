@@ -1324,3 +1324,13 @@ node examples/face-domain-record3.ts
 面片は元の面を覆い、内部は重なりません。人工的な母線分割を残すため、最大の連結面へ統合した結果ではありません。平行軸の交線・接線、同一支持面、交差なし、孤立接触も区別します。対象は一つの帯／角度領域を一つの支持円柱で分ける処理で、有限な切断立体の全境界、複数回の任意分割、共通Bodyへの採用、曲面ブーリアンの組み立ては残ります。[構成と検証範囲](docs/proofs/cylinder-face-cylinder-partition3.md)。
 
 `npm run build && node examples/cylinder-face-cylinder-partition3.ts`で、四次交線を境界に持つ面分割を実行できます。
+
+### SSI面片への平面切断と有限円柱の材料分類
+
+`partitionCylinderFaceCellsByPlane3(partition, plane)`は、円柱／SSI面片を平面で再分割します。戻り値も同じ処理へ渡せます。`sourceCells`は直前の入力面片への対応、`planes`と`planeSides`は適用した全平面と各面片の開いた内部における符号です。元の円柱に対する`cells[].side`も維持します。上下の境界には定数・SSIに加えて平面を保持し、ネイティブの楕円境界へ接続します。
+
+`partitionCylinderFaceByFiniteCylinder3(face, cutter, lower, upper)`は、円柱の側面と二つの端面で分割し、`materialLocations`へ面片の開いた内部の`inside`・`outside`・`boundary`を返します。高さは切断円柱の非単位軸のパラメータです。一致する側面は端面間で`boundary`となります。閉じた境界上の各点の位置とは区別します。
+
+平面の再切断、斜めの四次交点、既存交線との楕円の共有、接線・交差なしにも対応します。人工的な母線分割は残します。切断円柱の平面キャップの分割・共通Bodyへの採用・立体ブーリアンの組み立ては未実装です。[構成と検証範囲](docs/proofs/cylinder-cell-plane-partition3.md)。
+
+`npm run build && node examples/cylinder-face-finite-cylinder3.ts`で、端面を含む有限円柱に対する面片の分類を実行できます。

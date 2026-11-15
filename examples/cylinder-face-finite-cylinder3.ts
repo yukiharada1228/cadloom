@@ -1,0 +1,4 @@
+import {point3,line3,cylinder3,prepareCylinderFace3,partitionCylinderFaceByFiniteCylinder3} from '../dist/index.js';
+const origin=point3(0n,0n),source=cylinder3(line3(origin,point3(0n,0n,1n)),1n),cutter=cylinder3(line3(origin,point3(1n,0n,0n)),1n),result=partitionCylinderFaceByFiniteCylinder3(prepareCylinderFace3(source,-2n,2n),cutter,'-1/2','1/2'),p=result.partition;
+// Diagnostic surface-cell classification, not a persistent solid Body record.
+console.log(JSON.stringify({cells:p.cells.length,inside:result.materialLocations.filter(s=>s==='inside').length,outside:result.materialLocations.filter(s=>s==='outside').length,coincidentBoundary:result.materialLocations.filter(s=>s==='boundary').length,capPlanes:p.planes.length,ssiEdges:p.sewn.topology.edges.filter(e=>e.curve.kind==='cylinder-ssi').length,openBoundaryEdges:p.sewn.topology.issues.filter(i=>i.kind==='boundary-edge').length,otherIssues:p.sewn.topology.issues.filter(i=>i.kind!=='boundary-edge')},null,2));
