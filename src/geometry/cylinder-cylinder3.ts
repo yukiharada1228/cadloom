@@ -7,7 +7,7 @@ import {cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js
 import type {Cylinder3} from './surface3.js';
 import {circle3,fullCircleArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,intersectCircles3,containsCircularArcProjection3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicQuadraticPoint3,algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluatePlaneAtAlgebraicPoint3} from './algebraic-segment-plane3.js';
 import {algebraicLine3} from './algebraic-line3.js';
@@ -69,6 +69,13 @@ function discriminant(f:Family,q:AlgebraicCoordinates3):AlgebraicReal {
 function lift(f:Family,q:AlgebraicCoordinates3,branch:-1|1):AlgebraicCoordinates3 {
   const event=f.events.find(e=>same(q,e.q));if(event)return event.p;
   const known=f.cache.find(e=>e.branch===branch&&same(q,e.q));if(known)return known.p;
+  const rational=getRationalParameterization3(q);if(rational){
+    const {parameter,numerators,denominator:W}=rational,inv=one.div(f.a),d=f.first.axis.direction,L=rationalPointLinearNumerator3(rational,f.n,dot3(f.n,f.second.axis.origin).neg()),B=rationalPointLinearNumerator3(rational,f.m,dot3(f.m,f.second.axis.origin).neg()),K=W.mul(W).scale(f.a.mul(f.second.radiusSquared).mul(f.E)).sub(L.mul(L).scale(f.E)),sign=parameter.signOf(K);if(sign<0)throw new RangeError('Base point has no real cylinder intersection fiber');
+    // sqrt(K/W²)=sqrt(K)/|W|. Keep the source parameter shared by
+    // all three coordinates and the radical instead of combining images.
+    const coefficient=inv.mul(new Rational(BigInt(branch*parameter.signOf(W)))),N=numerators.map((n,i)=>n.sub(B.scale(d[axes[i]!].mul(inv)))) as [Polynomial,Polynomial,Polynomial],p=algebraicQuadraticPoint3(parameter,N,scale(d,coefficient),K,W),height=parameter.quadraticImage(B.scale(inv.neg()),K,coefficient,W);
+    if(!f.sealed)f.cache.push({q,branch,p});lifted.set(p,{family:f,base:q,branch:sign===0?0:branch,height});return p;
+  }
   const disc=discriminant(f,q),discSign=disc.sign();if(discSign<0)throw new RangeError('Base point has no real cylinder intersection fiber');
   const root=disc.sqrt(),offset=dot3(f.m,f.second.axis.origin).neg(),data=getPointParameterization3(q),d=f.first.axis.direction,inv=one.div(f.a);
   let p:AlgebraicCoordinates3,height:AlgebraicReal;

@@ -10,7 +10,7 @@ import {getPointParameterization2} from './algebraic-point2.js';
 import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,getBiparameterization3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -56,6 +56,7 @@ export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,in
     const [U,V]=duals(e),X=rationalPointLinearNumerator3(rational,U,dot3(U,e.frame.origin).neg()),Y=rationalPointLinearNumerator3(rational,V,dot3(V,e.frame.origin).neg()),W=rational.denominator,sign=rational.parameter.signOf(X.mul(X).scale(e.radiusVSquared).add(Y.mul(Y).scale(e.radiusUSquared)).sub(W.mul(W).scale(e.radiusUSquared.mul(e.radiusVSquared))));
     return sign===0?'boundary':sign<0?'inside':'outside';
   }
+  const quadratic=getQuadraticParameterization3(point);if(quadratic){if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';const [U,V]=duals(e),sign=signQuadraticPointSquaredForms3(quadratic,[{normal:U,offset:dot3(U,e.frame.origin).neg(),weight:e.radiusVSquared},{normal:V,offset:dot3(V,e.frame.origin).neg(),weight:e.radiusUSquared}],e.radiusUSquared.mul(e.radiusVSquared).neg());return sign===0?'boundary':sign<0?'inside':'outside';}
   const pair=getBiparameterization3(point);if(pair){
     if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';const [U,V]=duals(e),delta=subtract3(pair.origin,e.frame.origin),q=point2(dot3(U,delta),dot3(V,delta)),a=point2(dot3(U,pair.u),dot3(V,pair.u)),b=point2(dot3(U,pair.v),dot3(V,pair.v)),inner=(a:Point2,b:Point2)=>a.x.mul(b.x).mul(e.radiusVSquared).add(a.y.mul(b.y).mul(e.radiusUSquared)),two=new Rational(2n),sign=signBiparametricQuadratic3(pair,inner(q,q).sub(e.radiusUSquared.mul(e.radiusVSquared)),inner(q,a).mul(two),inner(q,b).mul(two),inner(a,a),inner(a,b).mul(two),inner(b,b));return sign===0?'boundary':sign<0?'inside':'outside';
   }

@@ -264,6 +264,34 @@ export class AlgebraicReal {
       root=root.refine();
     }
   }
+  /** Image (N(t)+c*sqrt(K(t)))/D(t), retaining the shared source t.
+   * The elimination degree is at most twice the source degree, rather than
+   * multiplying the independent coordinate/radical image degrees. */
+  quadraticImage(numerator:Polynomial,radicand:Polynomial,coefficient:ExactInput=1n,denominator:Polynomial=new Polynomial([1n])):AlgebraicReal {
+    const c=exactRational(coefficient);if(this.signOf(denominator)===0)throw new RangeError('Quadratic image denominator is zero');
+    const sign=this.signOf(radicand);if(sign<0)throw new RangeError('Quadratic image has a negative radicand');
+    if(c.sign()===0||sign===0)return this.rationalFunction(numerator,denominator);
+    const direct=(t:Rational)=>AlgebraicReal.fromRational(radicand.evaluate(t)).sqrt().affine(c.div(denominator.evaluate(t)),numerator.evaluate(t).div(denominator.evaluate(t)));
+    if(this.rational!==null)return direct(this.rational);
+    const source=this.polynomial.divRem(this.polynomial.gcd(denominator)).quotient,n=numerator.divRem(source).remainder,d=denominator.divRem(source).remainder,k=radicand.divRem(source).remainder;
+    const A=n.mul(n).sub(k.scale(c.mul(c))).divRem(source).remainder,B=d.mul(n).scale(new Rational(-2n)).divRem(source).remainder,C=d.mul(d).divRem(source).remainder;
+    const equation=Array.from({length:Math.max(A.degree,B.degree,C.degree)+1},(_,i)=>new Polynomial([A.coefficient(i),B.coefficient(i),C.coefficient(i)])),image=resultantInParameter(source.coefficients.map(v=>new Polynomial([v])),equation).squareFree();
+    if(image.degree<=0)throw new Error('Quadratic image has no defining polynomial');
+    if(image.degree===1)return AlgebraicReal.fromRational(image.coefficient(0).neg().div(image.coefficient(1)));
+    const sequence=sturmSequence(image),certificate=sequence[0]!;let t:AlgebraicReal=this,radical=this.rationalFunction(k).sqrt();
+    while(true){
+      if(t.rational!==null)return direct(t.rational);
+      const [dl,du]=intervalValue(d,t.lower,t.upper);if(dl.sign()*du.sign()<=0){t=t.refine();continue;}
+      const [nl,nu]=intervalValue(n,t.lower,t.upper),rl=c.mul(c.sign()>0?radical.lower:radical.upper),ru=c.mul(c.sign()>0?radical.upper:radical.lower),low=nl.add(rl),high=nu.add(ru),bounds=[low.div(dl),low.div(du),high.div(dl),high.div(du)].sort((a,b)=>a.compare(b)),padding=bounds[3]!.sub(bounds[0]!).add(t.upper.sub(t.lower)).add(radical.upper.sub(radical.lower)),lo=bounds[0]!.sub(padding),hi=bounds[3]!.add(padding);
+      if(certificate.evaluate(lo).sign()!==0&&certificate.evaluate(hi).sign()!==0){const count=countOpen(sequence,lo,hi);if(count===0)throw new Error('Quadratic image lost its represented root');if(count===1){if(certificate.coefficient(0).sign()===0&&lo.sign()<0&&hi.sign()>0)return AlgebraicReal.fromRational(0n);return new AlgebraicReal(certificate,lo,hi);}}
+      t=t.refine();radical=radical.refine();
+    }
+  }
+  /** Exact sign of A(t)+B(t)*sqrt(K(t)) without constructing an extension. */
+  signQuadratic(a:Polynomial,b:Polynomial,radicand:Polynomial):Sign {
+    const k=this.signOf(radicand);if(k<0)throw new RangeError('Quadratic sign has a negative radicand');const A=this.signOf(a),B=this.signOf(b);if(k===0||B===0)return A;if(A===0)return B;if(A===B)return A;
+    const norm=this.signOf(a.mul(a).sub(b.mul(b).mul(radicand)));return norm===0?0:norm*A as Sign;
+  }
   /** Exact sign of another polynomial evaluated at this root, including equality. */
   signOf(input:Polynomial):Sign {
     const reduced=input.divRem(this.polynomial).remainder;

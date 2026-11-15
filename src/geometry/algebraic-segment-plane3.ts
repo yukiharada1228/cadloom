@@ -4,7 +4,7 @@ import {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3,vector3,dot3,pointsEqual3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
-import {algebraicPoint3,algebraicCoordinates3,compareAlgebraicPoints3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,subtractAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,algebraicCoordinates3,compareAlgebraicPoints3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,getQuadraticParameterization3,quadraticPointLinearValue3,subtractAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3} from './algebraic-segment3.js';
 import type {AlgebraicSegment3} from './algebraic-segment3.js';
@@ -15,7 +15,8 @@ export type AlgebraicSegmentPlaneIntersection3=
  | {readonly kind:'coplanar';readonly segment:AlgebraicSegment3};
 /** Internal linear evaluation preserving the factory-owned affine parameter. */
 export function evaluatePlaneAtAlgebraicPoint3(plane:Plane3,p:AlgebraicCoordinates3):AlgebraicReal {
-  const data=getPointParameterization3(p),n=plane.normal;
+  const data=getPointParameterization3(p),n=plane.normal,quadratic=getQuadraticParameterization3(p);
+  if(quadratic)return quadraticPointLinearValue3(quadratic,n,plane.offset);
   if(data)return data.parameter.affine(dot3(n,data.direction),dot3(n,data.origin).add(plane.offset));
   const rational=getRationalParameterization3(p);if(rational)return rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,n,plane.offset),rational.denominator);
   const pair=getBiparameterization3(p);if(pair)return pair.s.affine(dot3(n,pair.u),dot3(n,pair.origin).add(plane.offset)).add(pair.t.affine(dot3(n,pair.v)));

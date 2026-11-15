@@ -52,6 +52,7 @@ export function translateAlgebraicPoint3(input:Point3|AlgebraicCoordinates3,tran
     const point=algebraicCoordinates3(p.x.affine(1n,v.x),p.y.affine(1n,v.y),p.z.affine(1n,v.z)),numerators=rational.numerators.map((N,i)=>N.add(rational.denominator.scale(v[(['x','y','z'] as const)[i]!]))) as [Polynomial,Polynomial,Polynomial];
     rationalParameters.set(point,Object.freeze({parameter:rational.parameter,numerators:Object.freeze(numerators),denominator:rational.denominator}));return point;
   }
+  const quadratic=quadraticParameters.get(p);if(quadratic){const point=algebraicCoordinates3(p.x.affine(1n,v.x),p.y.affine(1n,v.y),p.z.affine(1n,v.z)),numerators=quadratic.numerators.map((N,i)=>N.add(quadratic.denominator.scale(v[(['x','y','z'] as const)[i]!]))) as [Polynomial,Polynomial,Polynomial];quadraticParameters.set(point,Object.freeze({...quadratic,numerators:Object.freeze(numerators)}));return point;}
   if(pair)return algebraicBiparametricPoint3(point3(pair.origin.x.add(v.x),pair.origin.y.add(v.y),pair.origin.z.add(v.z)),pair.u,pair.s,pair.v,pair.t);
   return algebraicCoordinates3(p.x.affine(1n,v.x),p.y.affine(1n,v.y),p.z.affine(1n,v.z));
 }
@@ -102,6 +103,22 @@ export function algebraicRationalPoint3(parameter:AlgebraicReal,numerators:reado
   rationalParameters.set(point,Object.freeze({parameter,numerators:Object.freeze([...numerators]) as readonly [Polynomial,Polynomial,Polynomial],denominator}));return point;
 }
 export function getRationalParameterization3(point:AlgebraicCoordinates3):RationalParameterization3|undefined{return rationalParameters.get(point);}
+export interface QuadraticParameterization3 extends RationalParameterization3 {readonly coefficients:Vector3;readonly radicand:Polynomial;}
+const quadraticParameters=new WeakMap<AlgebraicCoordinates3,QuadraticParameterization3>();
+/** Construct each coordinate in one shared quadratic extension. Public fields
+ * cannot register a point; only these actual coordinate constructions do. */
+export function algebraicQuadraticPoint3(parameter:AlgebraicReal,numerators:readonly [Polynomial,Polynomial,Polynomial],coefficients:Vector3,radicand:Polynomial,denominator=new Polynomial([1n])):AlgebraicCoordinates3 {
+ const c=vector3(coefficients.x,coefficients.y,coefficients.z),N=Object.freeze([...numerators]) as readonly [Polynomial,Polynomial,Polynomial],axes=['x','y','z'] as const,p=algebraicCoordinates3(...axes.map((k,i)=>parameter.quadraticImage(N[i]!,radicand,c[k],denominator)) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);quadraticParameters.set(p,Object.freeze({parameter,numerators:N,coefficients:c,radicand,denominator}));return p;
+}
+export function getQuadraticParameterization3(point:AlgebraicCoordinates3):QuadraticParameterization3|undefined{return quadraticParameters.get(point);}
+export function quadraticPointLinearParts3(p:QuadraticParameterization3,n:Vector3,offset=new Rational(0n)):{numerator:Polynomial;coefficient:Rational} {
+ return {numerator:rationalPointLinearNumerator3(p,n,offset),coefficient:dot3(p.coefficients,n)};
+}
+export function quadraticPointLinearValue3(p:QuadraticParameterization3,n:Vector3,offset=new Rational(0n)):AlgebraicReal {const v=quadraticPointLinearParts3(p,n,offset);return p.parameter.quadraticImage(v.numerator,p.radicand,v.coefficient,p.denominator);}
+/** Sign of constant + sum(weight * (normal·point+offset)^2). D² is positive. */
+export function signQuadraticPointSquaredForms3(p:QuadraticParameterization3,forms:readonly {readonly normal:Vector3;readonly offset:Rational;readonly weight:Rational}[],constant:Rational):Sign {
+ let A=p.denominator.mul(p.denominator).scale(constant),B=new Polynomial();for(const f of forms){const v=quadraticPointLinearParts3(p,f.normal,f.offset);A=A.add(v.numerator.mul(v.numerator).add(p.radicand.scale(v.coefficient.mul(v.coefficient))).scale(f.weight));B=B.add(v.numerator.scale(v.coefficient.mul(f.weight).mul(new Rational(2n))));}return p.parameter.signQuadratic(A,B,p.radicand);
+}
 export function rationalPointLinearNumerator3(p:RationalParameterization3,n:Vector3,offset:Rational):Polynomial {
   return p.numerators[0].scale(n.x).add(p.numerators[1].scale(n.y)).add(p.numerators[2].scale(n.z)).add(p.denominator.scale(offset));
 }
@@ -111,6 +128,7 @@ export function rationalPointSphereNumerator3(p:RationalParameterization3,center
 
 /** Internal exact linear sign without constructing an unnecessary compositum. */
 export function signLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:Vector3,offset:Rational):Sign {
+ const quadratic=quadraticParameters.get(point);if(quadratic){const v=quadraticPointLinearParts3(quadratic,normal,offset),sign=quadratic.parameter.signQuadratic(v.numerator,new Polynomial([v.coefficient]),quadratic.radicand);return sign===0?0:sign*quadratic.parameter.signOf(quadratic.denominator) as Sign;}
  const affine=parameters.get(point),rational=rationalParameters.get(point),pair=biparameters.get(point);
  if(affine)return affine.parameter.signOf(new Polynomial([dot3(normal,affine.origin).add(offset),dot3(normal,affine.direction)]));
  if(rational){const sign=rational.parameter.signOf(rationalPointLinearNumerator3(rational,normal,offset));return sign===0?0:sign*rational.parameter.signOf(rational.denominator) as Sign;}
@@ -125,6 +143,7 @@ export function signLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:Vec
 
 /** Internal exact comparison of a rational linear form and an algebraic constant. */
 export function compareLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:Vector3,constant:AlgebraicReal):Sign {
+ const quadratic=quadraticParameters.get(point);if(quadratic)return quadraticPointLinearValue3(quadratic,normal).compare(constant);
  const data=parameters.get(point),rational=rationalParameters.get(point),pair=biparameters.get(point);
  if(data)return data.parameter.affine(dot3(normal,data.direction),dot3(normal,data.origin)).compare(constant);
  if(rational)return rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,normal,new Rational(0n)),rational.denominator).compare(constant);
@@ -140,5 +159,5 @@ export function compareLinearAlgebraicPoint3(point:AlgebraicCoordinates3,normal:
 export function compareLinearPoints3(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3,n:Vector3):Sign {
  if(a===b)return 0;const axes=['x','y','z'] as const,active=axes.filter(k=>n[k].sign()!==0);if(!active.length)return 0;if(active.length===1){const k=active[0]!;const sign=a[k].compare(b[k]);return sign===0?0:sign*n[k].sign() as Sign;}let A=axes.map(k=>a[k]),B=axes.map(k=>b[k]);const interval=(p:readonly AlgebraicReal[])=>{let lo=new Rational(0n),hi=new Rational(0n);axes.forEach((k,i)=>{const value=p[i]!,positive=n[k].sign()>=0;lo=lo.add((positive?value.lower:value.upper).mul(n[k]));hi=hi.add((positive?value.upper:value.lower).mul(n[k]));});return {lo,hi};};
  for(let i=0;i<16;i++){const x=interval(A),y=interval(B);if(x.hi.compare(y.lo)<0)return -1;if(x.lo.compare(y.hi)>0)return 1;if(x.lo.compare(x.hi)===0&&y.lo.compare(y.hi)===0)return x.lo.compare(y.lo);A=A.map(p=>p.refine());B=B.map(p=>p.refine());}
- const affine=getPointParameterization3(b),rational=getRationalParameterization3(b),pair=getBiparameterization3(b),zero=new Rational(0n),constant=affine?affine.parameter.affine(dot3(n,affine.direction),dot3(n,affine.origin)):rational?rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,n,zero),rational.denominator):pair?pair.s.affine(dot3(n,pair.u),dot3(n,pair.origin)).add(pair.t.affine(dot3(n,pair.v))):b.x.affine(n.x).add(b.y.affine(n.y)).add(b.z.affine(n.z));return compareLinearAlgebraicPoint3(a,n,constant);
+ const affine=getPointParameterization3(b),rational=getRationalParameterization3(b),pair=getBiparameterization3(b),quadratic=getQuadraticParameterization3(b),zero=new Rational(0n),constant=quadratic?quadraticPointLinearValue3(quadratic,n):affine?affine.parameter.affine(dot3(n,affine.direction),dot3(n,affine.origin)):rational?rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,n,zero),rational.denominator):pair?pair.s.affine(dot3(n,pair.u),dot3(n,pair.origin)).add(pair.t.affine(dot3(n,pair.v))):b.x.affine(n.x).add(b.y.affine(n.y)).add(b.z.affine(n.z));return compareLinearAlgebraicPoint3(a,n,constant);
 }

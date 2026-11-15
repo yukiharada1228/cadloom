@@ -8,7 +8,7 @@ import {point3,vector3,subtract3,dot3,cross3,segment3,pointsEqual3} from './poin
 import type {Point3,Vector3,Segment3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
-import {algebraicCoordinates3,algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,signBiparametricQuadratic3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
+import {algebraicCoordinates3,algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,signLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 
 export interface Line3 {readonly origin:Point3;readonly direction:Vector3;}
@@ -67,6 +67,7 @@ export function classifyPointToSurface3(inputPoint:Point3|AlgebraicCoordinates3,
   if(surface.kind==='plane')return signLinearAlgebraicPoint3(point,surface.plane.normal,surface.plane.offset);
   const c=surface.cylinder,d=c.axis.direction,o=c.axis.origin;
   if(rational){const q=rational.numerators.map((N,i)=>N.sub(rational.denominator.scale(o[(['x','y','z'] as const)[i]!]))),x=q[2]!.scale(d.y).sub(q[1]!.scale(d.z)),y=q[0]!.scale(d.z).sub(q[2]!.scale(d.x)),z=q[1]!.scale(d.x).sub(q[0]!.scale(d.y));return rational.parameter.signOf(x.mul(x).add(y.mul(y)).add(z.mul(z)).sub(rational.denominator.mul(rational.denominator).scale(c.radiusSquared.mul(dot3(d,d)))));}
+  const quadratic=getQuadraticParameterization3(point);if(quadratic){const normals=[vector3(0n,d.z.neg(),d.y),vector3(d.z,0n,d.x.neg()),vector3(d.y.neg(),d.x,0n)],one=new Rational(1n);return signQuadraticPointSquaredForms3(quadratic,normals.map(normal=>({normal,offset:dot3(normal,o).neg(),weight:one})),c.radiusSquared.mul(dot3(d,d)).neg());}
   const pair=getBiparameterization3(point);if(pair){const q=cross3(d,subtract3(pair.origin,o)),u=cross3(d,pair.u),v=cross3(d,pair.v);return signBiparametricQuadratic3(pair,dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))),dot3(q,u).mul(two),dot3(q,v).mul(two),dot3(u,u),dot3(u,v).mul(two),dot3(v,v));}
   const separated=cylinderIntervalSign(point,c);if(separated!==undefined)return separated;
   const q=algebraicCoordinates3(point.x.affine(1n,o.x.neg()),point.y.affine(1n,o.y.neg()),point.z.affine(1n,o.z.neg()));

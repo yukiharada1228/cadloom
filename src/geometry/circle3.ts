@@ -5,7 +5,7 @@ import {AlgebraicReal,isolateRealRoots} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,algebraicPointsEqual3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,getQuadraticParameterization3,signQuadraticPointSquaredForms3,signBiparametricQuadratic3,algebraicPointsEqual3,compareAlgebraicPoints3,compareLinearPoints3,signLinearAlgebraicPoint3,compareLinearAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -48,6 +48,7 @@ export function pointOnCircle3(inputPoint:CirclePointInput3,input:Circle3):boole
   const data=getPointParameterization3(p);
   if(data)return data.parameter.signOf(sphereEquation(data.origin,data.direction,c))===0;
   const rational=getRationalParameterization3(p);if(rational)return rational.parameter.signOf(rationalPointSphereNumerator3(rational,c.center,c.radiusSquared))===0;
+  const quadratic=getQuadraticParameterization3(p);if(quadratic){const one=new Rational(1n);return signQuadraticPointSquaredForms3(quadratic,[vector3(1n,0n),vector3(0n,1n),vector3(0n,0n,1n)].map(normal=>({normal,offset:dot3(normal,c.center).neg(),weight:one})),c.radiusSquared.neg())===0;}
   const pair=getBiparameterization3(p);if(pair){const q=subtract3(pair.origin,c.center),u=pair.u,v=pair.v,two=new Rational(2n);return signBiparametricQuadratic3(pair,dot3(q,q).sub(c.radiusSquared),dot3(q,u).mul(two),dot3(q,v).mul(two),dot3(u,u),dot3(u,v).mul(two),dot3(v,v))===0;}
   const x=p.x.affine(1n,c.center.x.neg()),y=p.y.affine(1n,c.center.y.neg()),z=p.z.affine(1n,c.center.z.neg());
   return x.mul(x).add(y.mul(y)).add(z.mul(z)).affine(1n,c.radiusSquared.neg()).sign()===0;
