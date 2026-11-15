@@ -60,3 +60,7 @@ SolidCraft全体のスケッチ・履歴・コマンド・アプリケーショ�
 `partitionPlanarFaceByCylinder3`と`partitionPlanarFaceByFiniteCylinder3`で、所有された平面キャップ／ネイティブ平面領域を、円柱の断面と両端面で分割・分類します。円・楕円の四次交点、母線、穴、傾いた面を保持し、厳密な単調面片と共有辺を構築します。既知のイベントの反対の楕円枝は有理アフィン反射で求め、共通根の座標対応を維持します。側面とキャップの双方に分割経路が揃いました。次は両入力の面片を材料規則に従って選び、同一・反対向きの一致面を区別して閉じた境界へ接続する必要があります。共通Bodyの保存復元と曲面材料ブーリアンの認定は引き続き残ります。
 
 `prepareFiniteCylinder3`と`booleanFiniteCylinders3`で、両入力の側面・キャップを分割し、和・積・差・排他的和の必要面を選んで混合B-rep境界へ接続します。同一／反対向きの一致面を区別し、差・排他的和の内部面を反転します。面・分割片・共有辺の由来と厳密な材料照会を保持します。接触による釣り合った非多様体境界は診断付きで残します。これは二つの有限円柱の構築族であり、任意の曲面結果を再入力する演算、共通Bodyの保存復元・領域割当、面統合、一般の曲面ブーリアンの認定はまだ必要です。
+
+### Exact point chart persistence
+
+Portable exact points now retain registered rational-function and biparametric charts through JSON. This avoids discarding the common algebraic parameter used by curved-boundary predicates. Decoder evaluation and root/denominator checks remain mandatory; this does not certify surface membership. See [record semantics and limits](exact-point-chart-records3.md). Cylinder SSI curve records and common curved Body adoption remain next integration work.
