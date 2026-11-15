@@ -283,3 +283,6 @@ export {bodyRecordFromClippedCylinderExpression3} from './convert/clipped-cylind
 export {clippedCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
 export type {ClippedCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
 export {bodyFromClippedCylinderExpression3,clipCylinderExpressionBody3} from './ops/body3.js';
+
+export {boundaryCylinderMaterialExpression3,assertOwnedCylinderMaterialBoundary3,booleanCylinderMaterials3,clipCylinderMaterial3} from './geometry/cylinder-material-expression3.js';
+export type {CylinderMaterialExpression3,CylinderMaterialFaceOrigin3,CylinderMaterialFace3,CylinderMaterialBoundary3,CylinderMaterialOperand3} from './geometry/cylinder-material-expression3.js';
