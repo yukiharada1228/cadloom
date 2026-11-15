@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "78b70020407c8dcf6f7af6311caf9a7726366e18c8af63519a0d6a47410a6722",
+    "src/index.ts": "57d1ff7a322826daa5273caafe164724f303dcfac11cedc1f999b8ebabc26565",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -136,7 +136,7 @@
     "src/geometry/clipped-cylinder-expression3.ts": "e7005ff75a735f8d49d20fdb45dd83b2653a94e71e7a24d5438438e49840f9e4",
     "src/convert/clipped-cylinder-expression3.ts": "fb7ac3e8c43448a85c7623eb0c85be856135aa44d7bbec5d2fac061f8b93bbae",
     "src/geometry/finite-cylinder-plane-domain3.ts": "e98fb3c1f0ba65d0a027dec78b295a9d2e011f3a3b14ce577a9818a4a6d21d66",
-    "src/geometry/cylinder-material-expression3.ts": "1ba385b2adb565d794757fa294880faa61cb8679bb7f03c9e60048d28a5e5155",
+    "src/geometry/cylinder-material-expression3.ts": "f7eeccaba79f2a31aac5b69cad4bdf3a7c75fae1ab6ea3e1b765429c1b4b2353",
     "src/convert/cylinder-material3.ts": "61e7a2eec116319b55cfc0d0c060398c9244a3735e9ec52385d25e62953c37cd",
     "src/geometry/box-material3.ts": "53ecb636a14aed1097c1e24aa323d15fa4c25e9052b0c539df0aade0143db0cc",
     "src/geometry/convex-planar-material3.ts": "9e9fd1160be60271b259b437381c6804d726c2ed9bbbc3338215cd007861a59e",
@@ -149,10 +149,12 @@
     "src/geometry/curve-noding3.ts": "209cac6dbbd4fefe6c821c96d9cd0ac8f0b2629a42ffe204b661f196109cd0fc",
     "src/geometry/surface-germ3.ts": "62b49c36415bdd62e63dee36dfa40237799bcb4a12b3cd462fa546c4415d1d58",
     "src/geometry/planar-cell-surface3.ts": "1bb39b02c03713f31aa6d6d79c1c9b98f3f37cc57655e7143ab1344778e48880",
-    "src/geometry/planar-cell-material3.ts": "4496edb17f9116b407ae2d7b3bb523eb0f0221497816a6889aa2c8a359ed8789",
+    "src/geometry/planar-cell-material3.ts": "35064c4f08143499a4dfce759bc2c4c914e89d53f32748198a95b62e424dbfc2",
     "src/geometry/planar-material-cell-boundary3.ts": "1716b1b3265db0b3255b521b6518415ba35eefb78aa9fda5bed8300b252c8a0b",
     "src/geometry/refine-planar-material3.ts": "caa27e18cb9e4010f4e3dfa8d24b0ec557dac131f173ef93034463b869236b33",
-    "src/geometry/planar-material-surfaces3.ts": "54b6d94c90a56f382f4aac4a939d73c0aeec53ba02b4acc81c11e57f6501d269"
+    "src/geometry/planar-material-surfaces3.ts": "54b6d94c90a56f382f4aac4a939d73c0aeec53ba02b4acc81c11e57f6501d269",
+    "src/geometry/material-expression-eval3.ts": "fd12083ec85a959a9695a0c67e4928da24e41ce2f25ed11dba4fbe453f023955",
+    "src/geometry/cylinder-material-surfaces3.ts": "4a353fd9835b42719b8cc3e0b581f3b34b6e549ffbada6b00e7c678632e48d3a"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

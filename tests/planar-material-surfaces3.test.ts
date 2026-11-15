@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {point3,line3,cylinder3,plane3,prepareFiniteCylinder3,boundaryCylinderMaterialExpression3,boundaryPlanarMaterialSurfaces3,nativeBRepCurve3,sewMixedBRepFaces3,createPlanarBody3,serializeBody3,restoreBody3,locateBody3,planarBodyVolumeMoments3} from '../dist/index.js';
+import {point3,line3,cylinder3,plane3,prepareFiniteCylinder3,boundaryCylinderMaterialExpression3,boundaryPlanarMaterialSurfaces3,boundaryCylinderMaterialSurfaces3,nativeBRepCurve3,sewMixedBRepFaces3,createPlanarBody3,serializeBody3,restoreBody3,locateBody3,planarBodyVolumeMoments3} from '../dist/index.js';
 import {planarSolidFromBoundary3} from '../dist/convert/planar-body3.js';
 import type {CylinderMaterialExpression3} from '../dist/index.js';
 const O=point3(0n,0n,0n),Z=point3(0n,0n,1n),c=cylinder3(line3(O,Z),1n),raw=prepareFiniteCylinder3(c,-1n,1n);
@@ -32,6 +32,7 @@ test('a guarded six-plane box yields a checked planar solid and replayable commo
  const guard=prepareFiniteCylinder3(cylinder3(line3(O,Z),4n),-2n,2n),planes=[plane3(1n,0n,0n,'-1/2'),plane3(-1n,0n,0n,'-1/2'),plane3(0n,1n,0n,'-1/2'),plane3(0n,-1n,0n,'-1/2'),plane3(0n,0n,1n,'-1/2'),plane3(0n,0n,-1n,'-1/2')];
  let expression:CylinderMaterialExpression3={kind:'cylinder',cylinder:0};planes.forEach((_,halfspace)=>{expression={kind:'intersection',first:expression,second:{kind:'halfspace',halfspace}};});
  const material=boundaryCylinderMaterialExpression3([guard],planes,expression),result=boundaryPlanarMaterialSurfaces3(material);
+ assert.deepEqual(boundaryCylinderMaterialSurfaces3(material).faces,[]);
  assert.equal(result.supports.length,8);assert.ok(result.sewn.topology.closedOrientedIncidence);assert.deepEqual(result.sewn.topology.issues,[]);
  const checked=planarSolidFromBoundary3(result.sewn.topology);assert.equal(checked.volume.toString(),'1');
  const body=createPlanarBody3(checked.polygons),restored=restoreBody3(JSON.parse(serializeBody3(body)));assert.equal(planarBodyVolumeMoments3(restored).volume.toString(),'1');

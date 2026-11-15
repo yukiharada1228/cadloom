@@ -1,3 +1,4 @@
+import {evaluateCylinderMaterialExpression3 as truth} from './material-expression-eval3.js';
 import {surfaceGermSides3} from './surface-germ3.js';
 import {assertOwnedClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
 import type {ClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
@@ -47,7 +48,6 @@ function snapshot(t:CylinderMaterialExpression3,n:number,m:number,active=new Set
  else if(t.kind==='halfspace'){if(!Number.isSafeInteger(t.halfspace)||t.halfspace<0||t.halfspace>=m)throw new RangeError('Invalid material halfspace index');result=Object.freeze({kind:t.kind,halfspace:t.halfspace});}
  else {if(!['union','intersection','difference','xor'].includes(t.kind))throw new RangeError('Unknown material expression operation');result=Object.freeze({kind:t.kind,first:snapshot(t.first,n,m,active),second:snapshot(t.second,n,m,active)});}active.delete(t);return result;
 }
-function truth(t:CylinderMaterialExpression3,c:readonly boolean[],p:readonly boolean[]):boolean {if(t.kind==='cylinder')return c[t.cylinder]!;if(t.kind==='halfspace')return p[t.halfspace]!;const a=truth(t.first,c,p),b=truth(t.second,c,p);switch(t.kind){case 'union':return a||b;case 'intersection':return a&&b;case 'difference':return a&&!b;case 'xor':return a!==b;}}
 /** Conservative Boolean range with every cylinder false and all planes unknown.
  * False upper bound proves that the material is bounded by the cylinder union.
  * Compositions of bounded operands always retain that certificate. */

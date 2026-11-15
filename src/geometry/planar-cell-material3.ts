@@ -1,8 +1,9 @@
+import {evaluateCylinderMaterialExpression3 as truth} from './material-expression-eval3.js';
 import {dot3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Surface3} from './surface3.js';
 import {assertOwnedCylinderMaterialBoundary3} from './cylinder-material-expression3.js';
-import type {CylinderMaterialBoundary3,CylinderMaterialExpression3} from './cylinder-material-expression3.js';
+import type {CylinderMaterialBoundary3} from './cylinder-material-expression3.js';
 import type {PlanarFaceCurvePartition3} from './planar-face-cylinder-partition3.js';
 import {classifyPlanarPartitionSurfaces3} from './planar-cell-surface3.js';
 import type {PlanarCellSurfaceClassification3,PlanarPartitionSurfaceClassification3} from './planar-cell-surface3.js';
@@ -18,12 +19,6 @@ export interface PlanarPartitionMaterialClassification3 {
 const owned=new WeakSet<PlanarPartitionMaterialClassification3>();
 export function assertOwnedPlanarPartitionMaterialClassification3(input:PlanarPartitionMaterialClassification3):void {
  if(!owned.has(input))throw new RangeError('Expected a factory-created planar material classification');
-}
-function truth(t:CylinderMaterialExpression3,c:readonly boolean[],p:readonly boolean[]):boolean {
- if(t.kind==='cylinder')return c[t.cylinder]!;
- if(t.kind==='halfspace')return p[t.halfspace]!;
- const a=truth(t.first,c,p),b=truth(t.second,c,p);
- switch(t.kind){case 'union':return a||b;case 'intersection':return a&&b;case 'difference':return a&&!b;case 'xor':return a!==b;}
 }
 /** Evaluate material on both normal sides only after every primitive support
  * has been certified on the whole open cell. Unsplit zeros remain unresolved.
