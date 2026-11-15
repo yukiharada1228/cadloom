@@ -1,0 +1,23 @@
+# Constructive finite-cylinder Boolean shell regions
+
+`finiteCylinderBooleanRegions3` derives shell parent/depth roles, normal orientation, bounded-side/exterior-side rational witnesses, persistent region tables and one strict witness per bounded material region. It accepts only an owned finite-cylinder Boolean with manifold incidence. Generic imported closed boundaries and balanced nonmanifold contacts are not accepted as constructive solids. Results are immutable and weakly cached by the actual owned source.
+
+## Constructive scope
+
+The embedding argument comes from the restricted source construction, not an arbitrary record flag: each primitive is an embedded finite filled cylinder; the complete wall/wall, wall/cap and cap/cap support arrangements partition both primitive boundaries into embedded cells. Material side selection retains the separating open cells, removes duplicate coincident patches and reverses the selected cut faces. Distinct selected open cells cannot cross internally: their support intersections were arrangement boundaries. Whole-edge sewing and manifold vertex/edge incidence then supply embedded closed shells. This argument depends on the correctness/completeness of those existing construction algorithms. It is documented mathematics and runtime checks, not a machine-checked refinement proof of their TypeScript implementation. The manifold flag alone would be insufficient without this factory provenance.
+
+## Exact line probes
+
+The line query now retains both positive and negative algebraic parameters. Starting near one strict open face sample of each shell, the region analyzer tries exact rational lines. Coordinate isolation intervals are refined and integer direction sets grow until a regular line has a simple interior hit on the selected face. Supporting containment, trim edges, tangencies at the selected hit and duplicate uses request another line. No floating tolerance or fixed retry cap is used.
+
+A strict open face patch admits a nonempty open set of transverse lines. Rational approximations converge to its strict sample, while integer directions become dense in direction space. For an embedded finite semialgebraic boundary, edge/vertex/tangent exceptional directions leave regular lines available. This supplies the termination argument within the owned constructive scope; it is not a termination promise for arbitrary invalid imported shells.
+
+All complete-line simple roots are scanned from positive infinity, where every bounded shell is outside. Double roots do not toggle state. The analyzer checks an even total crossing count for every shell. At a chosen simple face hit, adjacent open line intervals differ in exactly that shell's membership. Rational parameters strictly between neighboring algebraic roots give exact rational witnesses on each side, without a guessed geometric offset. Other shells' membership at these intervals gives the target shell's containers, constant along its connected face because constructive shell surfaces are disjoint.
+
+Container relations must form a strict nesting forest with one parent of depth one less. The physical normal dotted with the rational line direction identifies outward versus inward orientation. Depth-even shells must face outward and bound material; depth-odd cavity shells must face inward and bound void. Both adjacent witnesses are checked against the original Boolean material locator. A bounded region consists of its shell and its immediate children. The infinite region references root shells and remains nonvoid by the existing record convention.
+
+The returned common BodyRecord replaces caller-supplied region roles with these derived roles. Empty results have only the infinite region. This does not yet add a common owned Body3 construction or enable previous curved Boolean results as new operands. Arbitrary analytic/NURBS shell embedding remains outside this restricted adopter.
+
+Tests cover a transverse intersection, an internal-cylinder cavity with reversed shell and independently checked parent containment, disjoint roots, empty material, provenance/nonmanifold rejection and oblique nonunit axes. Existing selected Lean theorems remain unchanged.
+
+Restoration reuses regenerated SSI endpoint provenance only after exact coordinate equality, including native generator/ellipse endpoints. Face binding consumes the already checked reconstructed edges. Definition-only partition caches are scoped to one restore batch; each face still independently validates its witness, orientation and complete boundary. No caller metadata establishes SSI ownership.

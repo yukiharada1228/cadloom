@@ -29,18 +29,26 @@ export function encodePlanarCellDomain3(input:PlanarFaceCylinderPartition3,cell:
 }
 /** Recompute a complete constructive partition and select by strict membership,
  * never by an unchecked serialized cell index or caller-supplied bound ordering. */
-export function decodeMixedFaceDomain3(input:unknown):DecodedMixedFaceDomain3 {
+export function decodeMixedFaceDomain3(input:unknown):DecodedMixedFaceDomain3 {return createMixedFaceDomainDecoder3()(input);}
+/** Definition-only caches live for this explicit batch; witness selection and
+ * orientation are validated separately for every decoded face. */
+export function createMixedFaceDomainDecoder3() {
+ const planarPartitions=new Map<string,PlanarFaceCylinderPartition3>(),cylinderPartitions=new Map<string,Partition>();
+ return (input:unknown):DecodedMixedFaceDomain3=>{
  const record=readFaceDomainRecord3(input);
  if(record.kind==='planar-partition-cell'){
-  const base=decodePlanarDomain3(record.base),c=record.cutter,cutter=cylinder3(line3(decodeRationalPoint3(c.origin),decodeRationalPoint3(c.direction)),c.radiusSquared),partition=partitionPlanarFaceByCylinder3(base,cutter,record.planes.map(p=>plane3(p.normal[0],p.normal[1],p.normal[2],p.offset))),witness=decodeExactPoint3(record.sample),cells=partition.cells.filter(c=>c.locate(witness)==='inside');
+  const {sample:_sample,orientation:_orientation,...definition}=record,key=JSON.stringify(definition);let partition=planarPartitions.get(key);if(!partition){const base=decodePlanarDomain3(record.base),c=record.cutter,cutter=cylinder3(line3(decodeRationalPoint3(c.origin),decodeRationalPoint3(c.direction)),c.radiusSquared);partition=partitionPlanarFaceByCylinder3(base,cutter,record.planes.map(p=>plane3(p.normal[0],p.normal[1],p.normal[2],p.offset)));planarPartitions.set(key,partition);}const base=partition.base,witness=decodeExactPoint3(record.sample),cells=partition.cells.filter(c=>c.locate(witness)==='inside');
   if(cells.length!==1)throw new RangeError('Planar cell witness must select exactly one strict interior cell');const cell=cells[0]!,loop=cell.boundary.map(nativeBRepCurve3),boundary=record.orientation===1?Object.freeze(loop):Object.freeze(loop.reverse().map(reverseBRepCurve3));
   return Object.freeze({record,surface:Object.freeze({kind:'plane',plane:base.surface}),sense:base.sense*record.orientation as 1|-1,boundary:Object.freeze([boundary]),sample:cell.sample,locate:cell.locate});
  }
  if(record.kind!=='cylinder-partition-cell'){const f=decodeFaceDomain3(record);return Object.freeze({...f,boundary:Object.freeze(f.boundary.map(loop=>Object.freeze(loop.map(nativeBRepCurve3))))});}
+ const {sample:_sample,orientation:_orientation,...definition}=record,key=JSON.stringify(definition);let partition=cylinderPartitions.get(key);if(!partition){
  const b=record.base,a=decodeCurveRecord3(b.angular);if(a.kind!=='circular-arc')throw new RangeError('Cylinder angular domain must be a spatial circular arc');
  const base=prepareCylinderFace3(cylinder3(line3(decodeRationalPoint3(b.origin),decodeRationalPoint3(b.direction)),b.radiusSquared),b.lower,b.upper,{angular:a.arc,sense:b.sense}),c=record.cutter,cutter=cylinder3(line3(decodeRationalPoint3(c.origin),decodeRationalPoint3(c.direction)),c.radiusSquared);
- let partition:Partition=partitionCylinderFaceByCylinder3(base,cutter);for(const p of record.planes)partition=partitionCylinderFaceCellsByPlane3(partition,plane3(p.normal[0],p.normal[1],p.normal[2],p.offset));
+ partition=partitionCylinderFaceByCylinder3(base,cutter);for(const p of record.planes)partition=partitionCylinderFaceCellsByPlane3(partition,plane3(p.normal[0],p.normal[1],p.normal[2],p.offset));cylinderPartitions.set(key,partition);}
+ const base=partition.base;
  const witness=decodeExactPoint3(record.sample),cells=partition.cells.filter(c=>c.locate(witness)==='inside');if(cells.length!==1)throw new RangeError('Cylinder cell witness must select exactly one strict interior cell');
  const cell=cells[0]!,boundary=record.orientation===1?cell.boundary:Object.freeze([...cell.boundary].reverse().map(reverseBRepCurve3)),surface:Surface3=Object.freeze({kind:'cylinder',cylinder:base.surface});
  return Object.freeze({record,surface,sense:base.sense*record.orientation as 1|-1,boundary:Object.freeze([boundary]),sample:cell.sample,locate:cell.locate});
+ };
 }

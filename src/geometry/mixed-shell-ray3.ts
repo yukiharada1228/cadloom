@@ -20,9 +20,14 @@ function faceIds(input:MixedBRepFaces3,shell:number|undefined):readonly number[]
  * Shared edges/vertices, duplicate face interiors and contained supports request
  * another ray; no arbitrary half-open edge ownership rule is invented. */
 export function intersectMixedBoundaryRay3(input:MixedBRepFaces3,origin:Point3,direction:Vector3,shell?:number):MixedBoundaryRay3 {
+ return intersectMixedLine(input,origin,direction,shell,true);
+}
+/** Exact two-sided line events, retaining negative parameters for region scans. */
+export function intersectMixedBoundaryLine3(input:MixedBRepFaces3,origin:Point3,direction:Vector3,shell?:number):MixedBoundaryRay3 {return intersectMixedLine(input,origin,direction,shell,false);}
+function intersectMixedLine(input:MixedBRepFaces3,origin:Point3,direction:Vector3,shell:number|undefined,forward:boolean):MixedBoundaryRay3 {
  const ids=faceIds(input,shell),line=line3(origin,direction),containedSupports:number[]=[],groups:{parameter:AlgebraicReal;point:AlgebraicCoordinates3;uses:MixedRayFaceUse3[]}[]=[];
  for(const face of ids){const f=input.faces[face]!,hit=intersectLineSurface3(line,f.surface);if(hit.kind==='contained'){containedSupports.push(face);continue;}if(hit.kind!=='points')continue;
-  for(const h of hit.hits){if(h.parameter.sign()<0)continue;const location=f.locate(h.point);if(location==='outside')continue;const use=Object.freeze({face,location,multiplicity:h.multiplicity as 1|2}),existing=groups.find(g=>g.parameter.compare(h.parameter)===0);if(existing)existing.uses.push(use);else groups.push({parameter:h.parameter,point:h.point,uses:[use]});}
+  for(const h of hit.hits){if(forward&&h.parameter.sign()<0)continue;const location=f.locate(h.point);if(location==='outside')continue;const use=Object.freeze({face,location,multiplicity:h.multiplicity as 1|2}),existing=groups.find(g=>g.parameter.compare(h.parameter)===0);if(existing)existing.uses.push(use);else groups.push({parameter:h.parameter,point:h.point,uses:[use]});}
  }
  groups.sort((a,b)=>a.parameter.compare(b.parameter));const hits=Object.freeze(groups.map(g=>Object.freeze({...g,uses:Object.freeze(g.uses)}))),degenerate=containedSupports.length>0||hits.some(h=>h.uses.length!==1||h.uses[0]!.location==='boundary');return Object.freeze({kind:degenerate?'degenerate':'regular',hits,containedSupports:Object.freeze(containedSupports)});
 }

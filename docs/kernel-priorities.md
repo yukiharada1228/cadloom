@@ -84,3 +84,7 @@ Planar cylinder-cut cells now have replay-validated common domain records. Owned
 ### Exact mixed shell ray queries
 
 Factory-restored plane/cylinder face domains now support exact bounded forward-ray intersections and evidence-carrying parity queries for closed locally manifold shells. Shared boundary hits and contained supports explicitly request another ray; tangent double roots do not toggle parity. See [query semantics and limits](mixed-shell-ray3.md). These queries enable future containment/nesting work but do not certify global embedding, material regions or owned curved Body validity.
+
+### Constructive curved shell regions
+
+Owned manifold two-cylinder Boolean boundaries now derive nesting forests, cavity orientation, strict rational adjacent-side samples and persistent material/void region roles using exact two-sided line scans. Arbitrary imported incidence is not promoted to a solid. See [construction argument and region algorithm](finite-cylinder-regions3.md). Common owned Body3 construction/persistence and reusable curved Boolean operands remain next integration work.

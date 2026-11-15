@@ -238,3 +238,7 @@ export {bodyRecordFromFiniteCylinderBoolean3} from './convert/finite-cylinder-bo
 export {assertOwnedMixedBRepFaces3} from './convert/mixed-faces3.js';
 export {intersectMixedBoundaryRay3,locatePointInMixedShell3} from './geometry/mixed-shell-ray3.js';
 export type {MixedRayFaceUse3,MixedBoundaryRayHit3,MixedBoundaryRay3,MixedShellPointLocation3} from './geometry/mixed-shell-ray3.js';
+export {intersectMixedBoundaryLine3} from './geometry/mixed-shell-ray3.js';
+export {finiteCylinderBooleanRegions3} from './geometry/finite-cylinder-regions3.js';
+export type {FiniteCylinderShellRegion3,FiniteCylinderBooleanRegions3} from './geometry/finite-cylinder-regions3.js';
+export {createMixedFaceDomainDecoder3} from './convert/mixed-face-domain3.js';

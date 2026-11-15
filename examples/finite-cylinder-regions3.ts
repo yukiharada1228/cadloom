@@ -1,0 +1,3 @@
+import {point3,line3,cylinder3,prepareFiniteCylinder3,booleanFiniteCylinders3,finiteCylinderBooleanRegions3} from '../dist/index.js';
+const axis=line3(point3(0n,0n),point3(0n,0n,1n)),outer=prepareFiniteCylinder3(cylinder3(axis,9n),-3n,3n),inner=prepareFiniteCylinder3(cylinder3(axis,1n),-1n,1n),result=booleanFiniteCylinders3(outer,inner,'difference'),regions=finiteCylinderBooleanRegions3(result);
+console.log({shells:regions.shells.map(s=>({parent:s.parent,depth:s.depth,outward:s.outward})),regions:regions.regions,materialSamples:regions.materialSamples.map(p=>({point:[p.x.toString(),p.y.toString(),p.z.toString()],location:result.locate(p)}))});

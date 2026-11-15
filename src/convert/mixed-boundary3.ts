@@ -1,3 +1,5 @@
+import {ellipticArc3} from '../geometry/ellipse3.js';
+import {algebraicSegment3} from '../geometry/algebraic-segment3.js';
 import {readBodyRecord3} from '../record/body3.js';
 import {decodeBodyGeometry3} from './body3.js';
 import type {DecodedBodyGeometry3} from './body3.js';
@@ -17,8 +19,11 @@ export interface MixedBRepBoundary3 {
  * Wires and NURBS faces/edges require other conversion backends.
  */
 export function restoreMixedBRepBoundary3(input:unknown,limits:RecordReadLimits3={}):MixedBRepBoundary3 {
-  const record=readBodyRecord3(input,limits),geometry=decodeBodyGeometry3(record,limits),curves:BRepCurve3[]=[];
-  for(const e of record.edges){const c=geometry.curves[e.curve]!;if(c.kind==='nurbs')throw new RangeError('Mixed boundary conversion does not support NURBS edges');const curve=c.kind==='cylinder-ssi'?c:nativeBRepCurve3(c),ends=brepCurveEndpoints3(curve);if(compareAlgebraicPoints3(ends[0],geometry.vertices[e.start]!)!==0||compareAlgebraicPoints3(ends[1],geometry.vertices[e.end]!)!==0)throw new RangeError('Edge geometry does not match its declared vertices');curves.push(curve);}
+  const record=readBodyRecord3(input,limits),geometry=decodeBodyGeometry3(record,limits),curves:BRepCurve3[]=[],ssiPoints=geometry.curves.flatMap(c=>c.kind==='cylinder-ssi'?[c.arc.start,c.arc.end]:[]);
+  // Exact value equality permits reusing a regenerated SSI endpoint's immutable
+  // coordinate/support provenance; external coordinate claims never establish it.
+  const preferred=(p:typeof geometry.vertices[number])=>ssiPoints.find(q=>compareAlgebraicPoints3(p,q)===0)??p;
+  for(const e of record.edges){const c=geometry.curves[e.curve]!;if(c.kind==='nurbs')throw new RangeError('Mixed boundary conversion does not support NURBS edges');const curve=c.kind==='cylinder-ssi'?c:nativeBRepCurve3(c.kind==='algebraic-segment'?{kind:'algebraic-segment',segment:algebraicSegment3(preferred(c.segment.start),preferred(c.segment.end))}:c.kind==='elliptic-arc'?{kind:'elliptic-arc',arc:ellipticArc3(c.arc.ellipse,preferred(c.arc.start),preferred(c.arc.end),{direction:c.arc.direction,fullEllipse:c.arc.fullEllipse})}:c),ends=brepCurveEndpoints3(curve);if(compareAlgebraicPoints3(ends[0],geometry.vertices[e.start]!)!==0||compareAlgebraicPoints3(ends[1],geometry.vertices[e.end]!)!==0)throw new RangeError('Edge geometry does not match its declared vertices');curves.push(curve);}
   const directions=new Map<number,1|-1>();
   for(const shell of record.shells){if(shell.kind!=='faces'||shell.wires.length)throw new RangeError('Mixed face boundary conversion does not support wire or vertex shells');for(const f of shell.faces)directions.set(f.face,f.direction);}
   const faces:BRepFaceInput3[]=record.faces.map((f,id)=>{

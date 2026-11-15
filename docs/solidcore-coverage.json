@@ -190,10 +190,11 @@
         "src/geometry/planar-solid-boolean3.ts",
         "src/ops/body3.ts",
         "src/geometry/consolidate-planar-solid3.ts",
-        "src/geometry/finite-cylinder-boolean3.ts"
+        "src/geometry/finite-cylinder-boolean3.ts",
+        "src/geometry/finite-cylinder-regions3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar materials and constructive two-finite-cylinder native/SSI union/intersection/difference/xor have exact face provenance and material queries. Curved results are not yet reusable operands or persistent common Bodies; persistent regions, maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned rational planar materials and constructive two-finite-cylinder native/SSI Booleans have exact face provenance, persistent bounded face domains, material queries and geometry-derived manifold shell/cavity region tables with strict samples. Curved results are not yet reusable operands or owned common Bodies; maximal curved consolidation and arbitrary analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",
