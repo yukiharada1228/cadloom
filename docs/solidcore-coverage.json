@@ -206,10 +206,11 @@
         "src/geometry/clipped-cylinder-expression3.ts",
         "src/geometry/cylinder-material-expression3.ts",
         "src/geometry/box-material3.ts",
-        "src/geometry/convex-planar-material3.ts"
+        "src/geometry/convex-planar-material3.ts",
+        "src/geometry/planar-material-program3.ts"
       ],
       "status": "partial",
-      "gap": "Owned planar and finite-cylinder material supports exact queries, shell regions and common Body replay, including repeated halfspace clipping. Bounded cylinder/plane predicates now preserve operand-local cuts through common Body Booleans, derived regions, complete domain persistence and replay/reuse. Nonmanifold material remains lower-level only. An exact six-plane box bridge now composes with cylinder materials at the kernel boundary layer. Native owned/restored Box Bodies now compose with cylinder-family Bodies through booleanMixedBodies3 and replayable material recipes. An owned convex single-shell planar-material bridge now derives exact supporting halfspaces; actual convex planar/consolidated Body sources now enter mixed Booleans with complete replay. Nonconvex/void/multi-shell planar decomposition remains incomplete. General planar-versus-cylinder dispatch, broader contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned planar and finite-cylinder material supports exact queries, shell regions and common Body replay, including repeated halfspace clipping. Bounded cylinder/plane predicates now preserve operand-local cuts through common Body Booleans, derived regions, complete domain persistence and replay/reuse. Nonmanifold material remains lower-level only. An exact six-plane box bridge now composes with cylinder materials at the kernel boundary layer. Native owned/restored Box Bodies now compose with cylinder-family Bodies through booleanMixedBodies3 and replayable material recipes. An owned convex single-shell planar-material bridge now derives exact supporting halfspaces; actual convex planar/consolidated Body sources now enter mixed Booleans with complete replay. Nonconvex/void/multi-shell material now compiles to bounded parity predicates; its general sewn-boundary and Body integration remain incomplete. General planar-versus-cylinder dispatch, broader contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",

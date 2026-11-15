@@ -174,3 +174,7 @@ Owned convex single-shell rational polyhedra now lower to their outward supporti
 ### Convex planar common Body operands
 
 `booleanMixedBodies3` now lowers actual planar/consolidated Body backends through the owned convex supporting-halfspace bridge. Restored Bodies reestablish source ownership; cylinder-specific dispatch consistently rejects planar inputs. See [contract and validation scope](convex-planar-body3.md). Concave/void/multi-shell decomposition, broader native extrusion conversion and analytic/NURBS parity remain incomplete.
+
+### General planar parity programs
+
+Owned rational planar material now compiles into a balanced bounded halfspace/tetrahedron parity expression, including concave material, nested voids/islands, disconnected shells and empty input. Three focused strict-chamber tests pass against independent rational-cell predicates and the prepared-solid classifier. See [construction argument and explicit boundary gap](planar-material-program3.md). No general sewn BRep, native Body dispatch or complete mixed Boolean parity is claimed by this compiler alone.
