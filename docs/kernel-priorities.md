@@ -386,3 +386,26 @@ caller-provided certificate selects this branch. The raw mixed XOR implementatio
 is unchanged and retains its preceding pass. The earlier full source68 snapshot
 and explicit 21-plane resource run remain independently live; they do not cover
 this later dispatch change.
+
+### General dispatch broad gate and explicit retained resource gate completed
+
+The source68 general-dispatch snapshot (`f8d280c` source/tests) passed all 848
+non-hard tests in one invocation (1,289,085 ms). This includes all five native
+general planar composition cases and the corrected canonical/public fixtures.
+It precedes the later native planar-pair direct dispatch.
+
+The explicit original 21-plane/275-face resource example on the isolated source62
+build terminated with exit 0 and `all-checks-passed` at 3,188,506 ms. It retained
+the original prepared source, raw material, Body and JSON through restoration
+and queried them afterwards. All restored face samples, 64 independent strict
+L points, nine seam/bounded-boundary cases, topology/regions and unchanged original
+serialization passed. At the final checkpoint heapUsed was 3,196,203,392 bytes
+and RSS 4,032,515,376 bytes. These are checkpoint observations, not measured peak
+or a memory bound; no heap limit was increased. The difficult 21-plane condition
+was preserved, independently of the newer 14-face default and native pair path.
+
+A complete non-hard snapshot of the current native-pair source has now started,
+including all six contact/dispatch/reuse cases. That later full result is pending.
+The existing scoped 133-declaration audit passed for the native-pair source;
+whole TypeScript execution verification and general analytic/NURBS parity remain
+outside these successful gates.

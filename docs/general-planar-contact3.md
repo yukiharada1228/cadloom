@@ -57,6 +57,8 @@ the checked Body interface and its actual construction variant. The reuse test
 verifies the native result can still enter the real cylinder/material backend.
 
 This is focused verification, not a proof of all contact configurations or of
-TypeScript execution. The previously launched broad/resource jobs use earlier
-isolated builds and retain their original scope. Broader mixed contacts and
+TypeScript execution. The preceding general-dispatch snapshot passed all 848 non-hard tests and the
+explicit original 21-plane resource example passed every check. Those builds
+precede the native pair dispatch change; the latest complete non-hard snapshot
+including all six contact/dispatch cases has now started separately. Broader mixed contacts and
 analytic/NURBS Booleans remain incomplete.
