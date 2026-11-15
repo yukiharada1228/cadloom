@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Rational,point3,line3,cylinder3,plane3,intersectCylinders3,cylinderIntersectionArcOnSurface3,cylinderIntersectionBRepCurve3 as ssi,nativeBRepCurve3 as native,reverseBRepCurve3 as reverse,brepCurveEndpoints3 as ends,brepCurveOnSurface3,pointOnBRepCurve3,buildMixedBRepTopology3,sewMixedBRepFaces3,compareAlgebraicPoints3,classifyPointToSurface3,splitCylinderIntersectionArc3,clipCylinderBRep3,surfacesCoincide3,reverseCurve3,createBoxBody3} from '../dist/index.js';
-import type {Cylinder3,CylinderIntersectionArc3,BRepCurve3,MixedBRepFace3,SewnMixedBRep3,BRepTopology3} from '../dist/index.js';
+import {Rational,point3,line3,cylinder3,plane3,intersectCylinders3,cylinderIntersectionArcOnSurface3,cylinderIntersectionBRepCurve3 as ssi,nativeBRepCurve3 as native,reverseBRepCurve3 as reverse,brepCurveEndpoints3 as ends,brepCurveOnSurface3,pointOnBRepCurve3,buildMixedBRepTopology3,sewMixedBRepFaces3,compareAlgebraicPoints3,classifyPointToSurface3,splitCylinderIntersectionArc3,clipCylinderBRep3,surfacesCoincide3,reverseCurve3,createBoxBody3,algebraicCoordinates3,fullCircleArc3,circle3,curveNodingPoints3,lineInterval3,planeFrame3,prepareRectangleFace3,prepareCylinderFace3,intersectPlanarCylinderFaces3,curveEndpoints3} from '../dist/index.js';
+import type {Curve3,Cylinder3,CylinderIntersectionArc3,BRepCurve3,MixedBRepFace3,SewnMixedBRep3,BRepTopology3} from '../dist/index.js';
 const O=point3(0n,0n),Z=point3(0n,0n,1n),X=point3(1n,0n,0n),A=cylinder3(line3(O,Z),1n),B=cylinder3(line3(O,X),4n);
 const rev=(loop:readonly BRepCurve3[])=>[...loop].reverse().map(reverse);
 function graph(a=A,b=B){const g=intersectCylinders3(a,b);assert.equal(g.kind,'bounded');if(g.kind!=='bounded')throw new Error('Expected SSI');return g;}
@@ -15,7 +15,7 @@ function provenance(r:SewnMixedBRep3,input:readonly MixedBRepFace3[]){
  r.topology.edges.forEach(edge=>edge.coedges.forEach(id=>assert.equal(brepCurveOnSurface3(edge.curve,r.topology.faces[r.topology.coedges[id]!.face]!.surface),true)));
  assert.ok(Object.isFrozen(r)&&Object.isFrozen(r.sourceUses)&&Object.isFrozen(r.faceLoops));
 }
-function patch(t:BRepTopology3,id:number):MixedBRepFace3 {const f=t.faces[id]!;return {surface:f.surface,sense:f.sense,loops:f.loops.map(l=>t.loops[l]!.coedges.map(id=>{const h=t.coedges[id]!,c=t.edges[h.edge]!.curve;return native(h.direction===1?c:reverseCurve3(c));}))};}
+function patch(t:BRepTopology3<Curve3|BRepCurve3>,id:number):MixedBRepFace3 {const f=t.faces[id]!;return {surface:f.surface,sense:f.sense,loops:f.loops.map(l=>t.loops[l]!.coedges.map(id=>{const h=t.coedges[id]!,raw=t.edges[h.edge]!.curve,c=raw.kind==='native'||raw.kind==='cylinder-ssi'?raw:native(raw);return h.direction===1?c:reverse(c);}))};}
 function ordered(arcs:readonly CylinderIntersectionArc3[],ccw:boolean):BRepCurve3[]{
  const remaining=arcs.map(a=>ssi(a)),loop=[remaining.shift()!];while(remaining.length){const target=ends(loop[loop.length-1]!)[1],i=remaining.findIndex(c=>ends(c).some(p=>compareAlgebraicPoints3(p,target)===0));assert.ok(i>=0);let c=remaining.splice(i,1)[0]!;if(compareAlgebraicPoints3(ends(c)[0],target)!==0)c=reverse(c);loop.push(c);}
  assert.equal(compareAlgebraicPoints3(ends(loop[loop.length-1]!)[1],ends(loop[0]!)[0]),0);
@@ -62,4 +62,50 @@ test('native-only compatibility, orientation snapshots and forged algebraic edge
  const a=graph().arcs[0]!,c=ssi(a),back=reverse(c);assert.equal(compareAlgebraicPoints3(ends(c)[0],ends(back)[1]),0);assert.equal(compareAlgebraicPoints3(ends(c)[1],ends(back)[0]),0);assert.equal(pointOnBRepCurve3(a.sample,back),true);
  assert.throws(()=>ssi({...a}),RangeError);assert.throws(()=>ssi(a,0 as 1),RangeError);assert.throws(()=>sewMixedBRepFaces3([],{requireClosed:1 as unknown as boolean}),TypeError);
  const fake={...c,start:point3(999n,999n,999n),end:point3(999n,999n,999n)};assert.equal(compareAlgebraicPoints3(ends(fake)[0],a.start),0);
+});
+
+test('upstream cut points split a shared box edge and map back to exact topology vertices',()=>{
+ const box=createBoxBody3(O,2n,2n,2n),faces=box.topology.faces.map((_,i)=>patch(box.topology,i));
+ const baseline=sewMixedBRepFaces3(faces,{requireClosed:true}),edge=baseline.topology.edges[0]!,[a,b]=ends(edge.curve);
+ const middle=algebraicCoordinates3(a.x.add(b.x).affine('1/2'),a.y.add(b.y).affine('1/2'),a.z.add(b.z).affine('1/2'));
+ const cuts=[middle,middle,point3(9n,9n,9n),a],result=sewMixedBRepFaces3(faces,{requireClosed:true,splitPoints:cuts});
+ provenance(result,faces);assert.equal(result.topology.edges.length,baseline.topology.edges.length+1);assert.equal(result.topology.vertices.length,baseline.topology.vertices.length+1);
+ assert.ok(result.topology.closedOrientedIncidence);assert.equal(result.splitPointVertices[0],result.splitPointVertices[1]);assert.equal(result.splitPointVertices[2],null);
+ cuts.forEach((p,i)=>{const vertex=result.splitPointVertices[i];if(vertex!==null)assert.equal(compareAlgebraicPoints3(algebraicCoordinates3(p.x,p.y,p.z),result.topology.vertices[vertex!]!),0);});
+ assert.ok(Object.isFrozen(result.splitPointVertices));assert.equal(baseline.splitPointVertices.length,0);
+ const reversed=sewMixedBRepFaces3(faces,{requireClosed:true,splitPoints:[...cuts].reverse()});assert.deepEqual([...reversed.splitPointVertices].reverse(),result.splitPointVertices);
+});
+test('upstream SSI interior cuts preserve shared edges, source paths and closure',()=>{
+ const {faces,g}=fixture(),cut=g.arcs[0]!.sample,baseline=sewMixedBRepFaces3(faces,{requireClosed:true});
+ const result=sewMixedBRepFaces3(faces,{requireClosed:true,splitPoints:[cut]});provenance(result,faces);
+ assert.equal(result.topology.edges.length,baseline.topology.edges.length+1);assert.equal(result.topology.vertices.length,baseline.topology.vertices.length+1);
+ const vertex=result.splitPointVertices[0]!;assert.notEqual(vertex,null);assert.equal(compareAlgebraicPoints3(result.topology.vertices[vertex!]!,cut),0);
+ assert.ok(result.topology.edges.every(e=>e.coedges.length===2));assert.ok(result.sourceUses.flat(2).some(uses=>uses.length===2));
+});
+test('native conic intersection events feed sewing without changing the source loop',()=>{
+ const circle={kind:'circular-arc' as const,arc:fullCircleArc3(circle3(O,Z,1n))};
+ const cutting={kind:'line' as const,interval:lineInterval3(line3(point3('-2','4/5',0n),X),0n,4n)};
+ const points=curveNodingPoints3(circle,cutting);assert.equal(points.length,2);
+ const faces:MixedBRepFace3[]=[{surface:{kind:'plane',plane:plane3(0n,0n,1n)},sense:1,loops:[[native(circle)]]}];
+ const baseline=sewMixedBRepFaces3(faces),result=sewMixedBRepFaces3(faces,{splitPoints:points});provenance(result,faces);
+ assert.equal(result.topology.edges.length,baseline.topology.edges.length+2);assert.equal(result.topology.vertices.length,baseline.topology.vertices.length+2);
+ result.splitPointVertices.forEach((vertex,i)=>{assert.notEqual(vertex,null);assert.equal(compareAlgebraicPoints3(result.topology.vertices[vertex!]!,points[i]!),0);});
+ assert.equal(result.sourceUses[0]![0]![0]!.length,baseline.sourceUses[0]![0]![0]!.length+2);
+});
+
+test('finite face section endpoints become exact boundary vertices with source paths retained',()=>{
+ const planar=prepareRectangleFace3(planeFrame3(O,X,point3(0n,1n,0n)),-2n,2n,'-1/2','1/2');
+ const wall=prepareCylinderFace3(A,-1n,1n),section=intersectPlanarCylinderFaces3(planar,wall);
+ const points=[...section.curves.flatMap(c=>curveEndpoints3(c.curve)),...section.points];
+ const faces:MixedBRepFace3[]=[{surface:{kind:'plane',plane:planar.surface},sense:1,loops:planar.boundary.map(loop=>loop.map(native))}];
+ const baseline=sewMixedBRepFaces3(faces),result=sewMixedBRepFaces3(faces,{splitPoints:points});provenance(result,faces);
+ const unique=new Set(result.splitPointVertices);unique.delete(null);assert.equal(unique.size,4);
+ assert.equal(result.topology.vertices.length,baseline.topology.vertices.length+4);assert.equal(result.topology.edges.length,baseline.topology.edges.length+4);
+ for(const [i,vertex] of result.splitPointVertices.entries()){
+  const onBoundary=faces[0]!.loops.flat().some(c=>pointOnBRepCurve3(points[i]!,c));
+  assert.equal(vertex!==null,onBoundary);
+  if(vertex!==null)assert.equal(compareAlgebraicPoints3(result.topology.vertices[vertex]!,points[i]!),0);
+ }
+ // These are cuts of the supplied boundary only: no interior circle arcs or new faces are inferred.
+ assert.equal(result.topology.faces.length,1);assert.ok(result.topology.edges.every(e=>e.curve.kind==='native'&&e.curve.curve.kind==='algebraic-segment'));
 });

@@ -1,8 +1,9 @@
 import type {Surface3} from './surface3.js';
+import type {Point3} from './point3.js';
 import {snapshotBRepCurve3,nativeBRepCurve3,cylinderIntersectionBRepCurve3,brepCurveEndpoints3,pointOnBRepCurve3,brepCurveOnSurface3,buildMixedBRepTopology3} from './brep-curve3.js';
 import type {BRepCurve3} from './brep-curve3.js';
 import {restrictAlgebraicSegment3,algebraicSegment3,pointOnAlgebraicSegment3} from './algebraic-segment3.js';
-import {compareAlgebraicPoints3,getPointParameterization3,getRationalParameterization3,getBiparameterization3} from './algebraic-point3.js';
+import {snapshotExactPoint3,compareAlgebraicPoints3,getPointParameterization3,getRationalParameterization3,getBiparameterization3} from './algebraic-point3.js';
 import {ellipsesCoincide3,splitEllipticArc3} from './ellipse3.js';
 import {curveOnSurface3} from './curve3.js';
 import {canonical,samePoint} from './planar-trim-utils3.js';
@@ -13,10 +14,17 @@ import type {BRepTopology3,BRepEdgeUse3} from './brep-topology3.js';
 import type {SewBRepOptions3,SewnBRep3} from './sew-brep3.js';
 
 export interface MixedBRepFace3 {readonly surface:Surface3;readonly sense:1|-1;readonly loops:readonly (readonly BRepCurve3[])[];}
+export interface SewMixedBRepOptions3 extends SewBRepOptions3 {
+  /** Additional exact cuts from upstream intersections. Only points on supplied
+   * boundary curves are used; this does not insert interior face intersection edges. */
+  readonly splitPoints?:readonly (Point3|AlgebraicCoordinates3)[];
+}
 export interface SewnMixedBRep3 {
   readonly topology:BRepTopology3<BRepCurve3>;
   readonly sourceUses:SewnBRep3['sourceUses'];
   readonly faceLoops:SewnBRep3['faceLoops'];
+  /** Vertex for each supplied split point, or null when it lies on no boundary. */
+  readonly splitPointVertices:readonly (number|null)[];
 }
 /** Equal values may have different construction records. Preserve useful
  * immutable support/field provenance instead of retaining an arbitrary copy. */
@@ -34,14 +42,15 @@ function sameSupport(a:BRepCurve3,b:BRepCurve3):boolean {
   const native=a.kind==='native'?a:b,ssi=a.kind==='cylinder-ssi'?a:b;
   return native.kind==='native'&&ssi.kind==='cylinder-ssi'&&[ssi.arc.first,ssi.arc.second].every(c=>curveOnSurface3(native.curve,{kind:'cylinder',cylinder:c}));
 }
-/** Node supplied endpoints, merge certified coincident native/SSI pieces and
+/** Node supplied endpoints and optional upstream intersection points, merge certified coincident native/SSI pieces and
  * build shared-edge/coedge incidence. Preserves original curve-use provenance.
  * No arbitrary missing interior/interior crossings, bounded face validity or
  * global shell/material embedding is inferred from closed incidence.
  */
-export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewBRepOptions3={}):SewnMixedBRep3 {
+export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewMixedBRepOptions3={}):SewnMixedBRep3 {
   if(options.requireClosed!==undefined&&typeof options.requireClosed!=='boolean')throw new TypeError('requireClosed must be boolean');
-  const prepared=input.map(f=>f.loops.map(loop=>loop.map(c=>{const p=snapshotBRepCurve3(c);return p.kind==='native'?sectionPieces(canonical(p.curve)).map(nativeBRepCurve3):[p];}))),points=preferredPoints(prepared.flat(3).flatMap(brepCurveEndpoints3)),edges:BRepCurve3[]=[];
+  const splitPoints=(options.splitPoints??[]).map(snapshotExactPoint3);
+  const prepared=input.map(f=>f.loops.map(loop=>loop.map(c=>{const p=snapshotBRepCurve3(c);return p.kind==='native'?sectionPieces(canonical(p.curve)).map(nativeBRepCurve3):[p];}))),points=preferredPoints([...prepared.flat(3).flatMap(brepCurveEndpoints3),...splitPoints]),edges:BRepCurve3[]=[];
   // Prepared and split curves are owned immutable snapshots. Reuse the exact
   // witness only within this sewing call; no caller-mutable keys escape it.
   const samples=new Map<BRepCurve3,AlgebraicCoordinates3>();
@@ -69,5 +78,6 @@ export function sewMixedBRepFaces3(input:readonly MixedBRepFace3[],options:SewBR
   }))))));
   const faceLoops=Object.freeze(sourceUses.map(loops=>Object.freeze(loops.map(loop=>Object.freeze(loop.flat()))))),topology=buildMixedBRepTopology3(edges,input.map((f,i)=>({surface:f.surface,sense:f.sense,loops:faceLoops[i]!})));
   if(options.requireClosed&&(!topology.closedOrientedIncidence||topology.issues.length))throw new RangeError('Mixed boundaries do not form closed oriented manifold incidence');
-  return Object.freeze({topology,sourceUses,faceLoops});
+  const splitPointVertices=Object.freeze(splitPoints.map(p=>{const vertex=topology.vertices.findIndex(q=>samePoint(p,q));return vertex<0?null:vertex;}));
+  return Object.freeze({topology,sourceUses,faceLoops,splitPointVertices});
 }
