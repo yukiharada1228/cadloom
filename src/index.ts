@@ -262,3 +262,6 @@ export {finiteCylinderExpressionRegions3} from './geometry/finite-cylinder-regio
 export type {FiniteCylinderExpressionRegions3} from './geometry/finite-cylinder-regions3.js';
 export {bodyFromFiniteCylinderExpression3} from './ops/body3.js';
 export {locateFiniteCylinderExpression3} from './geometry/finite-cylinder-expression3.js';
+
+export {sectionFiniteCylinderExpression3,assertOwnedCylinderExpressionPlaneSection3} from './geometry/cylinder-expression-plane-section3.js';
+export type {CylinderExpressionSectionPatch3,CylinderExpressionPlaneSection3} from './geometry/cylinder-expression-plane-section3.js';

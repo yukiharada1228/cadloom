@@ -132,3 +132,5 @@ Constructive cylinder Body adoption now reuses the exact mixed-face geometry alr
 ### Plane events for clipped expression leaves
 
 Finite-cylinder wall and planar face arrangements accept additional oriented rational plane cuts, retaining cap/material indices and appending exact plane-side columns. Oblique/reversed planes, independent rational grids and a `10^-40` height strip with domain replay pass; all 770 non-hard regressions and the scoped audit pass. See [semantics and remaining assembly work](finite-cylinder-plane-arrangements3.md). New cut-cap generation, clipped-leaf material selection, closed-shell assembly and construction-document integration are still required.
+
+Owned finite-cylinder expressions now produce positive-area plane-section cells with exact material flags on both normal sides. Genuine interior cuts are distinguished from coincident outer/cavity caps, including cancelled opposed caps. See [construction argument and remaining split assembly](cylinder-expression-plane-section3.md). Closed child assembly, contact reporting and persistent clipped recipes are still required.
