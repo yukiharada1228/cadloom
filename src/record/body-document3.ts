@@ -12,6 +12,7 @@ import type {RecordReadLimits3} from './schema.js';
 
 export interface FiniteCylinderConstructionRecord3 {readonly origin:RationalPointRecord3;readonly direction:RationalPointRecord3;readonly radiusSquared:string;readonly lower:string;readonly upper:string;}
 export type BodyConstructionRecord3=
+ | {readonly kind:'clipped-cylinder-expression';readonly operands:readonly FiniteCylinderConstructionRecord3[];readonly expression:FiniteCylinderExpression3;readonly halfspaces:readonly HalfSpaceRecord3[]}
  | {readonly kind:'plane-cut-cylinder-expression';readonly operands:readonly FiniteCylinderConstructionRecord3[];readonly expression:FiniteCylinderExpression3;readonly cut:HalfSpaceRecord3}
  | {readonly kind:'finite-cylinder-expression';readonly operands:readonly FiniteCylinderConstructionRecord3[];readonly expression:FiniteCylinderExpression3}
  | {readonly kind:'finite-cylinder-boolean';readonly first:FiniteCylinderConstructionRecord3;readonly second:FiniteCylinderConstructionRecord3;readonly operation:'union'|'intersection'|'difference'|'xor'}
@@ -27,6 +28,7 @@ const cylinderExpressionSchema3:Schema3=(value,path,reader)=>{
  const active=new Set<object>();const read:Schema3=(v,p,r)=>{if(v!==null&&typeof v==='object'){if(active.has(v))throw new RangeError('Cyclic cylinder expression record');active.add(v);}const child=objectSchema3({kind:literalSchema3('union','intersection','difference','xor'),first:read,second:read}),result=taggedSchema3({operand:objectSchema3({kind:literalSchema3('operand'),operand:indexSchema3}),union:child,intersection:child,difference:child,xor:child})(v,p,r);if(v!==null&&typeof v==='object')active.delete(v);return result;};return read(value,path,reader);
 };
 export const constructionSchema3=taggedSchema3({
+  'clipped-cylinder-expression':objectSchema3({kind:literalSchema3('clipped-cylinder-expression'),operands:arraySchema3(finiteCylinderSchema3,1),expression:cylinderExpressionSchema3,halfspaces:arraySchema3(objectSchema3({normal:rationalPointSchema3,offset:rationalSchema3,side:directionSchema3}))}),
   'plane-cut-cylinder-expression':objectSchema3({kind:literalSchema3('plane-cut-cylinder-expression'),operands:arraySchema3(finiteCylinderSchema3,1),expression:cylinderExpressionSchema3,cut:objectSchema3({normal:rationalPointSchema3,offset:rationalSchema3,side:directionSchema3})}),
   'finite-cylinder-expression':objectSchema3({kind:literalSchema3('finite-cylinder-expression'),operands:arraySchema3(finiteCylinderSchema3,1),expression:cylinderExpressionSchema3}),
   'finite-cylinder-boolean':objectSchema3({kind:literalSchema3('finite-cylinder-boolean'),first:finiteCylinderSchema3,second:finiteCylinderSchema3,operation:literalSchema3('union','intersection','difference','xor')}),

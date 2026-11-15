@@ -1,3 +1,6 @@
+import {clipFiniteCylinderExpression3,refineClippedCylinderExpression3} from '../geometry/clipped-cylinder-expression3.js';
+import type {ClippedCylinderExpression3} from '../geometry/clipped-cylinder-expression3.js';
+import {adoptClippedCylinderExpressionBody3,clippedCylinderExpressionSourceOfBody3,planeCutCylinderExpressionSourceOfBody3} from '../model/body3.js';
 import {splitFiniteCylinderExpressionByPlane3} from '../geometry/cylinder-expression-plane-split3.js';
 import type {CylinderExpressionPlaneSplit3} from '../geometry/cylinder-expression-plane-split3.js';
 import {adoptCylinderExpressionSplitBody3} from '../model/body3.js';
@@ -54,6 +57,7 @@ export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);
 export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
+    case 'clipped-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper)),source=boundaryFiniteCylinderExpression3(operands,construction.expression);return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(source,construction.halfspaces.map(h=>({plane:plane3(h.normal[0],h.normal[1],h.normal[2],h.offset),side:h.side}))));}
     case 'plane-cut-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper)),source=boundaryFiniteCylinderExpression3(operands,construction.expression),cut=construction.cut,split=splitFiniteCylinderExpressionByPlane3(source,plane3(cut.normal[0],cut.normal[1],cut.normal[2],cut.offset));return bodyFromCylinderExpressionSplit3(split,cut.side);}
     case 'finite-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper));return bodyFromFiniteCylinderExpression3(boundaryFiniteCylinderExpression3(operands,construction.expression));}
     case 'finite-cylinder-boolean':{const cylinder=(p:typeof construction.first)=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper);return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(cylinder(construction.first),cylinder(construction.second),construction.operation));}
@@ -137,3 +141,12 @@ export function bodyFromFiniteCylinderExpression3(source:FiniteCylinderExpressio
 
 /** Common Body with derived regions and replay-checked single-cut construction. */
 export function bodyFromCylinderExpressionSplit3(source:CylinderExpressionPlaneSplit3,side:-1|1):Body3 {return adoptCylinderExpressionSplitBody3(source,side);}
+
+export function bodyFromClippedCylinderExpression3(source:ClippedCylinderExpression3):Body3 {return adoptClippedCylinderExpressionBody3(source);}
+/** Append halfspaces to owned cylinder-family Bodies, including restored previous
+ * cut results. Does not make clipped leaves operands of unrelated Booleans. */
+export function clipCylinderExpressionBody3(body:Body3,halfspaces:readonly CylinderHalfSpace3[]):Body3 {
+ assertOwnedBody3(body);const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return bodyFromClippedCylinderExpression3(refineClippedCylinderExpression3(clipped,halfspaces));const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(cut.source,[cut.cut,...halfspaces]));
+ let source=finiteCylinderExpressionSourceOfBody3(body);const binary=finiteCylinderBooleanSourceOfBody3(body);if(!source&&binary)source=boundaryFiniteCylinderExpression3([binary.first,binary.second],{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}});
+ if(source)return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(source,halfspaces));const primitive=cylinderSourceOfBody3(body),base=prepareFiniteCylinder3(primitive.cylinder,primitive.lower,primitive.upper),expression=boundaryFiniteCylinderExpression3([base],{kind:'operand',operand:0});return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(expression,[...primitive.planes.map(plane=>({plane,side:-1 as const})),...halfspaces]));
+}

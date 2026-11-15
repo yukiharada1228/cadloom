@@ -94,7 +94,8 @@
         "src/geometry/face-domain-binding3.ts",
         "src/convert/mixed-faces3.ts",
         "src/convert/mixed-face-domain3.ts",
-        "src/convert/cylinder-expression-split3.ts"
+        "src/convert/cylinder-expression-split3.ts",
+        "src/convert/clipped-cylinder-expression3.ts"
       ],
       "status": "partial",
       "gap": "Supported native/mixed analytic face domains reconstruct from raw records and bind complete oriented boundaries, including both plane-cut cylinder-expression children. Arbitrary imported face/shell embedding, void containment, independent pcurves and NURBS face conversion remain missing."
@@ -111,7 +112,7 @@
         "src/record/body-document3.ts"
       ],
       "status": "partial",
-      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and their single-plane-cut children share owned Body records, derived material regions, bounded-face queries and replay-checked persistence. Repeated cuts of expression Bodies, clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing."
+      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing."
     },
     {
       "id": "primitive",
@@ -204,7 +205,7 @@
         "src/geometry/clipped-cylinder-expression3.ts"
       ],
       "status": "partial",
-      "gap": "Owned rational planar materials and manifold finite-cylinder expressions support exact queries, shell/cavity regions, common Body adoption and replay-checked persistence. Uncut expression results are reusable operands; single-plane cut Bodies adopt and replay. Repeated halfspace cuts now produce closed kernel boundary/material results, but their common Body persistence/adoption, clipped leaves in later Booleans, broad contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned rational planar materials and finite-cylinder expressions support exact queries, shell/cavity regions, common Body adoption and replay-checked persistence. Uncut expression results are reusable Boolean operands. Repeated halfspace-clipped expressions now adopt/replay Bodies and accept further cuts, but per-operand clipped leaves in unrelated Booleans, broad contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
     },
     {
       "id": "sweep",

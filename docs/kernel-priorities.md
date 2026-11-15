@@ -146,3 +146,7 @@ Owned manifold split children now derive nesting/void roles and strict rational 
 ### Repeated halfspace cuts at the kernel boundary layer
 
 Owned finite-cylinder expressions now intersect with ordered lists of halfspaces, and further cuts retain all earlier constraints. Wall source-cell provenance composes across refinements; original caps and every cut cap are noded by all planes. Duplicate caps select one representative, opposed/incompatible constraints produce empty regularized volume, and balanced nonmanifold incidence remains explicit. Independent reordered-cut grids, cap intersections, SSI cuts and a `10^-40` strip pass. See [construction and remaining Body integration](clipped-cylinder-expression3.md). Multi-cut Body persistence/adoption and unrelated clipped-leaf Booleans are not yet connected.
+
+### Repeated clipping through common Body persistence
+
+Multi-cut expression boundaries now export all bounded domains, derive material/void regions and adopt common Body3 with a replay-checked `clipped-cylinder-expression` recipe. `clipCylinderExpressionBody3` appends conditions to actual owned/restored cylinder-family backends, including old single-cut, binary and native clipped-cylinder Bodies. Original constraints survive further cuts and empty results. Five connected end-to-end tests and all 800 non-hard regressions pass. See [invariants and remaining unrelated-Boolean reuse](multi-cut-expression-body3.md). Clipped operands inside unrelated unions/differences still require a material-expression backend with per-operand halfspace predicates.
