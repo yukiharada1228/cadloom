@@ -85,7 +85,7 @@
     "src/convert/exact3.ts": "a2f90ce6fc15317d35b0fe03124324b18f5d1d088fe06fff35df52e3830dc694",
     "src/record/body-document3.ts": "d32161c6b30fc12ecb6cbb10321fd3deeab42c56ae5b64de2f66166f8dacd949",
     "src/model/body3.ts": "994082242c7a0496b112a9988b0c9a5d7eed32847f3e17ee792d79e2a62ae716",
-    "src/ops/body3.ts": "0e0fb6d5ffa867e7e8d1493f78ef583611c3c33b1d0ff76e2e4b84c25c2c9cdb",
+    "src/ops/body3.ts": "aff0e89dcd784c6e3447a623bf9dd9c84e27ca171a68919d66ef740dcf233071",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "bf554a7865790e7391da62adf73ae30d25c9942feeed6693a2fb7450167a475f",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",

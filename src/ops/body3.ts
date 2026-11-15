@@ -158,19 +158,25 @@ export function clipCylinderExpressionBody3(body:Body3,halfspaces:readonly Cylin
 }
 
 export function bodyFromCylinderMaterial3(source:CylinderMaterialBoundary3):Body3 {return adoptCylinderMaterialBody3(source);}
+/** Selection only inspects owned backend provenance and actual support types;
+ * the planar converter still validates straight edges and rational geometry. */
+function nativePlanarOperand3(body:Body3):boolean {
+ return !!planarSourceOfBody3(body)||body.construction.kind==='extrude'&&body.topology.faces.every(f=>f.surface.kind==='plane');
+}
 /** Boolean composition for owned planar, box and cylinder-family Bodies.
  * Planar pairs use the native planar kernel; other supported pairs use the mixed
  * material recipe. Both paths require manifold material and support replay. */
 export function booleanMixedBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
  assertOwnedBody3(first);assertOwnedBody3(second);
  if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown mixed Body operation');
- if(planarSourceOfBody3(first)&&planarSourceOfBody3(second))return booleanPlanarBodies3(first,second,operation);
+ if(nativePlanarOperand3(first)&&nativePlanarOperand3(second))return booleanPlanarBodies3(first,second,operation);
  return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
 }
 /** Source conversion is restricted to actual owned planar/box/cylinder backends. */
 function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
  assertOwnedBody3(body);
- const planar=planarSourceOfBody3(body);if(planar)return boundaryPlanarMaterial3(planar);
+ if(nativePlanarOperand3(body))return boundaryPlanarMaterial3(planarSourceOfBody3(body)??planarSolidFromBoundary3(body.topology));
+ if(body.construction.kind==='extrude')throw new RangeError('Mixed Body Boolean does not yet support curved-profile Extrude operands');
  if(body.construction.kind==='box'){const c=body.construction;return boundaryBoxMaterial3(decodeRationalPoint3(c.origin),c.size[0],c.size[1],c.size[2]);}
  const material=cylinderMaterialSourceOfBody3(body);if(material)return material;const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return clipped;const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return clipFiniteCylinderExpression3(cut.source,[cut.cut]);let source=finiteCylinderExpressionSourceOfBody3(body);const binary=finiteCylinderBooleanSourceOfBody3(body);if(!source&&binary)source=boundaryFiniteCylinderExpression3([binary.first,binary.second],{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}});if(source)return clipFiniteCylinderExpression3(source,[]);const c=cylinderSourceOfBody3(body),base=prepareFiniteCylinder3(c.cylinder,c.lower,c.upper);if(body.construction.kind==='cylinder')return boundaryCylinderMaterialExpression3([base],[],{kind:'cylinder',cylinder:0});return clipFiniteCylinderExpression3(boundaryFiniteCylinderExpression3([base],{kind:'operand',operand:0}),c.planes.map(plane=>({plane,side:-1 as const})));
 }

@@ -442,3 +442,26 @@ product Extrude Body mixed-Boolean lowering: the mass adapter can convert its
 straight planar topology, but mixed operand selection still handles explicit
 planar sources/Box/cylinder families only. Do not infer native Extrude Boolean
 coverage from the successful createPlanarBody3/extrudePolygon fixtures.
+
+### Planar moment full regression completed
+
+The source74/moment snapshot passed all 863 non-hard tests in one invocation
+(634,137 ms), including all nine volume-moment cases and historical Body readers.
+This predates the later straight-product Extrude mixed operand dispatch.
+
+### Native straight-profile Extrude mixed Body dispatch
+
+Recognize actual owned product Extrude planar supports, then use the exact
+straight/rational planar converter rather than falling through cylinder-only
+source lookup. Two eligible planar/product operands dispatch to the native
+planar Boolean kernel; eligible product/cylinder pairs use the material compiler
+and local formula composition. Curved-profile product Extrude remains explicitly
+unsupported. No caller flag or unchecked cast supplies planar certification.
+
+Four new cases passed across three initial tests and a targeted reverse case:
+restored concave native Extrude pair Booleans/regularized seams, a real cylinder
+intersecting a holed Extrude, curved rejection, and reversed cylinder-minus-
+Extrude producing a rational planar tunnel with independently checked volume,
+centroid and central inertia. Build, strict typing and the existing scoped audit
+passed. The 13 prior mixed-Body/contact cases are still running; no later broad
+source pass is claimed. See straight-extrude-mixed-body3.md for accepted inputs.

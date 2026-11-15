@@ -73,8 +73,6 @@ added targeted integrations/scale checks. Independent expectations include:
   volume 10^-150 and nonzero exact central inertia.
 
 The existing constructed/planar Body regression invocation passed all 22 cases.
-Build, standalone strict typing and the existing scoped audit passed. The prior
-native-pair kernel snapshot passed 854 non-hard tests; that predates this module
-and the wrapped-curve conversion extension, so it is not a full pass for this
-new source. A complete non-hard snapshot including the new moment cases is now running;
-its result remains a separate requirement.
+Build, standalone strict typing and the existing scoped audit passed. The moment/source74 snapshot subsequently passed all 863 non-hard tests in one
+invocation, including these nine cases and historical Body readers. That snapshot
+predates later product-Extrude Boolean dispatch work.
