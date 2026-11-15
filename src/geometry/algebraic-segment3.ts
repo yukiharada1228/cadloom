@@ -53,6 +53,9 @@ export function pointOnAlgebraicSegment3(inputPoint:Point3|AlgebraicCoordinates3
   const certified=lineCache.get(s.start)?.get(s.end);
   if(certified){
     if(p===s.start||p===s.end)return true;
+    // Coordinate bounds are necessary even before line membership is known.
+    // Reject distant endpoints before comparing unrelated algebraic line fields.
+    for(const axis of axes){const order=s.start[axis].compare(s.end[axis]),lo=order<=0?s.start[axis]:s.end[axis],hi=order<=0?s.end[axis]:s.start[axis];if(p[axis].compare(lo)<0||p[axis].compare(hi)>0)return false;}
     if(!liesOnLine(p,certified))return false;
     // A nonzero coordinate of the rational direction is injective on this
     // certified line, including a degenerate segment. One interval suffices.

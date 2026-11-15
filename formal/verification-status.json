@@ -43,7 +43,7 @@
     "src/geometry/circle3.ts": "7b4ff1a316c7bfe07b603afacc6d58c3986548be2d8acb9a8f43cbc52f78a9d5",
     "src/geometry/brep-topology3.ts": "7738ec1b40a84f4b1302d4b9c58b96c70c588c52f911b18bbf418e49d3ff2f4b",
     "src/geometry/planar-face3.ts": "97635a4af8ad28423b49a1a92307d751143c82514c3e90fdae8263eeffacb0b9",
-    "src/geometry/algebraic-segment3.ts": "c9d56a15cfc668ccffbf5a243135bcf716c0c83bfb5b761f9f504e298d411be6",
+    "src/geometry/algebraic-segment3.ts": "15ce937808c06199e46b6fc0eb493dfa70ea00033937338932944c01d1a7e26f",
     "src/geometry/cylinder-face3.ts": "ce15c7027222cd12d046a1e8bb78ad26d21c939165a29432d8c34053d00c292d",
     "src/geometry/extruded-brep3.ts": "6eb174b4cb30bb862a919b25de7d37f06a9e5f91c90d1e1d543da2ebb668575b",
     "src/geometry/plane-frame3.ts": "37aebb3aeae6c6d3a648e36946b1b5e89b71e1338a18c36bfdd8abe181bf8151",
