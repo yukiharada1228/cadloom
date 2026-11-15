@@ -1212,3 +1212,9 @@ body.faces; // 同じ手順で復元・照合した面領域
 npm run build
 node examples/face-domain-record3.ts
 ```
+
+## 凸な平面多角形の厳密な分割
+
+`partitionConvexPolygonByPlanes3(vertices, planes)`は有理座標の凸な平面多角形を複数の平面で分割します。三角形化の対角線を追加せず、各片の`polygon`、入力平面順の内部符号`signs`、厳密な内部点`witness`を返します。切断境界は両側に含まれ、面全体と一致する平面の符号は0です。入力の向きと同一直線上を前進する境界頂点を保持します。
+
+非平面・非凸・自己交差・後戻り・重複頂点・面積0の境界を拒否します。穴や曲線辺は対象外です。これはB-repの面分割に向けた基礎処理で、共有辺の更新や立体の成立を認定するAPIではありません。[構成と検証範囲](docs/proofs/convex-polygon-plane-arrangement3.md)。

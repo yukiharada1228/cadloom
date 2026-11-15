@@ -155,10 +155,11 @@
         "src/geometry/trimmed-planar3.ts",
         "src/geometry/trimmed-cylinder3.ts",
         "src/geometry/sew-brep3.ts",
-        "src/geometry/clipped-cylinder-split3.ts"
+        "src/geometry/clipped-cylinder-split3.ts",
+        "src/geometry/convex-polygon-plane-arrangement3.ts"
       ],
       "status": "partial",
-      "gap": "Plane splitting of selected domains and analytic sewing exist; arbitrary face/face noding, splitting and sewing are missing."
+      "gap": "Exact supporting-plane subdivision of rational convex polygons, plane splitting of selected analytic domains and analytic sewing exist; common Body face/edge updates, arbitrary face/face noding and general splitting/sewing remain missing."
     },
     {
       "id": "boolean",

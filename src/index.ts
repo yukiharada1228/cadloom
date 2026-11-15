@@ -177,3 +177,6 @@ export {encodePlanarDomain3,encodeCylinderDomain3,encodeTrimmedPlanarDomain3,enc
 export type {DecodedFaceDomain3} from './convert/face-domain3.js';
 export {restoreNativeBRepFaces3} from './convert/native-faces3.js';
 export type {NativeBRepFaces3} from './convert/native-faces3.js';
+
+export {partitionConvexPolygonByPlanes3} from './geometry/convex-polygon-plane-arrangement3.js';
+export type {ConvexPolygonPlaneCell3} from './geometry/convex-polygon-plane-arrangement3.js';
