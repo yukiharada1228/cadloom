@@ -333,3 +333,6 @@ export type {PlanarMaterialSupportOrigin3,PlanarMaterialSurface3,PlanarMaterialS
 
 export {classifyCylinderMaterialWall3,boundaryCylinderMaterialWall3,boundaryCylinderMaterialSurfaces3} from './geometry/cylinder-material-surfaces3.js';
 export type {CylinderWallMaterialCell3,CylinderMaterialWallClassification3,CylinderMaterialWallBoundary3,CylinderMaterialSurfaces3} from './geometry/cylinder-material-surfaces3.js';
+
+export {boundaryMaterialSurfaces3} from './geometry/material-surface-boundary3.js';
+export type {MaterialSurfaceFaceOrigin3,MaterialSurfaceBoundaryOptions3,MaterialSurfaceBoundary3} from './geometry/material-surface-boundary3.js';
