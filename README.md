@@ -1310,3 +1310,9 @@ node examples/face-domain-record3.ts
 支持面への所属は曲線全体について検査します。端点と代表点だけが別の円柱上にある反例も拒否します。異なる円柱パラメータ化や、同じ楕円を表す既存曲線とSSI辺も接続できます。閉じた接続は有界面・埋め込み・材料の認定ではありません。任意の未指定交点の発見、パラメータ境界との対応、Body保存形式への採用、曲面ブーリアンは残っています。[構成と検証範囲](docs/proofs/mixed-brep3.md)。
 
 `npm run build && node examples/mixed-brep3.ts`で、異なる半径の直交円柱の交線を三つの面の共有境界へ接続する例を実行できます。
+
+### 有界な円柱面同士の交線
+
+`clipCylinderIntersectionToFaces3(graph, firstFace, secondFace)`は、所有された円柱SSIグラフを二つの`PreparedCylinderFace3`の閉じた領域へ制限します。高さだけでなく、無理数座標の端点を持つ角度範囲、大きな角度範囲、周期の継ぎ目も扱います。曲線片と点だけの接触を区別し、既に切り取られた入力部分を復活させません。支持円柱は面の順序・軸の原点移動・非零の軸倍率に対して幾何学的に照合します。
+
+入力面の領域を再構築するため、外部の`locate`コールバックは信頼しません。対象は非平行な支持円柱の`bounded`グラフです。有界面そのものの分割・パラメータ曲線・曲面ブーリアンは引き続き必要です。[構成と検証範囲](docs/proofs/cylinder-intersection-face3.md)。実行例は`npm run build && node examples/cylinder-ssi-face-trims3.ts`です。

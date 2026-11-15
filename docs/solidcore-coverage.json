@@ -147,10 +147,11 @@
         "src/geometry/nurbs-plane-section3.ts",
         "src/geometry/cylinder-cylinder3.ts",
         "src/geometry/cylinder-intersection-plane3.ts",
-        "src/geometry/cylinder-intersection-support3.ts"
+        "src/geometry/cylinder-intersection-support3.ts",
+        "src/geometry/cylinder-intersection-face3.ts"
       ],
       "status": "partial",
-      "gap": "Rational cylinder supporting SSI graphs, rational-plane sections and whole native-support identity checks bind owned SSI arcs to mixed BRep edges. General NURBS SSI, face-domain/pcurve correspondence and persistent mixed Bodies remain incomplete."
+      "gap": "Owned bounded cylinder SSI graphs restrict exactly to both finite height/angular face domains, including algebraic angular endpoints and isolated contacts. Parallel/coincident face intersections, general NURBS SSI, oriented pcurves and persistent mixed Bodies remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -167,10 +168,11 @@
         "src/ops/cylinder-body-split3.ts",
         "src/geometry/cylinder-cylinder3.ts",
         "src/geometry/cylinder-intersection-plane3.ts",
-        "src/geometry/sew-mixed-brep3.ts"
+        "src/geometry/sew-mixed-brep3.ts",
+        "src/geometry/cylinder-intersection-face3.ts"
       ],
       "status": "partial",
-      "gap": "Planar/cylinder Body cuts, SSI plane subdivision and endpoint-noded native/SSI shared-edge sewing exist, including reparameterized and elliptic overlap matching. Missing interior intersections are not discovered; bounded curved face splitting, pcurves, embedding and general curved Booleans remain incomplete."
+      "gap": "Finite cylinder height/angular domains now restrict owned SSI graphs, with exact generator events and contacts. Native/SSI shared-edge sewing remains incidence-level; SSI-trimmed bounded face construction/splitting, pcurves, embedding and general curved Booleans remain incomplete."
     },
     {
       "id": "boolean",

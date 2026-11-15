@@ -1,12 +1,13 @@
+import {cylinderCoordinates3} from './cylinder-coordinates3.js';
 import {Rational} from '../numeric/rational.js';
 import {exactRational} from '../numeric/polynomial.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
-import {point3,vector3,dot3,subtract3} from './point3.js';
+import {point3,vector3,dot3} from './point3.js';
 import type {Point3,Vector3} from './point3.js';
 import {cylinder3,classifyPointToSurface3} from './surface3.js';
 import type {Cylinder3} from './surface3.js';
-import {algebraicCoordinates3,algebraicPoint3,snapshotExactPoint3,getPointParameterization3,translateAlgebraicPoint3} from './algebraic-point3.js';
+import {algebraicCoordinates3,snapshotExactPoint3,translateAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3} from './algebraic-segment3.js';
 import {reverseCurve3} from './curve3.js';
@@ -42,7 +43,6 @@ export interface PreparedCylinderFace3 {
 }
 const axes=['x','y','z'] as const;
 function scale(v:Vector3,t:Rational):Vector3{return vector3(v.x.mul(t),v.y.mul(t),v.z.mul(t));}
-function linear(p:AlgebraicCoordinates3,v:Vector3,offset:Rational):AlgebraicReal{return p.x.affine(v.x,offset).add(p.y.affine(v.y)).add(p.z.affine(v.z));}
 export function prepareCylinderFace3(input:Cylinder3,inputLower:ExactInput,inputUpper:ExactInput,options:CylinderFaceOptions3={}):PreparedCylinderFace3 {
   const surface=cylinder3(input.axis,input.radiusSquared),lower=exactRational(inputLower),upper=exactRational(inputUpper),sense=options.sense??1,o=surface.axis.origin,d=surface.axis.direction,D=dot3(d,d);
   if(lower.compare(upper)>=0)throw new RangeError('Cylinder face requires strictly increasing axial bounds');
@@ -52,29 +52,11 @@ export function prepareCylinderFace3(input:Cylinder3,inputLower:ExactInput,input
   const direction=dot3(raw.circle.normal,d).sign()>0?raw.direction:raw.direction==='ccw'?'cw':'ccw';
   const angular=circularArc3(base,direction==='ccw'?raw.start:raw.end,direction==='ccw'?raw.end:raw.start,{direction:'ccw',fullCircle:raw.fullCircle});
   if(!angular.fullCircle&&angular.start.x.compare(angular.end.x)===0&&angular.start.y.compare(angular.end.y)===0&&angular.start.z.compare(angular.end.z)===0)throw new RangeError('Cylinder angular patch requires positive extent');
-  function parameter(p:AlgebraicCoordinates3):AlgebraicReal {
-    const data=getPointParameterization3(p);
-    if(data)return data.parameter.affine(dot3(data.direction,d).div(D),dot3(subtract3(data.origin,o),d).div(D));
-    return linear(p,scale(d,new Rational(1n).div(D)),dot3(o,d).neg().div(D));
-  }
-  // Project along the axis onto the reference circle plane. Registered affine
-  // coordinates remain affine in the same parameter, avoiding field-degree growth.
-  function reference(p:AlgebraicCoordinates3):AlgebraicCoordinates3 {
-    const data=getPointParameterization3(p);
-    if(data){
-      const t0=dot3(subtract3(data.origin,o),d).div(D),rate=dot3(data.direction,d).div(D);
-      return algebraicPoint3(subtract3(data.origin,scale(d,t0)),subtract3(data.direction,scale(d,rate)),data.parameter);
-    }
-    const component=(k:typeof axes[number])=>{
-      const row=vector3(...axes.map(j=>(j===k?new Rational(1n):new Rational(0n)).sub(d[k].mul(d[j]).div(D))) as [Rational,Rational,Rational]);
-      return linear(p,row,d[k].mul(dot3(o,d)).div(D));
-    };
-    return algebraicCoordinates3(component('x'),component('y'),component('z'));
-  }
+  const reference=(p:AlgebraicCoordinates3)=>cylinderCoordinates3(surface,p).base;
   const locate:PreparedCylinderFace3['locate']=inputPoint=>{
     const p=snapshotExactPoint3(inputPoint);if(classifyPointToSurface3(p,{kind:'cylinder',cylinder:surface})!==0)return 'outside';
-    const t=parameter(p),lo=t.compare(AlgebraicReal.fromRational(lower)),hi=t.compare(AlgebraicReal.fromRational(upper));if(lo<0||hi>0)return 'outside';
-    const position=angular.fullCircle?'interior':locatePointOnArc3(reference(p),angular);
+    const coordinates=cylinderCoordinates3(surface,p),t=coordinates.height,lo=t.compare(AlgebraicReal.fromRational(lower)),hi=t.compare(AlgebraicReal.fromRational(upper));if(lo<0||hi>0)return 'outside';
+    const position=angular.fullCircle?'interior':locatePointOnArc3(coordinates.base,angular);
     return position==='outside'?'outside':lo===0||hi===0||position==='endpoint'?'boundary':'inside';
   };
   const at=(t:Rational)=>{

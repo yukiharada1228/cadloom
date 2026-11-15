@@ -207,3 +207,4 @@ export {nativeBRepCurve3,cylinderIntersectionBRepCurve3,snapshotBRepCurve3,brepC
 export type {BRepCurve3} from './geometry/brep-curve3.js';
 export {sewMixedBRepFaces3} from './geometry/sew-mixed-brep3.js';
 export type {MixedBRepFace3,SewnMixedBRep3} from './geometry/sew-mixed-brep3.js';
+export {clipCylinderIntersectionToFaces3} from './geometry/cylinder-intersection-face3.js';

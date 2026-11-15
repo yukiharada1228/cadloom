@@ -117,6 +117,10 @@ export function splitCylinderIntersectionArc3(arc:CylinderIntersectionArc3,input
   return Object.freeze(pieces.map(base=>{const baseSample=interiorPointOnArc3(base),next=Object.freeze({first:arc.first,second:arc.second,base,branch:arc.branch,start:points.find(p=>same(p.q,base.start))!.p,end:points.find(p=>same(p.q,base.end))!.p,baseSample,sample:lift(f,baseSample,arc.branch)});arcFamilies.set(next,f);return next;}));
 }
 export function assertOwnedCylinderIntersectionGraph3(input:BoundedCylinderIntersection3):void {if(!boundedFamilies.has(input))throw new RangeError('Expected a factory-created bounded cylinder intersection graph');}
+/** Internal support identity even when a clipped graph has no remaining arcs. */
+export function cylinderIntersectionSupports3(input:BoundedCylinderIntersection3):readonly [Cylinder3,Cylinder3] {
+  assertOwnedCylinderIntersectionGraph3(input);const f=boundedFamilies.get(input)!;return Object.freeze([f.first,f.second]);
+}
 /** Internal subset graph construction; all arcs and points remain on the same
  * certified supporting pair. Does not claim the subset is the full SSI. */
 export function rebuildCylinderIntersectionGraph3(input:BoundedCylinderIntersection3,arcs:readonly CylinderIntersectionArc3[],points:readonly AlgebraicCoordinates3[]):BoundedCylinderIntersection3 {
