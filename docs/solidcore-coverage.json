@@ -156,7 +156,8 @@
         "src/geometry/cylinder-intersection-plane3.ts",
         "src/geometry/cylinder-intersection-support3.ts",
         "src/geometry/cylinder-intersection-face3.ts",
-        "src/geometry/cylinder-intersection-cylinder3.ts"
+        "src/geometry/cylinder-intersection-cylinder3.ts",
+        "src/geometry/curve-noding3.ts"
       ],
       "status": "partial",
       "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI recovery. Finite-cylinder expression plane sections and closed cut boundaries exist. General analytic/NURBS SSI, complete contact relations and broader clipped-material operations remain incomplete."
@@ -183,10 +184,11 @@
         "src/geometry/cylinder-face-finite-cylinder3.ts",
         "src/geometry/planar-face-cylinder-partition3.ts",
         "src/geometry/planar-face-finite-cylinder3.ts",
-        "src/geometry/finite-cylinder-boolean3.ts"
+        "src/geometry/finite-cylinder-boolean3.ts",
+        "src/geometry/curve-noding3.ts"
       ],
       "status": "partial",
-      "gap": "Finite-cylinder wall/cap partitions now select and sew balanced native/SSI Boolean material boundaries, including coincident/opposed faces and contact diagnostics. General repeated curved cuts, maximal consolidation, persistent regions and common mixed Body adoption remain incomplete."
+      "gap": "Finite-cylinder wall/cap partitions select and sew balanced native/SSI Boolean boundaries with supported common Body persistence. Shared bounded native curve events retain source indexes; upstream cuts feed native and mixed sewing. Finite coplanar lines/conic arcs now enter the common planar strip decomposition, including finite face sections and dangling endpoints. Artificial vertical edges remain. General curved face insertion, complete material-side certification, repeated general curved cuts and maximal consolidation remain incomplete."
     },
     {
       "id": "boolean",
@@ -209,10 +211,11 @@
         "src/geometry/convex-planar-material3.ts",
         "src/geometry/planar-material-program3.ts",
         "src/geometry/planar-material-chambers3.ts",
-        "src/geometry/planar-material-boundary3.ts"
+        "src/geometry/planar-material-boundary3.ts",
+        "src/geometry/surface-germ3.ts"
       ],
       "status": "partial",
-      "gap": "Owned planar and finite-cylinder material supports exact queries, shell regions and common Body replay, including repeated halfspace clipping. Bounded cylinder/plane predicates now preserve operand-local cuts through common Body Booleans, derived regions, complete domain persistence and replay/reuse. Nonmanifold material remains lower-level only. An exact six-plane box bridge now composes with cylinder materials at the kernel boundary layer. Native owned/restored Box Bodies now compose with cylinder-family Bodies through booleanMixedBodies3 and replayable material recipes. An owned convex single-shell planar-material bridge now derives exact supporting halfspaces; actual convex planar/consolidated Body sources now enter mixed Booleans with complete replay. General owned planar material now also compiles from physical-plane chambers and constructs sewn boundaries with common Body replay; focused cases include concavity, nested cavities/islands/disconnected shells and through-holes. Native planar/consolidated mixed Body dispatch uses convex supports or chambers; five focused native concave/disconnected/void/empty composition, replay and repeated-cut cases passed. Actual owned planar pairs now dispatch to the checked native planar Boolean kernel with focused regularized shared-plane contact, replay and subsequent cylinder-reuse checks. Actual owned/restored straight-profile product Extrude now lowers through exact planar conversion, including through-hole and reversed real-cylinder composition in focused tests. Actual normalized circular-loop product Extrude now lowers to finite-cylinder parity with owned product provenance and exact full-circle coverage checks, including annuli, islands/disconnected components and non-unit-axis spatial composition in focused cases. General arc-line and different-circle arc product lowering remains incomplete. Broader mixed contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete."
+      "gap": "Owned planar and finite-cylinder material supports exact queries, shell regions and common Body replay, including repeated halfspace clipping. Bounded cylinder/plane predicates now preserve operand-local cuts through common Body Booleans, derived regions, complete domain persistence and replay/reuse. Nonmanifold material remains lower-level only. An exact six-plane box bridge now composes with cylinder materials at the kernel boundary layer. Native owned/restored Box Bodies now compose with cylinder-family Bodies through booleanMixedBodies3 and replayable material recipes. An owned convex single-shell planar-material bridge now derives exact supporting halfspaces; actual convex planar/consolidated Body sources now enter mixed Booleans with complete replay. General owned planar material now also compiles from physical-plane chambers and constructs sewn boundaries with common Body replay; focused cases include concavity, nested cavities/islands/disconnected shells and through-holes. Native planar/consolidated mixed Body dispatch uses convex supports or chambers; five focused native concave/disconnected/void/empty composition, replay and repeated-cut cases passed. Actual owned planar pairs now dispatch to the checked native planar Boolean kernel with focused regularized shared-plane contact, replay and subsequent cylinder-reuse checks. Actual owned/restored straight-profile product Extrude now lowers through exact planar conversion, including through-hole and reversed real-cylinder composition in focused tests. Actual normalized circular-loop product Extrude now lowers to finite-cylinder parity with owned product provenance and exact full-circle coverage checks, including annuli, islands/disconnected components and non-unit-axis spatial composition in focused cases. General arc-line and different-circle arc product lowering remains incomplete. Broader mixed contact coverage, maximal curved consolidation and general analytic/NURBS Booleans remain incomplete. Exact two-sided straight germs of planes/cylinders are shared with material boundary queries; these point germs do not certify a whole partition cell."
     },
     {
       "id": "sweep",
