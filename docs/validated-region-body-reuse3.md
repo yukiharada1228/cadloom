@@ -16,6 +16,14 @@ The connected 25-test group passed against an isolated source-35 build, includin
 
 The existing scoped Lean audit passed all 133 declared theorems after updating the reviewed source manifest. These declarations do not prove this new runtime reuse path.
 
-The full source-35 broad suite subsequently passed all 767 tests outside the unchanged two-test hard oblique file in one isolated invocation (103913 ms). This includes the historical fixture and both new certificate/reuse tests. The unchanged source-35 hard integration remains live; no measured speedup or complete latest-source oblique result is established by the broad suite.
+The full source-35 broad suite subsequently passed all 767 tests outside the unchanged two-test hard oblique file in one isolated invocation (103913 ms). This includes the historical fixture and both new certificate/reuse tests. That broad suite alone did not establish the hard result; the subsequent complete integration is recorded below.
 
-The preceding source-34 sewing snapshot completed its unchanged hard oblique run successfully with status 0: both tests passed, Body ended at 807441 ms and total duration was 807495 ms. Together with its 764-test broad run and separately passing historical fixture, this establishes the scoped source-34 integration before region reuse. The source-35 reuse run remains separate and live; elapsed durations are not controlled comparisons.
+The preceding source-34 sewing snapshot completed its unchanged hard oblique run successfully with status 0: both tests passed, Body ended at 807441 ms and total duration was 807495 ms. Together with its 764-test broad run and separately passing historical fixture, this establishes the scoped source-34 integration before region reuse. The source-35 reuse run is separate; elapsed durations are not controlled comparisons.
+
+## Completed source-35 integration
+
+The retained source-35 hard process completed with status 0 and both unchanged tests passed. Boundary ended at 289469 ms, independent material-grid checks ended at 289478 ms, Body ended at 530091 ms and total reported duration was 530173 ms. Assertions retain manifold/closed boundary, a selected third-operand SSI face, more than 100 strict independent rational material queries, common Body adoption and location of all interior samples. The isolated test differs only in compiled import path and phase logging; no shape or assertion was weakened.
+
+Together with the 767-test non-hard suite, all 769 distinct current tests have passing evidence across these two runs. The existing 133-declaration scoped audit also passed; it is not a proof of the new execution path. Source runtime corresponds to `8bd335f`; subsequent commits only document results.
+
+The roughly 8 minute 50 second total and the preceding snapshot's timing are diagnostic observations under different concurrent/debugger conditions, not a controlled speedup benchmark. Correctness and removal of the duplicate restoration are established here; interactive performance, general curved/contact/NURBS Booleans and full SolidCraft parity remain incomplete.
