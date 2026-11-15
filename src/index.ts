@@ -303,3 +303,6 @@ export {boundaryPlanarMaterial3} from './geometry/planar-material-boundary3.js';
 export type {PlanarMaterialProgram3} from './geometry/planar-material-program3.js';
 export {compilePlanarChambers3} from './geometry/planar-material-chambers3.js';
 export type {PlanarChamberProgram3} from './geometry/planar-material-chambers3.js';
+export {planarVolumeMoments3} from './geometry/planar-volume-moments3.js';
+export type {PlanarVolumeMoments3,RationalMatrix3} from './geometry/planar-volume-moments3.js';
+export {planarBodyVolumeMoments3} from './ops/volume-moments3.js';

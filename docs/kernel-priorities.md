@@ -409,3 +409,29 @@ including all six contact/dispatch/reuse cases. That later full result is pendin
 The existing scoped 133-declaration audit passed for the native-pair source;
 whole TypeScript execution verification and general analytic/NURBS parity remain
 outside these successful gates.
+
+### Native planar-pair full regression completed
+
+The source71/native-pair snapshot passed all 854 non-hard tests in one invocation
+(622,092 ms), including all six contact/dispatch/reuse cases and the historical
+reader. This predates the new volume-moment module and its conversion extension.
+
+### Exact planar volume moments
+
+Add `planarVolumeMoments3` and the owned common Body adapter
+`planarBodyVolumeMoments3`: exact rational volume, centroid and unit-density
+inertia about the world origin and centroid. Integrate signed reference-relative
+surface tetrahedra, preserving cavity/island/disconnected signs and checking
+volume against the prepared source certificate. Empty material has a null
+centroid and zero tensors; unsupported curved geometry is never reported as zero.
+The rational planar converter now also accepts actual wrapped native line edges,
+with the same straight-edge/rational-vertex and embedded-solid validation.
+
+All nine distinct new cases passed across the initial six and three targeted
+additions. Tests use independent cuboid/simplex/affine covariance expectations,
+subdivision, common Body variants, native concave Boolean replay, a through-hole
+and extreme rational scales/positions. The existing 22 constructed/planar Body
+cases passed in one invocation. Build, strict typing and the existing scoped
+133-declaration audit passed; no new mechanical moment/TypeScript proof is
+claimed. Curved-body mass, surface area, certified integration and other M3
+capabilities remain incomplete. See planar-volume-moments3.md for units/formulas.

@@ -254,10 +254,12 @@
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/mass.rs",
       "localPaths": [
         "src/geometry/mesh3.ts",
-        "src/geometry/solid3.ts"
+        "src/geometry/solid3.ts",
+        "src/geometry/planar-volume-moments3.ts",
+        "src/ops/volume-moments3.ts"
       ],
       "status": "partial",
-      "gap": "Some polyhedral quantities exist; curved-body volume/area/centroid/inertia with explicit exact or certified numeric results are missing."
+      "gap": "Owned rational planar material now supports exact volume, centroid and unit-density origin/central inertia, including cavities, islands, disconnected material, native/wrapped planar Body variants and replayed Boolean results in focused cases. Curved-body volume/area/centroid/inertia, general surface area and certified integration remain incomplete."
     },
     {
       "id": "query",

@@ -8,6 +8,8 @@ import {encodePlanarDomain3} from './face-domain3.js';
 import {triangulatePolygon} from '../geometry/triangulate.js';
 import {preparePlanarSolid3} from '../geometry/planar-solid3.js';
 import type {BRepTopology3} from '../geometry/brep-topology3.js';
+import type {Curve3} from '../geometry/curve3.js';
+import type {BRepCurve3} from '../geometry/brep-curve3.js';
 /** Internal exact polygon-to-existing-chart-domain bridge. */
 export function encodePlanarPolygonDomain3(polygon:readonly Point3[],normal:Point3){
   const origin=polygon[0]!,u=subtract3(polygon[1]!,origin),v=cross3(normal,u),frame=planeFrame3(origin,u,v),U=dot3(u,u),V=dot3(v,v);
@@ -18,7 +20,7 @@ export function encodePlanarPolygonDomain3(polygon:readonly Point3[],normal:Poin
  * material geometry. Nonconvex faces and holes are decomposed exactly in charts;
  * curved edges/surfaces and nonrational vertices fail explicitly.
  */
-export function planarSolidWithFaceOrigins3(t:BRepTopology3){
+export function planarSolidWithFaceOrigins3(t:BRepTopology3<Curve3|BRepCurve3>){
   const polygons:Point3[][]=[],faceOrigins:number[]=[];
   for(const [faceId,face] of t.faces.entries()){
     if(face.surface.kind!=='plane')throw new RangeError('Planar Body operations do not support curved surfaces');
@@ -26,7 +28,8 @@ export function planarSolidWithFaceOrigins3(t:BRepTopology3){
     const seed=n.x.sign()===0?point3(1n,0n):n.y.sign()===0?point3(0n,1n):point3(0n,0n,1n),v=cross3(n,seed),u=cross3(v,n),U=dot3(u,u),V=dot3(v,v);
     const rings=face.loops.map(id=>t.loops[id]!.coedges.map(id=>{
       const coedge=t.coedges[id]!,edge=t.edges[coedge.edge]!;
-      if(edge.curve.kind!=='line'&&edge.curve.kind!=='algebraic-segment')throw new RangeError('Planar Body operations require straight boundary edges');
+      const curve=edge.curve.kind==='native'?edge.curve.curve:edge.curve;
+      if(curve.kind!=='line'&&curve.kind!=='algebraic-segment')throw new RangeError('Planar Body operations require straight boundary edges');
       const p=t.vertices[coedge.origin]!;if(p.x.rational===null||p.y.rational===null||p.z.rational===null)throw new RangeError('Planar Body operations require rational vertices');
       const q=subtract3(point3(p.x.rational,p.y.rational,p.z.rational),origin);return point2(dot3(q,u).div(U),dot3(q,v).div(V));
     }));
@@ -38,4 +41,4 @@ export function planarSolidWithFaceOrigins3(t:BRepTopology3){
   return Object.freeze({solid:preparePlanarSolid3(polygons),faceOrigins:Object.freeze(faceOrigins)});
 }
 
-export function planarSolidFromBoundary3(t:BRepTopology3){return planarSolidWithFaceOrigins3(t).solid;}
+export function planarSolidFromBoundary3(t:BRepTopology3<Curve3|BRepCurve3>){return planarSolidWithFaceOrigins3(t).solid;}
