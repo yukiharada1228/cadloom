@@ -1,7 +1,8 @@
 # Planar material from physical-plane chambers
 
-Status: implemented as the separate `compilePlanarChambers3` API; the existing
-parity compiler and public boundary wrapper are unchanged.
+Status: `compilePlanarChambers3` is now used by `boundaryPlanarMaterial3`. The
+original cone-parity compiler remains available, and historical stored material
+expressions still replay through the unchanged complete material backend.
 
 The current cone-parity compiler adds internal tetrahedron carriers. For the
 extruded L fixture it produces 21 carriers, and the existing exact material
@@ -81,3 +82,20 @@ cooriented shells, void and material membership, bounded face witnesses and
 post-replay original Body queries. The scoped source/Lean audit passed its
 existing 133 declarations; this is not a proof of the new chamber algorithm or
 of full TypeScript execution. The tests also passed standalone strict typing.
+
+## Broader boundary integration
+
+Two further full boundary/replay cases passed on the same compiler: nested
+cavity, material island and a disconnected cube (four shells, three material
+regions, all face samples, 324 independent strict points and five bounded
+boundary queries); and an extruded through-hole (one shell/region, 100 strict
+points and bounded tunnel/cap queries). The former took 262,010 ms and the latter
+13,965 ms under concurrent work. No controlled speedup is asserted.
+
+After connecting the public boundary entry point, its existing five compiler/
+tetrahedron integration cases passed in 49,687 ms. The scoped 133-declaration
+audit passed. The full non-hard regression invocation is running, including the
+immutable historical 275-face reader fixture. Native mixed-Boolean planar
+dispatch remains convex-only at this milestone. The resource example explicitly
+uses the original 21-plane cone compiler, preserving its difficult condition
+while the public API evolves; its strengthened retained run is still pending.

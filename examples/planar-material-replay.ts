@@ -1,16 +1,19 @@
 import assert from 'node:assert/strict';
 import {memoryUsage} from 'node:process';
-import {point2,point3,triangle3,extrudePolygon,preparePlanarSolid3,boundaryPlanarMaterial3,bodyFromCylinderMaterial3,serializeBody3,restoreBody3,locateBody3,locateBodyFace3,surfacesCoincide3,Rational} from '../dist/index.js';
+import {point2,point3,triangle3,extrudePolygon,preparePlanarSolid3,compilePlanarMaterial3,boundaryCylinderMaterialExpression3,bodyFromCylinderMaterial3,serializeBody3,restoreBody3,locateBody3,locateBodyFace3,surfacesCoincide3,Rational} from '../dist/index.js';
 
 // Resource/integration reproduction: run after building, at the default heap.
 // Keep the original material and Body observable after restoring a second Body.
+// Pin the original 21-plane cone program even as the public boundary API evolves.
 const started=performance.now();
 const checkpoint=(phase:string)=>console.log(JSON.stringify({phase,elapsedMs:Math.round(performance.now()-started),memory:memoryUsage()}));
 checkpoint('start');
 const mesh=extrudePolygon([[point2(0n,0n),point2(2n,0n),point2(2n,1n),point2(1n,1n),point2(1n,2n),point2(0n,2n)]],2n);
 const source=preparePlanarSolid3(mesh.triangles.map(t=>triangle3(mesh.vertices[t[0]]!,mesh.vertices[t[1]]!,mesh.vertices[t[2]]!)));
 checkpoint('source');
-const raw=boundaryPlanarMaterial3(source);
+const program=compilePlanarMaterial3(source);
+assert.equal(program.planes.length,21);
+const raw=boundaryCylinderMaterialExpression3(program.cylinders,program.planes,program.expression);
 assert.ok(raw.manifold);
 assert.equal(raw.faces.length,275);
 for(const face of raw.faces){

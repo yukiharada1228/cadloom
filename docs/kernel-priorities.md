@@ -277,3 +277,20 @@ retained original Body queries. The six new cases passed as five initial cases
 plus the added cavity integration case, with standalone strict typing and the
 existing 133-declaration scoped audit. No general native planar Boolean dispatch
 or production compiler replacement is included in this additive milestone.
+
+### Physical-plane boundary API integration
+
+The chamber backend passed actual through-hole and nested cavity/island/
+disconnected boundary adoption and replay. Four shells and three regions survive
+the latter, with every face sample, 324 strict points and five bounded boundary
+queries. The through-hole case checks 100 strict points plus tunnel/cap seams.
+`boundaryPlanarMaterial3` now uses this compiler; its five existing compiler/
+tetrahedron checks passed, as did the existing scoped audit. Native planar mixed
+Boolean dispatch remains convex-only. The full non-hard suite is running.
+
+The retained replay example now explicitly calls the unchanged 21-plane cone
+compiler and complete material backend, retaining its 275-face resource gate.
+It must not silently become a smaller 14-face case when the public API changes.
+Its isolated previously launched run still uses the same original program and
+has reached serialization with the original state held; restoration is pending.
+Historical material recipes and backend replay ordering are unchanged.

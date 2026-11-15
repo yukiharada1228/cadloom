@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Rational,point2,point3,triangle3,extrudePolygon,preparePlanarSolid3,compilePlanarChambers3,compilePlanarMaterial3,evaluatePlane3,classifyPointToSurface3,boundaryCylinderMaterialExpression3,bodyFromCylinderMaterial3,serializeBody3,restoreBody3,locateBody3,locateBodyFace3,surfacesCoincide3} from '../dist/index.js';
+import {Rational,point2,point3,triangle3,extrudePolygon,preparePlanarSolid3,compilePlanarChambers3,compilePlanarMaterial3,boundaryPlanarMaterial3,evaluatePlane3,classifyPointToSurface3,boundaryCylinderMaterialExpression3,bodyFromCylinderMaterial3,serializeBody3,restoreBody3,locateBody3,locateBodyFace3,surfacesCoincide3} from '../dist/index.js';
 import type {CylinderMaterialExpression3,PlanarChamberProgram3,Point3} from '../dist/index.js';
 function box(a:bigint,b:bigint){const p=(x:bigint,y:bigint,z:bigint)=>point3(x?a:b,y?a:b,z?a:b);return [[p(1n,1n,1n),p(1n,0n,1n),p(0n,0n,1n),p(0n,1n,1n)],[p(1n,1n,0n),p(0n,1n,0n),p(0n,0n,0n),p(1n,0n,0n)],[p(1n,1n,1n),p(0n,1n,1n),p(0n,1n,0n),p(1n,1n,0n)],[p(1n,0n,1n),p(1n,0n,0n),p(0n,0n,0n),p(0n,0n,1n)],[p(1n,1n,1n),p(1n,1n,0n),p(1n,0n,0n),p(1n,0n,1n)],[p(0n,1n,1n),p(0n,0n,1n),p(0n,0n,0n),p(0n,1n,0n)]];}
 
@@ -39,7 +39,7 @@ test('empty planar material has no chambers and retains an immutable false progr
  const p=compilePlanarChambers3(preparePlanarSolid3([]));assert.equal(p.chambers,0);assert.equal(p.materialChambers,0);assert.equal(p.candidateVertices,0);assert.equal(p.planes.length,0);assert.ok(Object.isFrozen(p)&&Object.isFrozen(p.expression));for(const q of [point3('1/3','1/5','1/7'),point3(3n,4n,5n)])assert.equal(strict(p,q),false);
 });
 test('L chamber program constructs physical manifold faces and replays with the original Body retained',()=>{
- const source=lSource(),p=compilePlanarChambers3(source),raw=boundaryCylinderMaterialExpression3(p.cylinders,p.planes,p.expression);assert.ok(raw.manifold);assert.equal(raw.faces.length,14);
+ const source=lSource(),raw=boundaryPlanarMaterial3(source);assert.ok(raw.manifold);assert.equal(raw.faces.length,14);
  for(const f of raw.faces){assert.equal(f.origin.kind,'halfspace');assert.ok(source.topology.faces.some(g=>surfacesCoincide3(g.surface,f.surface)));const q=f.domain.sample;assert.ok(q.x.rational&&q.y.rational&&q.z.rational);assert.equal(source.locate(point3(q.x.rational,q.y.rational,q.z.rational)),'boundary');}
  const original=bodyFromCylinderMaterial3(raw),data=serializeBody3(original),body=restoreBody3(data);assert.ok(body.topology.closedOrientedIncidence);assert.equal(body.topology.issues.length,0);assert.equal(body.topology.shells.length,1);assert.equal(body.interiorSamples.length,1);body.faces.forEach((f,i)=>assert.equal(locateBodyFace3(body,i,f.sample),'inside'));
  for(const x of ['-1/2','1/2','3/2','5/2'])for(const y of ['-1/2','1/2','3/2','5/2'])for(const z of ['-1/2','1/2','3/2','5/2']){const q=point3(x,y,z),inside=[q.x,q.y,q.z].every(v=>between(v,0n,2n))&&(q.x.compare(new Rational(1n))<0||q.y.compare(new Rational(1n))<0);assert.equal(locateBody3(body,q),inside?'inside':'outside');}
@@ -52,4 +52,21 @@ test('cavity boundary chambers preserve void shell coorientation through common 
  const original=bodyFromCylinderMaterial3(raw),body=restoreBody3(serializeBody3(original));assert.equal(body.topology.shells.length,2);assert.ok(body.topology.closedOrientedIncidence);assert.equal(body.topology.issues.length,0);
  for(const [q,l] of [[point3('1/2','3/2','3/2'),'inside'],[point3('3/2','3/2','3/2'),'outside'],[point3(1n,'3/2','3/2'),'boundary'],[point3(0n,'3/2','3/2'),'boundary'],[point3('7/2','3/2','3/2'),'outside']] as const)assert.equal(locateBody3(body,q),l);
  body.faces.forEach((f,i)=>assert.equal(locateBodyFace3(body,i,f.sample),'inside'));for(const q of body.interiorSamples)assert.equal(locateBody3(body,q),'inside');assert.equal(locateBody3(original,point3('3/2','3/2','3/2')),'outside');
+});
+test('nested cavity, material island and disconnected chamber boundaries replay four shells and three regions',()=>{
+ const source=preparePlanarSolid3([...box(0n,6n),...box(1n,5n).map(f=>[...f].reverse()),...box(2n,4n),...box(8n,9n)]),p=compilePlanarChambers3(source),raw=boundaryCylinderMaterialExpression3(p.cylinders,p.planes,p.expression);
+ assert.ok(raw.manifold);assert.ok(raw.faces.every(f=>f.origin.kind==='halfspace'&&source.topology.faces.some(g=>surfacesCoincide3(g.surface,f.surface))));
+ const original=bodyFromCylinderMaterial3(raw),data=serializeBody3(original),body=restoreBody3(data);assert.equal(body.topology.shells.length,4);assert.equal(body.interiorSamples.length,3);assert.ok(body.topology.closedOrientedIncidence);assert.equal(body.topology.issues.length,0);body.faces.forEach((f,i)=>assert.equal(locateBodyFace3(body,i,f.sample),'inside'));
+ for(const x of ['-1/2','1/2','3/2','5/2','9/2','11/2','13/2','17/2','19/2'])for(const y of ['1/2','3/2','5/2','9/2','11/2','17/2'])for(const z of ['1/2','3/2','5/2','9/2','11/2','17/2']){
+  const q=point3(x,y,z),all=(a:bigint,b:bigint)=>[q.x,q.y,q.z].every(v=>between(v,a,b)),inside=all(0n,6n)&&(!all(1n,5n)||all(2n,4n))||all(8n,9n);assert.equal(locateBody3(body,q),inside?'inside':'outside');
+ }
+ for(const q of [point3(0n,'1/2','1/2'),point3(1n,'3/2','3/2'),point3(2n,'5/2','5/2'),point3(8n,'17/2','17/2'),point3(9n,'17/2','17/2')])assert.equal(locateBody3(body,q),'boundary');
+ for(const q of body.interiorSamples)assert.equal(locateBody3(body,q),'inside');assert.equal(locateBody3(original,point3('5/2','5/2','5/2')),'inside');assert.equal(serializeBody3(original),data);
+});
+test('through-hole chamber boundary retains one positive-genus shell without filling its tunnel on replay',()=>{
+ const mesh=extrudePolygon([[point2(0n,0n),point2(3n,0n),point2(3n,3n),point2(0n,3n)],[point2(1n,1n),point2(1n,2n),point2(2n,2n),point2(2n,1n)]],2n),source=preparePlanarSolid3(mesh.triangles.map(t=>triangle3(mesh.vertices[t[0]]!,mesh.vertices[t[1]]!,mesh.vertices[t[2]]!))),p=compilePlanarChambers3(source),raw=boundaryCylinderMaterialExpression3(p.cylinders,p.planes,p.expression);
+ assert.ok(raw.manifold);assert.ok(raw.faces.every(f=>f.origin.kind==='halfspace'&&source.topology.faces.some(g=>surfacesCoincide3(g.surface,f.surface))));
+ const original=bodyFromCylinderMaterial3(raw),body=restoreBody3(serializeBody3(original));assert.equal(body.topology.shells.length,1);assert.equal(body.interiorSamples.length,1);assert.ok(body.topology.closedOrientedIncidence);assert.equal(body.topology.issues.length,0);body.faces.forEach((f,i)=>assert.equal(locateBodyFace3(body,i,f.sample),'inside'));
+ for(const x of ['-1/2','1/2','3/2','5/2','7/2'])for(const y of ['-1/2','1/2','3/2','5/2','7/2'])for(const z of ['-1/2','1/2','3/2','5/2']){const q=point3(x,y,z),inside=between(q.x,0n,3n)&&between(q.y,0n,3n)&&between(q.z,0n,2n)&&!(between(q.x,1n,2n)&&between(q.y,1n,2n));assert.equal(locateBody3(body,q),inside?'inside':'outside');}
+ for(const [q,l] of [[point3(1n,'3/2',1n),'boundary'],[point3('3/2','3/2',0n),'outside'],[point3('3/2','3/2',2n),'outside'],[point3('1/2','3/2',0n),'boundary']] as const)assert.equal(locateBody3(body,q),l);for(const q of body.interiorSamples)assert.equal(locateBody3(body,q),'inside');assert.equal(locateBody3(original,point3('3/2','3/2',1n)),'outside');
 });

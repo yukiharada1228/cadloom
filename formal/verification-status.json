@@ -141,7 +141,7 @@
     "src/geometry/box-material3.ts": "53ecb636a14aed1097c1e24aa323d15fa4c25e9052b0c539df0aade0143db0cc",
     "src/geometry/convex-planar-material3.ts": "db232ad7371f0721ff9f422cb7dd4d2b497100bf1c14581d0b6c7d1d045709f1",
     "src/geometry/planar-material-program3.ts": "32af3855502d17dc158637db906b0dce1de372a9a15e052891cd0657aea4bcaa",
-    "src/geometry/planar-material-boundary3.ts": "46a837405f5803104633faa1d7e29f28a1d94588e7d1aef7c5f5828c81155de2",
+    "src/geometry/planar-material-boundary3.ts": "9e2a18992d0aac41bd6b9b168c8b6d54a93663166e20f3daf3894253954aad8f",
     "src/geometry/planar-material-chambers3.ts": "dc09e6062459541f2b07e5c770561cb06be9fcd0cbb91f29372e7bad39a5a8a8"
   },
   "checkedTheorems": [
