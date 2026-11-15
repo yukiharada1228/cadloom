@@ -294,3 +294,24 @@ It must not silently become a smaller 14-face case when the public API changes.
 Its isolated previously launched run still uses the same original program and
 has reached serialization with the original state held; restoration is pending.
 Historical material recipes and backend replay ordering are unchanged.
+
+### General native planar mixed Body dispatch (verification pending)
+
+`booleanMixedBodies3` now lowers actual owned planar/consolidated sources through
+the general planar material boundary entry point. A private exact convexity
+selector preserves the existing supporting-halfspace backend for one positive
+convex shell; concavity, voids, disconnected shells and empty material use the
+chamber compiler. It checks ownership and all vertices against oriented support
+planes, with no exception-catching or caller certificate fallback. The dedicated
+convex entry point retains its rejection contract, and cylinder-only Body Boolean
+still rejects native planar inputs.
+
+Five new execution cases are running: four operations with restored concave
+material versus an independently classified cylinder; consolidated concave
+intersection and repeated clipping after replay; disconnected native shells; a
+void clipping a cylinder into two material components; and empty-material Boolean
+identities. The three existing convex Body cases, four convex boundary cases and
+five compiler/tetrahedron cases run in the same focused invocation (17 total
+expected). Build, standalone strict typing and the existing scoped 133-declaration
+audit passed. No success is claimed for the pending execution invocation or for
+the prior boundary-API full suite, which remains independently live.

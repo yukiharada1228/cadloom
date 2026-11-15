@@ -1,4 +1,4 @@
-import {boundaryConvexPlanarMaterial3} from '../geometry/convex-planar-material3.js';
+import {boundaryPlanarMaterial3} from '../geometry/planar-material-boundary3.js';
 import {boundaryBoxMaterial3} from '../geometry/box-material3.js';
 import {boundaryCylinderMaterialExpression3,booleanCylinderMaterials3,clipCylinderMaterial3} from '../geometry/cylinder-material-expression3.js';
 import type {CylinderMaterialBoundary3,CylinderMaterialOperand3} from '../geometry/cylinder-material-expression3.js';
@@ -135,7 +135,7 @@ export function bodyFromClippedCylinder3(source:ClippedCylinderBRep3):Body3 {
 export function bodyFromFiniteCylinderBoolean3(source:FiniteCylinderBoolean3):Body3 {return adoptFiniteCylinderBooleanBody3(source);}
 /** Cylinder-family Booleans retain operand-local planes on previously cut Bodies. */
 export function booleanCylinderBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
- assertOwnedBody3(first);assertOwnedBody3(second);if(first.construction.kind==='box'||second.construction.kind==='box'||planarSourceOfBody3(first)||planarSourceOfBody3(second))throw new RangeError('Cylinder Body Boolean requires cylinder/halfspace operands; use booleanMixedBodies3 for convex planar operands');if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown cylinder Body operation');const mixed=(b:Body3)=>['clipped-cylinder','plane-cut-cylinder-expression','clipped-cylinder-expression','cylinder-material-expression'].includes(b.construction.kind);if(mixed(first)||mixed(second))return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
+ assertOwnedBody3(first);assertOwnedBody3(second);if(first.construction.kind==='box'||second.construction.kind==='box'||planarSourceOfBody3(first)||planarSourceOfBody3(second))throw new RangeError('Cylinder Body Boolean requires cylinder/halfspace operands; use booleanMixedBodies3 for planar operands');if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown cylinder Body operation');const mixed=(b:Body3)=>['clipped-cylinder','plane-cut-cylinder-expression','clipped-cylinder-expression','cylinder-material-expression'].includes(b.construction.kind);if(mixed(first)||mixed(second))return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
  const primitive=(body:Body3)=>{const s=cylinderSourceOfBody3(body);if(s.planes.length!==2)throw new RangeError('Cylinder Body Boolean requires an unclipped finite cylinder');return prepareFiniteCylinder3(s.cylinder,s.lower,s.upper);};
  const parts=(body:Body3):{operands:readonly FiniteCylinder3[];expression:FiniteCylinderExpression3}|null=>{const expression=finiteCylinderExpressionSourceOfBody3(body);if(expression)return expression;const binary=finiteCylinderBooleanSourceOfBody3(body);return binary?{operands:[binary.first,binary.second],expression:{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}}}:null;},a=parts(first),b=parts(second);
  if(!a&&!b)return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(primitive(first),primitive(second),operation));
@@ -158,17 +158,17 @@ export function clipCylinderExpressionBody3(body:Body3,halfspaces:readonly Cylin
 }
 
 export function bodyFromCylinderMaterial3(source:CylinderMaterialBoundary3):Body3 {return adoptCylinderMaterialBody3(source);}
-/** Boolean composition for owned convex planar, box and cylinder-family Bodies. Results use
+/** Boolean composition for owned planar, box and cylinder-family Bodies. Results use
  * the replayable mixed material recipe and require manifold material. */
 export function booleanMixedBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
  assertOwnedBody3(first);assertOwnedBody3(second);
  if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown mixed Body operation');
  return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
 }
-/** Source conversion is restricted to actual owned convex planar/box/cylinder backends. */
+/** Source conversion is restricted to actual owned planar/box/cylinder backends. */
 function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
  assertOwnedBody3(body);
- const planar=planarSourceOfBody3(body);if(planar)return boundaryConvexPlanarMaterial3(planar);
+ const planar=planarSourceOfBody3(body);if(planar)return boundaryPlanarMaterial3(planar);
  if(body.construction.kind==='box'){const c=body.construction;return boundaryBoxMaterial3(decodeRationalPoint3(c.origin),c.size[0],c.size[1],c.size[2]);}
  const material=cylinderMaterialSourceOfBody3(body);if(material)return material;const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return clipped;const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return clipFiniteCylinderExpression3(cut.source,[cut.cut]);let source=finiteCylinderExpressionSourceOfBody3(body);const binary=finiteCylinderBooleanSourceOfBody3(body);if(!source&&binary)source=boundaryFiniteCylinderExpression3([binary.first,binary.second],{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}});if(source)return clipFiniteCylinderExpression3(source,[]);const c=cylinderSourceOfBody3(body),base=prepareFiniteCylinder3(c.cylinder,c.lower,c.upper);if(body.construction.kind==='cylinder')return boundaryCylinderMaterialExpression3([base],[],{kind:'cylinder',cylinder:0});return clipFiniteCylinderExpression3(boundaryFiniteCylinderExpression3([base],{kind:'operand',operand:0}),c.planes.map(plane=>({plane,side:-1 as const})));
 }
