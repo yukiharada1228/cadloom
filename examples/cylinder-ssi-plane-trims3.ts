@@ -1,0 +1,11 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {point3,line3,cylinder3,plane3,intersectCylinders3,clipCylinderIntersectionByHalfspaces3,encodeExactPoint3} from '../dist/index.js';
+const first=cylinder3(line3(point3(0n,0n),point3(0n,0n,1n)),2n);
+const second=cylinder3(line3(point3('1/3','2/5','1/7'),point3(1n,1n,1n)),1n);
+const source=intersectCylinders3(first,second);if(source.kind!=='bounded')throw new Error('Expected bounded SSI');
+const clipped=clipCylinderIntersectionByHalfspaces3(source,[{plane:plane3(0n,0n,1n),side:-1},{plane:plane3(0n,0n,-1n,'-1/2'),side:-1}]);
+const directory=new URL('../artifacts/',import.meta.url);await mkdir(directory,{recursive:true});
+const path=new URL('cylinder-ssi-plane-trims3.json',directory);
+await writeFile(path,JSON.stringify({purpose:'Exact diagnostic subset graph; not a persistent BRep import schema',vertices:clipped.vertices.map(encodeExactPoint3),edges:clipped.edges,ports:clipped.ports,isolatedPoints:clipped.isolatedPoints.map(encodeExactPoint3),singularVertices:clipped.singularVertices,supportSingularVertices:clipped.supportSingularVertices,components:clipped.components},null,2)+'\n');
+console.log(JSON.stringify({sourceArcs:source.arcs.length,clippedArcs:clipped.arcs.length,endpoints:clipped.ports.filter(p=>p.length===1).length,isolatedPoints:clipped.isolatedPoints.length,components:clipped.components.length,saved:fileURLToPath(path)},null,2));

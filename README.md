@@ -1288,3 +1288,17 @@ node examples/face-domain-record3.ts
 `vertices`・`edges`・`ports`・`components`で接続を保持します。孤立した接点は`isolatedPoints`、四つの枝が出会う頂点は`singularVertices`へ残します。成分は交点集合の連結成分であり、交差する曲線を任意の経路へ分けません。二つの高さの枝の合流点と、パラメータ化のための補助的な継ぎ目を区別して扱います。
 
 この型は支持面交差用で、既存の`Curve3`や有界面のB-rep辺へはまだ接続していません。曲線片の平面切り取り・面のパラメータ曲線・一般曲面ブーリアン・永続的な曲線レコードは引き続き必要です。`npm run build && node examples/cylinder-cylinder3.ts`で、ずれた非平行軸の交線グラフと正確な診断用座標を出力できます。[完全性の構成と検証範囲](docs/proofs/cylinder-cylinder3.md)。
+
+## 円柱交線の平面交差・分割・切り取り
+
+`intersectCylinderIntersectionArcPlane3(arc, plane)`は交線片と有理平面の全交点を求めます。結果は`none`・有限の`points`・片全体が平面に含まれる`overlap`です。有限交点は重複のない点集合で、消去方程式の重複度をそのまま幾何学的な接触次数とはみなしません。
+
+`splitCylinderIntersectionArcByPlane3`は、全交点で分けた各曲線片と、その開いた内部における平面の符号`pieces[].side`を返します。新しい切断点を正確な端点として保持し、接線で触れる点も分割から失いません。`splitCylinderIntersectionArc3(arc, points)`で既知の交線上の点による分割もできます。
+
+`clipCylinderIntersectionByHalfspaces3(graph, halfspaces)`は所有された`bounded`交線グラフを複数の有理平面半空間で切り取ります。これは曲線の閉集合の切り取りであり、接触だけになった部分も`isolatedPoints`へ残します。円柱の上下限に対応する平面を指定すれば、有限な高さの範囲へ制限できます。入力グラフが空でなくても結果が空になる場合は、同じ`bounded`型の空グラフを返します。
+
+`singularVertices`はグラフの価数が2を超える頂点です。別の`supportSingularVertices`は両円柱の法線が従属する点を示し、切り取りで価数が2以下になっても保持します。孤立した通常の接触点とは区別します。
+
+一般の平面断面は四次方程式へ帰着し、一つの根から各座標を有理式で復元します。分母がその根で0の場合は別に扱い、同じ射影座標を持つ二交点も取りこぼしません。曲線は近似しません。有界面の任意角度境界、パラメータ曲線とB-rep辺への結合、曲面ブーリアンは未実装です。[構成と検証範囲](docs/proofs/cylinder-intersection-plane3.md)。
+
+`npm run build && node examples/cylinder-ssi-plane-trims3.ts`で、ずれた軸の交線を高さの区間へ制限し、正確な診断用グラフを出力できます。

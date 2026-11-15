@@ -7,7 +7,7 @@ import {cylinder3,classifyPointToSurface3} from './surface3.js';
 import type {Cylinder3} from './surface3.js';
 import {circle3,fullCircleArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,intersectCircles3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,algebraicBiparametricPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluatePlaneAtAlgebraicPoint3} from './algebraic-segment-plane3.js';
 import {algebraicLine3} from './algebraic-line3.js';
@@ -32,6 +32,8 @@ export interface CylinderIntersectionGraph3 {
   readonly isolatedPoints:readonly AlgebraicCoordinates3[];
   /** Valence > 2; no arbitrary through-node pairing is selected. */
   readonly singularVertices:readonly number[];
+  /** Dependent supporting-surface normals, even after clipping lowers valence. */
+  readonly supportSingularVertices:readonly number[];
   readonly components:readonly {readonly vertices:readonly number[];readonly edges:readonly number[]}[];
 }
 export type CylinderCylinderIntersection3=
@@ -39,6 +41,8 @@ export type CylinderCylinderIntersection3=
  | {readonly kind:'coincident';readonly cylinder:Cylinder3}
  | {readonly kind:'lines';readonly lines:readonly {readonly line:AlgebraicLine3;readonly multiplicity:1|2}[]}
  | ({readonly kind:'bounded'}&CylinderIntersectionGraph3);
+export type BoundedCylinderIntersection3=Extract<CylinderCylinderIntersection3,{kind:'bounded'}>;
+const boundedFamilies=new WeakMap<BoundedCylinderIntersection3,Family>();
 const axes=['x','y','z'] as const,zero=new Rational(0n),one=new Rational(1n);
 const scale=(v:Vector3,s:Rational)=>point3(v.x.mul(s),v.y.mul(s),v.z.mul(s));
 function linear(p:AlgebraicCoordinates3,n:Vector3,offset=zero){return evaluatePlaneAtAlgebraicPoint3({normal:n,offset},p);}
@@ -50,7 +54,7 @@ function affineTwo(o:Point3,u:Vector3,s:AlgebraicReal,v:Vector3,t:AlgebraicReal)
 interface Family {
   first:Cylinder3;second:Cylinder3;a:Rational;E:Rational;D:Rational;sealed:boolean;
   n:Vector3;m:Vector3;circle:ReturnType<typeof circle3>;
-  events:{q:AlgebraicCoordinates3;p:AlgebraicCoordinates3}[];
+  events:{q:AlgebraicCoordinates3;p:AlgebraicCoordinates3;singular:boolean}[];
   cache:{q:AlgebraicCoordinates3;branch:-1|1;p:AlgebraicCoordinates3}[];
 }
 const arcFamilies=new WeakMap<CylinderIntersectionArc3,Family>();
@@ -74,26 +78,56 @@ function lift(f:Family,q:AlgebraicCoordinates3,branch:-1|1):AlgebraicCoordinates
 function family(arc:CylinderIntersectionArc3){const f=arcFamilies.get(arc);if(!f)throw new RangeError('Expected a factory-created cylinder intersection arc');return f;}
 /** Evaluate an owned algebraic SSI branch at a point on its base circular arc. */
 export function evaluateCylinderIntersectionArc3(arc:CylinderIntersectionArc3,input:Point3|AlgebraicCoordinates3):AlgebraicCoordinates3 {
-  const f=family(arc),q=snapshotExactPoint3(input);if(!pointOnArc3(q,arc.base))throw new RangeError('SSI parameter must lie on the base arc');return lift(f,q,arc.branch);
+  const f=family(arc),q=snapshotExactPoint3(input);
+  if(same(q,arc.base.start))return arc.start;if(same(q,arc.base.end))return arc.end;if(same(q,arc.baseSample))return arc.sample;
+  if(!pointOnArc3(q,arc.base))throw new RangeError('SSI parameter must lie on the base arc');return lift(f,q,arc.branch);
 }
 /** Exact branch membership, including shared critical endpoints. */
 export function pointOnCylinderIntersectionArc3(input:Point3|AlgebraicCoordinates3,arc:CylinderIntersectionArc3):boolean {
   const f=family(arc);
   if(input===arc.start||input===arc.end||input===arc.sample)return true;
-  const registered=lifted.get(input as AlgebraicCoordinates3);
-  let q:AlgebraicCoordinates3,p=snapshotExactPoint3(input);
-  if(registered?.family===f)q=registered.base;
-  else {const data=getPointParameterization3(p),pair=getBiparameterization3(p),d=f.first.axis.direction,o=f.first.axis.origin,project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(f.D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
-    if(data)q=algebraicPoint3(project(data.origin),project(data.direction,true),data.parameter);
-    else if(pair)q=affineTwo(project(pair.origin),project(pair.u,true),pair.s,project(pair.v,true),pair.t);
-    else {const t=linear(p,d,dot3(d,o).neg()).affine(one.div(f.D));q=algebraicCoordinates3(...axes.map(k=>p[k].sub(t.affine(d[k]))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
-  }
+  const registered=lifted.get(input as AlgebraicCoordinates3),p=snapshotExactPoint3(input),q=projectCylinderIntersectionBase3(arc,input);
   if(!pointOnArc3(q,arc.base))return false;
   if(registered?.family===f)return registered.branch===0||registered.branch===arc.branch;
   if(classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0)return false;
   const sign=linear(p,f.m,dot3(f.m,f.second.axis.origin).neg()).sign();return sign===0||sign===arc.branch;
 }
-function graph(arcs:readonly CylinderIntersectionArc3[],isolated:readonly AlgebraicCoordinates3[]):CylinderIntersectionGraph3 {
+
+/** Internal projection preserving certified rational/affine source fields. */
+export function projectCylinderIntersectionBase3(arc:CylinderIntersectionArc3,input:Point3|AlgebraicCoordinates3):AlgebraicCoordinates3 {
+  const f=family(arc),registered=lifted.get(input as AlgebraicCoordinates3);
+  let q:AlgebraicCoordinates3,p=snapshotExactPoint3(input);
+  if(registered?.family===f)q=registered.base;
+  else {const data=getPointParameterization3(p),pair=getBiparameterization3(p),rational=getRationalParameterization3(p),d=f.first.axis.direction,o=f.first.axis.origin,project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(f.D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
+    if(rational){const T=rationalPointLinearNumerator3(rational,d,dot3(d,o).neg()).scale(one.div(f.D));q=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
+    else if(data)q=algebraicPoint3(project(data.origin),project(data.direction,true),data.parameter);
+    else if(pair)q=affineTwo(project(pair.origin),project(pair.u,true),pair.s,project(pair.v,true),pair.t);
+    else {const t=linear(p,d,dot3(d,o).neg()).affine(one.div(f.D));q=algebraicCoordinates3(...axes.map(k=>p[k].sub(t.affine(d[k]))) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
+  }
+  return q;
+}
+
+export function assertOwnedCylinderIntersectionArc3(arc:CylinderIntersectionArc3):void {family(arc);}
+/** Subdivide one owned branch by verified 3D points, retaining exact cut-point
+ * representations instead of recomputing nested radicals at the endpoints. */
+export function splitCylinderIntersectionArc3(arc:CylinderIntersectionArc3,input:readonly (Point3|AlgebraicCoordinates3)[]):readonly CylinderIntersectionArc3[] {
+  const f=family(arc),cuts=input.map(p=>snapshotExactPoint3(p));if(cuts.some(p=>!pointOnCylinderIntersectionArc3(p,arc)))throw new RangeError('SSI cut point must belong to its arc');
+  const points=[{q:arc.base.start,p:arc.start},{q:arc.base.end,p:arc.end},...cuts.map(p=>({p,q:projectCylinderIntersectionBase3(arc,p)}))],pieces=splitCircularArc3(arc.base,points.map(p=>p.q));
+  if(pieces.length===1)return Object.freeze([arc]);
+  return Object.freeze(pieces.map(base=>{const baseSample=interiorPointOnArc3(base),next=Object.freeze({first:arc.first,second:arc.second,base,branch:arc.branch,start:points.find(p=>same(p.q,base.start))!.p,end:points.find(p=>same(p.q,base.end))!.p,baseSample,sample:lift(f,baseSample,arc.branch)});arcFamilies.set(next,f);return next;}));
+}
+export function assertOwnedCylinderIntersectionGraph3(input:BoundedCylinderIntersection3):void {if(!boundedFamilies.has(input))throw new RangeError('Expected a factory-created bounded cylinder intersection graph');}
+/** Internal subset graph construction; all arcs and points remain on the same
+ * certified supporting pair. Does not claim the subset is the full SSI. */
+export function rebuildCylinderIntersectionGraph3(input:BoundedCylinderIntersection3,arcs:readonly CylinderIntersectionArc3[],points:readonly AlgebraicCoordinates3[]):BoundedCylinderIntersection3 {
+  assertOwnedCylinderIntersectionGraph3(input);const f=boundedFamilies.get(input)!;
+  if(arcs.some(arc=>family(arc)!==f)||points.some(p=>classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.first})!==0||classifyPointToSurface3(p,{kind:'cylinder',cylinder:f.second})!==0))throw new RangeError('SSI subset geometry must lie on its supporting pair');
+  return finishBounded(f,arcs,points);
+}
+function finishBounded(f:Family,arcs:readonly CylinderIntersectionArc3[],points:readonly AlgebraicCoordinates3[]):BoundedCylinderIntersection3 {
+  const result=Object.freeze({kind:'bounded' as const,...graph(f,arcs,points)});boundedFamilies.set(result,f);return result;
+}
+function graph(f:Family,arcs:readonly CylinderIntersectionArc3[],isolated:readonly AlgebraicCoordinates3[]):CylinderIntersectionGraph3 {
   const records=[...arcs.flatMap(a=>[a.start,a.end]),...isolated].sort(compareAlgebraicPoints3),vertices=records.filter((p,i)=>i===0||!same(p,records[i-1]!));
   const index=(p:AlgebraicCoordinates3)=>vertices.findIndex(q=>same(p,q)),edges=arcs.map((_,arc)=>Object.freeze({arc,start:index(arcs[arc]!.start),end:index(arcs[arc]!.end)})),ports:number[][]=vertices.map(()=>[]);
   edges.forEach((e,i)=>{ports[e.start]!.push(2*i);ports[e.end]!.push(2*i+1);});
@@ -102,7 +136,7 @@ function graph(arcs:readonly CylinderIntersectionArc3[],isolated:readonly Algebr
     for(let i=0;i<ids.length;i++)for(const port of ports[ids[i]!]!){const edge=Math.floor(port/2),e=edges[edge]!,other=port%2===0?e.end:e.start;used.add(edge);if(!seen.has(other)){seen.add(other);ids.push(other);}}
     components.push(Object.freeze({vertices:Object.freeze(ids),edges:Object.freeze([...used].sort((a,b)=>a-b))}));
   });
-  return Object.freeze({arcs:Object.freeze([...arcs]),vertices:Object.freeze(vertices),edges:Object.freeze(edges),ports:Object.freeze(ports.map(p=>Object.freeze(p))),isolatedPoints:Object.freeze([...isolated]),singularVertices:Object.freeze(ports.flatMap((p,i)=>p.length>2?[i]:[])),components:Object.freeze(components)});
+  return Object.freeze({arcs:Object.freeze([...arcs]),vertices:Object.freeze(vertices),edges:Object.freeze(edges),ports:Object.freeze(ports.map(p=>Object.freeze(p))),isolatedPoints:Object.freeze([...isolated]),singularVertices:Object.freeze(ports.flatMap((p,i)=>p.length>2?[i]:[])),supportSingularVertices:Object.freeze(vertices.flatMap((p,i)=>f.events.some(e=>e.singular&&same(p,e.p))?[i]:[])),components:Object.freeze(components)});
 }
 /** Complete supporting-surface SSI for arbitrary rational circular cylinders.
  * Nonparallel axes reduce to two real algebraic height sheets over a base circle
@@ -128,7 +162,7 @@ export function intersectCylinders3(inputA:Cylinder3,inputB:Cylinder3):CylinderC
     const root=s.affine(one.div(V)).sqrt();
     for(const side of s.sign()===0?[1n]:[-1n,1n]){
       const t=root.affine(side),q=affineTwo(center,scale(n,inv),lambda,v,t),o=point3(center.x.sub(d.x.mul(b0).mul(inv)),center.y.sub(d.y.mul(b0).mul(inv)),center.z.sub(d.z.mul(b0).mul(inv))),w=point3(v.x.sub(d.x.mul(bV).mul(inv)),v.y.sub(d.y.mul(bV).mul(inv)),v.z.sub(d.z.mul(bV).mul(inv))),p=affineTwo(o,scale(n,inv),lambda,w,t);
-      if(!f.events.some(event=>same(event.q,q))){f.events.push({q,p});lifted.set(p,{family:f,base:q,branch:0});}
+      if(!f.events.some(event=>same(event.q,q))){f.events.push({q,p,singular:s.sign()===0});lifted.set(p,{family:f,base:q,branch:0});}
     }
   }
   const arcs:CylinderIntersectionArc3[]=[];
@@ -142,5 +176,5 @@ export function intersectCylinders3(inputA:Cylinder3,inputB:Cylinder3):CylinderC
   f.sealed=true;
   const isolated=f.events.filter(e=>!arcs.some(a=>same(e.p,a.start)||same(e.p,a.end))).map(e=>e.p);
   if(!arcs.length&&!isolated.length)return Object.freeze({kind:'none'});
-  return Object.freeze({kind:'bounded',...graph(arcs,isolated)});
+  return finishBounded(f,arcs,isolated);
 }

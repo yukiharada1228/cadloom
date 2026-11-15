@@ -130,10 +130,11 @@
         "src/geometry/nurbs-parameter-domain2.ts",
         "src/geometry/nurbs-surface-boundary3.ts",
         "src/geometry/nurbs-trim-regularity3.ts",
-        "src/geometry/nurbs-trim-seams3.ts"
+        "src/geometry/nurbs-trim-seams3.ts",
+        "src/geometry/cylinder-intersection-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Parameter domains, lifted boundaries, restricted rank and seam checks exist; complete embedded spatial trimmed NURBS faces are missing."
+      "gap": "Parameter-domain/lifted-boundary regularity checks and exact rational-halfspace trimming of algebraic cylinder SSI graphs exist. Arbitrary angular/curved face boundaries, embedded spatial NURBS face validity and shared edge/pcurve binding remain incomplete."
     },
     {
       "id": "intersect",
@@ -143,10 +144,11 @@
         "src/geometry/plane-cylinder3.ts",
         "src/geometry/nurbs-curve-intersection3.ts",
         "src/geometry/nurbs-plane-section3.ts",
-        "src/geometry/cylinder-cylinder3.ts"
+        "src/geometry/cylinder-cylinder3.ts",
+        "src/geometry/cylinder-intersection-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Exact planar/cylindrical intersections and arbitrary rational cylinder/cylinder supporting SSI with algebraic branch graphs exist. Bounded cylinder/cylinder face trimming, general NURBS SSI and common curve/BRep binding remain incomplete."
+      "gap": "Arbitrary rational cylinder/cylinder supporting graphs now have complete rational-plane sections, including shared elliptic components and quartic point recovery. General NURBS SSI and common curve/BRep binding remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -161,10 +163,11 @@
         "src/geometry/planar-brep-partition3.ts",
         "src/geometry/planar-solid3.ts",
         "src/ops/cylinder-body-split3.ts",
-        "src/geometry/cylinder-cylinder3.ts"
+        "src/geometry/cylinder-cylinder3.ts",
+        "src/geometry/cylinder-intersection-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Planar subdivision/sewing and constructive cylinder plane cuts connect to common Body. Arbitrary rational cylinder/cylinder supporting SSI now has exact algebraic branch graphs; bounded trimming, pcurve/edge binding and general curved splitting/sewing remain missing."
+      "gap": "Planar/cylinder Body cuts and algebraic cylinder SSI plane subdivision/closed-halfspace graph clipping exist. Arbitrary angular face trimming, pcurve/edge binding and general curved BRep splitting/sewing remain missing."
     },
     {
       "id": "boolean",

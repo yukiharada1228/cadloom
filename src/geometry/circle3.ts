@@ -5,7 +5,7 @@ import {AlgebraicReal,isolateRealRoots} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import {point3,vector3,dot3,cross3,subtract3,pointsEqual3,segment3} from './point3.js';
 import type {Point3,Vector3,Segment3} from './point3.js';
-import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,signBiparametricQuadratic3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,rationalPointSphereNumerator3,signBiparametricQuadratic3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -47,6 +47,7 @@ export function pointOnCircle3(inputPoint:CirclePointInput3,input:Circle3):boole
   if(classifyPointToSurface3(p,{kind:'plane',plane:circlePlane3(c)})!==0)return false;
   const data=getPointParameterization3(p);
   if(data)return data.parameter.signOf(sphereEquation(data.origin,data.direction,c))===0;
+  const rational=getRationalParameterization3(p);if(rational)return rational.parameter.signOf(rationalPointSphereNumerator3(rational,c.center,c.radiusSquared))===0;
   const pair=getBiparameterization3(p);if(pair){const q=subtract3(pair.origin,c.center),u=pair.u,v=pair.v,two=new Rational(2n);return signBiparametricQuadratic3(pair,dot3(q,q).sub(c.radiusSquared),dot3(q,u).mul(two),dot3(q,v).mul(two),dot3(u,u),dot3(u,v).mul(two),dot3(v,v))===0;}
   const x=p.x.affine(1n,c.center.x.neg()),y=p.y.affine(1n,c.center.y.neg()),z=p.z.affine(1n,c.center.z.neg());
   return x.mul(x).add(y.mul(y)).add(z.mul(z)).affine(1n,c.radiusSquared.neg()).sign()===0;
@@ -122,6 +123,7 @@ function basis(circle:Circle3):readonly [Vector3,Vector3] {
 function coordinate(circle:Circle3,p:AlgebraicCoordinates3,axis:Vector3):AlgebraicReal {
   const data=getPointParameterization3(p);
   if(data)return data.parameter.affine(dot3(data.direction,axis),dot3(subtract3(data.origin,circle.center),axis));
+  const rational=getRationalParameterization3(p);if(rational)return rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,axis,dot3(circle.center,axis).neg()),rational.denominator);
   const pair=getBiparameterization3(p);if(pair)return pair.s.affine(dot3(pair.u,axis),dot3(subtract3(pair.origin,circle.center),axis)).add(pair.t.affine(dot3(pair.v,axis)));
   return p.x.affine(axis.x,dot3(circle.center,axis).neg()).add(p.y.affine(axis.y)).add(p.z.affine(axis.z));
 }

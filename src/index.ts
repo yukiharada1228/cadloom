@@ -198,3 +198,7 @@ export {splitCylinderBodyByPlane3,rejoinCylinderBodySplit3} from './ops/cylinder
 export type {CylinderBodyPlaneSplit3,RejoinedCylinderBodySplit3} from './ops/cylinder-body-split3.js';
 export {intersectCylinders3,evaluateCylinderIntersectionArc3,pointOnCylinderIntersectionArc3} from './geometry/cylinder-cylinder3.js';
 export type {CylinderCylinderIntersection3,CylinderIntersectionArc3,CylinderIntersectionGraph3} from './geometry/cylinder-cylinder3.js';
+export {splitCylinderIntersectionArc3} from './geometry/cylinder-cylinder3.js';
+export type {BoundedCylinderIntersection3} from './geometry/cylinder-cylinder3.js';
+export {intersectCylinderIntersectionArcPlane3,splitCylinderIntersectionArcByPlane3,clipCylinderIntersectionByHalfspaces3} from './geometry/cylinder-intersection-plane3.js';
+export type {CylinderIntersectionArcPlane3,CylinderIntersectionArcPlaneSplit3} from './geometry/cylinder-intersection-plane3.js';

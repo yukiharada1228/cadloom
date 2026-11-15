@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "078277023b105fc980ddf456b88c8a5db40b06255667f77d30d754426f1363ab",
+    "src/index.ts": "cda4f66c47b0ca5f857b1a7ce86b0344444c069012b25cad891824bcc238eff4",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -37,10 +37,10 @@
     "src/geometry/curve-half-edges2.ts": "520e7700826dccb029c59c52323b2f8ed89aba04713ebecd2f034768dca234e0",
     "src/geometry/curve-faces2.ts": "05f02ea5d8ed14c3446c866b45771b2653a35b16ac49e3ce118ccc23a3c4286b",
     "src/geometry/curve-boolean2.ts": "158d75129dd99ea56f005496effac4e52c8d81590e141955e55d67ae977ae5be",
-    "src/geometry/algebraic-point3.ts": "7f0ab0584b9bb3f0a5c4c71bb5462b4961b1e5ba87a7cefef9cd4c9ebdea7d4e",
-    "src/geometry/surface3.ts": "519594f2d0e96a14db710ec98d1696fcc3a3a6d5e5519c566d47e860207b915f",
+    "src/geometry/algebraic-point3.ts": "40aada8c01419fae8574a8e0bb2035065494bba25198fc53dd6d305be4de755d",
+    "src/geometry/surface3.ts": "0efeb2bf5911332aed94b152ce403459d60397fec3eefa4cbbbb5694c737c7fa",
     "src/geometry/curve3.ts": "e8d7626dc99161be0f58d717f513cb63b4d0e9322ed520da9e188d20aa0f2043",
-    "src/geometry/circle3.ts": "acbf949213c12d57cf6a05b90b7b5cba9604a9387e02916a4c1b984e2166beb0",
+    "src/geometry/circle3.ts": "7bc82c83eec8a0fc259379f15ba15c9429dcbba0d61d5c8b63386896858af1d3",
     "src/geometry/brep-topology3.ts": "7738ec1b40a84f4b1302d4b9c58b96c70c588c52f911b18bbf418e49d3ff2f4b",
     "src/geometry/planar-face3.ts": "97635a4af8ad28423b49a1a92307d751143c82514c3e90fdae8263eeffacb0b9",
     "src/geometry/algebraic-segment3.ts": "d9f4028ff34ee949228eb095ef58fe12bd67ca6b3c2826f8771a5d5a003a93a1",
@@ -53,7 +53,7 @@
     "src/geometry/cylinder-face-section3.ts": "ef19cd0ad09e117a4f0a28ad67481bd77ff1822c7cf5c39a6d44263873051e3f",
     "src/geometry/planar-cylinder-intersection3.ts": "eaddd10bcd71a98e10e13e0b4f3c5ba5292fba367050857a447f46cf46dc42bd",
     "src/geometry/cylinder-plane-split3.ts": "b78cf2146fcf27990d6ca0b52c4e19f170d162b63a784c38ab667941f5f191ad",
-    "src/geometry/algebraic-segment-plane3.ts": "9f94095427f82d39a349e7143d32856bd7ff3fb6652bf90530b83734f4385513",
+    "src/geometry/algebraic-segment-plane3.ts": "e1cbbbd1022331b8899d978eb02212d6c3ea6347fa9660765269b062b7d18af7",
     "src/geometry/trimmed-cylinder3.ts": "38ff9f32801b1fa7742602c24338ba2e4638f959dca88a845032b36de2c50a5e",
     "src/geometry/planar-trim-utils3.ts": "6baa73a7ce76e0126c1eaf05ea516d6af5475e1906da9e1535b42f0f4c506360",
     "src/geometry/trimmed-planar3.ts": "61179bd5a5100884d2bba8ecfd116036aa9e22d578cd35f92041eca105e91c02",
@@ -103,7 +103,8 @@
     "src/geometry/planar-solid-regions3.ts": "24a7e1f0af0d5474d7cdc13c8463be840db5a2de45463dd8b88bc40a91f1933e",
     "src/geometry/consolidate-planar-solid3.ts": "f6e1fd5cd31c98a6efd05a23008c9d298adf75658cdf3f308d4dd5369e62978d",
     "src/ops/cylinder-body-split3.ts": "b5e72d8744345787b4f347c87ac574ff75592e05ef26e226670e6b837d0257e3",
-    "src/geometry/cylinder-cylinder3.ts": "2721b1ff830ccac3eca1abf8806e3a2097f461c08c8bbc98a87f295fec086b43"
+    "src/geometry/cylinder-cylinder3.ts": "0ade24e9d808d2d1b5421f82c19e6d54bc5bc57ab13b0c3340bed6622a34f528",
+    "src/geometry/cylinder-intersection-plane3.ts": "fd35a6b89e11c82e131a5ae438586e2dfae6e8a96e4e83536357f2c0bf6722ab"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
@@ -297,6 +298,7 @@
     "Manifold rational planar material adopts common Body through exact face-domain binding, recomputed shell-parent/void roles and replayed polygon snapshots. Algebraic queries choose exact rational representatives of support/edge-plane sign cells using rational elimination and interval refinement. These are documented constructions and tests, not runtime machine proofs. Contact-region Body adoption, curved/algebraic faces and persistent Boolean provenance remain incomplete.",
     "Coplanar cooriented rational material face consolidation uses exact chart unions, connected-domain reconstruction, collinear-port removal, source-face assignment and bijective shell mapping. Pinched domains retain valid source patches. Common Body replay and immediate input-face correspondence are executably tested, not machine-proved TypeScript. General curved consolidation, optimal patch selection, contact-region Body support and persistent provenance remain incomplete.",
     "Constructive convex cylinder/halfspace materials, plane split/rejoin certificates, child/parent face and shared coedge maps are connected to owned common Bodies and replayed exact constraint snapshots. Empty infeasibility constraints persist. Geometry/Body ID correspondence, oblique/irrational/thin sections and repeated operations are executably tested, not newly machine-proved. Arbitrary BRep cuts, cylinder/cylinder SSI, general curved Booleans and persistent split certificates remain incomplete.",
-    "Arbitrary rational circular-cylinder supporting SSI reduces nonparallel axes to a base-circle strip and two exact algebraic height sheets, with complete critical-point partition, isolated contacts, singular-node incidence and owned branch evaluation/membership. Factory biparametric affine points expand full linear/quadratic predicates without assuming parameter relations. These are documented mathematical reductions and executable tests, not new machine proofs. Bounded face trimming, common curve/BRep binding, persistent SSI graphs and general curved Booleans remain incomplete."
+    "Arbitrary rational circular-cylinder supporting SSI reduces nonparallel axes to a base-circle strip and two exact algebraic height sheets, with complete critical-point partition, isolated contacts, singular-node incidence and owned branch evaluation/membership. Factory biparametric affine points expand full linear/quadratic predicates without assuming parameter relations. These are documented mathematical reductions and executable tests, not new machine proofs. Bounded face trimming, common curve/BRep binding, persistent SSI graphs and general curved Booleans remain incomplete.",
+    "Algebraic cylinder SSI plane intersections use complete circle/conic quartic recovery with zero-coefficient exceptions and whole-ellipse overlap classification. Owned subdivision and closed-halfspace clipping retain isolated contacts and supporting-normal degeneracies. Single-source rational point certificates evaluate linear/quadratic predicates with exact denominator signs. These are documented reductions and executable tests, not new machine proofs; arbitrary face boundaries, pcurve/common-edge binding, SSI persistence and curved Booleans remain incomplete."
   ]
 }

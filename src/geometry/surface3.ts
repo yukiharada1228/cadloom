@@ -7,7 +7,7 @@ import {point3,vector3,subtract3,dot3,cross3,segment3,pointsEqual3} from './poin
 import type {Point3,Vector3,Segment3} from './point3.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
-import {algebraicCoordinates3,algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,signBiparametricQuadratic3} from './algebraic-point3.js';
+import {algebraicCoordinates3,algebraicPoint3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,signBiparametricQuadratic3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3,AlgebraicPoint3} from './algebraic-point3.js';
 
 export interface Line3 {readonly origin:Point3;readonly direction:Vector3;}
@@ -46,6 +46,7 @@ export function evaluateCylinder3(input:Cylinder3,point:Point3):Rational {
   return equation(point,vector3(0n,0n,0n),{kind:'cylinder',cylinder:cylinder3(input.axis,input.radiusSquared)}).coefficient(0);
 }
 function linear(point:AlgebraicCoordinates3,normal:Vector3,offset:Rational):AlgebraicReal {
+  const rational=getRationalParameterization3(point);if(rational)return rational.parameter.rationalFunction(rationalPointLinearNumerator3(rational,normal,offset),rational.denominator);
   const pair=getBiparameterization3(point);if(pair)return pair.s.affine(dot3(normal,pair.u),dot3(normal,pair.origin).add(offset)).add(pair.t.affine(dot3(normal,pair.v)));
   return point.x.affine(normal.x,offset).add(point.y.affine(normal.y)).add(point.z.affine(normal.z));
 }
@@ -53,8 +54,14 @@ function linear(point:AlgebraicCoordinates3,normal:Vector3,offset:Rational):Alge
 export function classifyPointToSurface3(inputPoint:Point3|AlgebraicCoordinates3,inputSurface:Surface3):Sign {
   const point=snapshotExactPoint3(inputPoint),surface=snapshotSurface(inputSurface),data=getPointParameterization3(point);
   if(data)return data.parameter.signOf(equation(data.origin,data.direction,surface));
-  if(surface.kind==='plane')return linear(point,surface.plane.normal,surface.plane.offset).sign();
+  const rational=getRationalParameterization3(point);
+  if(surface.kind==='plane'){
+    if(!rational)return linear(point,surface.plane.normal,surface.plane.offset).sign();
+    const sign=rational.parameter.signOf(rationalPointLinearNumerator3(rational,surface.plane.normal,surface.plane.offset));
+    return sign===0?0:(sign*rational.parameter.signOf(rational.denominator)) as Sign;
+  }
   const c=surface.cylinder,d=c.axis.direction,o=c.axis.origin;
+  if(rational){const q=rational.numerators.map((N,i)=>N.sub(rational.denominator.scale(o[(['x','y','z'] as const)[i]!]))),x=q[2]!.scale(d.y).sub(q[1]!.scale(d.z)),y=q[0]!.scale(d.z).sub(q[2]!.scale(d.x)),z=q[1]!.scale(d.x).sub(q[0]!.scale(d.y));return rational.parameter.signOf(x.mul(x).add(y.mul(y)).add(z.mul(z)).sub(rational.denominator.mul(rational.denominator).scale(c.radiusSquared.mul(dot3(d,d)))));}
   const pair=getBiparameterization3(point);if(pair){const q=cross3(d,subtract3(pair.origin,o)),u=cross3(d,pair.u),v=cross3(d,pair.v);return signBiparametricQuadratic3(pair,dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))),dot3(q,u).mul(two),dot3(q,v).mul(two),dot3(u,u),dot3(u,v).mul(two),dot3(v,v));}
   const q=algebraicCoordinates3(point.x.affine(1n,o.x.neg()),point.y.affine(1n,o.y.neg()),point.z.affine(1n,o.z.neg()));
   const x=q.z.affine(d.y).sub(q.y.affine(d.z)),y=q.x.affine(d.z).sub(q.z.affine(d.x)),z=q.y.affine(d.x).sub(q.x.affine(d.y));

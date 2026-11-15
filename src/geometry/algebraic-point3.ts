@@ -26,7 +26,7 @@ export function algebraicPoint3(origin:Point3,direction:Vector3,parameter:Algebr
 }
 /** Internal immutable snapshot preserving only registered coordinate correlations. */
 export function snapshotExactPoint3(point:Point3|AlgebraicCoordinates3):AlgebraicCoordinates3 {
-  if(biparameters.has(point as AlgebraicCoordinates3))return point as AlgebraicCoordinates3;
+  if(biparameters.has(point as AlgebraicCoordinates3)||rationalParameters.has(point as AlgebraicCoordinates3))return point as AlgebraicCoordinates3;
   const data=parameters.get(point as AlgebraicCoordinates3);
   return data?algebraicPoint3(data.origin,data.direction,data.parameter):algebraicCoordinates3(point.x,point.y,point.z);
 }
@@ -64,4 +64,20 @@ export function signBiparametricQuadratic3(p:Biparameterization3,c:Rational,a:Ra
   if(b.sign()!==0||B.sign()!==0)value=value.add(p.s.affine(B,b).mul(p.t));
   if(C.sign()!==0)value=value.add(p.t.rationalFunction(new Polynomial([0n,0n,C])));
   return value.sign();
+}
+
+export interface RationalParameterization3 {readonly parameter:AlgebraicReal;readonly numerators:readonly [Polynomial,Polynomial,Polynomial];readonly denominator:Polynomial;}
+const rationalParameters=new WeakMap<AlgebraicCoordinates3,RationalParameterization3>();
+/** Internal exact rational-function image of one algebraic source parameter. */
+export function algebraicRationalPoint3(parameter:AlgebraicReal,numerators:readonly [Polynomial,Polynomial,Polynomial],denominator=new Polynomial([1n])):AlgebraicCoordinates3 {
+  if(parameter.signOf(denominator)===0)throw new RangeError('Rational point denominator is zero');
+  const values=numerators.map(n=>parameter.rationalFunction(n,denominator)),point=algebraicCoordinates3(values[0]!,values[1]!,values[2]!);
+  rationalParameters.set(point,Object.freeze({parameter,numerators:Object.freeze([...numerators]) as readonly [Polynomial,Polynomial,Polynomial],denominator}));return point;
+}
+export function getRationalParameterization3(point:AlgebraicCoordinates3):RationalParameterization3|undefined{return rationalParameters.get(point);}
+export function rationalPointLinearNumerator3(p:RationalParameterization3,n:Vector3,offset:Rational):Polynomial {
+  return p.numerators[0].scale(n.x).add(p.numerators[1].scale(n.y)).add(p.numerators[2].scale(n.z)).add(p.denominator.scale(offset));
+}
+export function rationalPointSphereNumerator3(p:RationalParameterization3,center:Point3,radiusSquared:Rational):Polynomial {
+  return p.numerators.reduce((sum,N,i)=>{const q=N.sub(p.denominator.scale(center[(['x','y','z'] as const)[i]!]));return sum.add(q.mul(q));},new Polynomial()).sub(p.denominator.mul(p.denominator).scale(radiusSquared));
 }
