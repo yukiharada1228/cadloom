@@ -1,3 +1,5 @@
+import {readBodyRecord3} from '../record/body3.js';
+import type {BodyRegionRecord3} from '../record/body3.js';
 import {restoreMixedBRepBoundary3} from './mixed-boundary3.js';
 import type {MixedBRepBoundary3} from './mixed-boundary3.js';
 import {createMixedFaceDomainDecoder3} from './mixed-face-domain3.js';
@@ -24,4 +26,14 @@ export function restoreMixedBRepFaces3(input:unknown,limits:RecordReadLimits3={}
     validateMixedFaceBoundary3(face.surface,face.sense,face.boundary,loops);const shell=r.shells.find(s=>s.kind==='faces'&&s.faces.some(u=>u.face===i)),direction=shell?.kind==='faces'?shell.faces.find(u=>u.face===i)!.direction:1;return direction===1?face:Object.freeze({...face,sense:-face.sense as 1|-1,boundary:Object.freeze(face.boundary.map(loop=>Object.freeze([...loop].reverse().map(reverseBRepCurve3))))});
   }));
   const result=Object.freeze({boundary,faces});owned.add(result);return result;
+}
+
+/** Internal region-table replacement on an already fully bound boundary.
+ * Geometry, face domains, shell uses and decoded topology cannot be changed.
+ * Region schema/incidence references are checked; material nesting is not
+ * inferred here and must be established by constructive region analysis. */
+export function replaceMixedBRepRegions3(input:MixedBRepFaces3,regions:readonly BodyRegionRecord3[]):MixedBRepFaces3 {
+ assertOwnedMixedBRepFaces3(input);
+ const record=readBodyRecord3({...input.boundary.geometry.record,regions}),geometry=Object.freeze({...input.boundary.geometry,record}),boundary=Object.freeze({...input.boundary,geometry}),result=Object.freeze({boundary,faces:input.faces});
+ owned.add(result);return result;
 }

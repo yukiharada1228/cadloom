@@ -1,0 +1,17 @@
+# Reusing fully bound cylinder faces after region analysis
+
+Binary and expression cylinder Body adoption used to restore the same serialized mixed faces twice: once to derive shell nesting and strict material samples, then again to construct the Body. The second call rebuilt every geometric definition and face arrangement even though only the region table had changed.
+
+## Preserved invariants
+
+`replaceMixedBRepRegions3` requires an actual result registered by `restoreMixedBRepFaces3` (private WeakSet ownership). Its only replacement input is the region array. It copies the original record's geometry, vertices, edge uses, loops, bounded face domains, shell directions, units and coordinate convention, then uses the full `readBodyRecord3` schema/reference checks on the record with the replacement regions. This read snapshots and freezes the region input. It cannot replace a support, endpoint, trim, face orientation or shell use.
+
+The returned runtime object shares the previously decoded curves/surfaces/vertices, bound faces, topology and vertex map. The topology builder and bounded-face binding do not depend on region labels; they depend on the unchanged boundary tables and shell face-use directions. Reusing those objects therefore retains the exact boundary checks already performed. Region replacement alone is not a material-nesting certificate.
+
+Constructive finite-cylinder region analysis still performs the complete initial restoration, closed-manifold checks, line-crossing probes, strict containment forest validation, coorientation/material-side checks and strict witness selection. Only after these succeed is its region-only-bound face object associated with the actual immutable analysis result through a private WeakMap. Body adoption obtains that object using the real analysis-result identity; structural copies and user-provided records are rejected. Existing Body manifold, sample-count, sample-membership and construction-document checks remain in place. Normal external record restoration still performs the complete geometric and face-domain reconstruction.
+
+## Validation
+
+The connected 25-test group passed against an isolated source-35 build, including old-document replay, binary/expression cavities, face binding, strict region references, rejected copied ownership and actual reuse of geometry/topology/faces. Mutation of caller region arrays does not affect the result. The historical 74-face fixture also confirms that replacement preserves all non-region tables. Broader regression and the unchanged oblique integration are separate gates. No new Lean theorem or full TypeScript execution proof is claimed.
+
+The existing scoped Lean audit passed all 133 declared theorems after updating the reviewed source manifest. These declarations do not prove this new runtime reuse path.

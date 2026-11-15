@@ -9,7 +9,7 @@ import {normalToSurface3} from './surface3.js';
 import {assertOwnedFiniteCylinderBoolean3} from './finite-cylinder-boolean3.js';
 import type {FiniteCylinderBoolean3} from './finite-cylinder-boolean3.js';
 import {bodyRecordFromFiniteCylinderBoolean3} from '../convert/finite-cylinder-boolean3.js';
-import {restoreMixedBRepFaces3} from '../convert/mixed-faces3.js';
+import {restoreMixedBRepFaces3,replaceMixedBRepRegions3} from '../convert/mixed-faces3.js';
 import type {MixedBRepFaces3} from '../convert/mixed-faces3.js';
 import {readBodyRecord3} from '../record/body3.js';
 import type {BodyRecord3,BodyRegionRecord3} from '../record/body3.js';
@@ -27,6 +27,9 @@ export interface FiniteCylinderBooleanRegions3 {
  /** One strict sample for each nonvoid bounded region, in region-table order. */
  readonly materialSamples:readonly Point3[];
 }
+const regionFaces=new WeakMap<object,MixedBRepFaces3>();
+/** Internal access requires an actual constructive region result, not a record. */
+export function finiteCylinderRegionFaces3(input:FiniteCylinderBooleanRegions3|FiniteCylinderExpressionRegions3):MixedBRepFaces3 {const faces=regionFaces.get(input);if(!faces)throw new RangeError('Expected factory-created cylinder region analysis');return faces;}
 const cache=new WeakMap<FiniteCylinderBoolean3,FiniteCylinderBooleanRegions3>(),two=new Rational(2n),one=new Rational(1n),axes=['x','y','z'] as const;
 function between(a:AlgebraicReal,b:AlgebraicReal):Rational {let lo=a,hi=b;while(lo.upper.compare(hi.lower)>=0){lo=lo.refine();hi=hi.refine();}return lo.upper.add(hi.lower).div(two);}
 function at(o:Point3,d:Point3,t:Rational):Point3 {return point3(...axes.map(k=>o[k].add(d[k].mul(t))) as [Rational,Rational,Rational]);}
@@ -54,7 +57,7 @@ function probe(input:MixedBRepFaces3,shell:number,acceptSamples:(a:Point3,b:Poin
  * Complete support partitions and manifold source selection supply embedding. */
 export function finiteCylinderBooleanRegions3(source:FiniteCylinderBoolean3):FiniteCylinderBooleanRegions3 {
  assertOwnedFiniteCylinderBoolean3(source);const known=cache.get(source);if(known)return known;if(!source.manifold)throw new RangeError('Material regions require a manifold finite-cylinder Boolean');
- const ids=source.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromFiniteCylinderBoolean3(source,[{shells:ids,void:false}]),data=regionData(raw,p=>source.locate(p),()=>true),result=Object.freeze({source,...data});cache.set(source,result);return result;
+ const ids=source.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromFiniteCylinderBoolean3(source,[{shells:ids,void:false}]),data=regionData(raw,p=>source.locate(p),()=>true),result=Object.freeze({source,...data});regionFaces.set(result,regionFaces.get(data)!);cache.set(source,result);return result;
 }
 export interface FiniteCylinderExpressionRegions3 extends Omit<FiniteCylinderBooleanRegions3,'source'> {readonly source:FiniteCylinderExpressionBoundary3;}
 const expressionCache=new WeakMap<FiniteCylinderExpressionBoundary3,FiniteCylinderExpressionRegions3>();
@@ -64,7 +67,7 @@ function truth(tree:FiniteCylinderExpression3,values:readonly boolean[]):boolean
 function strictLocation(source:FiniteCylinderExpressionBoundary3,p:Point3):'inside'|'outside'|null {const locations=source.operands.map(c=>c.locate(p));if(locations.includes('boundary'))return null;return truth(source.expression,locations.map(l=>l==='inside'))?'inside':'outside';}
 export function finiteCylinderExpressionRegions3(source:FiniteCylinderExpressionBoundary3):FiniteCylinderExpressionRegions3 {
  assertOwnedFiniteCylinderExpressionBoundary3(source);const known=expressionCache.get(source);if(known)return known;if(!source.manifold)throw new RangeError('Material regions require a manifold cylinder expression');
- const ids=source.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromFiniteCylinderExpression3(source,[{shells:ids,void:false}]),locate=(p:Point3)=>strictLocation(source,p),data=regionData(raw,locate,(a,b)=>locate(a)!==null&&locate(b)!==null),result=Object.freeze({source,...data});expressionCache.set(source,result);return result;
+ const ids=source.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromFiniteCylinderExpression3(source,[{shells:ids,void:false}]),locate=(p:Point3)=>strictLocation(source,p),data=regionData(raw,locate,(a,b)=>locate(a)!==null&&locate(b)!==null),result=Object.freeze({source,...data});regionFaces.set(result,regionFaces.get(data)!);expressionCache.set(source,result);return result;
 }
 /** Private core: public entry points first establish constructive ownership. */
 function regionData(raw:BodyRecord3,locate:(p:Point3)=>'inside'|'outside'|'boundary'|null,acceptSamples:(a:Point3,b:Point3)=>boolean){
@@ -73,5 +76,5 @@ function regionData(raw:BodyRecord3,locate:(p:Point3)=>'inside'|'outside'|'bound
  for(let i=0;i<probes.length;i++)for(const j of probes[i]!.containers){if(j===i||probes[j]!.containers.includes(i)||!probes[j]!.containers.every(k=>probes[i]!.containers.includes(k)))throw new Error('Constructive shell containment is not a strict nesting forest');}
  const parents=probes.map((p,id)=>{const candidates=p.containers.filter(j=>depths[j]===depths[id]!-1);if(!p.containers.length)return null;if(candidates.length!==1)throw new Error('Shell containment has no unique immediate parent');return candidates[0]!;}),children=ids.map(id=>parents.flatMap((p,i)=>p===id?[i]:[]));
  const regions=Object.freeze([Object.freeze({shells:Object.freeze(parents.flatMap((p,i)=>p===null?[i]:[])),void:false}),...ids.map(id=>Object.freeze({shells:Object.freeze([id,...children[id]!]),void:depths[id]!%2===1}))]);
- const shells=Object.freeze(probes.map((p,id)=>{const material=depths[id]!%2===0;if(p.outward!==material||locate(p.bounded)!==(material?'inside':'outside')||locate(p.outside)!==(material?'outside':'inside'))throw new Error('Shell coorientation/material side disagrees with nesting');return Object.freeze({parent:parents[id]!,depth:depths[id]!,containers:Object.freeze(p.containers),boundedSample:p.bounded,unboundedSideSample:p.outside,outward:p.outward});})),materialSamples=Object.freeze(shells.flatMap((s,i)=>regions[i+1]!.void?[]:[s.boundedSample])),record=readBodyRecord3({...raw,regions}),result=Object.freeze({record,shells,regions,materialSamples});return result;
+ const shells=Object.freeze(probes.map((p,id)=>{const material=depths[id]!%2===0;if(p.outward!==material||locate(p.bounded)!==(material?'inside':'outside')||locate(p.outside)!==(material?'outside':'inside'))throw new Error('Shell coorientation/material side disagrees with nesting');return Object.freeze({parent:parents[id]!,depth:depths[id]!,containers:Object.freeze(p.containers),boundedSample:p.bounded,unboundedSideSample:p.outside,outward:p.outward});})),materialSamples=Object.freeze(shells.flatMap((s,i)=>regions[i+1]!.void?[]:[s.boundedSample])),record=readBodyRecord3({...raw,regions}),result=Object.freeze({record,shells,regions,materialSamples});regionFaces.set(result,replaceMixedBRepRegions3(restored,regions));return result;
 }
