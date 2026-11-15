@@ -8,7 +8,7 @@ import type {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3,vector3,dot3,cross3} from './point3.js';
 import type {Point3,Vector3} from './point3.js';
 import type {Plane3} from './plane3.js';
-import {snapshotExactPoint3,getPointParameterization3,getRationalParameterization3,getBiparameterization3,rationalPointLinearNumerator3,algebraicPoint3,algebraicCoordinates3,algebraicRationalPoint3,algebraicBiparametricPoint3,translateAlgebraicPoint3} from './algebraic-point3.js';
+import {snapshotExactPoint3,getQuadraticParameterization3,affineQuadraticPoint3,getPointParameterization3,getRationalParameterization3,getBiparameterization3,rationalPointLinearNumerator3,algebraicPoint3,algebraicCoordinates3,algebraicRationalPoint3,algebraicBiparametricPoint3,translateAlgebraicPoint3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 export interface AlgebraicAxialCoordinates3 {readonly base:AlgebraicCoordinates3;readonly direction:Vector3;}
 const axial=new WeakMap<AlgebraicCoordinates3,AlgebraicAxialCoordinates3>(),axes=['x','y','z'] as const,zero=new Rational(0n),one=new Rational(1n);
@@ -33,10 +33,11 @@ export function algebraicAxialPoint3(input:Point3|AlgebraicCoordinates3,inputDir
  * computes the affine projection; no caller-provided point is certified. */
 export function projectAlgebraicPointAlongDirection3(input:Point3|AlgebraicCoordinates3,inputDirection:Vector3,inputPlane:Plane3):AlgebraicCoordinates3 {
  const inherited=axial.get(input as AlgebraicCoordinates3),q=snapshotExactPoint3(input),d=direction(inputDirection),normal=vector3(inputPlane.normal.x,inputPlane.normal.y,inputPlane.normal.z),offset=inputPlane.offset,a=dot3(normal,d);if(a.sign()===0)throw new RangeError('Projection direction is parallel to the target plane');
- const map=(v:Point3,vector=false)=>{const t=dot3(normal,v).add(vector?zero:offset).div(a);return point3(...axes.map(k=>v[k].sub(d[k].mul(t))) as [Rational,Rational,Rational]);},rational=getRationalParameterization3(q),affine=getPointParameterization3(q),pair=getBiparameterization3(q);let p:AlgebraicCoordinates3;
+ const map=(v:Point3,vector=false)=>{const t=dot3(normal,v).add(vector?zero:offset).div(a);return point3(...axes.map(k=>v[k].sub(d[k].mul(t))) as [Rational,Rational,Rational]);},rational=getRationalParameterization3(q),affine=getPointParameterization3(q),pair=getBiparameterization3(q),quadratic=getQuadraticParameterization3(q);let p:AlgebraicCoordinates3;
  if(rational){const T=rationalPointLinearNumerator3(rational,normal,offset).scale(one.div(a));p=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
  else if(affine)p=algebraicPoint3(map(affine.origin),map(affine.direction,true),affine.parameter);
  else if(pair)p=algebraicBiparametricPoint3(map(pair.origin),map(pair.u,true),pair.s,map(pair.v,true),pair.t);
+ else if(quadratic)p=affineQuadraticPoint3(quadratic,map(point3(0n,0n)),[map(point3(1n,0n),true),map(point3(0n,1n),true),map(point3(0n,0n,1n),true)]);
  else p=algebraicCoordinates3(...axes.map(k=>{const terms=axes.map(j=>({value:q[j],coefficient:(j===k?one:zero).sub(d[k].mul(normal[j]).div(a))})).filter(t=>t.coefficient.sign()!==0);return terms.reduce((sum,t)=>sum.add(t.value.affine(t.coefficient)),q[k].affine(0n,d[k].mul(offset).div(a).neg()));}) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);
  axial.set(p,Object.freeze({base:inherited&&parallel(inherited.direction,d)?inherited.base:q,direction:d}));return p;
 }

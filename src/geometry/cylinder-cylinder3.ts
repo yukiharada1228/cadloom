@@ -7,7 +7,7 @@ import {cylinder3,classifyPointToSurface3,surfacesCoincide3} from './surface3.js
 import type {Cylinder3} from './surface3.js';
 import {circle3,fullCircleArc3,splitCircularArc3,interiorPointOnArc3,pointOnArc3,intersectCircles3,containsCircularArcProjection3} from './circle3.js';
 import type {CircularArc3} from './circle3.js';
-import {algebraicQuadraticPoint3,algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
+import {algebraicQuadraticPoint3,algebraicPoint3,algebraicCoordinates3,snapshotExactPoint3,getQuadraticParameterization3,affineQuadraticPoint3,getPointParameterization3,getBiparameterization3,getRationalParameterization3,rationalPointLinearNumerator3,algebraicRationalPoint3,algebraicBiparametricPoint3,algebraicPointsEqual3,compareAlgebraicPoints3,translateAlgebraicPoint3,signLinearAlgebraicPoint3,compareLinearPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluatePlaneAtAlgebraicPoint3} from './algebraic-segment-plane3.js';
 import {algebraicLine3} from './algebraic-line3.js';
@@ -137,10 +137,11 @@ export function evaluateCylinderIntersectionFiber3(arc:CylinderIntersectionArc3,
  // its coordinates by reflecting an unrelated multivariate representation.
  if(same(q,arc.base.start))return arc.start;if(same(q,arc.base.end))return arc.end;if(same(q,arc.baseSample))return arc.sample;
  const offset=dot3(f.m,f.second.axis.origin).neg(),sign=signLinearAlgebraicPoint3(p,f.m,offset);if(sign===0||sign===arc.branch)return p;
- const factor=new Rational(2n).div(f.a),d=f.first.axis.direction,rational=getRationalParameterization3(p),affine=getPointParameterization3(p),pair=getBiparameterization3(p),reflect=(v:Point3,vector=false)=>{const t=dot3(f.m,v).add(vector?zero:offset).mul(factor);return point3(...axes.map(k=>v[k].sub(d[k].mul(t))) as [Rational,Rational,Rational]);};let result:AlgebraicCoordinates3;
+ const factor=new Rational(2n).div(f.a),d=f.first.axis.direction,rational=getRationalParameterization3(p),affine=getPointParameterization3(p),pair=getBiparameterization3(p),quadratic=getQuadraticParameterization3(p),reflect=(v:Point3,vector=false)=>{const t=dot3(f.m,v).add(vector?zero:offset).mul(factor);return point3(...axes.map(k=>v[k].sub(d[k].mul(t))) as [Rational,Rational,Rational]);};let result:AlgebraicCoordinates3;
  if(rational){const T=rationalPointLinearNumerator3(rational,f.m,offset).scale(factor);result=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
  else if(affine)result=algebraicPoint3(reflect(affine.origin),reflect(affine.direction,true),affine.parameter);
  else if(pair)result=algebraicBiparametricPoint3(reflect(pair.origin),reflect(pair.u,true),pair.s,reflect(pair.v,true),pair.t);
+ else if(quadratic)result=affineQuadraticPoint3(quadratic,reflect(point3(0n,0n)),[reflect(point3(1n,0n),true),reflect(point3(0n,1n),true),reflect(point3(0n,0n,1n),true)]);
  else {result=algebraicCoordinates3(...axes.map(k=>{const terms=axes.map(j=>({value:p[j],coefficient:(j===k?one:zero).sub(d[k].mul(f.m[j]).mul(factor))})).filter(t=>t.coefficient.sign()!==0);return terms.reduce((sum,t)=>sum.add(t.value.affine(t.coefficient)),AlgebraicReal.fromRational(d[k].mul(offset).mul(factor).neg()));}) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);}
  const height=linear(result,d,dot3(d,f.first.axis.origin).neg()).affine(one.div(f.D));lifted.set(result,{family:f,base:q,branch:arc.branch,height});return result;
 }
@@ -164,10 +165,11 @@ export function projectCylinderIntersectionBase3(arc:CylinderIntersectionArc3,in
   const f=family(arc),registered=lifted.get(input as AlgebraicCoordinates3);
   let q:AlgebraicCoordinates3,p=snapshotExactPoint3(input),cache=projectionCache.get(f);if(!cache){cache=new WeakMap();projectionCache.set(f,cache);}const cached=cache.get(p);if(cached)return cached;
   if(registered?.family===f)q=registered.base;
-  else {const data=getPointParameterization3(p),pair=getBiparameterization3(p),rational=getRationalParameterization3(p),d=f.first.axis.direction,o=f.first.axis.origin,project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(f.D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
+  else {const data=getPointParameterization3(p),pair=getBiparameterization3(p),rational=getRationalParameterization3(p),quadratic=getQuadraticParameterization3(p),d=f.first.axis.direction,o=f.first.axis.origin,project=(v:Point3,vector=false)=>{const t=dot3(d,vector?v:subtract3(v,o)).div(f.D);return point3(v.x.sub(d.x.mul(t)),v.y.sub(d.y.mul(t)),v.z.sub(d.z.mul(t)));};
     if(rational){const T=rationalPointLinearNumerator3(rational,d,dot3(d,o).neg()).scale(one.div(f.D));q=algebraicRationalPoint3(rational.parameter,rational.numerators.map((N,i)=>N.sub(T.scale(d[axes[i]!])) ) as [Polynomial,Polynomial,Polynomial],rational.denominator);}
     else if(data)q=algebraicPoint3(project(data.origin),project(data.direction,true),data.parameter);
     else if(pair)q=affineTwo(project(pair.origin),project(pair.u,true),pair.s,project(pair.v,true),pair.t);
+    else if(quadratic)q=affineQuadraticPoint3(quadratic,project(point3(0n,0n)),[project(point3(1n,0n),true),project(point3(0n,1n),true),project(point3(0n,0n,1n),true)]);
     else if(registered&&[registered.family.first,registered.family.second].some(c=>surfacesCoincide3({kind:'cylinder',cylinder:c},{kind:'cylinder',cylinder:f.first}))){
       const base=cylinderIntersectionPointBase3(p,f.first);if(!base)throw new Error('Expected a certified SSI projection');q=base;
     }

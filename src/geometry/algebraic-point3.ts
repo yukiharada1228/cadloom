@@ -111,6 +111,12 @@ export function algebraicQuadraticPoint3(parameter:AlgebraicReal,numerators:read
  const c=vector3(coefficients.x,coefficients.y,coefficients.z),N=Object.freeze([...numerators]) as readonly [Polynomial,Polynomial,Polynomial],axes=['x','y','z'] as const,p=algebraicCoordinates3(...axes.map((k,i)=>parameter.quadraticImage(N[i]!,radicand,c[k],denominator)) as [AlgebraicReal,AlgebraicReal,AlgebraicReal]);quadraticParameters.set(p,Object.freeze({parameter,numerators:N,coefficients:c,radicand,denominator}));return p;
 }
 export function getQuadraticParameterization3(point:AlgebraicCoordinates3):QuadraticParameterization3|undefined{return quadraticParameters.get(point);}
+/** Construct o + U*x + V*y + W*z in the same source field. A map that
+ * annihilates the radical returns a genuine rational-univariate chart. */
+export function affineQuadraticPoint3(p:QuadraticParameterization3,origin:Point3,columns:readonly [Vector3,Vector3,Vector3]):AlgebraicCoordinates3 {
+ const o=point3(origin.x,origin.y,origin.z),[U,V,W]=columns.map(c=>vector3(c.x,c.y,c.z)),axes=['x','y','z'] as const,rows=axes.map(k=>vector3(U![k],V![k],W![k])),N=rows.map((row,i)=>rationalPointLinearNumerator3(p,row,o[axes[i]!])) as [Polynomial,Polynomial,Polynomial],c=vector3(...rows.map(row=>dot3(row,p.coefficients)) as [Rational,Rational,Rational]);
+ return c.x.sign()===0&&c.y.sign()===0&&c.z.sign()===0?algebraicRationalPoint3(p.parameter,N,p.denominator):algebraicQuadraticPoint3(p.parameter,N,c,p.radicand,p.denominator);
+}
 export function quadraticPointLinearParts3(p:QuadraticParameterization3,n:Vector3,offset=new Rational(0n)):{numerator:Polynomial;coefficient:Rational} {
  return {numerator:rationalPointLinearNumerator3(p,n,offset),coefficient:dot3(p.coefficients,n)};
 }

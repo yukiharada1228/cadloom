@@ -37,7 +37,7 @@
     "src/geometry/curve-half-edges2.ts": "520e7700826dccb029c59c52323b2f8ed89aba04713ebecd2f034768dca234e0",
     "src/geometry/curve-faces2.ts": "05f02ea5d8ed14c3446c866b45771b2653a35b16ac49e3ce118ccc23a3c4286b",
     "src/geometry/curve-boolean2.ts": "158d75129dd99ea56f005496effac4e52c8d81590e141955e55d67ae977ae5be",
-    "src/geometry/algebraic-point3.ts": "f2923068eee92573a438cfed6609804eb7769b9680430e7f1bbab5b4d3492831",
+    "src/geometry/algebraic-point3.ts": "1ea43de435d429fee8c395ca2ecf6b1229e5f91433aa907d60b64319b8c79428",
     "src/geometry/surface3.ts": "ac60dcdd816cdc533d16bfeab987e3cac2c64a78799adc49fd7f551f85820ae3",
     "src/geometry/curve3.ts": "c21110a823c90aa3a199bf87fe86b7a38cd08cf555e3f6fad81b6e48148cf378",
     "src/geometry/circle3.ts": "7b4ff1a316c7bfe07b603afacc6d58c3986548be2d8acb9a8f43cbc52f78a9d5",
@@ -103,13 +103,13 @@
     "src/geometry/planar-solid-regions3.ts": "24a7e1f0af0d5474d7cdc13c8463be840db5a2de45463dd8b88bc40a91f1933e",
     "src/geometry/consolidate-planar-solid3.ts": "f6e1fd5cd31c98a6efd05a23008c9d298adf75658cdf3f308d4dd5369e62978d",
     "src/ops/cylinder-body-split3.ts": "b5e72d8744345787b4f347c87ac574ff75592e05ef26e226670e6b837d0257e3",
-    "src/geometry/cylinder-cylinder3.ts": "c93b07a7ef548ea7bffa90de3c5305ed48717e0ab98d10da3800ab4a11e1e331",
+    "src/geometry/cylinder-cylinder3.ts": "50d5ec919623035489a7fb23e0d97a908e8ee7ccc4125dfa7c3c8e8b227c20a4",
     "src/geometry/cylinder-intersection-plane3.ts": "fd35a6b89e11c82e131a5ae438586e2dfae6e8a96e4e83536357f2c0bf6722ab",
     "src/geometry/brep-curve3.ts": "9158d8b4dbbb3898f7311efc6c23ad06b9d733ea231ac1bf15ff66de8e103224",
     "src/geometry/sew-mixed-brep3.ts": "e6f93b7c9a7563545f84ee6a7c189f6e331ad7e876e753e1ecaeda1f5a4d854e",
     "src/geometry/cylinder-intersection-support3.ts": "b1387f5657961e168fa40a5897b50e72f083bcd896d340850329efa59629f4c5",
     "src/geometry/cylinder-intersection-face3.ts": "fd7b490e9c3685c2ca3993b3345e001995ec12d11bc3e74451332241c1bcc1cd",
-    "src/geometry/cylinder-coordinates3.ts": "4715cf858e720ff0d1630dc172f1d1b19e2168391d49dda0e356279b1006100a",
+    "src/geometry/cylinder-coordinates3.ts": "2350437bb6ca914915cb8eb39bbd716596ff7753a9b19e59fb22b50c21393695",
     "src/geometry/cylinder-face-cylinder-partition3.ts": "0d3ce34965bfb7858f83da3258ca160c863fa90f30124d1284917478d2ef3cfa",
     "src/geometry/cylinder-face-finite-cylinder3.ts": "708a515cd02da95c2df47c32867370d775b0e49f433901293a3e4762dfdc8937",
     "src/geometry/cylinder-cell-plane-partition3.ts": "e4a46c2bb64e9142eedc8acb38550b8092cbbb6bfc225862c9856704b6fa225c",
@@ -129,7 +129,7 @@
     "src/geometry/cylinder-cell-refinement3.ts": "8e154928158d454cf40a140caf580488ee0a13344c1381534d9a5175b3a2cd48",
     "src/geometry/finite-cylinder-expression3.ts": "ccf405c581386d359b1f361befa0a43e92e99ce1cbace864ce490bfc03f59a9b",
     "src/convert/finite-cylinder-expression3.ts": "4114952d90062f809d339eefd7931f7017df415d1e6dee073ca27675ef05e574",
-    "src/geometry/algebraic-axial-point3.ts": "5b6b46f51493769b481ea595d8d7a968f0b8d73cc2572489302ad9d6abcee6ee"
+    "src/geometry/algebraic-axial-point3.ts": "09773723c40f03cdcaf4f04cf3a8938985d9ff6ae15181a1d0bbb964e45d72c9"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
