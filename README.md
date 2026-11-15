@@ -1226,3 +1226,11 @@ node examples/face-domain-record3.ts
 `cells`の番号は`sewn.topology.faces`の番号と一致します。各片は`sourceFace`と切断平面順の`signs`を保持し、`edgeOrigins`は共有辺から各片の境界、元の面・辺、辺全体を含む切断平面、使用方向への対応を返します。切断で新設された辺の`sourceEdge`は`null`です。`cells.map(c => c.polygon)`を再入力してさらに分割できます。その場合の由来は直前の入力への対応です。
 
 `requireClosed`は閉じた向き付き多様体の接続を検査します。入力は多角形群であり、自己交差のない立体や空洞の成立は認定しません。指定していない面間交差を自動発見する処理、非凸面・穴・曲線面、共通Bodyへの採用と一般ブーリアンは今後の開発です。[構成と検証範囲](docs/proofs/planar-brep-partition3.md)。
+
+## 検証済みの平面多角形立体
+
+`preparePlanarSolid3(polygons)`は凸な有理平面多角形群を接続し、面の埋め込み、シェルの包含と向き、材料の体積・内外判定まで検査します。非凸な立体・空洞・入れ子の材料・貫通穴も、複数の凸な面で表現できます。各入力面は穴のない凸多角形である必要があります。
+
+`topology`と`polygons`は共有辺を持つ多角形B-repです。`shells`は多角形の面ID、包含の深さ`depth`、向き付き体積を保持します。`volume`は材料体積、`locate(point3(...))`は有理座標の`inside`／`boundary`／`outside`を返します。内部の厳密な三角形分解は`triangles`と`triangleFaces`で対応を確認できます。これは近似メッシュへの置換ではなく、元の平面領域を厳密に被覆する検証用の分解です。
+
+開いた面、非多様体、自己交差・不正な重なり、接触する別シェル、包含に対して向きが不正なシェルを拒否します。一般の曲面・代数的座標の面・共通Bodyへの採用・B-repブーリアンはまだ対象外です。[成立条件と検証範囲](docs/proofs/planar-solid3.md)。
