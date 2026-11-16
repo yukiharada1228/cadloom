@@ -485,3 +485,5 @@ export type {NurbsSourceBRep3,NurbsSourceBRepEdge3,NurbsSourceBRepFace3} from '.
 export {readNurbsSourceBRepRecord3,parseNurbsSourceBRepRecord3} from './record/nurbs-source-brep3.js';
 export type {NurbsSourceBRepRecord3,NurbsSourceDomainRecord3} from './record/nurbs-source-brep3.js';
 export {encodeNurbsSourceBRep3,decodeNurbsSourceBRep3,stringifyNurbsSourceBRep3,restoreNurbsSourceBRep3} from './convert/nurbs-source-brep3.js';
+export {intersectNurbsSourceFaceLine3,intersectNurbsSourceFaceRay3,nurbsSourceFaceLineOverlapPoint3} from './geometry/nurbs-source-face-line3.js';
+export type {NurbsSourceFaceLine3,NurbsSourceLineVertex3,NurbsSourceLineOverlap3} from './geometry/nurbs-source-face-line3.js';

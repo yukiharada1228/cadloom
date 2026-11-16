@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "ad53e70f4fac68f18c42742ec933a3c2c356e20d16f6e049271c306654786dee",
+    "src/index.ts": "6c0e25991f5ae816a71f0c8295d1f765aa3059a462683eb7cea77f56a3e0507f",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -216,7 +216,7 @@
     "src/geometry/nurbs-source-face-location3.ts": "5bf61c60c0700c0b29d26fd3acb6701ac3bf8744bdda7eddac05312e7eccb681",
     "src/geometry/nurbs-source-face-lift3.ts": "3cdd49042af5d44448298ef75904dfac28f4cb1f536e6451a0bb3f20df3ee6a0",
     "src/geometry/nurbs-source-face-patches3.ts": "39b0e39313871282386e0701c9fdc7dcb63384f024075c578b48a5f74c967cf3",
-    "src/geometry/nurbs-source-face-regularity3.ts": "1c157531c10bb1f3e4168692c8bf9508fb8d8b0dc7144734cb411fcf2910360a",
+    "src/geometry/nurbs-source-face-regularity3.ts": "5dc10fdc790439076366f10cb60d891a4e1164a78bdbb7bdbd1e4b9eb65e7c50",
     "src/geometry/nurbs-source-boundary-regularity3.ts": "a6cfdb4da48ae2aca1c34dbc4248a1690e3b3cf0d994caaea05c26ccb055ad4d",
     "src/geometry/nurbs-source-vertex-regularity3.ts": "ced96bf6f50a86d9d852422f3a5a9b4d0e4ab470ab2ab0f053551794c8ef89c9",
     "src/geometry/nurbs-source-closed-rank3.ts": "a212b5fa2dba3a4776bfec0ee1ae98642b55dc56d0e1c8379dc232d9f5ad2e4a",
@@ -228,7 +228,9 @@
     "src/geometry/nurbs-source-complex-face-preimage3.ts": "5a40516318b32ae9980aa95b7f9056dbea7e6c352983c085e0b391c0ac46a7e2",
     "src/geometry/nurbs-source-brep3.ts": "f1d7228ba224845953382ef7f0eecb78bfd58ab02f50d87380122f45d0455f84",
     "src/record/nurbs-source-brep3.ts": "98d0cdfeae0581426f1a5838fce9bd8085975d199d6d63483cbf75b1ab62996f",
-    "src/convert/nurbs-source-brep3.ts": "f948f85bf0ebf0af6368d327d4d5d7769005fc9716d633bb8ddeb8da7343f337"
+    "src/convert/nurbs-source-brep3.ts": "f948f85bf0ebf0af6368d327d4d5d7769005fc9716d633bb8ddeb8da7343f337",
+    "src/geometry/nurbs-source-face-partition3.ts": "524e08747eca07d70e954de96c9c6e40ddb2e1b9e8a5d801da8e749833b98de5",
+    "src/geometry/nurbs-source-face-line3.ts": "a41df7b8ce4c4a40db8b859b20c4411badce5150a37d395c28a602c10f2e413d"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

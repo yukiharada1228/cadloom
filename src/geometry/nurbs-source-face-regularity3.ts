@@ -4,7 +4,7 @@ import {assertOwnedNurbsSourceFacePatches3} from './nurbs-source-face-patches3.j
 import type {NurbsSourceFacePatches3} from './nurbs-source-face-patches3.js';
 import {analyzeNurbsSurfaceRegularity3} from './nurbs-surface-regularity3.js';
 import type {NurbsSurfaceRegularity3,NurbsSurfaceSingularPoint3} from './nurbs-surface-regularity3.js';
-import {prepareNurbsDomainPolynomialPartition2} from './nurbs-domain-polynomial-partition2.js';
+import {prepareNurbsSourceFacePolynomialPartition3} from './nurbs-source-face-partition3.js';
 import {witnessBivariatePartition2} from './algebraic-curve-inequalities2.js';
 import {locateNurbsSourceFace3} from './nurbs-source-face-location3.js';
 import {liftNurbsSectionPatch3} from './nurbs-plane-section3.js';
@@ -21,10 +21,7 @@ const one=new BivariatePolynomial([[1n]]);
  * one-sided patch. Boundary/vertex rank, injectivity and material are separate. */
 export function analyzeNurbsSourceFaceInteriorRegularity3(source:NurbsSourceFacePatches3):NurbsSourceFaceRegularity3 {
  assertOwnedNurbsSourceFacePatches3(source);if(source.kind==='unresolved')return Object.freeze({kind:'unresolved',source,reason:'unresolved-patches'});
- const L=source.source,F=L.source,c=F.source.source,R=c.source,support=analyzeNurbsSurfaceRegularity3(R.source.source.source.equations.source),domainPartition=prepareNurbsDomainPolynomialPartition2(c.sharing.boundary.domain),edgePolynomials:BivariatePolynomial[]=[];
- const add=(p:BivariatePolynomial)=>{if((p.degreeU>0||p.degreeV>0)&&!edgePolynomials.some(q=>q.equals(p)))edgePolynomials.push(p);};
- for(const v of c.vertices){add(new BivariatePolynomial(v.u.recognizeRational().polynomial.coefficients.map(q=>[q])));add(new BivariatePolynomial([v.v.recognizeRational().polynomial.coefficients]));}
- for(const e of R.edges){const old=R.source.edges[e.sourceEdge]!,use=old.uses[0]!,p=R.source.source.patches[use.patch]!,t=p.edges[use.edge]!,raw=R.source.source.source.patches[p.sourceIntersectionPatch]!.edges[t.sourceEdge]!;add(raw.graph.polynomial);}
+ const L=source.source,F=L.source,c=F.source.source,R=c.source,support=analyzeNurbsSurfaceRegularity3(R.source.source.source.equations.source),facePartition=prepareNurbsSourceFacePolynomialPartition3(source);
  const partitions=new Map<number,readonly BivariatePolynomial[]>();
  const faces=source.faces.map(face=>{
   const patches=support.patches.map((p,patch):NurbsSourceFacePatchRegularity3=>{
@@ -37,7 +34,7 @@ export function analyzeNurbsSourceFaceInteriorRegularity3(source:NurbsSourceFace
    if(p.locus===null||p.locus.kind==='curve'&&p.locus.edges.length===0){point=[...p.points,...(p.locus?.vertices??[])].find(belongs)??null;}
    else{
     const q=p.patch,bounds={uMin:q.startU,uMax:q.endU,vMin:q.startV,vMax:q.endV};let polynomials=partitions.get(patch);
-    if(!polynomials){polynomials=Object.freeze([...domainPartition(bounds),...edgePolynomials,p.normalX,p.normalY,p.normalZ]);partitions.set(patch,polynomials);}
+    if(!polynomials){polynomials=Object.freeze([...facePartition(bounds),p.normalX,p.normalY,p.normalZ]);partitions.set(patch,polynomials);}
     // Every normal zero, finite boundary branch endpoint, graph support and
     // coordinate event is an arrangement stratum. Membership is queried on
     // the actual finite UV graph, not inferred from implicit support alone.
