@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "93044d153eaad794cb2a75acf0927dd56cc7088bfec2ce3ccdc8cf45f5281487",
+    "src/index.ts": "d169aa81ff51c088d83cbdfbf6ca3635505488dc5de118f78d4c311bb21ea180",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -287,7 +287,8 @@
     "src/geometry/nurbs-recut-curve-plane3.ts": "69e674cc84cac1ebd445a094b846f53367c2b59b69e3d95ba3735408a1120746",
     "src/geometry/nurbs-recut-cap-winding3.ts": "96ea7045f66e3a8a6fabf3d5729a623e0b28cd75e7a684994cb09cdb715b50bc",
     "src/geometry/nurbs-recut-cap-domains3.ts": "00829ffc56a413f98ac36ee88d536615ec5905ffb8ae7e9531434aa1c6b105bd",
-    "src/geometry/cap-nurbs-recut-half3.ts": "9539d71d4dcede4a564dd050a6d749c909f64d1dbbc1fd7065bd41e1e23e8ec9"
+    "src/geometry/cap-nurbs-recut-half3.ts": "9539d71d4dcede4a564dd050a6d749c909f64d1dbbc1fd7065bd41e1e23e8ec9",
+    "src/geometry/nurbs-source-plane-zero-set3.ts": "06c9f548dcc676fe9f99e063808f67fef26cbe44d8137b8e11134d51240c50ea"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

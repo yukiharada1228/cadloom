@@ -621,3 +621,5 @@ export {certifyNurbsRecutAssemblyEmbedding3,analyzeNurbsRecutCapDomains3,locateN
 export type {NurbsRecutAssemblyEmbeddingCertificate3,NurbsRecutAssemblyEmbedding3,NurbsRecutCapDomainsCertificate3,NurbsRecutCapDomains3,NurbsRecutCapFaceLocation3} from './geometry/nurbs-recut-cap-domains3.js';
 export {capNurbsRecutHalf3,locateNurbsRecutClosedSurface3,nurbsRecutNewCapPoint3} from './geometry/cap-nurbs-recut-half3.js';
 export type {CappedNurbsRecutHalf3,NurbsRecutClosedSurface3,NurbsRecutNewCapSurface3} from './geometry/cap-nurbs-recut-half3.js';
+export {analyzeNurbsSourcePlaneZeroSet3} from './geometry/nurbs-source-plane-zero-set3.js';
+export type {NurbsSourcePlaneZeroSet3,NurbsSourcePlaneZeroSetCertificate3} from './geometry/nurbs-source-plane-zero-set3.js';
