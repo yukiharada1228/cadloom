@@ -349,3 +349,4 @@ export {bodyRecordFromMaterialSurfaceBoundary3} from './convert/material-surface
 export {materialSurfaceRegions3} from './geometry/finite-cylinder-regions3.js';
 export type {MaterialSurfaceRegions3} from './geometry/finite-cylinder-regions3.js';
 export {strictCylinderMaterialProgramLocation3} from './geometry/cylinder-material-program3.js';
+export {locateMaterialSurfaceBoundary3} from './geometry/material-surface-boundary3.js';

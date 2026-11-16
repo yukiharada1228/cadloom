@@ -1,3 +1,12 @@
+import {snapshotExactPoint3} from './algebraic-point3.js';
+import type {AlgebraicCoordinates3} from './algebraic-point3.js';
+import {point3,dot3} from './point3.js';
+import type {Point3} from './point3.js';
+import {classifyPointToSurface3} from './surface3.js';
+import {surfaceGermSides3} from './surface-germ3.js';
+import {plane3} from './plane3.js';
+import {evaluateCylinderMaterialExpression3 as truth} from './material-expression-eval3.js';
+import type {CurveRegionLocation2} from './curve-boolean2.js';
 import {resolveCylinderMaterialProgram3} from './cylinder-material-expression3.js';
 import type {CylinderMaterialDefinition3} from './cylinder-material-expression3.js';
 import {boundaryPlanarMaterialSurfaces3} from './planar-material-surfaces3.js';
@@ -45,4 +54,36 @@ export function boundaryMaterialSurfaces3(material:CylinderMaterialDefinition3,o
  const empty=faces.length===0;if('empty' in material&&empty!==material.empty)throw new Error('Assembled and source material disagree on emptiness');
  const result=Object.freeze({material,planar,cylindrical,faces,faceOrigins,sewn,empty,closedOrientedIncidence:sewn.topology.closedOrientedIncidence&&sewn.topology.issues.length===0});
  owned.add(result);return result;
+}
+
+/** Regularized membership uses selected bounded faces for the boundary, then
+ * an exact eventual straight-line germ for cancelled primitive seams. */
+export function locateMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3,input:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
+ assertOwnedMaterialSurfaceBoundary3(source);
+ if(source.empty)return 'outside';
+ const program=resolveCylinderMaterialProgram3(source.material),p=snapshotExactPoint3(input);
+ const cs=program.cylinders.map(c=>c.locate(p)),ps=program.planes.map(plane=>classifyPointToSurface3(p,{kind:'plane',plane}));
+ if(cs.every(c=>c!=='boundary')&&ps.every(s=>s!==0))return truth(program.expression,cs.map(c=>c==='inside'),ps.map(s=>s<0))?'inside':'outside';
+ const onBoundary=source.faceOrigins.some(origin=>{
+  const domain=origin.kind==='plane'?source.planar.supports[origin.support]!.refinement.classification.source.cells[origin.cell]!:source.cylindrical.walls[origin.cylinder]!.source.source.partition.cells[origin.cell]!;
+  return domain.locate(p)!=='outside';
+ });
+ if(onBoundary)return 'boundary';
+ for(let k=0n;;k++){
+  const direction=point3(1n,k,k*k),cylinders:boolean[]=[],planes:boolean[]=[];let retry=false;
+  for(const c of program.cylinders){
+   const radial=surfaceGermSides3(p,direction,{kind:'cylinder',cylinder:c.cylinder}).plus;
+   const d=c.cylinder.axis.direction,o=c.cylinder.axis.origin,D=dot3(d,d);
+   const cap=(t:typeof c.lower)=>surfaceGermSides3(p,direction,{kind:'plane',plane:plane3(d.x,d.y,d.z,dot3(d,o).add(D.mul(t)).neg())}).plus;
+   const lo=cap(c.lower),hi=cap(c.upper);
+   if(radial===0||lo===0||hi===0){retry=true;break;}
+   cylinders.push(radial<0&&lo>0&&hi<0);
+  }
+  if(retry)continue;
+  for(let i=0;i<program.planes.length;i++){
+   const sign=ps[i]===0?dot3(program.planes[i]!.normal,direction).sign():ps[i]!;
+   if(sign===0){retry=true;break;}planes.push(sign<0);
+  }
+  if(!retry)return truth(program.expression,cylinders,planes)?'inside':'outside';
+ }
 }

@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "c86a24ce420f916e2bc9014d50bc01d5dad23415126649301d3a5251a30260fd",
+    "src/index.ts": "a83f69c37c1e64d53ef9130860e4724f3ecff90c4bff2898dbe577afb53df6a4",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -155,7 +155,7 @@
     "src/geometry/planar-material-surfaces3.ts": "7fb7bfbe213a15ce795c850b807bd5c1b2aa4d35ad0d68a8040ff70e24a449db",
     "src/geometry/material-expression-eval3.ts": "3feef0a7aa2b6a02c2c5392e39e15bbaae72dc7a57ab876bab706e46dc2173d0",
     "src/geometry/cylinder-material-surfaces3.ts": "c22e44871978db70843b36d904a809dfbef96a6c3e494d2c96a6e86afd4591a3",
-    "src/geometry/material-surface-boundary3.ts": "ddda075ed1f60b22cfa29ec475df4e62f270c7925b3b7680a71c41c06bab10b1",
+    "src/geometry/material-surface-boundary3.ts": "79d94b073f608315296af63107f9735b57e8f793c69ebeb8ca50583bd3dafc13",
     "src/geometry/cylinder-material-program3.ts": "166902b223efae593fe89bcf64140debf45c6426a077fccf9dca0d20a6f4a1d6",
     "src/convert/material-surface-boundary3.ts": "f5bb8d5f863649ac7f4786c53607ddfba85f206bc511a79ca42a14f7239ec9bc"
   },
