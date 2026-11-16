@@ -514,3 +514,6 @@ export type {NurbsSourcePlaneVertex3,NurbsSourcePlaneEdge3,NurbsSourcePlaneArea3
 export {intersectSewnNurbsSourceBoundaryPlane3,nurbsBoundaryPlaneEdgePoint3} from './geometry/sewn-nurbs-source-boundary-plane3.js';
 export type {NurbsBoundaryPlaneVertex3,NurbsBoundaryPlaneEdge3,NurbsBoundaryPlaneComponent3,NurbsBoundaryPlaneDiagnostic3,SewnNurbsBoundaryPlane3} from './geometry/sewn-nurbs-source-boundary-plane3.js';
 export {intersectNurbsBodyBoundaryPlane3} from './ops/nurbs-body-boundary-plane3.js';
+
+export {certifyNurbsBoundaryPlaneWires3} from './geometry/nurbs-plane-wires3.js';
+export type {NurbsPlaneWireEdge3,NurbsPlaneWire3,NurbsPlaneWiresCertificate3,NurbsPlaneWires3} from './geometry/nurbs-plane-wires3.js';

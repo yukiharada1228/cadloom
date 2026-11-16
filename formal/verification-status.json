@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "b2fe4cde0fb3e9e9614ba892719663bb4a458e408a23ff8b39f346713712e4ae",
+    "src/index.ts": "f3a79a66210a4a89db7a9e6fb1fecf03a5c2d56cc7e6f269369366517aa0ec04",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -245,8 +245,9 @@
     "src/record/nurbs-body3.ts": "3a0d4e192229f7acff62a8942312fe8e863420ec6c4570b19dd66104c4a15897",
     "src/numeric/bivariate-equation-basis.ts": "5d7d811cf4afee131f65fbb15fade7ba8a829d158b7692672d6511385ba9bc2b",
     "src/geometry/nurbs-source-face-plane3.ts": "d87ba38237256ae4b54374424be5b6190f53f85e425ac684f5c35b34519708dd",
-    "src/geometry/sewn-nurbs-source-boundary-plane3.ts": "bd546642b6c380a9300f23e6daefa7599beff62fdf5cce4f4ff38257c1926940",
-    "src/ops/nurbs-body-boundary-plane3.ts": "998521d8977829bf1f6ab65221e9fc89c8ca4c7729a958ab34e2de8bd503db0b"
+    "src/geometry/sewn-nurbs-source-boundary-plane3.ts": "f8424912ef47da35eb1104b5a1aa2b8202ef610e45e616e3ed4b6f6f59475e34",
+    "src/ops/nurbs-body-boundary-plane3.ts": "998521d8977829bf1f6ab65221e9fc89c8ca4c7729a958ab34e2de8bd503db0b",
+    "src/geometry/nurbs-plane-wires3.ts": "f7a7a47b9110bf1cca5deb00143c1d39e566fbe40dd494cba3ce7bf8914a55ab"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

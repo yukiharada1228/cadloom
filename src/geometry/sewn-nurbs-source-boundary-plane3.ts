@@ -37,6 +37,8 @@ export type SewnNurbsBoundaryPlane3=
    edges:readonly NurbsBoundaryPlaneEdge3[];areas:readonly Readonly<{face:number;section:Section;area:number}>[];
    components:readonly NurbsBoundaryPlaneComponent3[];diagnostics:readonly NurbsBoundaryPlaneDiagnostic3[]}>;
 const owned=new WeakSet<SewnNurbsBoundaryPlane3>();
+/** Internal provenance guard for derived section certificates. */
+export function assertOwnedSewnNurbsBoundaryPlane3(input:SewnNurbsBoundaryPlane3):void {if(!owned.has(input))throw new RangeError('Expected factory-created boundary plane section');}
 /** Exact boundary-section assembly for a certified globally embedded material.
  * Face intervals are retained, not chordalized or guessed to be cap boundaries. */
 export function intersectSewnNurbsSourceBoundaryPlane3(material:SewnNurbsSourceMaterialCertificate3,input:Plane3):SewnNurbsBoundaryPlane3 {
