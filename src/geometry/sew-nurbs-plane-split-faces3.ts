@@ -12,8 +12,8 @@ export type SewnNurbsPlaneSplitEdge3=
  | Readonly<{kind:'source';source:SewnNurbsSourceEdgePlane3;edge:number;lower:AlgebraicReal;upper:AlgebraicReal}>
  | Readonly<{kind:'section';source:Built;edge:number;lower:AlgebraicReal;upper:AlgebraicReal}>;
 export type SewnNurbsPlaneSplitFaces3=
- | Readonly<{kind:'unresolved';source:SewnNurbsSourceEdgePlane3;inputs:readonly NurbsPlaneSplitFaces3[];reason:'face-assembly'|'missing-source-face'|'coplanar-side-selection';input?:number;face?:number}>
- | Readonly<{kind:'sewn';source:SewnNurbsSourceEdgePlane3;inputs:readonly Built[];side:1|-1|null;
+ | Readonly<{kind:'unresolved';source:SewnNurbsSourceEdgePlane3;inputs:readonly NurbsPlaneSplitFaces3[];previous:SewnNurbsPlaneSplitFaces3|null;reason:'face-assembly'|'missing-source-face'|'coplanar-side-selection'|'parent-sewing'|'recut-incidence';input?:number;face?:number}>
+ | Readonly<{kind:'sewn';source:SewnNurbsSourceEdgePlane3;inputs:readonly Built[];previous:SewnNurbsPlaneSplitFaces3|null;side:1|-1|null;
    topology:BRepTopology3<SewnNurbsPlaneSplitEdge3,NurbsPlaneSplitFaceSurface3>;
    sourceEdges:readonly (readonly (readonly BRepEdgeUse3[]|null)[])[];
    sourceFaces:readonly (readonly (number|null)[])[];
@@ -25,16 +25,30 @@ const ownedEdges=new WeakSet<SewnNurbsPlaneSplitEdge3>();
 export function assertOwnedSewnNurbsPlaneSplitEdge3(edge:SewnNurbsPlaneSplitEdge3):void {if(!ownedEdges.has(edge))throw new RangeError('Expected factory-created sewn split edge');}
 /** Sew all original finite-face subdivisions using canonical shared curve
  * intervals. Optional side selection leaves open section boundaries, not caps. */
-export function sewNurbsPlaneSplitFaces3(source:SewnNurbsSourceEdgePlane3,input:readonly NurbsPlaneSplitFaces3[],side?:1|-1):SewnNurbsPlaneSplitFaces3 {
+export function sewNurbsPlaneSplitFaces3(source:SewnNurbsSourceEdgePlane3,input:readonly NurbsPlaneSplitFaces3[],side?:1|-1):SewnNurbsPlaneSplitFaces3 {return sewFaces(source,input,side,null);}
+/** Rebuild shared original-source intervals across every previous finite face.
+ * Previous face identity, rather than raw face number, permits disconnected
+ * retained regions from the same original face without omitting siblings. */
+export function sewNurbsRecutSourceFaces3(previous:SewnNurbsPlaneSplitFaces3,source:SewnNurbsSourceEdgePlane3,input:readonly NurbsPlaneSplitFaces3[],side?:1|-1):SewnNurbsPlaneSplitFaces3 {
+ assertOwnedSewnNurbsPlaneSplitFaces3(previous);assertOwnedSewnNurbsSourceEdgePlane3(source);if(side!==undefined&&side!==1&&side!==-1)throw new RangeError('Split-face side must be +1 or -1');
+ if(previous.source.source!==source.source)throw new RangeError('Recut refinement belongs to a different original source');
+ if(previous.kind!=='sewn'){const inputs=Object.freeze(Array.from(input,r=>{assertOwnedNurbsPlaneSplitFaces3(r);return r;}));return own(Object.freeze({kind:'unresolved',source,inputs,previous,reason:'parent-sewing'}));}
+ return sewFaces(source,input,side,previous);
+}
+function sewFaces(source:SewnNurbsSourceEdgePlane3,input:readonly NurbsPlaneSplitFaces3[],side:1|-1|undefined,previous:Extract<SewnNurbsPlaneSplitFaces3,{kind:'sewn'}>|null):SewnNurbsPlaneSplitFaces3 {
  assertOwnedSewnNurbsSourceEdgePlane3(source);if(side!==undefined&&side!==1&&side!==-1)throw new RangeError('Split-face side must be +1 or -1');
  const inputs=Object.freeze(Array.from(input,r=>{assertOwnedNurbsPlaneSplitFaces3(r);return r;})),seen=new Set<number>(),built:Built[]=[];
  for(const [i,r] of inputs.entries()){
   if(r.source.source.vertices.source!==source)throw new RangeError('Split faces belong to a different source refinement');
-  const face=r.source.source.vertices.face;if(seen.has(face))throw new RangeError('Duplicate original source face');seen.add(face);
-  if(r.kind!=='built')return own(Object.freeze({kind:'unresolved',source,inputs,reason:'face-assembly',input:i}));built.push(r);
+  const restriction=r.source.source.vertices.cells.source.restriction;
+  const face=previous===null?r.source.source.vertices.face:previous.topology.faces.findIndex(f=>f.surface===restriction);
+  if(previous===null&&restriction!==null)throw new RangeError('Restricted recut faces require their previous assembly');
+  if(previous!==null&&face<0)throw new RangeError('Recut faces belong to a different previous finite region');
+  if(seen.has(face))throw new RangeError('Duplicate original or previous finite source face');seen.add(face);
+  if(r.kind!=='built')return own(Object.freeze({kind:'unresolved',source,inputs,previous,reason:'face-assembly',input:i}));built.push(r);
  }
- for(let face=0;face<source.topology.faces.length;face++)if(!seen.has(face))return own(Object.freeze({kind:'unresolved',source,inputs,reason:'missing-source-face',face}));
- if(side!==undefined)for(const [i,r] of built.entries())if(r.topology.faces.some(f=>f.surface.sign===0))return own(Object.freeze({kind:'unresolved',source,inputs,reason:'coplanar-side-selection',input:i}));
+ for(let face=0;face<(previous===null?source.topology.faces.length:previous.topology.faces.length);face++)if(!seen.has(face))return own(Object.freeze({kind:'unresolved',source,inputs,previous,reason:'missing-source-face',face}));
+ if(side!==undefined)for(const [i,r] of built.entries())if(r.topology.faces.some(f=>f.surface.sign===0))return own(Object.freeze({kind:'unresolved',source,inputs,previous,reason:'coplanar-side-selection',input:i}));
  const cuts=source.topology.edges.map(e=>[e.curve.lower,e.curve.upper]);
  for(const r of built)for(const e of r.topology.edges){const q=e.curve.source.edges[e.curve.edge]!.source;if(!q)continue;const old=source.topology.edges[q.edge]!.curve;
   if(q.lower.compare(old.lower)<0||q.upper.compare(old.upper)>0||q.lower.compare(q.upper)>=0)throw new Error('Split face lost its finite shared-curve restriction');
@@ -66,8 +80,9 @@ export function sewNurbsPlaneSplitFaces3(source:SewnNurbsSourceEdgePlane3,input:
   endpoints:e=>e.kind==='source'?[nurbsSourcePlaneEdgeFragmentPoint3(e.source.topology.edges[e.edge]!.curve,e.lower),nurbsSourcePlaneEdgeFragmentPoint3(e.source.topology.edges[e.edge]!.curve,e.upper)] as const:[e.source.topology.vertices[e.source.topology.edges[e.edge]!.start]!,e.source.topology.vertices[e.source.topology.edges[e.edge]!.end]!] as const,closed:()=>false,
   snapshotSurface:(s:NurbsPlaneSplitFaceSurface3)=>{if(!memberships.has(s))throw new RangeError('Expected selected split-face surface');return s;},onSurface:(e,s)=>memberships.get(s)?.has(indices.get(e)!)??false,
  });
- if(side===undefined&&source.topology.closedOrientedIncidence&&!topology.closedOrientedIncidence)throw new Error('Full split-face sewing changed closed oriented incidence');
- return own(Object.freeze({kind:'sewn',source,inputs:Object.freeze(built),side:side??null,topology,sourceEdges:Object.freeze(sourceEdges.map(a=>Object.freeze(a))),sourceFaces:Object.freeze(sourceFaces.map(a=>Object.freeze(a))),sharedFragments:Object.freeze(pieces.map(p=>Object.freeze([...p.entries()].sort((a,b)=>a[0]-b[0]).map(([,edge])=>edge))))}));
+ if(previous!==null&&(!topology.consistentlyOriented||!topology.manifoldVertices||topology.boundaryLoops===null))return own(Object.freeze({kind:'unresolved',source,inputs,previous,reason:'recut-incidence'}));
+ if(side===undefined&&(previous===null?source.topology.closedOrientedIncidence:previous.topology.closedOrientedIncidence)&&!topology.closedOrientedIncidence){if(previous!==null)return own(Object.freeze({kind:'unresolved',source,inputs,previous,reason:'recut-incidence'}));throw new Error('Full split-face sewing changed closed oriented incidence');}
+ return own(Object.freeze({kind:'sewn',source,inputs:Object.freeze(built),previous,side:side??null,topology,sourceEdges:Object.freeze(sourceEdges.map(a=>Object.freeze(a))),sourceFaces:Object.freeze(sourceFaces.map(a=>Object.freeze(a))),sharedFragments:Object.freeze(pieces.map(p=>Object.freeze([...p.entries()].sort((a,b)=>a[0]-b[0]).map(([,edge])=>edge))))}));
 }
 export function sewnNurbsPlaneSplitEdgePoint3(edge:SewnNurbsPlaneSplitEdge3,input:AlgebraicReal|ExactInput) {
  if(!ownedEdges.has(edge))throw new RangeError('Expected factory-created sewn split edge');const t=input instanceof AlgebraicReal?input:AlgebraicReal.fromRational(input);
