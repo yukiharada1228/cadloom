@@ -33,7 +33,7 @@ export function nurbsBoundaryCoordinateRoots3(s:NurbsSpan3,key:'x'|'y'|'z',value
  }
  const P=value.recognizeRational().polynomial,n=P.degree,NP=[one],WP=[one];for(let i=1;i<=n;i++){NP.push(NP[i-1]!.mul(N));WP.push(WP[i-1]!.mul(W));}
  let f=new Polynomial();for(let i=0;i<=n;i++)f=f.add(NP[i]!.mul(WP[n-i]!).scale(P.coefficient(i)));
- return isolateRealRoots(f).filter(t=>t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0&&t.signOf(W)!==0&&t.rationalFunction(N,W).compare(value)===0);
+ return isolateRealRoots(f).map(t=>t.recognizeRational()).filter(t=>t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0&&t.signOf(W)!==0&&t.rationalFunction(N,W).compare(value)===0);
 }
 /** Node every finite trim-boundary span at all refined intersection vertices.
  * Computes exact parameter preimages, including algebraic values and knots.

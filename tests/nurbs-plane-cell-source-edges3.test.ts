@@ -56,8 +56,8 @@ test('nonlinear cube cell boundary intervals match canonical source curves and o
  }
  assert.ok(matched>0&&interior>0&&reversed>0);
 });
-test('weighted curved constant-UV boundaries match while general implicit trim paths remain explicit unresolved',()=>{
- const p=plane3(0n,0n,1n,'-1/2'),source=refineSewnNurbsSourceEdgesByPlane3(cylinder(),p);let wallMatched=false,capUnresolved=false;
- for(const face of [0,4]){const f=source.topology.faces[face]!,partition=partitionNurbsSourceFaceByPlane3(f.surface.source.complex,f.surface.face,p),cells=buildNurbsSourcePlaneCellComplex3(partition),r=matchNurbsPlaneCellSourceEdges3(source,face,cells);if(face===0){assert.equal(r.allOriginalBoundariesMatched,true);wallMatched=r.edges.some(e=>e.kind==='matched');}else{capUnresolved=r.edges.some(e=>e.kind==='unresolved'&&e.reason==='implicit-curve-map');assert.equal(r.allOriginalBoundariesMatched,false);}assert.throws(()=>matchNurbsPlaneCellSourceEdges3({...source},face,cells),/factory/);}
- assert.ok(wallMatched&&capUnresolved);
+test('weighted curved wall and implicit circular trim boundaries both match original source intervals',()=>{
+ const p=plane3(0n,0n,1n,'-1/2'),source=refineSewnNurbsSourceEdgesByPlane3(cylinder(),p);let wallMatched=false,capMatched=false;
+ for(const face of [0,4]){const f=source.topology.faces[face]!,partition=partitionNurbsSourceFaceByPlane3(f.surface.source.complex,f.surface.face,p),cells=buildNurbsSourcePlaneCellComplex3(partition),r=matchNurbsPlaneCellSourceEdges3(source,face,cells);if(face===0){assert.equal(r.allOriginalBoundariesMatched,true);wallMatched=r.edges.some(e=>e.kind==='matched');}else{capMatched=r.edges.some(e=>e.kind==='matched'&&e.parameterization.parameterSpan!==null);assert.equal(r.allOriginalBoundariesMatched,true);}assert.throws(()=>matchNurbsPlaneCellSourceEdges3({...source},face,cells),/factory/);}
+ assert.ok(wallMatched&&capMatched);
 });

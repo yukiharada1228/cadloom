@@ -21,8 +21,9 @@ export interface AlgebraicCurveTopology2 {
   readonly components:readonly {readonly vertices:readonly number[];readonly edges:readonly number[]}[];
 }
 const owned=new WeakSet<AlgebraicCurveTopology2>(),two=new Rational(2n);
+const graphFactors=new WeakMap<AlgebraicCurveTopology2,readonly BivariatePolynomial[]>();
 const real=(value:AlgebraicReal|ExactInput)=>value instanceof AlgebraicReal?value:AlgebraicReal.fromRational(value);
-function finish(value:AlgebraicCurveTopology2):AlgebraicCurveTopology2 {const frozen=Object.freeze(value);owned.add(frozen);return frozen;}
+function finish(value:AlgebraicCurveTopology2,factors?:readonly BivariatePolynomial[]):AlgebraicCurveTopology2 {const frozen=Object.freeze(value);owned.add(frozen);if(factors)graphFactors.set(frozen,Object.freeze([...factors]));return frozen;}
 /** Internal provenance guard shared by exact graph restriction operations. */
 export function assertOwnedAlgebraicCurveTopology2(input:AlgebraicCurveTopology2):void {if(!owned.has(input))throw new RangeError('Curve evaluation requires a factory-created topology');}
 /** Density of Q, using only exact separating intervals. */
@@ -35,6 +36,9 @@ function distinct(values:AlgebraicReal[]):AlgebraicReal[]{return values.sort((a,
 function fiber(H:BivariatePolynomial,u:AlgebraicReal,bounds:CurveRectangle2):readonly AlgebraicReal[] {
   const result=bivariateFiberRoots(H,u);if(result.kind==='whole')throw new Error('Primitive nonvertical curve has an identically zero fiber');
   return result.roots.filter(v=>v.compare(real(bounds.vMin))>=0&&v.compare(real(bounds.vMax))<=0);
+}
+function factoredFiber(H:BivariatePolynomial,u:AlgebraicReal,bounds:CurveRectangle2,factors?:readonly BivariatePolynomial[]):readonly AlgebraicReal[] {
+ return factors?distinct(factors.flatMap(f=>[...fiber(f,u,bounds)])):fiber(H,u,bounds);
 }
 function connections(vertices:readonly AlgebraicCurveVertex2[],edges:readonly AlgebraicCurveEdge2[]):AlgebraicCurveTopology2['components'] {
   const incidence=vertices.map(()=>[] as number[]);edges.forEach((e,i)=>{incidence[e.from]!.push(i);incidence[e.to]!.push(i);});const seen=new Set<number>(),result:{vertices:readonly number[];edges:readonly number[]}[]=[];
@@ -49,16 +53,41 @@ function connections(vertices:readonly AlgebraicCurveVertex2[],edges:readonly Al
  * rectangle. Branches are implicit ordered roots, not straight segments.
  */
 export function traceAlgebraicCurve2(F:BivariatePolynomial,inputBounds:{readonly uMin:ExactInput;readonly uMax:ExactInput;readonly vMin:ExactInput;readonly vMax:ExactInput}):AlgebraicCurveTopology2 {
+ return trace(F,inputBounds);
+}
+/** Exact union of input zero loci, preserving factors for projection and
+ * fiber solving. Pairwise resultants include all inter-factor crossings. */
+export function traceAlgebraicCurveProduct2(input:readonly BivariatePolynomial[],inputBounds:{readonly uMin:ExactInput;readonly uMax:ExactInput;readonly vMin:ExactInput;readonly vMax:ExactInput}):AlgebraicCurveTopology2 {
+ let F=new BivariatePolynomial([[1n]]);for(const f of input)F=F.mul(f);
+ return trace(F,inputBounds,input);
+}
+function trace(F:BivariatePolynomial,inputBounds:{readonly uMin:ExactInput;readonly uMax:ExactInput;readonly vMin:ExactInput;readonly vMax:ExactInput},inputFactors?:readonly BivariatePolynomial[]):AlgebraicCurveTopology2 {
   const bounds=Object.freeze({uMin:exactRational(inputBounds.uMin),uMax:exactRational(inputBounds.uMax),vMin:exactRational(inputBounds.vMin),vMax:exactRational(inputBounds.vMax)});
   if(bounds.uMin.compare(bounds.uMax)>=0||bounds.vMin.compare(bounds.vMax)>=0)throw new RangeError('Curve rectangle must have positive width and height');
   if(F.degreeU<0)return finish({kind:'area',polynomial:F,bounds,verticalFactor:new Polynomial(),nonvertical:F,events:Object.freeze([]),vertices:Object.freeze([]),edges:Object.freeze([]),slabs:Object.freeze([]),components:Object.freeze([])});
-  const content=F.transpose().rows.reduce((g,p)=>g.gcd(p),new Polynomial()),C=content.squareFree(),primitive=divideBivariateExact(F,new BivariatePolynomial(content.coefficients.map(c=>[c]))),H=divideBivariateExact(primitive,gcdBivariate(primitive,primitive.derivativeV())),projection:Polynomial[]=[C];
-  if(H.degreeV>0){
-    const discriminant=resultantBivariate(H,H.derivativeV());if(discriminant.degree<0)throw new Error('Square-free nonvertical curve has a zero projection resultant');
-    projection.push(discriminant,H.transpose().rows[H.degreeV]!,H.specializeV(bounds.vMin),H.specializeV(bounds.vMax));
+  let C:Polynomial,H:BivariatePolynomial,factors:readonly BivariatePolynomial[]|undefined;
+  if(inputFactors){
+    let content=new Polynomial([1n]),product=new BivariatePolynomial([[1n]]);const parts:BivariatePolynomial[]=[];
+    for(const f of inputFactors){
+      const c=f.transpose().rows.reduce((g,p)=>g.gcd(p),new Polynomial());content=content.mul(c);
+      const primitive=divideBivariateExact(f,new BivariatePolynomial(c.coefficients.map(q=>[q]))),sf=divideBivariateExact(primitive,gcdBivariate(primitive,primitive.derivativeV())),fresh=divideBivariateExact(sf,gcdBivariate(product,sf));
+      if(fresh.degreeV>0){parts.push(fresh);product=product.mul(fresh);}
+    }
+    C=content.squareFree();H=product;factors=parts;
+  }else{
+    const content=F.transpose().rows.reduce((g,p)=>g.gcd(p),new Polynomial()),primitive=divideBivariateExact(F,new BivariatePolynomial(content.coefficients.map(c=>[c])));
+    C=content.squareFree();H=divideBivariateExact(primitive,gcdBivariate(primitive,primitive.derivativeV()));
+  }
+  const projection:Polynomial[]=[C],parts=factors??[H];
+  for(const h of parts)if(h.degreeV>0){
+    const discriminant=resultantBivariate(h,h.derivativeV());if(discriminant.degree<0)throw new Error('Square-free nonvertical curve has a zero projection resultant');
+    projection.push(discriminant,h.transpose().rows[h.degreeV]!,h.specializeV(bounds.vMin),h.specializeV(bounds.vMax));
+  }
+  if(factors)for(let i=0;i<factors.length;i++)for(let j=i+1;j<factors.length;j++){
+    const crossing=resultantBivariate(factors[i]!,factors[j]!);if(crossing.degree<0)throw new Error('Arrangement factors have an unremoved common component');projection.push(crossing);
   }
   const xs=distinct([real(bounds.uMin),real(bounds.uMax),...projection.filter(p=>p.degree>0).flatMap(p=>isolateRealRoots(p)).map(u=>u.recognizeRational()).filter(u=>u.compare(real(bounds.uMin))>=0&&u.compare(real(bounds.uMax))<=0)]),events:CurveEvent2[]=[],vertices:AlgebraicCurveVertex2[]=[],edges:AlgebraicCurveEdge2[]=[],slabs:{leftEvent:number;rightEvent:number;sampleU:Rational;edges:readonly number[]}[]=[];
-  const rootsByEvent:readonly AlgebraicReal[][]=xs.map(u=>[...fiber(H,u,bounds)]);
+  const at=(u:AlgebraicReal)=>factoredFiber(H,u,bounds,factors),rootsByEvent:readonly AlgebraicReal[][]=xs.map(u=>[...at(u)]);
   xs.forEach((u,event)=>{
     const vertical=u.signOf(C)===0,roots=rootsByEvent[event]!,all=distinct([...roots,...(vertical?[real(bounds.vMin),real(bounds.vMax)]:[])]),ids=all.map(v=>{const id=vertices.length;vertices.push(Object.freeze({u,v,event}));return id;}),nonverticalVertices=roots.map(v=>ids[all.findIndex(w=>w.compare(v)===0)]!);
     events.push(Object.freeze({u,vertical,vertices:Object.freeze(ids),nonverticalVertices:Object.freeze(nonverticalVertices)}));
@@ -73,20 +102,21 @@ export function traceAlgebraicCurve2(F:BivariatePolynomial,inputBounds:{readonly
     if(roots.length===1)return Array.from({length:count},()=>at.nonverticalVertices[0]!);
     const separators=roots.slice(0,-1).map((v,i)=>between(v,roots[i+1]!)),sample=real(sampleU),left=sample.compare(at.u)<0;let nearest=sample;
     for(const v of separators){
-      const restriction=H.specializeV(v);if(restriction.degree<0||at.u.signOf(restriction)===0)throw new Error('An event separator lies on its fiber');
+      for(const h of parts){const restriction=h.specializeV(v);if(restriction.degree<0||at.u.signOf(restriction)===0)throw new Error('An event separator lies on its fiber');
       for(const root of isolateRealRoots(restriction)){
         if(left?root.compare(nearest)>0&&root.compare(at.u)<0:root.compare(at.u)>0&&root.compare(nearest)<0)nearest=root;
       }
+      }
     }
-    const probe=real(left?between(nearest,at.u):between(at.u,nearest)),values=fiber(H,probe,bounds);if(values.length!==count)throw new Error('Slab branch count changed away from projection events');
+    const probe=real(left?between(nearest,at.u):between(at.u,nearest)),values=factoredFiber(H,probe,bounds,factors);if(values.length!==count)throw new Error('Slab branch count changed away from projection events');
     return values.map(v=>{let rank=0;for(const s of separators){const sign=v.compare(real(s));if(sign===0)throw new Error('Probe is on a horizontal separator crossing');if(sign>0)rank++;}return at.nonverticalVertices[rank]!;});
   };
   for(let i=0;i+1<events.length;i++){
-    const sampleU=between(xs[i]!,xs[i+1]!),values=fiber(H,real(sampleU),bounds),from=attach(i,sampleU,values.length),to=attach(i+1,sampleU,values.length),ids:number[]=[];
+    const sampleU=between(xs[i]!,xs[i+1]!),values=at(real(sampleU)),from=attach(i,sampleU,values.length),to=attach(i+1,sampleU,values.length),ids:number[]=[];
     values.forEach((v,rank)=>{ids.push(edges.length);edges.push(Object.freeze({kind:'branch',from:from[rank]!,to:to[rank]!,slab:i,rank,sample:Object.freeze({u:real(sampleU),v})}));});
     slabs.push(Object.freeze({leftEvent:i,rightEvent:i+1,sampleU,edges:Object.freeze(ids)}));
   }
-  return finish({kind:'curve',polynomial:F,bounds,verticalFactor:C,nonvertical:H,events:Object.freeze(events),vertices:Object.freeze(vertices),edges:Object.freeze(edges),slabs:Object.freeze(slabs),components:connections(vertices,edges)});
+  return finish({kind:'curve',polynomial:F,bounds,verticalFactor:C,nonvertical:H,events:Object.freeze(events),vertices:Object.freeze(vertices),edges:Object.freeze(edges),slabs:Object.freeze(slabs),components:connections(vertices,edges)},factors);
 }
 /** Evaluate a branch by u, or a vertical edge by v, on its closed domain. */
 export function evaluateAlgebraicCurveEdge2(input:AlgebraicCurveTopology2,edge:number,parameter:AlgebraicReal|ExactInput):BivariateRoot {
@@ -96,5 +126,5 @@ export function evaluateAlgebraicCurveEdge2(input:AlgebraicCurveTopology2,edge:n
   if(t.compare(lo)<0||t.compare(hi)>0)throw new RangeError('Curve parameter is outside the edge');
   if(t.compare(lo)===0)return Object.freeze({u:a.u,v:a.v});if(t.compare(hi)===0)return Object.freeze({u:b.u,v:b.v});
   if(e.kind==='vertical')return Object.freeze({u:a.u,v:t});
-  const values=fiber(input.nonvertical,t,input.bounds),v=values[e.rank];if(v===undefined)throw new Error('Curve rank is absent from an interior fiber');return Object.freeze({u:t,v});
+  const values=factoredFiber(input.nonvertical,t,input.bounds,graphFactors.get(input)),v=values[e.rank];if(v===undefined)throw new Error('Curve rank is absent from an interior fiber');return Object.freeze({u:t,v});
 }

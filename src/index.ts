@@ -127,7 +127,7 @@ export type { BivariateRoot, BivariateSystemSolutions } from './numeric/bivariat
 
 export { bivariateFiberRoots } from './numeric/bivariate-system.js';
 export type { BivariateFiberRoots } from './numeric/bivariate-system.js';
-export { traceAlgebraicCurve2, evaluateAlgebraicCurveEdge2 } from './geometry/algebraic-curve-topology2.js';
+export { traceAlgebraicCurve2, traceAlgebraicCurveProduct2, evaluateAlgebraicCurveEdge2 } from './geometry/algebraic-curve-topology2.js';
 export type { CurveRectangle2, CurveEvent2, AlgebraicCurveVertex2, AlgebraicCurveEdge2, AlgebraicCurveTopology2 } from './geometry/algebraic-curve-topology2.js';
 
 export { intersectNurbsSurfacePlane3, nurbsPlaneSectionVertex3, nurbsPlaneSectionEdgePoint3 } from './geometry/nurbs-plane-section3.js';
@@ -541,3 +541,6 @@ export type {NurbsSpanInterval3,NurbsSpanIntervalMatchCertificate3,NurbsSpanInte
 
 export {matchNurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-edges3.js';
 export type {NurbsPlaneCellSourceEdge3,NurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-edges3.js';
+
+export {nurbsPlaneCellRationalMap3,nurbsPlaneCellRationalMapPoint3} from './geometry/nurbs-plane-cell-rational-map3.js';
+export type {NurbsPlaneCellRationalMap3,NurbsPlaneCellRationalMapResult3,NurbsPlaneCellRationalPoint3} from './geometry/nurbs-plane-cell-rational-map3.js';

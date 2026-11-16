@@ -1,6 +1,7 @@
 import {Rational} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {BivariatePolynomial} from '../numeric/bivariate-polynomial.js';
+import {gcdBivariate,divideBivariateExact} from '../numeric/bivariate-system.js';
 import type {ExactInput} from './point2.js';
 import {plane3} from './plane3.js';
 import type {Plane3} from './plane3.js';
@@ -9,7 +10,7 @@ import type {NurbsSourceFaceComplex3} from './nurbs-source-face-complex3.js';
 import {prepareNurbsSourceFacePolynomialPartition3} from './nurbs-source-face-partition3.js';
 import {evaluateNurbsSourceComplexFace3} from './nurbs-source-complex-face-query3.js';
 import type {NurbsSourceComplexFacePoint3} from './nurbs-source-complex-face-query3.js';
-import {traceAlgebraicCurve2,evaluateAlgebraicCurveEdge2} from './algebraic-curve-topology2.js';
+import {traceAlgebraicCurveProduct2,evaluateAlgebraicCurveEdge2} from './algebraic-curve-topology2.js';
 import type {AlgebraicCurveTopology2} from './algebraic-curve-topology2.js';
 
 export interface NurbsSourcePlaneCell3 {
@@ -44,14 +45,25 @@ export function partitionNurbsSourceFaceByPlane3(complex:NurbsSourceFaceComplex3
   const bounds={uMin:max(b.uMin,p.startU),uMax:min(b.uMax,p.endU),vMin:max(b.vMin,p.startV),vMax:min(b.vMax,p.endV)};
   if(bounds.uMin.compare(bounds.uMax)>=0||bounds.vMin.compare(bounds.vMax)>=0)continue;
   const F=p.x.scale(plane.normal.x).add(p.y.scale(plane.normal.y)).add(p.z.scale(plane.normal.z)).add(p.weight.scale(plane.offset));
-  const polynomials=[...partition(bounds),F],seen:BivariatePolynomial[]=[];let product=new BivariatePolynomial([[1n]]);
+  const polynomials=[...partition(bounds),F],seen:BivariatePolynomial[]=[],factors:BivariatePolynomial[]=[];let product=new BivariatePolynomial([[1n]]);
   // Scalar multiples have the same zero locus. Canonicalize before forming
   // the arrangement so repeated trim supports do not inflate its degree.
   for(const f of polynomials)if(f.degreeU>0||f.degreeV>0){
+   // Rectangle sides already bound the strips. Their linear factors have no
+   // zeros in the open rectangle, so adding them cannot refine an open cell.
+   // Root/rectangle crossings remain projection events of the other factors.
+   if(f.degreeU===1&&f.degreeV===0){const root=f.coefficient(0,0).neg().div(f.coefficient(1,0));if(root.compare(bounds.uMin)===0||root.compare(bounds.uMax)===0)continue;}
+   if(f.degreeU===0&&f.degreeV===1){const root=f.coefficient(0,0).neg().div(f.coefficient(0,1));if(root.compare(bounds.vMin)===0||root.compare(bounds.vMax)===0)continue;}
    const row=f.rows[f.degreeU]!,canonical=f.scale(new Rational(1n).div(row.coefficient(row.degree)));
-   if(!seen.some(q=>q.equals(canonical))){seen.push(canonical);product=product.mul(canonical);}
+   if(!seen.some(q=>q.equals(canonical))){
+    seen.push(canonical);
+    const repeated=gcdBivariate(gcdBivariate(canonical,canonical.derivativeU()),canonical.derivativeV());
+    const squareFree=divideBivariateExact(canonical,repeated),fresh=divideBivariateExact(squareFree,gcdBivariate(product,squareFree));
+    product=product.mul(fresh);
+    if(fresh.degreeU>0||fresh.degreeV>0)factors.push(fresh);
+   }
   }
-  const graph=traceAlgebraicCurve2(product,bounds);graphs.push(graph);
+  const graph=traceAlgebraicCurveProduct2(factors,bounds);graphs.push(graph);
   for(const [slab,s] of graph.slabs.entries()){
    const u=real(s.sampleU),lo=real(bounds.vMin),hi=real(bounds.vMax);
    const cuts:{v:AlgebraicReal;edge:number|null}[]=[{v:lo,edge:null},...s.edges.map(edge=>({v:evaluateAlgebraicCurveEdge2(graph,edge,u).v,edge})).filter(q=>q.v.compare(lo)>0&&q.v.compare(hi)<0),{v:hi,edge:null}];

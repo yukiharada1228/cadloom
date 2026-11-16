@@ -100,7 +100,9 @@ export class AlgebraicReal {
   static linearCombination(input:readonly Readonly<{value:AlgebraicReal;coefficient:ExactInput}>[],offsetInput:ExactInput=0n):AlgebraicReal {
     let offset=exactRational(offsetInput);const terms:{value:AlgebraicReal;coefficient:Rational}[]=[];
     for(const term of input){const value=term.value,coefficient=exactRational(term.coefficient);if(!realInstances.has(value))throw new RangeError('Linear image requires factory-created algebraic values');if(coefficient.sign()===0)continue;if(value.rational!==null)offset=offset.add(coefficient.mul(value.rational));else terms.push({value,coefficient});}
-    if(!terms.length)return AlgebraicReal.fromRational(offset);const forms=terms.map(t=>realSource(t.value)),source=forms[0]!.source;
+    if(!terms.length)return AlgebraicReal.fromRational(offset);
+    if(terms.length===1)return terms[0]!.value.affine(terms[0]!.coefficient,offset);
+    const forms=terms.map(t=>realSource(t.value)),source=forms[0]!.source;
     if(forms.every(f=>f.source===source)){
       let N=new Polynomial([offset]),D=sourceOne;forms.forEach((f,i)=>{N=N.mul(f.denominator).add(f.numerator.scale(terms[i]!.coefficient).mul(D)).divRem(source.polynomial).remainder;D=D.mul(f.denominator).divRem(source.polynomial).remainder;});return source.rationalFunction(N,D);
     }
@@ -115,6 +117,7 @@ export class AlgebraicReal {
       if(coefficient.sign()===0)continue;if(!factors.length)offset=offset.add(coefficient);else terms.push({factors,coefficient});
     }
     if(!terms.length)return AlgebraicReal.fromRational(offset);
+    if(terms.length===1&&terms[0]!.factors.length===1)return terms[0]!.factors[0]!.affine(terms[0]!.coefficient,offset);
     const forms=terms.map(t=>t.factors.map(realSource)),source=forms[0]![0]!.source;
     if(forms.every(fs=>fs.every(f=>f.source===source))){
       const reduce=(p:Polynomial)=>p.divRem(source.polynomial).remainder;let N=new Polynomial([offset]),D=sourceOne;
@@ -298,6 +301,7 @@ export class AlgebraicReal {
     const n=numerator.divRem(this.polynomial).remainder,d=denominator.divRem(this.polynomial).remainder;
     if(this.signOf(n)===0)return AlgebraicReal.fromRational(0n);
     if(this.rational!==null)return AlgebraicReal.fromRational(n.evaluate(this.rational).div(d.evaluate(this.rational)));
+    if(d.degree===0&&n.degree<=1)return this.affine(n.coefficient(1).div(d.coefficient(0)),n.coefficient(0).div(d.coefficient(0)));
     // Remove denominator-zero conjugates, even when the defining polynomial
     // is reducible. They cannot be the represented source root.
     const sourcePolynomial=this.polynomial.divRem(this.polynomial.gcd(d)).quotient;
