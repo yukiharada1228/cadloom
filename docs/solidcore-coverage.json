@@ -46,10 +46,12 @@
       "referenceUrl": "https://github.com/tangency-labs/solidcraft/blob/cd20a1fe14062cc1642e1c04fb9805f86d9e2eef/solidcore/crates/solidcore/src/nurbs.rs",
       "localPaths": [
         "src/geometry/nurbs-curve3.ts",
-        "src/geometry/nurbs-surface3.ts"
+        "src/geometry/nurbs-surface3.ts",
+        "src/geometry/nurbs-triangular-projection3.ts",
+        "src/geometry/nurbs-source-face-embedding3.ts"
       ],
       "status": "partial",
-      "gap": "Positive rational weights, evaluation, derivatives, knot insertion, split and reversal exist; general fitting, degree editing and broad imported data coverage are missing."
+      "gap": "Positive rational weights, evaluation, derivatives, knot operations and sufficient affine/triangular face-embedding certificates exist. A rational-weight cylinder wall/cap path now has fixed integration coverage. General fitting, degree editing, complete embedding tests and broad imported-data coverage remain missing."
     },
     {
       "id": "record",
@@ -61,10 +63,11 @@
         "src/record/geometry3.ts",
         "src/record/exact3.ts",
         "src/record/schema.ts",
-        "src/record/face-domain3.ts"
+        "src/record/face-domain3.ts",
+        "src/record/nurbs-source-brep3.ts"
       ],
       "status": "partial",
-      "gap": "Versioned exact geometry/topology/region records and supported analytic bounded face definitions exist. General NURBS/procedural domains and independent pcurve correspondence remain missing."
+      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete."
     },
     {
       "id": "topology",
@@ -73,10 +76,12 @@
       "localPaths": [
         "src/geometry/brep-topology3.ts",
         "src/geometry/nurbs-edge3.ts",
-        "src/geometry/brep-curve3.ts"
+        "src/geometry/brep-curve3.ts",
+        "src/geometry/nurbs-source-brep3.ts",
+        "src/geometry/sew-nurbs-source-breps3.ts"
       ],
       "status": "partial",
-      "gap": "Native, NURBS and mixed native/cylinder-SSI edge incidence exists; bounded curved face domains, geometric orientation, global embedding and common mixed Body persistence remain incomplete."
+      "gap": "Native, NURBS and mixed edge incidence exists. Certified finite source faces enter the shared engine, and supported rational boundary maps sew across sources with full interval coverage. Fixed nonlinear cube and weighted-cylinder shells close. General SSI map extraction, surface-interior/global embedding and material certification remain incomplete."
     },
     {
       "id": "conversion",
@@ -96,10 +101,11 @@
         "src/convert/mixed-face-domain3.ts",
         "src/convert/cylinder-expression-split3.ts",
         "src/convert/clipped-cylinder-expression3.ts",
-        "src/convert/cylinder-material3.ts"
+        "src/convert/cylinder-material3.ts",
+        "src/convert/nurbs-source-brep3.ts"
       ],
       "status": "partial",
-      "gap": "Supported native/mixed analytic face domains reconstruct from raw records and bind complete oriented boundaries, including both plane-cut cylinder-expression children. Arbitrary imported face/shell embedding, void containment, independent pcurves and NURBS face conversion remain missing."
+      "gap": "Supported analytic domains and constructed NURBS source recipes reconstruct geometry and re-run applicable face and boundary checks. Weighted wall/circular-cap recipes rebuild exact sewn queries in regression. Arbitrary imported face/shell certification, independent pcurves, global void containment and common NURBS Body adoption remain incomplete."
     },
     {
       "id": "ops",
@@ -288,10 +294,14 @@
         "src/geometry/extruded-brep3.ts",
         "src/geometry/clipped-cylinder-brep3.ts",
         "src/model/body3.ts",
-        "src/geometry/mixed-shell-ray3.ts"
+        "src/geometry/mixed-shell-ray3.ts",
+        "src/geometry/nurbs-source-complex-face-query3.ts",
+        "src/geometry/nurbs-source-complex-face-preimage3.ts",
+        "src/geometry/nurbs-source-face-line3.ts",
+        "src/geometry/sewn-nurbs-source-ray3.ts"
       ],
       "status": "partial",
-      "gap": "Common owned constructed Body and bounded-face membership exist alongside earlier classifiers. Factory-restored mixed plane/cylinder boundaries support exact rational forward rays and closed locally manifold shell parity with explicit degeneracy/retry. Global shell embedding/material certification, algebraic-origin/general NURBS rays, general distances and closest points remain missing."
+      "gap": "Supported native/analytic queries and certified finite NURBS face evaluation, inverse membership, line/ray sections and guarded sewn-shell intersection parity exist. Tangencies, seams and overlaps remain explicit degeneracies. General nearest-point/measurement families, automatic ray selection, global shell validation and NURBS material classification remain incomplete."
     },
     {
       "id": "tessellation",
@@ -347,5 +357,16 @@
       "status": "missing",
       "gap": "Desktop/browser application, assemblies and product workflows remain later scope; no UI reuse is planned."
     }
-  ]
+  ],
+  "nurbsIntegrationEvidence": {
+    "sourceCommit": "39257e5744ae9517e69bc1319eda8aeda9f2f43f",
+    "scope": "Constructed, positively certified NURBS face paths and fixed closed-shell regression examples only; no full SolidCraft parity or arbitrary material certificate",
+    "tests": [
+      "tests/nurbs-source-cylinder-integration3.test.ts",
+      "tests/sew-nurbs-source-breps3.test.ts",
+      "tests/sewn-nurbs-source-ray3.test.ts",
+      "tests/nurbs-source-brep-record3.test.ts"
+    ],
+    "document": "docs/nurbs-source-cylinder-integration3.md"
+  }
 }
