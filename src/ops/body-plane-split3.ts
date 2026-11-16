@@ -4,6 +4,7 @@ import {isOwnedCellularBody3} from '../model/cellular-body3.js';
 import {plane3} from '../geometry/plane3.js';
 import type {Plane3} from '../geometry/plane3.js';
 import {clipCylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
+import {compactCylinderMaterialProgram3} from '../geometry/compact-material-program3.js';
 import {boundaryMaterialSurfaces3} from '../geometry/material-surface-boundary3.js';
 import {materialProgramOfBody3,bodyFromMaterialSurfaceBoundary3,rationalPlanarBody3} from './body3.js';
 import {splitPlanarBodyByPlane3} from './planar-body-split3.js';
@@ -20,6 +21,6 @@ export function splitBodyByPlane3(body:KernelBody3,input:Plane3):BodyPlaneSplit3
  const plane=plane3(input.normal.x,input.normal.y,input.normal.z,input.offset);
  const planar=rationalPlanarBody3(body);
  if(planar){const split=splitPlanarBodyByPlane3(body,plane);return Object.freeze({representation:'planar',parent:body,plane,negative:split.negative,positive:split.positive,planar:split});}
- const source=materialProgramOfBody3(body),child=(side:-1|1)=>bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(clipCylinderMaterialProgram3(source,[{plane,side}]),{requireClosed:true}));
+ const source=compactCylinderMaterialProgram3(materialProgramOfBody3(body)),child=(side:-1|1)=>bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(compactCylinderMaterialProgram3(clipCylinderMaterialProgram3(source,[{plane,side}])),{requireClosed:true}));
  return Object.freeze({representation:'surface-material',parent:body,plane,negative:child(-1),positive:child(1)});
 }
