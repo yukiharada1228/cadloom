@@ -1,3 +1,5 @@
+import {isOwnedCappedNurbsBody3,locateOwnedCappedNurbsBody3,locateOwnedCappedNurbsBodyFace3} from './capped-nurbs-body3.js';
+import type {CappedNurbsBody3} from './capped-nurbs-body3.js';
 import {isOwnedCellularBody3,locateOwnedCellularBody3,locateOwnedCellularBodyFace3} from './cellular-body3.js';
 import type {CellularBody3} from './cellular-body3.js';
 import {isOwnedNurbsBody3,locateOwnedNurbsBody3,locateOwnedNurbsBodyFace3} from './nurbs-body3.js';
@@ -53,14 +55,15 @@ export interface Body3 {
   readonly construction:BodyConstructionRecord3;
   readonly interiorSamples:readonly AlgebraicCoordinates3[];readonly faces:readonly (DecodedFaceDomain3|DecodedMixedFaceDomain3)[];
 }
-export type KernelBody3=Body3|CellularBody3|NurbsBody3;
+export type KernelBody3=Body3|CellularBody3|NurbsBody3|CappedNurbsBody3;
 type Location=(point:Point3|AlgebraicCoordinates3)=>CurveRegionLocation2;
 const states=new WeakMap<Body3,{locate:Location;faces:readonly Location[];planar:PreparedPlanarSolid3|undefined;cylinder:ClippedCylinderBRep3|undefined;nativeTopology:BRepTopology3|undefined;finiteCylinderBoolean:FiniteCylinderBoolean3|undefined;finiteCylinderExpression?:FiniteCylinderExpressionBoundary3;clippedExpression?:ClippedCylinderExpression3;material?:CylinderMaterialBoundary3;materialSurface?:MaterialSurfaceBoundary3;planeCutExpression?:Readonly<{source:FiniteCylinderExpressionBoundary3;cut:CylinderHalfSpace3}>}>();
 function state(body:Body3){const data=states.get(body);if(!data)throw new RangeError('Operation requires a factory-created Body');return data;}
 export function assertOwnedBody3(body:Body3):void {state(body);}
-export function locateBody3(body:KernelBody3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2{return isOwnedNurbsBody3(body)?locateOwnedNurbsBody3(body,point):isOwnedCellularBody3(body)?locateOwnedCellularBody3(body,point):state(body).locate(point);}
+export function locateBody3(body:KernelBody3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2{return isOwnedCappedNurbsBody3(body)?locateOwnedCappedNurbsBody3(body,point):isOwnedNurbsBody3(body)?locateOwnedNurbsBody3(body,point):isOwnedCellularBody3(body)?locateOwnedCellularBody3(body,point):state(body).locate(point);}
 /** Location relative to one bounded face, not relative to solid material. */
 export function locateBodyFace3(body:KernelBody3,face:number,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
+  if(isOwnedCappedNurbsBody3(body))return locateOwnedCappedNurbsBodyFace3(body,face,point);
   if(isOwnedNurbsBody3(body))return locateOwnedNurbsBodyFace3(body,face,point);
   if(isOwnedCellularBody3(body))return locateOwnedCellularBodyFace3(body,face,point);
   const s=state(body);if(!Number.isSafeInteger(face)||face<0||face>=s.faces.length)throw new RangeError('Invalid Body face index');return s.faces[face]!(point);

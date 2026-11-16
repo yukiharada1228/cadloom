@@ -583,3 +583,9 @@ export {certifyCappedNurbsPlaneMaterial3} from './geometry/capped-nurbs-plane-ma
 export type {CappedNurbsPlaneMaterial3,CappedNurbsPlaneMaterialCertificate3,CappedNurbsPlaneShellOrientation3,CappedNurbsPlaneMaterialRegion3} from './geometry/capped-nurbs-plane-material3.js';
 export {locateNurbsPlaneSplitFaceParameters3} from './geometry/nurbs-plane-split-face-query3.js';
 export type {NurbsPlaneSplitFaceParameterLocation3} from './geometry/nurbs-plane-split-face-query3.js';
+export {bodyFromCappedNurbsMaterial3,createCappedNurbsBody3,splitNurbsBodyByPlane3,restoreCappedNurbsBody3} from './ops/capped-nurbs-body3.js';
+export type {CappedNurbsBody3} from './model/capped-nurbs-body3.js';
+export {readCappedNurbsBodyDocument3} from './record/capped-nurbs-body3.js';
+export type {CappedNurbsBodyDocument3} from './record/capped-nurbs-body3.js';
+export {intersectCappedNurbsPlaneMaterialLine3} from './geometry/capped-nurbs-plane-material-line3.js';
+export type {CappedNurbsMaterialLine3,CappedNurbsMaterialLineHit3,CappedNurbsMaterialLineSpan3} from './geometry/capped-nurbs-plane-material-line3.js';

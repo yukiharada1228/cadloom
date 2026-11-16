@@ -1,0 +1,25 @@
+# 認定済みのキャップ付きNURBS Body
+
+`CappedNurbsBody3` はKernelBody3の新しい所有された型です。元面と平面キャップからなる厳密なtopology、有限面、認定された材料領域・空洞・内部サンプルを保持します。`bodyFromCappedNurbsMaterial3` は所有された新材料証明だけを採用し、構造をコピーしたオブジェクトや任意のBRepからはBodyを発行しません。
+
+`createCappedNurbsBody3` は所有された元のNurbsBody3と平面・側を受け、共有辺の細分化、全有限面の分割、共有曲線の照合とnoding、縫合、キャップ境界・外周と穴、面の生成、埋込み、新シェル包含、実際の材料方向と内部点を再検査します。`splitNurbsBodyByPlane3` は面分割を共有して両側を作ります。共通の`splitBodyByPlane3`も元のNurbsBody3をこの経路へdispatchし、representation:nurbsとして両側のBodyを返します。単一側のcreateは他側の認定を要求しません。検査が未解決または未認定ならRangeErrorを返し、不正なBodyやメッシュ近似へ置き換えません。
+
+共通のlocateBody3/locateBodyFace3は、材料・穴・材料の島と、元の分割面・有限キャップを厳密に問い合わせます。intersectBodyLine3/intersectBodyRay3は新しい面・シェルのレイAPIへdispatchします。入力は所有されたBodyに限定されます。
+
+intersectBodyLineMaterial3は、親の完全な有限境界イベントへ直線と切断平面のイベントを加え、各区間を新しい材料で判定します。平面に含まれる直線も、有限なキャップ領域の閉じた境界区間として扱います。元の面に含まれる区間や孤立した接点も保持します。端点の閉集合所属は元の所有された材料境界と横断的な切断証明に基づき、未解決や閉包の矛盾は結果へ伝搬します。sourceHitは元の境界の由来であり、新しい面IDへ付け替えたものではありません。cutは独立な直線・切断平面イベントを加えた印で、平面内の直線では追加イベントを作りません。
+
+## 保存と復元
+
+bodyDocument3/serializeBody3はversion:1、kind:capped-nurbs-body-document、parent、plane、sideを保存します。parentは元のNURBS構成レシピと未信頼の探索用分離平面です。新しいtopology、閉じたフラグ、材料認定、内部点の真偽は保存しません。readCappedNurbsBodyDocument3は構造・正確な数値・方向・共有の読み込み予算を検査します。
+
+restoreBody3/restoreCappedNurbsBody3は元のレシピから元材料を再構築し、切断から新材料の認定まで再実行します。探索条件を含む証明そのものを保存しないため、復元の既定の予算で検査が解決しなければ拒否します。未知の認定フラグや不正な側を受け付けず、零の平面法線は幾何学的に拒否します。レシピの妥当な側を変更した場合は、その新しい構成を再検証します。
+
+## 相似変換と残る範囲
+
+transformBody3は元のNURBS定義・対象面・探索用分離平面を変換し、切断平面の法線をL*n/scaleSquared、オフセットをoffset−n'·translationへ写して再構築します。反転を含む相似変換でも元の材料方向を再検査します。
+
+現在の十分条件で扱えない退化切断は未認定のままです。キャップ付きBodyへの再切断、一般のNURBSブーリアン、一般アフィン変換、共通の分割インターフェース・親面provenance atom表、距離・曲面体積などの未対応操作は引き続き必要です。解析曲面やメッシュへ暗黙にlowerしません。これはSolidCraft全体の再実装完了やTypeScript全体の形式検証を意味しません。
+
+## 検証
+
+独立したステージ内容のスナップショットでビルド成功。新規Body・既存NURBS埋込み・共通平面切断の3テストファイルはstrict/noUncheckedIndexedAccess/exactOptionalPropertyTypesの型検査も成功しました。関連36ファイルの回帰テストは209件成功、失敗・取消・スキップ0件（413879.664042 ms）。新規6件には穴と材料の島、重み付き曲面、孤立した接点、保存復元、反転を含む相似変換を含みます。274個の実行ソースのSHA-256はステージ済みmanifestと一致し、変更した実行ソース・テストはビルドしたスナップショットと一致しました。ハッシュ照合は同一性の確認であり形式証明ではありません。

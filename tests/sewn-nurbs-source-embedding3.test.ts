@@ -160,7 +160,7 @@ test('common NURBS Body derives material-region samples outside cavities and rec
  const material=materialOf(sewn([...cube(true),...scaled('1/2','1/4',true),...scaled('1/4','3/8')])),body=bodyFromNurbsMaterial3(material);
  assert.equal(body.regions.length,2);assert.deepEqual(body.regions.map(r=>r.cavities.length),[1,0]);for(const region of body.regions){const q=locateSewnNurbsSourceMaterial3(material,region.sample);assert.equal(q.kind,'inside');if(q.kind==='inside')assert.equal(q.deepestShell,region.shell);}
  const restored=restoreBody3(serializeBody3(body));assert.equal(restored.regions.length,2);for(const x of ['1/8','1/3','1/2'])assert.equal(locateBody3(restored,point3(x,'1/2','1/2')),locateBody3(body,point3(x,'1/2','1/2')));
- const box=createBoxBody3(point3(0n,0n,0n),1n,1n,1n);assert.throws(()=>booleanMaterialBodies3(body,box,'union'),/NURBS Body Boolean/);assert.throws(()=>booleanMaterialBodies3(box,body,'difference'),/NURBS Body Boolean/);assert.throws(()=>splitBodyByPlane3(body,plane3(1n,0n,0n,'-1/2')),/NURBS Body plane splitting/);
+ const box=createBoxBody3(point3(0n,0n,0n),1n,1n,1n);assert.throws(()=>booleanMaterialBodies3(body,box,'union'),/NURBS Body Boolean/);assert.throws(()=>booleanMaterialBodies3(box,body,'difference'),/NURBS Body Boolean/);const split=splitBodyByPlane3(body,plane3(1n,0n,0n,'-1/2'));assert.equal(split.representation,'nurbs');if(split.representation==='nurbs')for(const child of [split.negative,split.positive]){assert.equal(child.kind,'capped-nurbs-body');assert.equal(child.regions.length,2);assert.ok(child.interiorSamples.every(p=>locateBody3(child,p)==='inside'));}
 });
 
 test('NURBS Body similarities preserve nonlinear and weighted curved membership under a rational spatial rotation',()=>{

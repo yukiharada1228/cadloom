@@ -68,10 +68,12 @@
         "src/record/schema.ts",
         "src/record/face-domain3.ts",
         "src/record/nurbs-source-brep3.ts",
-        "src/record/nurbs-body3.ts"
+        "src/record/nurbs-body3.ts",
+        "src/record/nurbs-body3.ts",
+        "src/record/capped-nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete. A NURBS Body recipe document now replays all source faces, sewing, global embedding, containment, orientation and region-sample checks through common Body restoration. Optional rational separation planes are untrusted search hints checked against whole finite faces during replay; they are not stored proof flags."
+      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete. A NURBS Body recipe document now replays all source faces, sewing, global embedding, containment, orientation and region-sample checks through common Body restoration. Optional rational separation planes are untrusted search hints checked against whole finite faces during replay; they are not stored proof flags. Capped NURBS Body documents now store parent source recipes plus one plane/side and replay all geometry/material gates through the common restore API; no serialized certification flags are accepted."
     },
     {
       "id": "topology",
@@ -129,10 +131,12 @@
         "src/model/body3.ts",
         "src/record/body-document3.ts",
         "src/ops/nurbs-body3.ts",
-        "src/ops/body-transform3.ts"
+        "src/ops/body-transform3.ts",
+        "src/model/capped-nurbs-body3.ts",
+        "src/ops/capped-nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing. Certified NURBS materials now join KernelBody3 with owned topology, cavity-aware region samples, point/face/line/ray queries and replayed source-only persistence. NURBS similarity transforms now rebuild exact source/target controls, flip reflected face senses, and revalidate covariantly transformed separation-plane hints. General NURBS Booleans, splitting, arbitrary affine transforms and mass properties remain incomplete."
+      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing. Certified NURBS materials now join KernelBody3 with owned topology, cavity-aware region samples, point/face/line/ray queries and replayed source-only persistence. NURBS similarity transforms now rebuild exact source/target controls, flip reflected face senses, and revalidate covariantly transformed separation-plane hints. General NURBS Booleans, repeated/degenerate splitting, arbitrary affine transforms and mass properties remain incomplete. Certified single-plane NURBS cut materials now adopt as owned KernelBody3 children, split from source NURBS Bodies through common dispatch, persist/replay and rebuild under reflected similarities. Capped-body repeated cuts and mixed/native interface atoms remain explicit unsupported operations."
     },
     {
       "id": "primitive",
@@ -237,7 +241,7 @@
         "src/geometry/nurbs-plane-cap-face-query3.ts"
       ],
       "status": "partial",
-      "gap": "Supported analytic finite-cylinder/halfspace boundaries share planar conic and curved-wall partitions, strict two-sided material selection, native/SSI provenance and balanced sewing with incidence diagnostics. General curved embeddings, maximal consolidation and common adoption of arbitrary assembled solids remain incomplete. Certified NURBS materials support finite-face plane loci and sufficient oriented section wires, with degenerate cases retained. Signed UV cells now close, join across patch seams, match recovered original rational trim paths to canonical source curves, insert shared-edge refinements, adopt region loops into BRep split faces and sew all original faces using interval endpoint unions. Cap boundary curves retain native intervals; complete plane events and independent algebraic point queries provide exact per-loop winding with budgeted retries. Boundaries tied to the same globally embedded, oriented material now yield checked containment forests and outer/hole domain groups, including nested islands and disconnected components. General non-domain implicit SSI source correspondence, coplanar side ownership, certified child Bodies, common persistence and repeated general NURBS cutting remain incomplete. Outer/hole cap groups now adopt as finite planar BRep faces, reuse exact source boundary curves and sew to closed oriented incidence with vertex links rechecked. Cap faces support exact algebraic point location and finite-domain XYZ evaluation, retaining unresolved query budgets. Closed incidence is not yet a newly certified child solid."
+      "gap": "Supported analytic finite-cylinder/halfspace boundaries share planar conic and curved-wall partitions, strict two-sided material selection, native/SSI provenance and balanced sewing with incidence diagnostics. General curved embeddings, maximal consolidation and common adoption of arbitrary assembled solids remain incomplete. Certified NURBS materials support finite-face plane loci and sufficient oriented section wires, with degenerate cases retained. Signed UV cells now close, join across patch seams, match recovered original rational trim paths to canonical source curves, insert shared-edge refinements, adopt region loops into BRep split faces and sew all original faces using interval endpoint unions. Cap boundary curves retain native intervals; complete plane events and independent algebraic point queries provide exact per-loop winding with budgeted retries. Boundaries tied to the same globally embedded, oriented material now yield checked containment forests and outer/hole domain groups, including nested islands and disconnected components. General non-domain implicit SSI source correspondence, coplanar side ownership, general degenerate/repeated NURBS cutting remains incomplete. Outer/hole cap groups now adopt as finite planar BRep faces, reuse exact source boundary curves and sew to closed oriented incidence with vertex links rechecked. Cap faces support exact algebraic point location and finite-domain XYZ evaluation, retaining unresolved query budgets. Closed incidence is not yet a newly certified child solid. Transversely certified single-plane children now enter the common Body API with source-only replay, exact queries and similarity reconstruction; general SSI/coplanar ownership, repeated cuts and interface provenance atoms remain incomplete."
     },
     {
       "id": "boolean",
@@ -343,10 +347,11 @@
         "src/ops/nurbs-body-boundary-plane3.ts",
         "src/geometry/nurbs-plane-split-face-query3.ts",
         "src/geometry/capped-nurbs-plane-query3.ts",
-        "src/geometry/capped-nurbs-plane-ray3.ts"
+        "src/geometry/capped-nurbs-plane-ray3.ts",
+        "src/geometry/capped-nurbs-plane-material-line3.ts"
       ],
       "status": "partial",
-      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained. Owned finite-face plane section evaluators preserve native UV graph parameters, finite trim/approached-patch membership and full spatial plane equality. Closed capped split results now query finite original UV-region unions and cap domains through spatial face IDs, then classify the regularized source-material halfspace selection with retained-boundary checks. Opposite-side tangential contacts are not inherited as boundary; unresolved inverse/winding/material queries propagate. Common Body dispatch remains incomplete. Owned capped embedding certificates now support exact regular line/ray hits and budgeted new-shell parity, filtering discarded parent-boundary events and retaining relevant degeneracies. New shell depths are recomputed rather than copied from the source. Known owned ray UV provenance now classifies split regions without redundant spatial inversion, with source-frame and XYZ identity checks. New material regions validate samples against complete boundary gaps, selected-material membership and new shell parities."
+      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained. Owned finite-face plane section evaluators preserve native UV graph parameters, finite trim/approached-patch membership and full spatial plane equality. Closed capped split results now query finite original UV-region unions and cap domains through spatial face IDs, then classify the regularized source-material halfspace selection with retained-boundary checks. Opposite-side tangential contacts are not inherited as boundary; unresolved inverse/winding/material queries propagate. Common Body dispatch remains incomplete. Owned capped embedding certificates now support exact regular line/ray hits and budgeted new-shell parity, filtering discarded parent-boundary events and retaining relevant degeneracies. New shell depths are recomputed rather than copied from the source. Known owned ray UV provenance now classifies split regions without redundant spatial inversion, with source-frame and XYZ identity checks. New material regions validate samples against complete boundary gaps, selected-material membership and new shell parities. Common capped Body point/face, line/ray and complete closed material-line queries now dispatch to the certified capped backend, retaining contained spans and isolated tangencies."
     },
     {
       "id": "tessellation",
@@ -439,7 +444,8 @@
       "tests/cap-nurbs-plane-split-faces3.test.ts",
       "tests/capped-nurbs-plane-query3.test.ts",
       "tests/capped-nurbs-plane-ray3.test.ts",
-      "tests/capped-nurbs-plane-material3.test.ts"
+      "tests/capped-nurbs-plane-material3.test.ts",
+      "tests/capped-nurbs-body3.test.ts"
     ],
     "document": "docs/nurbs-source-cylinder-integration3.md",
     "materialBoundarySourceCommit": "30f6883",
@@ -474,7 +480,8 @@
       "docs/cap-nurbs-plane-split-faces3.md",
       "docs/capped-nurbs-plane-query3.md",
       "docs/capped-nurbs-plane-embedding3.md",
-      "docs/capped-nurbs-plane-material3.md"
+      "docs/capped-nurbs-plane-material3.md",
+      "docs/capped-nurbs-body3.md"
     ]
   }
 }

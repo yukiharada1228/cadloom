@@ -12,7 +12,7 @@ export interface NurbsBodyDocument3 {
  readonly separators?:readonly Readonly<{first:number;second:number;normal:RationalPointRecord3;offset:string}>[];
 }
 const separator=objectSchema3({first:indexSchema3,second:indexSchema3,normal:rationalPointSchema3,offset:rationalSchema3});
-const schema=objectSchema3({version:literalSchema3(1),kind:literalSchema3('nurbs-body-document'),sources:arraySchema3(nurbsSourceBRepRecordSchema3)},{separators:arraySchema3(separator)});
+export const nurbsBodyDocumentSchema3=objectSchema3({version:literalSchema3(1),kind:literalSchema3('nurbs-body-document'),sources:arraySchema3(nurbsSourceBRepRecordSchema3)},{separators:arraySchema3(separator)});
 export function readNurbsBodyDocument3(input:unknown,limits:RecordReadLimits3={}):NurbsBodyDocument3 {
- return schema(input,'nurbsBody',new RecordReader3(limits)) as NurbsBodyDocument3;
+ return nurbsBodyDocumentSchema3(input,'nurbsBody',new RecordReader3(limits)) as NurbsBodyDocument3;
 }
