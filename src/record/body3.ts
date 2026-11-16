@@ -38,7 +38,9 @@ const indices=arraySchema3(indexSchema3),useSchema=objectSchema3({edge:indexSche
   wire:objectSchema3({kind:literalSchema3('wire'),edges:arraySchema3(indexSchema3,1)}),
   vertex:objectSchema3({kind:literalSchema3('vertex'),vertex:indexSchema3}),
 });
-export const bodySchema3=objectSchema3({version:literalSchema3(1),units:literalSchema3('mm'),coordinates:literalSchema3('right-handed-z-up'),curves:arraySchema3(bodyCurveSchema3),surfaces:arraySchema3(surfaceSchema3),vertices:arraySchema3(pointSchema3),edges:arraySchema3(objectSchema3({curve:indexSchema3,start:indexSchema3,end:indexSchema3})),loops:arraySchema3(objectSchema3({uses:arraySchema3(useSchema,1)})),faces:arraySchema3(objectSchema3({surface:indexSchema3,sense:directionSchema3,loops:indices},{parameterBounds:arraySchema3(realSchema3,4,4),domain:faceDomainSchema3})),shells:arraySchema3(shellSchema),regions:arraySchema3(objectSchema3({shells:indices,void:booleanSchema3}),1)});
+/** Shared boundary-table schema; shell connectivity carries no material roles. */
+export const bodyBoundaryFields3={version:literalSchema3(1),units:literalSchema3('mm'),coordinates:literalSchema3('right-handed-z-up'),curves:arraySchema3(bodyCurveSchema3),surfaces:arraySchema3(surfaceSchema3),vertices:arraySchema3(pointSchema3),edges:arraySchema3(objectSchema3({curve:indexSchema3,start:indexSchema3,end:indexSchema3})),loops:arraySchema3(objectSchema3({uses:arraySchema3(useSchema,1)})),faces:arraySchema3(objectSchema3({surface:indexSchema3,sense:directionSchema3,loops:indices},{parameterBounds:arraySchema3(realSchema3,4,4),domain:faceDomainSchema3})),shells:arraySchema3(shellSchema)};
+export const bodySchema3=objectSchema3({...bodyBoundaryFields3,regions:arraySchema3(objectSchema3({shells:indices,void:booleanSchema3}),1)});
 /** Strict, immutable JSON/data snapshot. No geometry evaluation or body certification. */
 export function readBodyRecord3(input:unknown,limits:RecordReadLimits3={}):BodyRecord3 {
   const b=bodySchema3(input,'body',new RecordReader3(limits)) as unknown as BodyRecord3;

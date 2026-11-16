@@ -377,3 +377,7 @@ export type {PlanarMaterial3,PlanarMaterialDocument3,PlanarMaterialNodeRecord3,P
 
 export {planarMaterialRegions3} from './ops/planar-material3.js';
 export type {PlanarMaterialRegion3,PlanarMaterialBoundaryUse3,PlanarMaterialRegions3} from './geometry/planar-material-regions3.js';
+export {readCellularBodyRecord3,parseCellularBodyRecord3} from './record/cellular-body3.js';
+export type {CellularBoundaryRecord3,CellularRegionRecord3,CellularBodyRecord3} from './record/cellular-body3.js';
+export {cellularBodyFromPlanarMaterial3,cellularBodyFromBody3,planarMaterialOfCellularBody3,locateCellularBody3,booleanCellularBodies3,cellularBodyDocument3,serializeCellularBody3,restoreCellularBody3} from './ops/cellular-body3.js';
+export type {CellularBody3,CellularBodyDocument3,CellularBodyReadLimits3} from './ops/cellular-body3.js';
