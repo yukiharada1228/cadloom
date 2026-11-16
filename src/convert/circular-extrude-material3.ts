@@ -1,3 +1,4 @@
+import {prepareSupportedProfileProgram3} from './supported-profile-program3.js';
 import {prepareCylinderMaterialProgram3,booleanCylinderMaterialPrograms3} from '../geometry/cylinder-material-program3.js';
 import type {CylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
 import {point2} from '../geometry/point2.js';
@@ -51,8 +52,9 @@ export function prepareExtrudeMaterialProgram3(body:Body3):CylinderMaterialProgr
  if(!source||body.construction.kind!=='extrude')throw new RangeError('Expected an owned product Extrude Body');
  if(!source.region.rings.length)throw new RangeError('Empty Extrude profile is unsupported');
  const programs=source.region.rings.map(ring=>{
-  if(ring.every(c=>c.kind==='arc'))return prepareCylinderMaterialProgram3([circularRingCylinder(ring,source.zMin,source.zMax)],[],{kind:'cylinder',cylinder:0});
-  if(ring.some(c=>c.kind==='arc'))throw new RangeError('Extrude material lowering requires separate polygon or full circular boundary loops');
+  const first=ring[0];
+  if(first?.kind==='arc'&&ring.every(c=>c.kind==='arc'&&c.arc.circle.center.x.equals(first.arc.circle.center.x)&&c.arc.circle.center.y.equals(first.arc.circle.center.y)&&c.arc.circle.radiusSquared.equals(first.arc.circle.radiusSquared)))return prepareCylinderMaterialProgram3([circularRingCylinder(ring,source.zMin,source.zMax)],[],{kind:'cylinder',cylinder:0});
+  if(ring.some(c=>c.kind==='arc'))return prepareSupportedProfileProgram3(ring,source.zMin,source.zMax);
   const polygon=ring.map(c=>{
    if(c.kind==='arc')throw new RangeError('Mixed arc-line loops are unsupported');
    if(c.kind==='segment')return point2(c.segment.start.x,c.segment.start.y);

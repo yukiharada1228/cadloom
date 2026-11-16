@@ -18,11 +18,11 @@ test('mixed polygon/circle product material enters the common kernel without fil
  assert.ok(result.topology.faces.some(f=>f.surface.kind==='cylinder'));
  for(const [p,expected] of [[point3(0n,0n,2n),'outside'],[point3('3/4',0n,2n),'inside'],[point3('1/2',0n,2n),'boundary'],[point3('3/4',0n,1n),'boundary'],[point3('3/4',0n,0n),'outside']] as const)assert.equal(locateBody3(result,p),expected);
 });
-test('circular annuli retain parity while a mixed arc-line loop remains explicit unsupported input',()=>{
+test('circular annuli retain parity and a certified arc-line loop lowers exactly',()=>{
  const annulus=extrudeBody3([circle(4n),circle(1n)],2n),p=prepareExtrudeMaterialProgram3(annulus);
  assert.equal(strictCylinderMaterialProgramLocation3(p,point3(0n,0n,1n)),'outside');assert.equal(strictCylinderMaterialProgramLocation3(p,point3('3/2',0n,1n)),'inside');
  const half=extrudeBody3([[{kind:'arc',arc:circularArc2(circle2(point2(0n,0n),1n),point2(1n,0n),point2(-1n,0n))},{kind:'segment',segment:{start:point2(-1n,0n),end:point2(1n,0n)}}]],2n);
- assert.throws(()=>prepareExtrudeMaterialProgram3(half),/separate polygon or full circular/);
+ const halfProgram=prepareExtrudeMaterialProgram3(half);assert.equal(strictCylinderMaterialProgramLocation3(halfProgram,point3(0n,'1/2',1n)),'inside');assert.equal(strictCylinderMaterialProgramLocation3(halfProgram,point3(0n,'-1/2',1n)),'outside');
 });
 test('a polygon island inside a circular hole survives normalized loop parity',()=>{
  const p=[point2('-1/4','-1/4'),point2('1/4','-1/4'),point2('1/4','1/4'),point2('-1/4','1/4')],island=p.map((start,i)=>({kind:'segment' as const,segment:{start,end:p[(i+1)%p.length]!}}));

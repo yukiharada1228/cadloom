@@ -145,7 +145,7 @@
     "src/geometry/planar-material-chambers3.ts": "dc09e6062459541f2b07e5c770561cb06be9fcd0cbb91f29372e7bad39a5a8a8",
     "src/geometry/planar-volume-moments3.ts": "033f559934602ce51a1be297b54714b71bbae4e7460c2220a7ce51474feef185",
     "src/ops/volume-moments3.ts": "ded0d7b1dde710a2926120668cfbd18d59937f2aa0c83202c1fd9f7058ea0598",
-    "src/convert/circular-extrude-material3.ts": "64b0213fc16fba5488898cead64d9c1c399cace46e992694389ea3b75496779a",
+    "src/convert/circular-extrude-material3.ts": "db18957e77d77cec0527934268a997e98b1fbe35a4137a11d3803a7b68cb6704",
     "src/geometry/curve-noding3.ts": "209cac6dbbd4fefe6c821c96d9cd0ac8f0b2629a42ffe204b661f196109cd0fc",
     "src/geometry/surface-germ3.ts": "62b49c36415bdd62e63dee36dfa40237799bcb4a12b3cd462fa546c4415d1d58",
     "src/geometry/planar-cell-surface3.ts": "6a92935758a475f9906725f2b79b7856732a7535d83c7fb2f75076dcf54a4f14",
@@ -157,7 +157,8 @@
     "src/geometry/cylinder-material-surfaces3.ts": "c22e44871978db70843b36d904a809dfbef96a6c3e494d2c96a6e86afd4591a3",
     "src/geometry/material-surface-boundary3.ts": "79d94b073f608315296af63107f9735b57e8f793c69ebeb8ca50583bd3dafc13",
     "src/geometry/cylinder-material-program3.ts": "d12d447ad8510d1a171706046f7a7a2c95a2596b3676ffb1110a2369f2fa1997",
-    "src/convert/material-surface-boundary3.ts": "f5bb8d5f863649ac7f4786c53607ddfba85f206bc511a79ca42a14f7239ec9bc"
+    "src/convert/material-surface-boundary3.ts": "f5bb8d5f863649ac7f4786c53607ddfba85f206bc511a79ca42a14f7239ec9bc",
+    "src/convert/supported-profile-program3.ts": "e7e37cf5633acac06e9533b4d25184fe92c7509dca0efdda6c174d059127fe3f"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
