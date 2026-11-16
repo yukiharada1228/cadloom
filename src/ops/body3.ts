@@ -246,7 +246,8 @@ function booleanSurfaceBodies3(first:KernelBody3,second:KernelBody3,operation:Bo
 }
 
 export interface MaterialBodyBooleanOptions3 {readonly contacts?:'reject'|'preserve';}
-function rationalPlanarBody3(body:KernelBody3):boolean {
+/** Internal common dispatch predicate; ownership must be checked by the caller. */
+export function rationalPlanarBody3(body:KernelBody3):boolean {
  if(isOwnedCellularBody3(body))return true;
  return body.topology.faces.every(f=>f.surface.kind==='plane')&&body.topology.vertices.every(p=>p.x.rational!==null&&p.y.rational!==null&&p.z.rational!==null)&&body.topology.edges.every(e=>{const c=e.curve.kind==='native'?e.curve.curve:e.curve;return c.kind==='line'||c.kind==='algebraic-segment';});
 }

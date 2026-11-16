@@ -1,0 +1,25 @@
+import type {KernelBody3,Body3} from '../model/body3.js';
+import {assertOwnedBody3} from '../model/body3.js';
+import {isOwnedCellularBody3} from '../model/cellular-body3.js';
+import {plane3} from '../geometry/plane3.js';
+import type {Plane3} from '../geometry/plane3.js';
+import {clipCylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
+import {boundaryMaterialSurfaces3} from '../geometry/material-surface-boundary3.js';
+import {materialProgramOfBody3,bodyFromMaterialSurfaceBoundary3,rationalPlanarBody3} from './body3.js';
+import {splitPlanarBodyByPlane3} from './planar-body-split3.js';
+import type {PlanarBodyPlaneSplit3} from './planar-body-split3.js';
+
+export type BodyPlaneSplit3 =
+ | Readonly<{representation:'planar';parent:KernelBody3;plane:Plane3;negative:KernelBody3;positive:KernelBody3;planar:PlanarBodyPlaneSplit3}>
+ | Readonly<{representation:'surface-material';parent:KernelBody3;plane:Plane3;negative:Body3;positive:Body3}>;
+/** Split supported owned material Bodies without replacing curved boundaries by
+ * meshes. Curved children must pass the existing closed manifold certificate.
+ * This common entry does not yet supply paired curved cap/coedge lineage. */
+export function splitBodyByPlane3(body:KernelBody3,input:Plane3):BodyPlaneSplit3 {
+ const cell=isOwnedCellularBody3(body);if(!cell)assertOwnedBody3(body as Body3);
+ const plane=plane3(input.normal.x,input.normal.y,input.normal.z,input.offset);
+ const planar=rationalPlanarBody3(body);
+ if(planar){const split=splitPlanarBodyByPlane3(body,plane);return Object.freeze({representation:'planar',parent:body,plane,negative:split.negative,positive:split.positive,planar:split});}
+ const source=materialProgramOfBody3(body),child=(side:-1|1)=>bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(clipCylinderMaterialProgram3(source,[{plane,side}]),{requireClosed:true}));
+ return Object.freeze({representation:'surface-material',parent:body,plane,negative:child(-1),positive:child(1)});
+}
