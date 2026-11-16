@@ -400,3 +400,7 @@ export {bodySplitInterface3} from './ops/body-split-interface3.js';
 export type {BodySplitInterface3,BodySplitInterfaceCoedge3,BodySplitInterfaceAtom3} from './ops/body-split-interface3.js';
 export {rejoinBodyPlaneSplit3} from './ops/rejoin-body-split3.js';
 export type {RejoinedBodyPlaneSplit3} from './ops/rejoin-body-split3.js';
+export {secondDifferentialNurbsSurface3} from './geometry/nurbs-surface3.js';
+export type {NurbsSurfaceSecondDifferential3} from './geometry/nurbs-surface3.js';
+export {curvatureNurbsSurface3} from './geometry/nurbs-surface-curvature3.js';
+export type {NurbsSurfaceCurvature3} from './geometry/nurbs-surface-curvature3.js';
