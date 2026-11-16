@@ -520,3 +520,6 @@ export type {NurbsPlaneWireEdge3,NurbsPlaneWire3,NurbsPlaneWiresCertificate3,Nur
 
 export {nurbsPlaneDomain3,locateNurbsPlaneDomain3,nurbsPlaneDomainEdgePoint3} from './geometry/nurbs-plane-domain3.js';
 export type {NurbsPlaneDomain3} from './geometry/nurbs-plane-domain3.js';
+
+export {partitionNurbsSourceFaceByPlane3,nurbsSourcePlaneCellPoint3} from './geometry/nurbs-source-plane-cells3.js';
+export type {NurbsSourcePlaneCell3,NurbsSourcePlaneCells3} from './geometry/nurbs-source-plane-cells3.js';
