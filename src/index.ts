@@ -561,3 +561,7 @@ export {queryNurbsPlaneCapWinding3} from './geometry/nurbs-plane-cap-winding3.js
 export type {NurbsPlaneCapWinding3} from './geometry/nurbs-plane-cap-winding3.js';
 export {partitionSewnNurbsSplitEdgeByAlgebraicPlane3} from './geometry/sewn-nurbs-split-edge-plane3.js';
 export type {AlgebraicOffsetPlane3} from './geometry/sewn-nurbs-split-edge-plane3.js';
+export {queryNurbsPlaneCapLoopWinding3} from './geometry/nurbs-plane-cap-winding3.js';
+export type {NurbsPlaneCapLoopWinding3} from './geometry/nurbs-plane-cap-winding3.js';
+export {analyzeNurbsPlaneCapContainment3} from './geometry/nurbs-plane-cap-containment3.js';
+export type {NurbsPlaneCapContainment3,NurbsPlaneCapContainmentCertificate3} from './geometry/nurbs-plane-cap-containment3.js';
