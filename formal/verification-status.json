@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "6c0e25991f5ae816a71f0c8295d1f765aa3059a462683eb7cea77f56a3e0507f",
+    "src/index.ts": "95737af28543468c59b9240d754e38909795f2b1309cd0367909529872aae1e5",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -71,7 +71,7 @@
     "src/geometry/nurbs-curve-intersection3.ts": "34b2c6bb47907deccecb48d0eed3aca9cd7074863e6afff6e866ff00a07b97a8",
     "src/geometry/nurbs-curve-analysis3.ts": "0b5a12627ba62d849adb6d52a64fc133c5adfdfddd063e941b6844eff1af651d",
     "src/geometry/nurbs-edge3.ts": "46c1e85d8b7e562d02eef6be2097abfde8fde2d2d7d9d2544dab51627fef0c24",
-    "src/geometry/nurbs-surface-boundary3.ts": "e0931858ae5c82ceb1795fd6293ddb4f73bf664b948cd766002679cf9aa811ef",
+    "src/geometry/nurbs-surface-boundary3.ts": "27ad19e9f00e0fbd2ec7f323614128ae52abc4caac19dd3b8853c9641b1de264",
     "src/geometry/nurbs-parameter-domain2.ts": "c33315979b6b7737126e57734e8d1ab41bf7b9e332e1483417fd145312f63045",
     "src/geometry/nurbs-surface-regularity3.ts": "8c596eab7763cf2bbdc7047c473bb538f9f48546929bf8ecb0438d2eaa76d799",
     "src/geometry/nurbs-trim-regularity3.ts": "71f9a50ed069e55d486851b59b8b648b8f89feb99172ba694070427ab0acbb04",
@@ -230,7 +230,9 @@
     "src/record/nurbs-source-brep3.ts": "98d0cdfeae0581426f1a5838fce9bd8085975d199d6d63483cbf75b1ab62996f",
     "src/convert/nurbs-source-brep3.ts": "f948f85bf0ebf0af6368d327d4d5d7769005fc9716d633bb8ddeb8da7343f337",
     "src/geometry/nurbs-source-face-partition3.ts": "524e08747eca07d70e954de96c9c6e40ddb2e1b9e8a5d801da8e749833b98de5",
-    "src/geometry/nurbs-source-face-line3.ts": "a41df7b8ce4c4a40db8b859b20c4411badce5150a37d395c28a602c10f2e413d"
+    "src/geometry/nurbs-source-face-line3.ts": "a41df7b8ce4c4a40db8b859b20c4411badce5150a37d395c28a602c10f2e413d",
+    "src/geometry/nurbs-source-boundary-map3.ts": "24eaa45c1f501ade049b9042476e762f885494340029eb18ce273ddbd132b189",
+    "src/geometry/sew-nurbs-source-breps3.ts": "0c1509e736261bae5e0326bf66656de8ad6047f9cf6dc0d9feb57663dbc1c848"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

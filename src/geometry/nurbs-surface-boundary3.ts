@@ -38,7 +38,8 @@ export function nurbsParameterPolynomial3(f:BivariatePolynomial,s:NurbsSpan3):Po
   const du=Math.max(0,f.degreeU),dv=Math.max(0,f.degreeV),degree=du+dv;
   return substitute(f,powers(s.x,du),powers(s.y,dv),powers(s.weight,degree),degree);
 }
-function compose(p:NurbsSurfacePatch3,s:NurbsSpan3,startParameter:AlgebraicReal,endParameter:AlgebraicReal):NurbsSurfaceBoundaryPiece3 {
+/** Internal exact composition; callers retain selected patch provenance. */
+export function composeNurbsSurfaceBoundarySpan3(p:NurbsSurfacePatch3,s:NurbsSpan3,startParameter:AlgebraicReal,endParameter:AlgebraicReal):NurbsSurfaceBoundaryPiece3 {
   const coordinates=[p.x,p.y,p.z,p.weight],du=Math.max(...coordinates.map(f=>f.degreeU)),dv=Math.max(...coordinates.map(f=>f.degreeV)),degree=du+dv,U=powers(s.x,du),V=powers(s.y,dv),W=powers(s.weight,degree),[x,y,z,weight]=coordinates.map(f=>substitute(f,U,V,W,degree));
   return Object.freeze({curveSpan:s.index,patch:p,startParameter,endParameter,x:x!,y:y!,z:z!,weight:weight!});
 }
@@ -67,7 +68,7 @@ export function liftNurbsSurfaceBoundary3(inputSurface:NurbsSurface3,inputCurve:
     cuts.sort((a,b)=>a.compare(b));
     for(let i=0;i+1<cuts.length;i++){
       const a=cuts[i]!,b=cuts[i+1]!,sample=between(a,b),uv=evaluateNurbsSpanPoint3(s,real(sample)),patch=select(patches,uv.x,uv.y,sides);
-      pieces.push(compose(patch,s,a,b));
+      pieces.push(composeNurbsSurfaceBoundarySpan3(patch,s,a,b));
     }
   }
   const result=Object.freeze({surface,parameterCurve,pieces:Object.freeze(pieces)});owned.add(result);return result;
