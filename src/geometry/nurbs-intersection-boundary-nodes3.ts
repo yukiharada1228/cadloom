@@ -23,7 +23,7 @@ export interface NurbsIntersectionBoundaryNodes3 {
  readonly intersectionVertices:readonly (number|null)[];
 }
 const real=(x:Parameters<typeof AlgebraicReal.fromRational>[0])=>AlgebraicReal.fromRational(x),one=new Polynomial([1n]);
-function coordinateRoots(s:NurbsSpan3,key:'x'|'y',value:AlgebraicReal):readonly AlgebraicReal[]|null {
+export function nurbsBoundaryCoordinateRoots3(s:NurbsSpan3,key:'x'|'y',value:AlgebraicReal):readonly AlgebraicReal[]|null {
  const N=s[key],W=s.weight;
  if(N.derivative().mul(W).sub(N.mul(W.derivative())).degree<0)return real(N.evaluate(s.startParameter).div(W.evaluate(s.startParameter))).compare(value)===0?null:[];
  const P=value.recognizeRational().polynomial,n=P.degree,NP=[one],WP=[one];for(let i=1;i<=n;i++){NP.push(NP[i-1]!.mul(N));WP.push(WP[i-1]!.mul(W));}
@@ -41,8 +41,10 @@ export function nodeNurbsIntersectionBoundary3(source:RefinedNurbsAffineIntersec
   const ids:number[]=[];
   for(const [curve,c] of curves.entries())for(const s of nurbsCurveSpans3(c)){
    const cuts=[real(s.startParameter),real(s.endParameter)];
+   // Monotone coordinate atoms support exact finite-interval matching.
+   for(const key of ['x','y'] as const){const f=s[key].derivative().mul(s.weight).sub(s[key].mul(s.weight.derivative()));for(const t of f.degree>0?isolateRealRoots(f):[])if(t.compare(cuts[0]!)>0&&t.compare(cuts[1]!)<0&&!cuts.some(q=>q.compare(t)===0))cuts.push(t);}
    for(const [index,p] of points.entries()){
-    const xs=coordinateRoots(s,'x',p.u),candidates=xs??coordinateRoots(s,'y',p.v)??[real(s.startParameter),real(s.endParameter)];
+    const xs=nurbsBoundaryCoordinateRoots3(s,'x',p.u),candidates=xs??nurbsBoundaryCoordinateRoots3(s,'y',p.v)??[real(s.startParameter),real(s.endParameter)];
     for(const t of candidates){const q=evaluateNurbsSpanPoint3(s,t);if(q.x.compare(p.u)!==0||q.y.compare(p.v)!==0)continue;if(!cuts.some(a=>a.compare(t)===0))cuts.push(t);const v=vertex(p.u,p.v);if(!vertices[v]!.intersectionVertices.includes(index))vertices[v]!.intersectionVertices.push(index);intersectionVertices[index]=v;}
    }
    cuts.sort((a,b)=>a.compare(b));const vs=cuts.map(t=>{const q=evaluateNurbsSpanPoint3(s,t);return vertex(q.x,q.y);});

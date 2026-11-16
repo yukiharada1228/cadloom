@@ -447,3 +447,5 @@ export {refineNurbsAffineIntersectionComplex3,refinedNurbsAffineIntersectionEdge
 export type {RefinedNurbsIntersectionVertex3,RefinedNurbsIntersectionEdge3,RefinedNurbsAffineIntersectionComplex3} from './geometry/nurbs-affine-intersection-refine3.js';
 export {nodeNurbsIntersectionBoundary3} from './geometry/nurbs-intersection-boundary-nodes3.js';
 export type {NurbsIntersectionBoundaryVertex2,NurbsIntersectionBoundaryEdge2,NurbsIntersectionBoundaryNodes3} from './geometry/nurbs-intersection-boundary-nodes3.js';
+export {matchNurbsIntersectionSourceBoundary3} from './geometry/nurbs-intersection-boundary-sharing3.js';
+export type {NurbsSourceBoundarySharedInterval3,NurbsSourceBoundarySharing3} from './geometry/nurbs-intersection-boundary-sharing3.js';
