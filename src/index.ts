@@ -433,3 +433,5 @@ export {nurbsAffineIntersectionEquations3,nurbsAffineIntersectionContains3,nurbs
 export type {NurbsAffineIntersectionEquationPatch3,NurbsAffineIntersectionEquations3,NurbsAffineIntersectionPoint3} from './geometry/nurbs-affine-intersection-equations3.js';
 export {solveNurbsAffineIntersectionEquations3,intersectNurbsSurfaceAffineTarget3,nurbsAffineIntersectionEdgePoint3,nurbsAffineIntersectionRegionPoint3} from './geometry/nurbs-affine-intersection3.js';
 export type {NurbsAffineIntersectionEdge3,NurbsAffineIntersectionPatch3,NurbsAffineIntersection3} from './geometry/nurbs-affine-intersection3.js';
+export {implicitizeNurbsParameterCurve2,implicitNurbsParameterSpanPoint2} from './geometry/nurbs-parameter-implicit2.js';
+export type {ImplicitNurbsParameterSpan2,ImplicitNurbsParameterCurve2} from './geometry/nurbs-parameter-implicit2.js';
