@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "887849c8dcad56e77ea967d5d7347bed5e1129242541906b493caa2caf9392c9",
+    "src/index.ts": "e2f7b03400a4eb4d7a9bfe2c450422eea1470fcef91470cab93283f7146af589",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -234,7 +234,11 @@
     "src/geometry/nurbs-source-boundary-map3.ts": "24eaa45c1f501ade049b9042476e762f885494340029eb18ce273ddbd132b189",
     "src/geometry/sew-nurbs-source-breps3.ts": "db0100ea75d5db867ef60ae7f1b9be15fffaf874c8c6c982a8202df3eed8720a",
     "src/geometry/sewn-nurbs-source-ray3.ts": "588a6bb736b4c763c70e001b2d9237272eb82668fb475b1d6e6f5b3dabdb4773",
-    "src/geometry/sewn-nurbs-source-embedding3.ts": "4dabd77b26d2dab5f451a13606007e42c18f44c55e4f9a2007e48ca3b32fd93a"
+    "src/geometry/sewn-nurbs-source-embedding3.ts": "4dabd77b26d2dab5f451a13606007e42c18f44c55e4f9a2007e48ca3b32fd93a",
+    "src/geometry/sewn-nurbs-source-parity-search3.ts": "7710025f2d828cf211e60f1b3558ab157b29d9ef8b3d71a08c289b06b61ac5f1",
+    "src/geometry/sewn-nurbs-source-containment3.ts": "1fb045d6a28ce4a80900ab08e011576d0c2760dacd45cf01c21ee5291fe7f4d3",
+    "src/geometry/sewn-nurbs-source-material3.ts": "5c155a82d0a6a5ff1698520004374c91b75a31fe14c5f7c102ad31a2e76e820b",
+    "src/geometry/sewn-nurbs-source-material-query3.ts": "d4f5ce74e4960f23f639d21c929edfd5a92e6a2764c63ddf755279ec326fd9c6"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

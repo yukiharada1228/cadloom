@@ -491,5 +491,13 @@ export {sewNurbsSourceBReps3,sewnNurbsSourceEdgePoint3} from './geometry/sew-nur
 export type {SewnNurbsSourceBReps3,SewnNurbsSourceEdge3,SewnNurbsSourceFace3} from './geometry/sew-nurbs-source-breps3.js';
 export {intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3,querySewnNurbsSourceShellParity3} from './geometry/sewn-nurbs-source-ray3.js';
 export type {SewnNurbsSourceRay3,SewnNurbsSourceRayUse3,SewnNurbsSourceRayReason3,SewnNurbsShellParity3} from './geometry/sewn-nurbs-source-ray3.js';
+export {querySewnNurbsSourceShellParityAuto3} from './geometry/sewn-nurbs-source-parity-search3.js';
+export type {SewnNurbsParitySearchOptions3,SewnNurbsShellParitySearch3} from './geometry/sewn-nurbs-source-parity-search3.js';
+export {analyzeSewnNurbsSourceContainment3} from './geometry/sewn-nurbs-source-containment3.js';
+export type {SewnNurbsShellContainmentNode3,SewnNurbsSourceContainmentCertificate3,SewnNurbsSourceContainment3} from './geometry/sewn-nurbs-source-containment3.js';
+export {certifySewnNurbsSourceMaterial3} from './geometry/sewn-nurbs-source-material3.js';
+export type {SewnNurbsShellOrientation3,SewnNurbsSourceMaterialCertificate3,SewnNurbsSourceMaterial3} from './geometry/sewn-nurbs-source-material3.js';
+export {locateSewnNurbsSourceMaterial3} from './geometry/sewn-nurbs-source-material-query3.js';
+export type {SewnNurbsMaterialLocation3} from './geometry/sewn-nurbs-source-material-query3.js';
 export {certifySewnNurbsSourceEmbedding3} from './geometry/sewn-nurbs-source-embedding3.js';
 export type {SewnNurbsSourceEmbedding3,SewnNurbsSourceEmbeddingCertificate3,NurbsSourceFaceSeparation3} from './geometry/sewn-nurbs-source-embedding3.js';

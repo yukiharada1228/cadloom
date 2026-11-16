@@ -1,4 +1,7 @@
 import test from 'node:test';
+import {analyzeSewnNurbsSourceContainment3} from '../dist/index.js';
+import {certifySewnNurbsSourceMaterial3,querySewnNurbsSourceShellParityAuto3} from '../dist/index.js';
+import {locateSewnNurbsSourceMaterial3,algebraicCoordinates3,Polynomial} from '../dist/index.js';
 import assert from 'node:assert/strict';
 import {certifySewnNurbsSourceEmbedding3,encodeNurbsSourceBRep3,restoreNurbsSourceBRep3,stringifyNurbsSourceBRep3,nurbsSourceComplexFacePointPreimage3,intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3,querySewnNurbsSourceShellParity3,line3,sewNurbsSourceBReps3,sewnNurbsSourceEdgePoint3,buildNurbsSourceBRep3,nurbsSourceBRepEdgePoint3,prepareNurbsSourceFaceComplex3,evaluateNurbsSourceComplexEdge3,certifyNurbsSurfaceTriangularProjection3,evaluateNurbsTriangularSurface3,certifyNurbsSourceFaceEmbedding3,evaluateNurbsSurface3,analyzeNurbsSourceFaceClosedRank3,analyzeNurbsSourceFaceVertexRegularity3,analyzeNurbsSourceFaceBoundaryRegularity3,analyzeNurbsSourceFaceInteriorRegularity3,selectNurbsSourceFacePatches3,liftNurbsSourceFaceBoundaries3,evaluateNurbsSourceLiftPiece3,compareAlgebraicPoints3,locateNurbsSourceFace3,reverseNurbsCurve3,classifyNurbsSourceFaces3,buildNurbsSourceHalfedges3,buildNurbsSourceBoundaryComplex3,matchNurbsIntersectionSourceBoundary3,insertNurbsKnot3,point3,nurbsCurve3,nurbsSurface3,prepareNurbsParameterDomain2,certifyNurbsSurfaceAffineProjection3,intersectNurbsSurfaceAffineTarget3,trimNurbsAffineIntersection3,sewNurbsAffineIntersection3,refineNurbsAffineIntersectionComplex3,nodeNurbsIntersectionBoundary3,AlgebraicReal,Rational} from '../dist/index.js';
 import type {NurbsSurface3,NurbsIntersectionBoundaryNodes3,PreparedNurbsParameterDomain2} from '../dist/index.js';
@@ -49,4 +52,60 @@ test('triangular octahedron faces certify shared-vertex-only contacts and trim-a
  const triangle=prepareNurbsParameterDomain2([nurbsCurve3(1,[point3(0n,0n,0n),point3(1n,0n,0n)],K),nurbsCurve3(1,[point3(1n,0n,0n),point3(0n,1n,0n)],K),nurbsCurve3(1,[point3(0n,1n,0n),point3(0n,0n,0n)],K)]),roots=[];
  for(const x of [-1n,1n])for(const y of [-1n,1n])for(const z of [-1n,1n]){const a=point3(x,0n,0n),b=point3(0n,y,0n),c=point3(0n,0n,z),source=nurbsSurface3(1,1,[[a,c],[b,point3(-x,y,z)]],K,K);roots.push(buildNurbsSourceBRep3(complex(source,plane('100'),triangle),x*y*z>0n?1:-1));}
  const r=sewn(roots);assert.ok(r.topology.closedOrientedIncidence);assert.equal(r.topology.faces.length,8);assert.equal(r.topology.vertices.length,6);assert.equal(r.topology.edges.length,12);const q=certifySewnNurbsSourceEmbedding3(r);assert.equal(q.kind,'certified');if(q.kind==='certified')assert.equal(q.certificate.separations.length,28);
+});
+
+function containmentOf(r:ReturnType<typeof sewn>){const proof=certifySewnNurbsSourceEmbedding3(r);assert.equal(proof.kind,'certified');if(proof.kind!=='certified')throw Error('Expected global embedding');const q=analyzeSewnNurbsSourceContainment3(proof.certificate);assert.equal(q.kind,'analyzed');if(q.kind!=='analyzed')throw Error('Expected containment');return q.certificate;}
+test('certified containment builds three-level shell ancestry independent of input order',()=>{
+ const scaled=(scale:string,shift:string)=>transformCube(cube(true),p=>{const f=(v:Rational)=>v.mul(Rational.parse(scale)).add(Rational.parse(shift));return point3(f(p.x),f(p.y),f(p.z));});
+ const r=sewn([...scaled('1/4','3/8'),...cube(true),...scaled('1/2','1/4')]),c=containmentOf(r),shellOf=(face:number)=>r.topology.faces[face]!.shell;
+ const island=shellOf(0),outer=shellOf(6),cavity=shellOf(12);
+ assert.deepEqual(c.shells.map(s=>s.depth),r.topology.shells.map((_,i)=>i===outer?0:i===cavity?1:2));
+ assert.equal(c.shells[island]!.parent,cavity);assert.equal(c.shells[cavity]!.parent,outer);assert.equal(c.shells[outer]!.parent,null);
+ assert.deepEqual(c.shells.map(s=>s.expectedOrientation),r.topology.shells.map((_,i)=>i===cavity?-1:1));
+ assert.ok(Object.isFrozen(c)&&Object.isFrozen(c.shells)&&Object.isFrozen(c.shells[island]!.containers));
+ const p=c.shells[island]!.sample,limited=analyzeSewnNurbsSourceContainment3(c.embedding,{maxDirections:1,directions:[point3(p.x.neg(),p.y.neg(),p.z.neg())]});
+ assert.equal(limited.kind,'unresolved');if(limited.kind==='unresolved'){assert.equal(limited.reason,'parity');assert.equal(limited.query?.kind,'unresolved');if(limited.query?.kind==='unresolved')assert.equal(limited.query.reason,'ray-budget');}
+});
+test('disjoint shells remain separate forest roots even when one orientation is reversed',()=>{
+ const a=cube(),b=transformCube(cube(true),p=>point3(p.x.add(new Rational(3n)),p.y,p.z)).map(r=>buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1)),c=containmentOf(sewn([...a,...b]));
+ assert.equal(c.shells.length,2);for(const shell of c.shells){assert.equal(shell.depth,0);assert.equal(shell.parent,null);assert.deepEqual(shell.containers,[]);assert.equal(shell.expectedOrientation,1);}
+});
+test('curved weighted cylinder is a single root and copied embedding certificates are rejected',()=>{
+ const r=cylinder(),c=containmentOf(r);assert.equal(c.shells.length,1);assert.equal(c.shells[0]!.depth,0);
+ const proof=certifySewnNurbsSourceEmbedding3(r);if(proof.kind!=='certified')throw Error('Expected embedding');assert.throws(()=>analyzeSewnNurbsSourceContainment3({...proof.certificate}),/factory/);
+});
+
+test('material orientation uses exact transverse enter/exit events and rational interior witnesses',()=>{
+ for(const r of [sewn(cube(true)),cylinder()]){const c=containmentOf(r),q=certifySewnNurbsSourceMaterial3(c);assert.equal(q.kind,'certified');if(q.kind==='certified')for(const o of q.certificate.orientations){assert.equal(o.orientation,1);assert.equal(o.ray.kind,'regular');const inside=querySewnNurbsSourceShellParityAuto3(r,o.shell,o.interiorWitness),outside=querySewnNurbsSourceShellParityAuto3(r,o.shell,o.exteriorWitness);assert.equal(inside.kind,'parity');if(inside.kind==='parity')assert.equal(inside.parity,'odd');assert.equal(outside.kind,'parity');if(outside.kind==='parity')assert.equal(outside.parity,'even');}}
+});
+test('nested material boundaries require inward cavity and outward island orientations',()=>{
+ const scaled=(scale:string,shift:string,reverse=false)=>transformCube(cube(true),p=>{const f=(v:Rational)=>v.mul(Rational.parse(scale)).add(Rational.parse(shift));return point3(f(p.x),f(p.y),f(p.z));}).map(r=>reverse?buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1):r);
+ const cavity=scaled('1/2','1/4',true),r=sewn([...cube(true),...cavity,...scaled('1/4','3/8')]),q=certifySewnNurbsSourceMaterial3(containmentOf(r));assert.equal(q.kind,'certified');if(q.kind==='certified'){assert.deepEqual(q.certificate.orientations.map(o=>o.orientation),[1,-1,1]);assert.ok(Object.isFrozen(q.certificate)&&Object.isFrozen(q.certificate.orientations));}
+ const bad=certifySewnNurbsSourceMaterial3(containmentOf(sewn([...cube(),...scaled('1/2','1/4')])));assert.equal(bad.kind,'orientation-mismatch');if(bad.kind==='orientation-mismatch'){assert.equal(bad.shells.length,1);assert.equal(bad.orientations[bad.shells[0]!]!.expectedOrientation,-1);}
+});
+test('reversed exterior orientation, budgets and copied containment are handled explicitly',()=>{
+ const roots=cube(),r=sewn(roots.map(r=>buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1))),c=containmentOf(r),q=certifySewnNurbsSourceMaterial3(c);assert.equal(q.kind,'orientation-mismatch');if(q.kind==='orientation-mismatch')assert.equal(q.orientations[0]!.orientation,-1);
+ const limited=certifySewnNurbsSourceMaterial3(c,{maxDirections:1,directions:[point3(-1n,0n,0n)]});assert.deepEqual(limited,{kind:'unresolved',reason:'ray-budget',shell:0,attempts:1});
+ assert.throws(()=>certifySewnNurbsSourceMaterial3({...c}),/factory/);for(const maxDirections of [0,NaN,1.5])assert.throws(()=>certifySewnNurbsSourceMaterial3(c,{maxDirections}),/positive safe integer/);
+});
+
+function materialOf(r:ReturnType<typeof sewn>){const q=certifySewnNurbsSourceMaterial3(containmentOf(r));assert.equal(q.kind,'certified');if(q.kind!=='certified')throw Error('Expected material boundary');return q.certificate;}
+test('material membership distinguishes exterior, solid, cavity, island and closed boundaries',()=>{
+ const scaled=(scale:string,shift:string,reverse=false)=>transformCube(cube(true),p=>{const f=(v:Rational)=>v.mul(Rational.parse(scale)).add(Rational.parse(shift));return point3(f(p.x),f(p.y),f(p.z));}).map(r=>reverse?buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1):r);
+ const m=materialOf(sewn([...cube(true),...scaled('1/2','1/4',true),...scaled('1/4','3/8')]));
+ for(const [x,expected,count] of [['2','outside',0],['1/8','inside',1],['1/3','outside',2],['1/2','inside',3]] as const){const q=locateSewnNurbsSourceMaterial3(m,point3(x,'1/2','1/2'));assert.equal(q.kind,expected);if(q.kind==='inside'||q.kind==='outside'){assert.equal(q.containingShells.length,count);assert.equal(q.deepestShell,count? q.containingShells[count-1]:null);assert.ok(Object.isFrozen(q.enclosure));}}
+ for(const x of ['0','1/4','3/8']){const q=locateSewnNurbsSourceMaterial3(m,point3(x,'1/2','1/2'));assert.equal(q.kind,'boundary');if(q.kind==='boundary'){assert.equal(q.faces.length,1);assert.equal(q.shells.length,1);}}
+ assert.throws(()=>locateSewnNurbsSourceMaterial3({...m},point3(0n,0n,0n)),/factory/);
+});
+test('algebraic membership proves a boundary-free box before replacing a point by a rational witness',()=>{
+ const m=materialOf(sewn(cube(true))),root=AlgebraicReal.isolate(new Polynomial([-2n,0n,1n])).find(q=>q.sign()>0)!,a=root.affine('1/2');
+ for(const [x,kind] of [[a,'inside'],[root,'outside']] as const){const p=algebraicCoordinates3(x,a,'1/2'),q=locateSewnNurbsSourceMaterial3(m,p);assert.equal(q.kind,kind);if(q.kind==='inside'||q.kind==='outside'){assert.ok(x.compare(AlgebraicReal.fromRational(q.enclosure.lower.x))>=0&&x.compare(AlgebraicReal.fromRational(q.enclosure.upper.x))<=0);assert.equal(locateSewnNurbsSourceMaterial3(m,q.rationalWitness).kind,kind);if(kind==='inside'){assert.ok(q.enclosure.lower.x.sign()>0);assert.ok(q.enclosure.upper.x.compare(new Rational(1n))<0);}}}
+ assert.equal(locateSewnNurbsSourceMaterial3(m,algebraicCoordinates3(0n,a,'1/2')).kind,'boundary');
+});
+test('weighted curved material queries retain exact algebraic wall membership',()=>{
+ const m=materialOf(cylinder()),root=AlgebraicReal.isolate(new Polynomial([-2n,0n,1n])).find(q=>q.sign()>0)!,a=root.affine('1/2');
+ assert.equal(locateSewnNurbsSourceMaterial3(m,algebraicCoordinates3(a,a,'1/2')).kind,'boundary');
+ assert.equal(locateSewnNurbsSourceMaterial3(m,algebraicCoordinates3(a,0n,'1/2')).kind,'inside');
+ assert.equal(locateSewnNurbsSourceMaterial3(m,algebraicCoordinates3(root,0n,'1/2')).kind,'outside');
+ const q=locateSewnNurbsSourceMaterial3(m,point3(0n,0n,'1/2'),{maxDirections:1,directions:[point3(1n,0n,0n)]});assert.equal(q.kind,'unresolved');if(q.kind==='unresolved'){assert.equal(q.reason,'parity');if(q.query?.kind==='unresolved')assert.equal(q.query.reason,'ray-budget');}
 });

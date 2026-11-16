@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {querySewnNurbsSourceShellParityAuto3} from '../dist/index.js';
 import assert from 'node:assert/strict';
 import {intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3,querySewnNurbsSourceShellParity3,line3,sewNurbsSourceBReps3,sewnNurbsSourceEdgePoint3,buildNurbsSourceBRep3,nurbsSourceBRepEdgePoint3,prepareNurbsSourceFaceComplex3,evaluateNurbsSourceComplexEdge3,certifyNurbsSurfaceTriangularProjection3,evaluateNurbsTriangularSurface3,certifyNurbsSourceFaceEmbedding3,evaluateNurbsSurface3,analyzeNurbsSourceFaceClosedRank3,analyzeNurbsSourceFaceVertexRegularity3,analyzeNurbsSourceFaceBoundaryRegularity3,analyzeNurbsSourceFaceInteriorRegularity3,selectNurbsSourceFacePatches3,liftNurbsSourceFaceBoundaries3,evaluateNurbsSourceLiftPiece3,compareAlgebraicPoints3,locateNurbsSourceFace3,reverseNurbsCurve3,classifyNurbsSourceFaces3,buildNurbsSourceHalfedges3,buildNurbsSourceBoundaryComplex3,matchNurbsIntersectionSourceBoundary3,insertNurbsKnot3,point3,nurbsCurve3,nurbsSurface3,prepareNurbsParameterDomain2,certifyNurbsSurfaceAffineProjection3,intersectNurbsSurfaceAffineTarget3,trimNurbsAffineIntersection3,sewNurbsAffineIntersection3,refineNurbsAffineIntersectionComplex3,nodeNurbsIntersectionBoundary3,AlgebraicReal,Rational} from '../dist/index.js';
 import type {NurbsSurface3,NurbsIntersectionBoundaryNodes3,PreparedNurbsParameterDomain2} from '../dist/index.js';
@@ -48,4 +49,28 @@ test('copied ownership, invalid shells and zero directions are rejected and unre
 test('a genuinely curved closed top produces algebraic ray hits and parity matching its polynomial height',()=>{
  const roots=cube(),U=['0','1/2','1'],top=nurbsSurface3(2,2,U.map((u,i)=>U.map((v,j)=>point3(u,v,i===1&&j===1?'5/4':'1'))),K2,K2);roots[1]=buildNurbsSourceBRep3(complex(top,plane('100')));const r=sewn(roots);assert.ok(r.topology.closedOrientedIncidence);const ray=intersectSewnNurbsSourceRay3(r,line3(point3(-1n,'1/2','33/32'),point3(1n,0n,0n)));assert.equal(ray.kind,'regular');if(ray.kind==='regular'){assert.equal(ray.hits.length,2);assert.deepEqual(ray.hits.map(h=>h.uses[0]!.normals[0]!.dotSign),[-1,1]);assert.ok(ray.hits.every(h=>h.parameter.recognizeRational().rational===null));}
  for(const x of ['1/10','1/4','1/2','3/4','9/10'])for(const z of ['1/2','33/32','35/32']){const p=point3(x,'1/2',z),height=new Rational(1n).add(p.x.mul(new Rational(1n).sub(p.x)).div(new Rational(4n))),inside=p.z.sign()>0&&p.z.compare(height)<0,q=querySewnNurbsSourceShellParity3(r,0,p);assert.equal(q.kind,'parity');if(q.kind==='parity'){assert.equal(q.parity,inside?'odd':'even');assert.equal(q.orientedSum,inside?1:0);}}
+});
+
+test('automatic parity retries vertex rays, preserves signed orientation and deduplicates positive scales',()=>{
+ const r=sewn(cube()),p=point3('1/2','1/2','1/2'),bad=point3(1n,1n,1n);
+ const exhausted=querySewnNurbsSourceShellParityAuto3(r,0,p,{maxDirections:1,directions:[bad]});
+ assert.equal(exhausted.kind,'unresolved');if(exhausted.kind==='unresolved')assert.equal(exhausted.reason,'ray-budget');assert.equal(exhausted.attempts,1);
+ const q=querySewnNurbsSourceShellParityAuto3(r,0,p,{maxDirections:2,directions:[bad,point3(2n,2n,2n)]});
+ assert.equal(q.kind,'parity');assert.equal(q.attempts,2);if(q.kind==='parity'){assert.equal(q.parity,'odd');assert.equal(q.orientedSum,1);}
+ const reversed=querySewnNurbsSourceShellParityAuto3(r,0,p,{maxDirections:2,directions:[bad,point3(-1n,-1n,-1n)]});
+ assert.equal(reversed.kind,'unresolved');assert.equal(reversed.attempts,2);
+ assert.ok(Object.isFrozen(q));
+});
+test('automatic parity checks closed boundary membership before retries and validates options',()=>{
+ const r=sewn(cube());for(const p of [point3(0n,'1/2','1/2'),point3(0n,0n,0n)]){const q=querySewnNurbsSourceShellParityAuto3(r,0,p);assert.equal(q.kind,'on-face');assert.equal(q.attempts,1);}
+ for(const maxDirections of [0,-1,NaN,Infinity,1.5])assert.throws(()=>querySewnNurbsSourceShellParityAuto3(r,0,point3(2n,2n,2n),{maxDirections}),/positive safe integer/);
+ assert.throws(()=>querySewnNurbsSourceShellParityAuto3(r,0,point3(2n,2n,2n),{directions:[point3(1n,0n,0n),point3(0n,0n,0n)]}),/nonzero/);
+ assert.throws(()=>querySewnNurbsSourceShellParityAuto3({...r},0,point3(2n,2n,2n)),/factory/);
+ assert.throws(()=>querySewnNurbsSourceShellParityAuto3(r,99,point3(2n,2n,2n)),/shell/);
+});
+test('automatic parity agrees with box membership after an intentionally degenerate first ray',()=>{
+ const r=sewn(cube(true));for(const x of ['-1','1/4','3/4','2'])for(const y of ['-1','1/4','3/4','2']){
+  const p=point3(x,y,'1/2'),q=querySewnNurbsSourceShellParityAuto3(r,0,p,{directions:[point3(p.x.neg(),p.y.neg(),p.z.neg())]});
+  assert.equal(q.kind,'parity');if(q.kind==='parity'){const inside=p.x.sign()>0&&p.x.compare(new Rational(1n))<0&&p.y.sign()>0&&p.y.compare(new Rational(1n))<0;assert.equal(q.parity,inside?'odd':'even');assert.equal(q.orientedSum,inside?1:0);}
+ }
 });
