@@ -625,3 +625,6 @@ export {analyzeNurbsSourcePlaneZeroSet3} from './geometry/nurbs-source-plane-zer
 export type {NurbsSourcePlaneZeroSet3,NurbsSourcePlaneZeroSetCertificate3} from './geometry/nurbs-source-plane-zero-set3.js';
 export {inspectNurbsRecutSourceCapContacts3} from './geometry/nurbs-recut-source-cap-contacts3.js';
 export type {NurbsRecutSourceCapContacts3,NurbsRecutCapContactWitness3} from './geometry/nurbs-recut-source-cap-contacts3.js';
+
+export {analyzeNurbsRecutInteriorZeroArcs3,nurbsRecutInteriorZeroArcPoint3} from './geometry/nurbs-recut-interior-zero-arcs3.js';
+export type {NurbsRecutInteriorZeroArcCertificate3,NurbsRecutInteriorZeroArcs3} from './geometry/nurbs-recut-interior-zero-arcs3.js';
