@@ -174,10 +174,11 @@
         "src/geometry/cylinder-intersection-face3.ts",
         "src/geometry/cylinder-intersection-cylinder3.ts",
         "src/geometry/curve-noding3.ts",
-        "src/geometry/nurbs-source-face-plane3.ts"
+        "src/geometry/nurbs-source-face-plane3.ts",
+        "src/geometry/sewn-nurbs-source-boundary-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI recovery. Finite-cylinder expression plane sections and closed cut boundaries exist. General analytic/NURBS SSI, complete contact relations and broader clipped-material operations remain incomplete. Certified finite NURBS faces now expose exact plane-section vertices, trimmed implicit graph intervals and coplanar finite-face domains, including holes and isolated contacts. Cross-face section assembly, cap material selection and NURBS Body plane splitting remain incomplete."
+      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI recovery. Finite-cylinder expression plane sections and closed cut boundaries exist. General analytic/NURBS SSI, complete contact relations and broader clipped-material operations remain incomplete. Certified finite NURBS faces now expose exact plane-section vertices, trimmed implicit graph intervals and coplanar finite-face domains, including holes and isolated contacts. Complete cross-face noding, cap material selection and NURBS Body plane splitting remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -210,10 +211,11 @@
         "src/geometry/planar-material-surfaces3.ts",
         "src/geometry/cylinder-material-surfaces3.ts",
         "src/geometry/material-expression-eval3.ts",
-        "src/geometry/material-surface-boundary3.ts"
+        "src/geometry/material-surface-boundary3.ts",
+        "src/geometry/sewn-nurbs-source-boundary-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Finite-cylinder wall/cap partitions select and sew balanced native/SSI Boolean boundaries with supported common Body persistence. Shared bounded native curve events retain source indexes; upstream cuts feed native and mixed sewing. Finite coplanar lines/conic arcs now enter the common planar strip decomposition, including finite face sections and dangling endpoints. Artificial vertical edges remain. General curved face insertion, complete material-side certification, repeated general curved cuts and maximal consolidation remain incomplete. Owned open planar cells now undergo complete plane/cylinder support-zero checks before two-sided material evaluation and oriented boundary selection/sewing. A finite cylinder cap/wall reconstruction verifies closed incidence; general curved-side selection, global coverage and embedded solid adoption remain incomplete. Missing planar support cuts can now be inserted automatically with reclassification and parent-cell provenance; generic curved refinement and full solid adoption remain incomplete. All candidate planar supports of owned cylinder/halfspace material now share partition, zero checking, refinement, material selection and sewing, with coincident support origins retained. Focused cases close against curved sides and validate an all-planar box through common Body replay; generic curved boundary extraction and global solid certification remain incomplete. Owned cylinder wall arrangements now share strict two-sided material evaluation and finite-band-aware coincident ownership, selecting native/SSI boundaries with provenance and nonmanifold diagnostics. General trimmed analytic/NURBS surfaces and embedded solid adoption remain incomplete. One assembly API now combines planar/cylinder selections with complete face provenance, balanced edge checks and strict incidence or nonmanifold diagnostics. Independent material-program ownership, arbitrary curved embeddings and common Body adoption remain incomplete."
+      "gap": "Finite-cylinder wall/cap partitions select and sew balanced native/SSI Boolean boundaries with supported common Body persistence. Shared bounded native curve events retain source indexes; upstream cuts feed native and mixed sewing. Finite coplanar lines/conic arcs now enter the common planar strip decomposition, including finite face sections and dangling endpoints. Artificial vertical edges remain. General curved face insertion, complete material-side certification, repeated general curved cuts and maximal consolidation remain incomplete. Owned open planar cells now undergo complete plane/cylinder support-zero checks before two-sided material evaluation and oriented boundary selection/sewing. A finite cylinder cap/wall reconstruction verifies closed incidence; general curved-side selection, global coverage and embedded solid adoption remain incomplete. Missing planar support cuts can now be inserted automatically with reclassification and parent-cell provenance; generic curved refinement and full solid adoption remain incomplete. All candidate planar supports of owned cylinder/halfspace material now share partition, zero checking, refinement, material selection and sewing, with coincident support origins retained. Focused cases close against curved sides and validate an all-planar box through common Body replay; generic curved boundary extraction and global solid certification remain incomplete. Owned cylinder wall arrangements now share strict two-sided material evaluation and finite-band-aware coincident ownership, selecting native/SSI boundaries with provenance and nonmanifold diagnostics. General trimmed analytic/NURBS surfaces and embedded solid adoption remain incomplete. One assembly API now combines planar/cylinder selections with complete face provenance, balanced edge checks and strict incidence or nonmanifold diagnostics. Independent material-program ownership, arbitrary curved embeddings and common Body adoption remain incomplete. Certified NURBS material boundaries now aggregate finite-face plane loci, weld algebraic endpoints, retain coplanar domains and report endpoint-graph cycles with contact diagnostics. These cycles are not oriented cap certificates; complete overlap noding, planar material selection and closed child-Body construction remain incomplete."
     },
     {
       "id": "boolean",
@@ -314,7 +316,9 @@
         "src/geometry/sewn-nurbs-source-material-query3.ts",
         "src/geometry/sewn-nurbs-source-material-line3.ts",
         "src/model/nurbs-body3.ts",
-        "src/geometry/nurbs-source-face-plane3.ts"
+        "src/geometry/nurbs-source-face-plane3.ts",
+        "src/geometry/sewn-nurbs-source-boundary-plane3.ts",
+        "src/ops/nurbs-body-boundary-plane3.ts"
       ],
       "status": "partial",
       "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained. Owned finite-face plane section evaluators preserve native UV graph parameters, finite trim/approached-patch membership and full spatial plane equality."
@@ -385,7 +389,8 @@
       "tests/sewn-nurbs-source-embedding3.test.ts",
       "tests/bivariate-equation-basis.test.ts",
       "tests/bivariate-system.test.ts",
-      "tests/nurbs-source-face-plane3.test.ts"
+      "tests/nurbs-source-face-plane3.test.ts",
+      "tests/sewn-nurbs-source-boundary-plane3.test.ts"
     ],
     "document": "docs/nurbs-source-cylinder-integration3.md",
     "materialBoundarySourceCommit": "30f6883",
@@ -396,7 +401,8 @@
       "docs/sewn-nurbs-source-material-line3.md",
       "docs/nurbs-body3.md",
       "docs/nurbs-body-similarity3.md",
-      "docs/nurbs-source-face-plane3.md"
+      "docs/nurbs-source-face-plane3.md",
+      "docs/nurbs-boundary-plane3.md"
     ]
   }
 }

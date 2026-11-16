@@ -510,3 +510,7 @@ export type {SewnNurbsSourceEmbedding3,SewnNurbsSourceEmbeddingCertificate3,Nurb
 
 export {intersectNurbsSourceFacePlane3,nurbsSourceFacePlaneEdgePoint3,nurbsSourceFacePlaneAreaPoint3} from './geometry/nurbs-source-face-plane3.js';
 export type {NurbsSourcePlaneVertex3,NurbsSourcePlaneEdge3,NurbsSourcePlaneArea3,NurbsSourceFacePlane3} from './geometry/nurbs-source-face-plane3.js';
+
+export {intersectSewnNurbsSourceBoundaryPlane3,nurbsBoundaryPlaneEdgePoint3} from './geometry/sewn-nurbs-source-boundary-plane3.js';
+export type {NurbsBoundaryPlaneVertex3,NurbsBoundaryPlaneEdge3,NurbsBoundaryPlaneComponent3,NurbsBoundaryPlaneDiagnostic3,SewnNurbsBoundaryPlane3} from './geometry/sewn-nurbs-source-boundary-plane3.js';
+export {intersectNurbsBodyBoundaryPlane3} from './ops/nurbs-body-boundary-plane3.js';
