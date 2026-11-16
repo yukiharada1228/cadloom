@@ -538,3 +538,6 @@ export type {NurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-so
 
 export {matchNurbsSpanIntervals3,nurbsSpanIntervalMatchPoint3} from './geometry/nurbs-span-interval-match3.js';
 export type {NurbsSpanInterval3,NurbsSpanIntervalMatchCertificate3,NurbsSpanIntervalMatch3} from './geometry/nurbs-span-interval-match3.js';
+
+export {matchNurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-edges3.js';
+export type {NurbsPlaneCellSourceEdge3,NurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-edges3.js';
