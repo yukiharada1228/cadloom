@@ -369,3 +369,6 @@ export {closestPointOnLine3,closestPointOnSegment3,closestPointOnSurface3} from 
 export type {UniqueClosestPoint3,LineClosestPoint3,SurfaceClosestPoint3} from './geometry/closest-point3.js';
 export {closestPointOnCircle3,closestPointOnCircularArc3} from './geometry/closest-point3.js';
 export type {CircleClosestPoint3,CircularArcClosestPoint3} from './geometry/closest-point3.js';
+export {closestPointOnPlanarSolidBoundary3} from './geometry/closest-planar-solid3.js';
+export type {PlanarBoundaryClosest3} from './geometry/closest-planar-solid3.js';
+export {closestPointOnPlanarBodyBoundary3} from './ops/body-closest3.js';

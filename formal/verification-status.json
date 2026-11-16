@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "b0ee555f2f6721c06d46d9e9b1fba44c7a18833a352232c330e157b79ae8382a",
+    "src/index.ts": "056b2cd3c8f4d1530d3122e0a9552d63296cfcfa229b69efe08944b48d871d32",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -164,7 +164,9 @@
     "src/geometry/similarity3.ts": "61776190c43e21d6eb1d20f671497c17f47e3f76ee8fc5463c8376d1e107081b",
     "src/geometry/transform-material-program3.ts": "0a8b3c7124ff5be4d86046b1846912380c25a3671fbe858573bc33c2576dc177",
     "src/ops/body-transform3.ts": "776455906996212db436ff2c0b6efe97162271bfbbc7ab6f557413761708207e",
-    "src/geometry/closest-point3.ts": "1c8dbe4a2f217215d2f44427aae31e6a0287f1b7543caaa0a4d707893a68c631"
+    "src/geometry/closest-point3.ts": "1c8dbe4a2f217215d2f44427aae31e6a0287f1b7543caaa0a4d707893a68c631",
+    "src/geometry/closest-planar-solid3.ts": "c2a31e81756d0c6527e074278aca568d0a3626d0e130dd057ce172bf6ad98c95",
+    "src/ops/body-closest3.ts": "49de6e3edb7d07486dd432a997abe09db5e408dae207b8f53f6dc2cc8c5a6205"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
