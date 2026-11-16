@@ -1,5 +1,7 @@
 import {assertOwnedNurbsPlaneSplitFaceSurface3} from './nurbs-plane-split-faces3.js';
 import type {NurbsPlaneSplitFaceSurface3} from './nurbs-plane-split-faces3.js';
+import {evaluateNurbsSourceComplexFace3} from './nurbs-source-complex-face-query3.js';
+import type {ExactInput} from './point2.js';
 import {nurbsSourceComplexFacePointPreimage3} from './nurbs-source-complex-face-preimage3.js';
 import {evaluateAlgebraicCurveEdge2} from './algebraic-curve-topology2.js';
 import {nurbsSourcePlaneCellComplexEdgePoint3} from './nurbs-source-plane-cell-complex3.js';
@@ -18,6 +20,21 @@ export function locateNurbsPlaneSplitFace3(surface:NurbsPlaneSplitFaceSurface3,i
  const q=nurbsSourceComplexFacePointPreimage3(S.complex,S.face,point);
  if(q.kind==='unresolved')return Object.freeze({kind:'unresolved',surface,point,reason:'face-preimage'});
  if(q.kind!=='point')return located('outside');
+ return classify(surface,point,q.u,q.v);
+}
+export type NurbsPlaneSplitFaceParameterLocation3=
+ | Readonly<{kind:'located';surface:NurbsPlaneSplitFaceSurface3;u:AlgebraicReal;v:AlgebraicReal;location:'inside'|'boundary';point:AlgebraicCoordinates3}>
+ | Readonly<{kind:'located';surface:NurbsPlaneSplitFaceSurface3;u:AlgebraicReal;v:AlgebraicReal;location:'outside';point?:AlgebraicCoordinates3}>
+ | Readonly<{kind:'unresolved';surface:NurbsPlaneSplitFaceSurface3;u:AlgebraicReal;v:AlgebraicReal;reason:'face-parameters'}>;
+/** Use known exact UV provenance without re-solving a spatial inverse. */
+export function locateNurbsPlaneSplitFaceParameters3(surface:NurbsPlaneSplitFaceSurface3,inputU:AlgebraicReal|ExactInput,inputV:AlgebraicReal|ExactInput):NurbsPlaneSplitFaceParameterLocation3 {
+ assertOwnedNurbsPlaneSplitFaceSurface3(surface);const real=(q:AlgebraicReal|ExactInput)=>q instanceof AlgebraicReal?q:AlgebraicReal.fromRational(q),u=real(inputU),v=real(inputV),S=surface.source.source.vertices.cells.source,q=evaluateNurbsSourceComplexFace3(S.complex,S.face,u,v);
+ if(q.kind==='unresolved')return Object.freeze({kind:'unresolved',surface,u,v,reason:'face-parameters'});
+ if(q.kind!=='point')return Object.freeze({kind:'located',surface,u,v,location:'outside'});
+ const result=classify(surface,q.point,u,v);if(result.kind!=='located')throw new Error('UV region classification unexpectedly unresolved');return Object.freeze({kind:'located',surface,u,v,point:q.point,location:result.location});
+}
+function classify(surface:NurbsPlaneSplitFaceSurface3,point:AlgebraicCoordinates3,u:AlgebraicReal,v:AlgebraicReal):NurbsPlaneSplitFaceLocation3 {
+ const N=surface.source,cells=N.source.vertices.cells,S=cells.source,region=N.regions[surface.region]!,q={u,v},located=(location:'inside'|'outside'|'boundary'):NurbsPlaneSplitFaceLocation3=>Object.freeze({kind:'located',surface,point,location});
  let member=false;
  for(const id of region.cells){const c=S.cells[id]!,g=c.graph,slab=g.slabs[c.slab]!,left=g.events[slab.leftEvent]!.u,right=g.events[slab.rightEvent]!.u;
   if(q.u.compare(left)<0||q.u.compare(right)>0)continue;

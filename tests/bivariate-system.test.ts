@@ -81,3 +81,7 @@ test('arbitrary equation lists preserve shared loci, zero constraints and the un
   const D=U.add(V).add(one.scale(2n)),C=U.add(V).sub(one),result=solveBivariateEquations([D.mul(U).mul(V),D.mul(U).mul(C),D.mul(V).mul(C)]);assert.equal(result.kind,'shared');assert.ok(result.commonFactor.equals(D));assert.equal(result.points.length,3);
   assert.equal(solveBivariateEquations([]).kind,'all');assert.equal(solveBivariateEquations([zero,zero]).kind,'all');assert.equal(solveBivariateEquations([zero,U,zero]).kind,'shared');assert.equal(solveBivariateEquations([zero,U,V,one]).points.length,0);
 });
+test('quadratic fibers preserve the cubic coefficient field and satisfy an independent degree-six eliminant',async()=>{
+ const {bivariateFiberRoots}=await import('../dist/index.js'),u=AlgebraicReal.isolate(new Polynomial([-2n,0n,0n,1n]))[0]!,F=new BivariatePolynomial([[-2n,0n,1n],[1n,1n,1n]]),result=bivariateFiberRoots(F,u);assert.equal(result.kind,'finite');assert.equal(result.roots.length,2);
+ const A=new Polynomial([1n,1n,1n]),B=new Polynomial([2n,0n,-1n]),equation=B.mul(B).mul(B).sub(A.mul(A).mul(A).scale(2n));assert.deepEqual(result.roots.map(v=>v.sign()),[-1,1]);for(const v of result.roots){assert.ok(v.polynomial.degree<=6);assert.equal(v.signOf(equation),0);assert.equal(v.rationalFunction(B,A).compare(u),0);}
+});

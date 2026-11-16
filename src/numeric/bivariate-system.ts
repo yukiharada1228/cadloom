@@ -87,7 +87,7 @@ export function bivariateFiberRoots(f:BivariatePolynomial,inputU:AlgebraicReal|E
     if(sign<0)return Object.freeze({kind:'finite',roots:Object.freeze([])});
     const denominator=A.scale(2n);
     if(sign===0)return Object.freeze({kind:'finite',roots:Object.freeze([u.rationalFunction(B.neg(),denominator)])});
-    const root=delta.sqrt(),roots:AlgebraicReal[]=root.rational!==null?[-1n,1n].map(s=>u.rationalFunction(B.neg().add(new Polynomial([root.rational!.mul(new Rational(s))])),denominator)):[-1n,1n].map(s=>u.rationalFunction(B).neg().add(root.affine(s)).div(u.rationalFunction(denominator)));
+    const root=delta.sqrt(),roots:AlgebraicReal[]=root.rational!==null?[-1n,1n].map(s=>u.rationalFunction(B.neg().add(new Polynomial([root.rational!.mul(new Rational(s))])),denominator)):[-1n,1n].map(s=>u.quadraticImage(B.neg(),D,s,denominator));
     return Object.freeze({kind:'finite',roots:Object.freeze(roots.sort((a,b)=>a.compare(b)))});
   }
   const roots=fiberCandidates(f,u).map(v=>v.recognizeRational()).filter(v=>f.evaluateAlgebraic(u,v).sign()===0).sort((a,b)=>a.compare(b));

@@ -1,5 +1,6 @@
 import {assertOwnedCappedNurbsPlaneEmbedding3} from './capped-nurbs-plane-embedding3.js';
 import type {CappedNurbsPlaneEmbeddingCertificate3} from './capped-nurbs-plane-embedding3.js';
+import {locateNurbsPlaneSplitFaceParameters3} from './nurbs-plane-split-face-query3.js';
 import {locateCappedNurbsPlaneFace3} from './capped-nurbs-plane-query3.js';
 import {intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3} from './sewn-nurbs-source-ray3.js';
 import type {SewnNurbsSourceRay3} from './sewn-nurbs-source-ray3.js';
@@ -34,8 +35,9 @@ function section(certificate:CappedNurbsPlaneEmbeddingCertificate3,input:Line3,s
  if(parent.overlaps.some(o=>retainedOriginal.has(o.face)))reasons.add('parent-ray');
  const append=(h:CappedNurbsPlaneRayHit3)=>{if(h.parameter.sign()===0)reasons.add('origin-hit');hits.push(Object.freeze(h));};
  for(const h of parent.hits)for(const use of h.uses)for(const face of ids){const f=T.faces[face]!;if(f.surface.kind!=='source'||f.surface.source.sourceFace!==use.face)continue;
-  const q=locateCappedNurbsPlaneFace3(source,face,h.point);if(q.kind==='unresolved')return Object.freeze({kind:'unresolved',certificate,reason:'face-query',face,parent});
-  if(q.location==='outside')continue;if(q.location==='boundary')reasons.add('boundary-event');
+  const context=f.surface.source.source.source.vertices.cells.source,original=raw.topology.faces[use.face]!.surface;if(context.complex!==original.source.complex||context.face!==use.sourceFace)throw new Error('Retained ray UV provenance belongs to a different source frame');
+  const q=locateNurbsPlaneSplitFaceParameters3(f.surface.source,use.u,use.v);if(q.kind==='unresolved')return Object.freeze({kind:'unresolved',certificate,reason:'face-query',face,parent});
+  if(q.location==='outside')continue;if(compareAlgebraicPoints3(q.point,h.point)!==0)throw new Error('Retained ray UV provenance lost XYZ equality');if(q.location==='boundary')reasons.add('boundary-event');
   if(use.stratum!=='face')reasons.add('parent-ray');if(use.normals.length!==1||use.normals[0]!.dotSign===0){reasons.add('parent-ray');continue;}
   append({parameter:h.parameter,point:h.point,face,shell:f.shell,dotSign:use.normals[0]!.dotSign as 1|-1});
  }
