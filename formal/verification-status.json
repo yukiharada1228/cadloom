@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "c3f90574dab3e2b8f30c08a07ddda2ec895e20a59e40e7b131ee13aeb3111ca9",
+    "src/index.ts": "c7c709e7a14bb7301607da3b540cf31c1e1576b89abdb39c8bd92d9ee96eb3e2",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -188,7 +188,8 @@
     "src/geometry/nurbs-domain-graph-edge2.ts": "33e2bca384b32c48a117c03470c18606c3009a39f72d1a9d2188cedf120032e5",
     "src/geometry/nurbs-domain-patch3.ts": "695d0eae0406d2679337b4bf5aca87e88fdac6fca8cefddb4e1f285297765524",
     "src/geometry/nurbs-trimmed-surface-preimage3.ts": "44ccb19143c59528bbba2b10fcc1dbb23532c33041f15899dd0a3b234382aa86",
-    "src/geometry/nurbs-affine-projection3.ts": "b949bc61075e77da7a8f8eede05842b9e01982e136896406a2454a392a02ebe4"
+    "src/geometry/nurbs-affine-projection3.ts": "5113b9935fe109ec6928cdffbc39c47663cd73f3ecc5e6857f07da574370949e",
+    "src/geometry/affine-nurbs-face3.ts": "7ca8b3242e2d0a7d54e919c578d6fcaeefb7a222173356dc3a53ada024d9ad4b"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

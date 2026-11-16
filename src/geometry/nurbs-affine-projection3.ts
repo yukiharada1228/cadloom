@@ -43,12 +43,12 @@ export function certifyNurbsSurfaceAffineProjection3(input:NurbsSurface3):NurbsA
  }
  return Object.freeze({kind:'not-certified',surface,reason:'no-affine-projection'});
 }
-function guard(c:NurbsAffineProjectionCertificate3):void {if(!owned.has(c))throw new RangeError('Operation requires a factory-created affine NURBS projection certificate');}
+export function assertOwnedNurbsAffineProjection3(c:NurbsAffineProjectionCertificate3):void {if(!owned.has(c))throw new RangeError('Operation requires a factory-created affine NURBS projection certificate');}
 function parameters(c:NurbsAffineProjectionCertificate3,p:AlgebraicCoordinates3){const apply=(r:NurbsAffineParameterRow3)=>AlgebraicReal.linearCombination([{value:p.x,coefficient:r.normal.x},{value:p.y,coefficient:r.normal.y},{value:p.z,coefficient:r.normal.z}],r.offset);return Object.freeze({u:apply(c.u),v:apply(c.v)});}
 /** Projection candidate for any exact spatial point; this alone is NOT an
  * assertion that the point lies on the surface or inside its rectangle. */
-export function nurbsAffineProjectionParameters3(c:NurbsAffineProjectionCertificate3,input:Point3|AlgebraicCoordinates3):Readonly<{u:AlgebraicReal;v:AlgebraicReal}> {guard(c);return parameters(c,snapshotExactPoint3(input));}
+export function nurbsAffineProjectionParameters3(c:NurbsAffineProjectionCertificate3,input:Point3|AlgebraicCoordinates3):Readonly<{u:AlgebraicReal;v:AlgebraicReal}> {assertOwnedNurbsAffineProjection3(c);return parameters(c,snapshotExactPoint3(input));}
 export function locateAffineProjectedNurbsSurface3(c:NurbsAffineProjectionCertificate3,input:Point3|AlgebraicCoordinates3):'inside'|'boundary'|'outside' {
- guard(c);const p=snapshotExactPoint3(input),{u,v}=parameters(c,p),s=c.surface,a=u.compare(AlgebraicReal.fromRational(s.startU)),b=u.compare(AlgebraicReal.fromRational(s.endU)),d=v.compare(AlgebraicReal.fromRational(s.startV)),e=v.compare(AlgebraicReal.fromRational(s.endV));
+ assertOwnedNurbsAffineProjection3(c);const p=snapshotExactPoint3(input),{u,v}=parameters(c,p),s=c.surface,a=u.compare(AlgebraicReal.fromRational(s.startU)),b=u.compare(AlgebraicReal.fromRational(s.endU)),d=v.compare(AlgebraicReal.fromRational(s.startV)),e=v.compare(AlgebraicReal.fromRational(s.endV));
  if(a<0||b>0||d<0||e>0||compareAlgebraicPoints3(evaluateNurbsSurface3(s,u,v),p)!==0)return 'outside';return a===0||b===0||d===0||e===0?'boundary':'inside';
 }
