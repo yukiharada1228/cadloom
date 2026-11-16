@@ -611,3 +611,5 @@ export type {NurbsRecutFaceJoin3,NurbsRecutJoinedCurve3,NurbsRecutJoinedSurface3
 export {sewNurbsRecutSourceFaces3} from './geometry/sew-nurbs-plane-split-faces3.js';
 export {joinNurbsRecutAssembly3} from './geometry/nurbs-recut-face-join3.js';
 export type {NurbsRecutAssemblyJoin3} from './geometry/nurbs-recut-face-join3.js';
+export {selectNurbsRecutHalfBoundary3,nurbsRecutHalfCapBoundary3,nurbsRecutHalfCapBoundaryPoint3} from './geometry/nurbs-recut-half-boundary3.js';
+export type {NurbsRecutHalfBoundary3,NurbsRecutHalfCapBoundaryCertificate3} from './geometry/nurbs-recut-half-boundary3.js';
