@@ -209,7 +209,7 @@
     "src/geometry/nurbs-affine-intersection-refine3.ts": "819679ea239cf970413003064594facdcbb498619bbe774d1d3cfcb75cba78dd",
     "src/geometry/nurbs-intersection-boundary-nodes3.ts": "f75453dd172bd5eed2569f7abb61cf4abb80cfa9ca464905b7b0e6b059bc2df9",
     "src/geometry/nurbs-intersection-boundary-sharing3.ts": "c0d4c420f4c4c3bfbd85bf3eaa8a5feed0b78f3c54b38f2feb75adfad6f32b3e",
-    "src/geometry/nurbs-source-boundary-complex3.ts": "ebdbc83b8c1890eea1f339e2d38c9683b5d5d498d9fd0877c3ab33e2194facb9",
+    "src/geometry/nurbs-source-boundary-complex3.ts": "6bc2e3c8e3f158a9dc96f03c54921e6df90bec9f8b18bc8f6c6c841cce472a34",
     "src/geometry/nurbs-source-halfedges3.ts": "765fcd6d393505549d3e79692acec138a4288dd9e4f90d6ad2250a13be47a8c4",
     "src/geometry/nurbs-source-faces3.ts": "9283999146f85f8348063ef4b3f942ca1f64dc8bda5c81c3d74cb5b4c7551709",
     "src/geometry/nurbs-source-uv-edge3.ts": "4158627e9ded4d5027c34231bba782e175ce156cf7c78b6a706a45ff65e41eae",

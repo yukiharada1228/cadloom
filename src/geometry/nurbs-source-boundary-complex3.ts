@@ -1,3 +1,4 @@
+import {Rational} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {nurbsCurveSpans3,evaluateNurbsSpanPoint3} from './nurbs-curve3.js';
 import {matchNurbsIntersectionSourceBoundary3} from './nurbs-intersection-boundary-sharing3.js';
@@ -29,6 +30,19 @@ export function buildNurbsSourceBoundaryComplex3(source:RefinedNurbsAffineInters
   for(let i=0;i+1<cuts.length;i++){const lower=cuts[i]!,upper=cuts[i+1]!,a=evaluateNurbsSpanPoint3(span,lower),z=evaluateNurbsSpanPoint3(span,upper),edge=edges.length,use=Object.freeze({edge,direction:1 as const,lower,upper});edges.push({from:vertex(a.x,a.y),to:vertex(z.x,z.y),boundaryUses:[Object.freeze({...use,edge:id})],intersectionUses:[]});uses.push(use);}
   boundaryEdges.push(uses);
  }
+ // Coincident knot-line curves may have different spatial images. The UV
+ // arrangement shares their line only, retaining every original spatial use.
+ const lineAtom=(id:number,lower:AlgebraicReal,upper:AlgebraicReal)=>{
+  const e=source.edges[id]!,old=source.source.edges[e.sourceEdge]!,use=old.uses[0]!,p=source.source.source.patches[use.patch]!,t=p.edges[use.edge]!,raw=source.source.source.source.patches[p.sourceIntersectionPatch]!.edges[t.sourceEdge]!,g=raw.graph;
+  if(g.edges[raw.sourceEdge]!.kind==='vertical')return true;
+  const a=refinedNurbsAffineIntersectionEdgePoint3(source,id,lower),b=refinedNurbsAffineIntersectionEdgePoint3(source,id,upper);if(a.v.compare(b.v)!==0)return false;
+  const fixed=a.v.recognizeRational().rational;if(fixed===null||g.nonvertical.specializeV(fixed).degree>=0)return false;
+  let lo=lower,hi=upper;while(lo.upper.compare(hi.lower)>=0){lo=lo.refine();hi=hi.refine();}
+  const q=refinedNurbsAffineIntersectionEdgePoint3(source,id,AlgebraicReal.fromRational(lo.upper.add(hi.lower).div(new Rational(2n))));
+  // The polynomial contains this whole line. A graph edge has no interior
+  // branch crossing, so this membership selects that line for the interval.
+  return q.v.compare(a.v)===0;
+ };
  for(const [id,e] of source.edges.entries()){
   const old=source.source.edges[e.sourceEdge]!,p=source.source.source.patches[old.uses[0]!.patch]!,t=p.edges[old.uses[0]!.edge]!,raw=source.source.source.source.patches[p.sourceIntersectionPatch]!.edges[t.sourceEdge]!,axis=raw.graph.edges[raw.sourceEdge]!.kind==='vertical'?'v':'u',relations=sharing.intervals.filter(q=>q.intersectionEdge===id),cuts=[e.lower,e.upper,...relations.flatMap(q=>[q.intersectionLower,q.intersectionUpper])];
   // UV nodes, including boundary knots/extrema, must also node every selected
@@ -42,6 +56,11 @@ export function buildNurbsSourceBoundaryComplex3(source:RefinedNurbsAffineInters
     if(edge>=0)break;
    }
    if(edge<0&&relations.some(r=>lower.compare(r.intersectionLower)>=0&&upper.compare(r.intersectionUpper)<=0))throw new Error('Certified sharing lost common atom boundaries');
+   if(edge<0&&lineAtom(id,lower,upper))for(const [candidate,q] of edges.entries()){
+    if(!q.intersectionUses.length||!((q.from===from&&q.to===to)||(q.from===to&&q.to===from)))continue;
+    const u=q.intersectionUses[0]!;if(!lineAtom(u.edge,u.lower,u.upper))continue;
+    edge=candidate;direction=q.from===from?1:-1;break;
+   }
    if(edge<0){edge=edges.length;edges.push({from,to,boundaryUses:[],intersectionUses:[]});}
    const use=Object.freeze({edge,direction,lower,upper});edges[edge]!.intersectionUses.push(Object.freeze({...use,edge:id}));uses.push(use);
   }

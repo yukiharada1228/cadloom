@@ -24,3 +24,13 @@ test('an interior transverse cut connects to boundary nodes without sharing boun
 test('boundary knot and projection extrema node a curved shared intersection consistently',()=>{
  const bottom=nurbsCurve3(1,[point3(0n,0n,0n),point3(1n,0n,0n)],K),top=insertNurbsKnot3(nurbsCurve3(2,[point3(1n,0n,0n),point3('1/2',1n,0n),point3(0n,0n,0n)],K2),'1/3'),d=prepareNurbsParameterDomain2([bottom,top]),target=nurbsSurface3(2,1,[0n,'1/2',1n].map((u,i)=>[0n,1n].map(v=>point3(u,v,new Rational(v).sub(new Rational(i===1?1n:0n))))),K2,K),c=buildNurbsSourceBoundaryComplex3(refined(plane(),target,d));coverage(c);assert.ok(c.edges.filter(e=>e.intersectionUses.length).every(e=>e.boundaryUses.length>0));assert.ok(c.intersectionEdges.flat().every(u=>u.direction===-1));
 });
+test('discontinuous vertical and horizontal source seam images share UV atoms without erasing spatial provenance',()=>{
+ for(const transpose of [false,true]){
+  const xs=['0','1/4','3/4','1'],zs=['-1/2','0','0','1/2'],points=xs.map((x,i)=>[0n,1n].map(v=>point3(x,v,zs[i]!))),knots=[0n,0n,'1/2','1/2',1n,1n],s=transpose?nurbsSurface3(1,1,[0,1].map(j=>points.map(row=>row[j]!)),K,knots):nurbsSurface3(1,1,points,knots,K),r=refined(s,plane()),c=buildNurbsSourceBoundaryComplex3(r);coverage(c);
+  const shared=c.edges.filter(e=>e.intersectionUses.length===2);assert.equal(shared.length,1);const e=shared[0]!;assert.equal(e.boundaryUses.length,0);assert.ok(e.intersectionUses.every(u=>c.intersectionEdges[u.edge]!.some(v=>c.edges[v.edge]===e)));
+  const first=e.intersectionUses[0]!,second=e.intersectionUses[1]!,a=r.vertices[r.edges[first.edge]!.from]!.point,b=r.vertices[r.edges[second.edge]!.from]!.point;assert.equal(a.u.compare(b.u),0);assert.equal(a.v.compare(b.v),0);assert.notEqual(a.point.x.compare(b.point.x),0);
+ }
+});
+test('partially overlapping seam curves are noded before their common UV interval is shared',()=>{
+ const xs=['0','1/4','3/4','1'],zs=['-1/2','0','0','1/2'],s=nurbsSurface3(1,1,xs.map((x,i)=>[0n,1n].map(v=>point3(x,i<2?new Rational(v,2n):v,zs[i]!))),[0n,0n,'1/2','1/2',1n,1n],K),t=nurbsSurface3(1,1,[0n,1n].map(u=>[0n,1n].map(v=>point3(u,new Rational(v,2n),0n))),K,K),c=buildNurbsSourceBoundaryComplex3(refined(s,t));coverage(c);const shared=c.edges.filter(e=>e.intersectionUses.length===2),single=c.edges.filter(e=>e.intersectionUses.length===1&&!e.boundaryUses.length);assert.equal(shared.length,1);assert.equal(single.length,1);const q=shared[0]!,end=c.vertices[q.to]!;assert.equal(end.v.compare(AlgebraicReal.fromRational('1/2')),0);assert.ok(single.some(e=>e.from===q.to||e.to===q.to));
+});

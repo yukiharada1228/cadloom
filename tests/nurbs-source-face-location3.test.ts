@@ -30,6 +30,6 @@ test('wire incidence preserves one enclosing face and its endpoint vertices',()=
 test('isolated contact vertices retain their containing face without fabricated edges',()=>{
  const q=[new Rational(1n,4n),new Rational(-1n,4n),new Rational(1n,4n)],xy=[0n,'1/2',1n],s=nurbsSurface3(2,2,xy.map((u,i)=>xy.map((v,j)=>point3(u,v,q[i]!.add(q[j]!)))),K2,K2),f=prepare(s,plane()),r=locateNurbsSourceFace3(f,'1/2','1/2');assert.equal(r.kind,'vertex');if(r.kind==='vertex'){assert.equal(r.edges.length,0);assert.equal(r.faces.length,1);assert.equal(f.faces[r.faces[0]!]!.location,'inside');}
 });
-test('owned unresolved classifications are propagated without guessing a face',()=>{
- const s=nurbsSurface3(1,1,[[point3(0n,0n,-1n),point3(0n,1n,-1n)],[point3('1/4',0n,0n),point3('1/4',1n,0n)],[point3('3/4',0n,0n),point3('3/4',1n,0n)],[point3(1n,0n,1n),point3(1n,1n,1n)]],[0n,0n,'1/2','1/2',1n,1n],K),f=classifyNurbsSourceFaces3(buildNurbsSourceHalfedges3(buildNurbsSourceBoundaryComplex3(refined(s,plane())))),r=locateNurbsSourceFace3(f,'1/2','1/2');assert.deepEqual(r,{kind:'unresolved',reason:'unresolved-faces'});
+test('a shared UV seam with distinct spatial images locates one edge incident to two faces',()=>{
+ const s=nurbsSurface3(1,1,[[point3(0n,0n,-1n),point3(0n,1n,-1n)],[point3('1/4',0n,0n),point3('1/4',1n,0n)],[point3('3/4',0n,0n),point3('3/4',1n,0n)],[point3(1n,0n,1n),point3(1n,1n,1n)]],[0n,0n,'1/2','1/2',1n,1n],K),f=classifyNurbsSourceFaces3(buildNurbsSourceHalfedges3(buildNurbsSourceBoundaryComplex3(refined(s,plane())))),r=locateNurbsSourceFace3(f,'1/2','1/2');assert.equal(r.kind,'edge');if(r.kind==='edge'){assert.equal(r.edges.length,1);assert.equal(r.faces.length,2);}
 });

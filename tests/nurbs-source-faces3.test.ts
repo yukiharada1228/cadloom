@@ -25,7 +25,7 @@ test('an interior wire does not fabricate a hole or split the enclosing UV face'
  const knots=['1/4','1/4','3/4','3/4'],s=nurbsSurface3(1,1,[0n,1n].map(u=>[0n,1n].map(v=>point3(u,v,new Rational(u).sub(new Rational(1n,2n))))),knots,knots),f=faces(s,plane()),inside=f.faces.filter(q=>q.location==='inside');assert.equal(inside.length,1);assert.equal(inside[0]!.holeCycles.length,0);assert.equal(inside[0]!.wireCycles.length,1);
 });
 
-test('reversing the trim sense preserves the planar faces and unresolved branches propagate',()=>{
+test('reversed trim senses and discontinuous spatial seam images retain well-defined UV faces',()=>{
  const d=prepareNurbsParameterDomain2(ring('0','0','1','1').slice().reverse().map(reverseNurbsCurve3),[],-1),f=faces(plane(),plane(),d);assert.equal(f.faces.filter(q=>q.location==='inside').length,1);assert.equal(f.faces.find(q=>q.location==='inside')!.outerCycles.length,1);
- const s=nurbsSurface3(1,1,[[point3(0n,0n,-1n),point3(0n,1n,-1n)],[point3('1/4',0n,0n),point3('1/4',1n,0n)],[point3('3/4',0n,0n),point3('3/4',1n,0n)],[point3(1n,0n,1n),point3(1n,1n,1n)]],[0n,0n,'1/2','1/2',1n,1n],K),h=buildNurbsSourceHalfedges3(buildNurbsSourceBoundaryComplex3(refined(s,plane()))),result=classifyNurbsSourceFaces3(h);assert.equal(result.kind,'unresolved');if(result.kind==='unresolved')assert.equal(result.reason,'branch-order');assert.ok(!('faces' in result));
+ const s=nurbsSurface3(1,1,[[point3(0n,0n,-1n),point3(0n,1n,-1n)],[point3('1/4',0n,0n),point3('1/4',1n,0n)],[point3('3/4',0n,0n),point3('3/4',1n,0n)],[point3(1n,0n,1n),point3(1n,1n,1n)]],[0n,0n,'1/2','1/2',1n,1n],K),h=buildNurbsSourceHalfedges3(buildNurbsSourceBoundaryComplex3(refined(s,plane()))),result=classifyNurbsSourceFaces3(h);assert.equal(result.kind,'classified');if(result.kind==='classified'){assert.equal(result.faces.filter(f=>f.location==='inside').length,2);assert.equal(result.faces.filter(f=>f.unbounded).length,1);}
 });
