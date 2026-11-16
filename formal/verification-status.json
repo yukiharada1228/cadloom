@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "e119f375a17639b242d7fa3b97b96428dec420bdb26dd77791a90c2ce05f59d4",
+    "src/index.ts": "d1a92d4f82ddcd7b213f63b4b2182a2b734f0d0bc30c7846f9d15d27648eba9a",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -63,7 +63,7 @@
     "src/geometry/clipped-cylinder-split3.ts": "884fb3ad64d96ca5f745ac706f2ca934c3851e8ec19eb1ec8b321212aa861744",
     "src/geometry/nurbs-curve3.ts": "63bf10e3c1b99466dd837ff5b5f2e0a46a386f7d35caf9ed9f8e6a386ba7e836",
     "src/numeric/bivariate-polynomial.ts": "f4c0e6d3d67dbf0331fa23bcc110fcce92e0f125d87205732b8e22b5e2a587f6",
-    "src/geometry/nurbs-surface3.ts": "cff0cfea00aca385cf50afd9ef8dc6e309865fdfea9de5899eaccd902836421a",
+    "src/geometry/nurbs-surface3.ts": "0eacc073fb22c757cb7bd2a13a2095a1fccb0b481058473f9fd60182254e819f",
     "src/numeric/bivariate-system.ts": "207e0a7623e956b63e9eb08a98c4333fa6a054b75ed5404afdf08d1accc8529b",
     "src/geometry/nurbs-plane-section3.ts": "b286bf499537d17cb5cb7a8e611b4b730a66849d83bc641497744c4ec3be4db8",
     "src/geometry/algebraic-curve-topology2.ts": "53dd30141ca3318a545147115218c7fa170720e00c54aee6f6f89e0ae99ad9e4",
@@ -178,7 +178,8 @@
     "src/geometry/compact-material-program3.ts": "e76c4e4d6452b2bba5c92f8ac189fb2f2a344fc66873961b517a74f981c13ed8",
     "src/ops/body-split-interface3.ts": "cf7a7d38d6563980b8f98e64ef4f23e11dfc85fc997a6a3ae4c52ec7ac249da6",
     "src/ops/rejoin-body-split3.ts": "dd39039b612104709106554b39d9f76b8065f7e2840548ea9633d6af8507ce76",
-    "src/geometry/nurbs-surface-curvature3.ts": "0e8782ea317276e107dc01e84091d7ac42cdf9c741b016929820f68c9433248e"
+    "src/geometry/nurbs-surface-curvature3.ts": "0e8782ea317276e107dc01e84091d7ac42cdf9c741b016929820f68c9433248e",
+    "src/geometry/nurbs-section-differential3.ts": "90635c0ac5a09b2d3de8c42ddedc87b3151e6b66564fbcad27f1f6726f22e055"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

@@ -96,7 +96,13 @@ export function differentialNurbsSurface3(input:NurbsSurface3,inputU:AlgebraicRe
  * as first derivatives. No assertion of C2 continuity across knot lines. */
 export function secondDifferentialNurbsSurface3(input:NurbsSurface3,inputU:AlgebraicReal|ExactInput,inputV:AlgebraicReal|ExactInput,sides:NurbsSurfaceSides3={}):NurbsSurfaceSecondDifferential3 {
   const selectedSides:NurbsSurfaceSides3={uSide:sides.uSide??'right',vSide:sides.vSide??'right'};
-  const s=snapshot(input),u=asReal(inputU),v=asReal(inputV),p=selected(s,u,v,selectedSides),W=p.weight,W2=W.mul(W),W3=W2.mul(W),two=new Rational(2n);
+  const s=snapshot(input),u=asReal(inputU),v=asReal(inputV),p=selected(s,u,v,selectedSides);
+  return secondDifferentialNurbsSurfacePatch3(p,u,v);
+}
+/** Internal evaluation on the already selected patch, preserving one-sided
+ * provenance at discontinuous knots. Caller checks the parameter domain. */
+export function secondDifferentialNurbsSurfacePatch3(p:NurbsSurfacePatch3,u:AlgebraicReal,v:AlgebraicReal):NurbsSurfaceSecondDifferential3 {
+  const W=p.weight,W2=W.mul(W),W3=W2.mul(W),two=new Rational(2n);
   const derivative=(f:BivariatePolynomial,axis:NurbsDirection3)=>axis==='u'?f.derivativeU():f.derivativeV();
   const second=(a:NurbsDirection3,b:NurbsDirection3)=>{
     const Wa=derivative(W,a),Wb=derivative(W,b),Wab=derivative(Wa,b);
@@ -105,7 +111,9 @@ export function secondDifferentialNurbsSurface3(input:NurbsSurface3,inputU:Algeb
       .sub(N.mul(W).mul(Wab)).add(N.mul(Wa).mul(Wb).scale(two)).rationalImage(u,v,W3);
     return algebraicCoordinates3(image(p.x),image(p.y),image(p.z));
   };
-  return Object.freeze({...differentialNurbsSurface3(s,u,v,selectedSides),duu:second('u','u'),duv:second('u','v'),dvv:second('v','v')});
+  const first=(axis:NurbsDirection3)=>{const dW=derivative(W,axis),image=(N:BivariatePolynomial)=>derivative(N,axis).mul(W).sub(N.mul(dW)).rationalImage(u,v,W2);return algebraicCoordinates3(image(p.x),image(p.y),image(p.z));};
+  const du=first('u'),dv=first('v'),normal=algebraicCoordinates3(du.y.mul(dv.z).sub(du.z.mul(dv.y)),du.z.mul(dv.x).sub(du.x.mul(dv.z)),du.x.mul(dv.y).sub(du.y.mul(dv.x)));
+  return Object.freeze({du,dv,normal,regular:normal.x.sign()!==0||normal.y.sign()!==0||normal.z.sign()!==0,duu:second('u','u'),duv:second('u','v'),dvv:second('v','v')});
 }
 /** Fix the named rational parameter; the returned curve varies in the other. */
 export function nurbsSurfaceIsoCurve3(input:NurbsSurface3,axis:NurbsDirection3,parameter:ExactInput,side:NurbsKnotSide3='right'):NurbsCurve3 {

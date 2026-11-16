@@ -404,3 +404,5 @@ export {secondDifferentialNurbsSurface3} from './geometry/nurbs-surface3.js';
 export type {NurbsSurfaceSecondDifferential3} from './geometry/nurbs-surface3.js';
 export {curvatureNurbsSurface3} from './geometry/nurbs-surface-curvature3.js';
 export type {NurbsSurfaceCurvature3} from './geometry/nurbs-surface-curvature3.js';
+export {nurbsPlaneSectionEdgeDifferential3} from './geometry/nurbs-section-differential3.js';
+export type {NurbsSectionEdgeDifferential3} from './geometry/nurbs-section-differential3.js';
