@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "056b2cd3c8f4d1530d3122e0a9552d63296cfcfa229b69efe08944b48d871d32",
+    "src/index.ts": "e2e330f4738a3e91568aca86ac9d25951657463858fac498b5c82195f7a5af6b",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -97,7 +97,7 @@
     "src/geometry/convex-polygon-plane-arrangement3.ts": "5a7e666a795f9d2713fab1df0c8dfe4db4337e6563be1e6d0faa654181d11e6a",
     "src/geometry/planar-brep-partition3.ts": "a7f8aaaf1ac30d41dc47345a77a686a95e41ba5a67bd022baaf69aca5add7184",
     "src/geometry/planar-solid3.ts": "2042db4f6bc1fff906320b5dd22e545793c9bf352ee2542994b11b95c573aee7",
-    "src/geometry/planar-solid-boolean3.ts": "25e09df8503edd57ca575270237631dcd8b3839f30a02f79176462ef902895ed",
+    "src/geometry/planar-solid-boolean3.ts": "65c9b3456174f99ac0b20869ba5b8107b3d5c03df6fdfaf4785a4c2224716e8b",
     "src/convert/planar-body3.ts": "c1a7e4e797ed5024f1de8c2c2a617d5dd36b0efa3aa0ae51af8bb590e18dec53",
     "src/geometry/exact-planar-location3.ts": "2f04df28e02e595c7fc44cda55ee90064319a82381466d687f4e14edb321a8b2",
     "src/geometry/planar-solid-regions3.ts": "24a7e1f0af0d5474d7cdc13c8463be840db5a2de45463dd8b88bc40a91f1933e",
@@ -166,7 +166,9 @@
     "src/ops/body-transform3.ts": "776455906996212db436ff2c0b6efe97162271bfbbc7ab6f557413761708207e",
     "src/geometry/closest-point3.ts": "1c8dbe4a2f217215d2f44427aae31e6a0287f1b7543caaa0a4d707893a68c631",
     "src/geometry/closest-planar-solid3.ts": "c2a31e81756d0c6527e074278aca568d0a3626d0e130dd057ce172bf6ad98c95",
-    "src/ops/body-closest3.ts": "49de6e3edb7d07486dd432a997abe09db5e408dae207b8f53f6dc2cc8c5a6205"
+    "src/ops/body-closest3.ts": "49de6e3edb7d07486dd432a997abe09db5e408dae207b8f53f6dc2cc8c5a6205",
+    "src/ops/planar-material3.ts": "54fa6787cdaf520044838619b90fa834af16bc6282b5e693d8bd04683ba43982",
+    "src/geometry/planar-material-regions3.ts": "dec0170314beed57f1116de972d75feb47879231182953e92c9cb23918660a71"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

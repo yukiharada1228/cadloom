@@ -372,3 +372,8 @@ export type {CircleClosestPoint3,CircularArcClosestPoint3} from './geometry/clos
 export {closestPointOnPlanarSolidBoundary3} from './geometry/closest-planar-solid3.js';
 export type {PlanarBoundaryClosest3} from './geometry/closest-planar-solid3.js';
 export {closestPointOnPlanarBodyBoundary3} from './ops/body-closest3.js';
+export {createPlanarMaterial3,planarMaterialFromBody3,booleanPlanarMaterials3,locatePlanarMaterial3,planarBodyFromMaterial3,planarMaterialDocument3,serializePlanarMaterial3,restorePlanarMaterial3} from './ops/planar-material3.js';
+export type {PlanarMaterial3,PlanarMaterialDocument3,PlanarMaterialNodeRecord3,PlanarMaterialReadLimits3} from './ops/planar-material3.js';
+
+export {planarMaterialRegions3} from './ops/planar-material3.js';
+export type {PlanarMaterialRegion3,PlanarMaterialBoundaryUse3,PlanarMaterialRegions3} from './geometry/planar-material-regions3.js';

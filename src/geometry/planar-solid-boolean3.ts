@@ -32,10 +32,11 @@ export interface PlanarSolidBooleanResult3 {
 }
 export type PlanarSolidBooleanOperand3=PreparedPlanarSolid3|PlanarSolidBooleanResult3;
 const ownedResults=new WeakSet<PlanarSolidBooleanResult3>();
-function operand(s:PlanarSolidBooleanOperand3){
+/** Internal guard: contact material results retain geometric construction ownership. */
+export function assertOwnedPlanarMaterialBoundary3(s:PlanarSolidBooleanOperand3):void {
   if(!ownedResults.has(s as PlanarSolidBooleanResult3))assertOwnedPlanarSolid3(s as PreparedPlanarSolid3);
-  return s;
 }
+function operand(s:PlanarSolidBooleanOperand3){assertOwnedPlanarMaterialBoundary3(s);return s;}
 const key=(p:Point3)=>`${p.x},${p.y},${p.z}`;
 function canonical(p:Plane3):Plane3 {
   const n=p.normal,k=[n.x,n.y,n.z].find(v=>v.sign()!==0)!;
