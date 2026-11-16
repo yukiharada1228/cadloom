@@ -356,3 +356,5 @@ export {booleanMaterialBodies3} from './ops/body3.js';
 export {prepareBoxMaterialProgram3} from './geometry/box-material3.js';
 export {preparePlanarMaterialProgram3} from './geometry/planar-material-boundary3.js';
 export {prepareExtrudeMaterialProgram3} from './convert/circular-extrude-material3.js';
+export {intersectBodyLine3,intersectBodyRay3} from './ops/body-query3.js';
+export type {BodyBoundaryIntersection3} from './ops/body-query3.js';
