@@ -489,3 +489,5 @@ export {intersectNurbsSourceFaceLine3,intersectNurbsSourceFaceRay3,nurbsSourceFa
 export type {NurbsSourceFaceLine3,NurbsSourceLineVertex3,NurbsSourceLineOverlap3} from './geometry/nurbs-source-face-line3.js';
 export {sewNurbsSourceBReps3,sewnNurbsSourceEdgePoint3} from './geometry/sew-nurbs-source-breps3.js';
 export type {SewnNurbsSourceBReps3,SewnNurbsSourceEdge3,SewnNurbsSourceFace3} from './geometry/sew-nurbs-source-breps3.js';
+export {intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3,querySewnNurbsSourceShellParity3} from './geometry/sewn-nurbs-source-ray3.js';
+export type {SewnNurbsSourceRay3,SewnNurbsSourceRayUse3,SewnNurbsSourceRayReason3,SewnNurbsShellParity3} from './geometry/sewn-nurbs-source-ray3.js';

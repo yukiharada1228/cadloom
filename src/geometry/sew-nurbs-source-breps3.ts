@@ -21,12 +21,14 @@ export type SewnNurbsSourceBReps3=
  | Readonly<{kind:'sewn';sources:readonly NurbsSourceBRep3[];topology:BRepTopology3<SewnNurbsSourceEdge3,SewnNurbsSourceFace3>;
    /** Input BRep -> original edge -> ordered children in its original direction. */
    sourceUses:readonly (readonly (readonly BRepEdgeUse3[])[])[]}>;
-const ownedEdges=new WeakSet<SewnNurbsSourceEdge3>(),ownedFaces=new WeakSet<SewnNurbsSourceFace3>();
+const owned=new WeakSet<SewnNurbsSourceBReps3>(),ownedEdges=new WeakSet<SewnNurbsSourceEdge3>(),ownedFaces=new WeakSet<SewnNurbsSourceFace3>();
+function own<T extends SewnNurbsSourceBReps3>(r:T):T {owned.add(r);return r;}
+export function assertOwnedSewnNurbsSourceBReps3(input:SewnNurbsSourceBReps3):void {if(!owned.has(input))throw new RangeError('Expected factory-created sewn NURBS source BReps');}
 /** Complete pairwise rational boundary intersection/coverage, not arbitrary
  * surface-interior intersection or a global solid/material certificate. */
 export function sewNurbsSourceBReps3(input:readonly NurbsSourceBRep3[]):SewnNurbsSourceBReps3 {
  const sources=Object.freeze(Array.from(input,s=>{assertOwnedNurbsSourceBRep3(s);return s;})),maps:NurbsSourceBoundaryMap3[]=[],references:{source:NurbsSourceBRep3;sourceEdge:number}[]=[],indices:number[][]=[];
- for(const [i,s] of sources.entries()){const ids:number[]=[];for(let edge=0;edge<s.complex.edges.length;edge++){const map=nurbsSourceBoundaryMap3(s,edge);if(map===null)return Object.freeze({kind:'unresolved',reason:'rational-map-unavailable',input:i,edge});ids.push(maps.length);maps.push(map);references.push({source:s,sourceEdge:edge});}indices.push(ids);}
+ for(const [i,s] of sources.entries()){const ids:number[]=[];for(let edge=0;edge<s.complex.edges.length;edge++){const map=nurbsSourceBoundaryMap3(s,edge);if(map===null)return own(Object.freeze({kind:'unresolved',reason:'rational-map-unavailable',input:i,edge}));ids.push(maps.length);maps.push(map);references.push({source:s,sourceEdge:edge});}indices.push(ids);}
  const cuts=maps.map(m=>[m.lower,m.upper]),relations:{a:number;b:number;locus:RestrictedAlgebraicCurve2}[]=[];
  const add=(id:number,t:AlgebraicReal)=>{const m=maps[id]!;if(t.compare(m.lower)>=0&&t.compare(m.upper)<=0&&!cuts[id]!.some(q=>q.compare(t)===0))cuts[id]!.push(t);};
  for(let a=0;a<maps.length;a++)for(let b=a+1;b<maps.length;b++){
@@ -53,7 +55,7 @@ export function sewNurbsSourceBReps3(input:readonly NurbsSourceBRep3[]):SewnNurb
   snapshot:(e:SewnNurbsSourceEdge3)=>{if(!ownedEdges.has(e))throw new RangeError('Expected sewn source edge');return e;},endpoints:ends,closed:()=>false,
   snapshotSurface:(f:SewnNurbsSourceFace3)=>{if(!ownedFaces.has(f))throw new RangeError('Expected sewn source face');return f;},
   onSurface:(e,f)=>{const index=edges.indexOf(e);return faces.some(candidate=>candidate.surface===f&&candidate.loops.some(loop=>loop.some(u=>u.edge===index)));},
- });return Object.freeze({kind:'sewn',sources,topology,sourceUses});
+ });return own(Object.freeze({kind:'sewn',sources,topology,sourceUses}));
 }
 export function sewnNurbsSourceEdgePoint3(edge:SewnNurbsSourceEdge3,input:AlgebraicReal|ExactInput):AlgebraicCoordinates3 {
  if(!ownedEdges.has(edge))throw new RangeError('Expected factory-created sewn source edge');const t=input instanceof AlgebraicReal?input:AlgebraicReal.fromRational(input);if(t.compare(edge.lower)<0||t.compare(edge.upper)>0)throw new RangeError('Parameter is outside the sewn source edge');return evaluateNurbsSpanPoint3(edge.map.span,t);
