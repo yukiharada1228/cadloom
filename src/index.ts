@@ -396,3 +396,5 @@ export type {PlanarBodySplitProvenance3,PlanarSplitChildProvenance3,SplitFaceOri
 export {splitBodyByPlane3} from './ops/body-plane-split3.js';
 export type {BodyPlaneSplit3} from './ops/body-plane-split3.js';
 export {compactCylinderMaterialProgram3} from './geometry/compact-material-program3.js';
+export {bodySplitInterface3} from './ops/body-split-interface3.js';
+export type {BodySplitInterface3,BodySplitInterfaceCoedge3,BodySplitInterfaceAtom3} from './ops/body-split-interface3.js';
