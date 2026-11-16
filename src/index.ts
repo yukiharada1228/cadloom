@@ -609,3 +609,5 @@ export type {NurbsRecutCapEdgeAlignment3,NurbsRecutCapEdgeAlignmentCertificate3}
 export {joinNurbsRecutSourceCaps3,nurbsRecutJoinedCurvePoint3,locateNurbsRecutJoinedSurface3} from './geometry/nurbs-recut-face-join3.js';
 export type {NurbsRecutFaceJoin3,NurbsRecutJoinedCurve3,NurbsRecutJoinedSurface3} from './geometry/nurbs-recut-face-join3.js';
 export {sewNurbsRecutSourceFaces3} from './geometry/sew-nurbs-plane-split-faces3.js';
+export {joinNurbsRecutAssembly3} from './geometry/nurbs-recut-face-join3.js';
+export type {NurbsRecutAssemblyJoin3} from './geometry/nurbs-recut-face-join3.js';
