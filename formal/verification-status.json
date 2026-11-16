@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "1caa1861c05abceb72599b5e0d889ade9cbb01c8e75b73133fd2bb21e01f3b8b",
+    "src/index.ts": "88a17887ebe7a949c7663a6b6b43f5fd341d09c9a7f3296b3bd912b2caddb20c",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -259,7 +259,8 @@
     "src/geometry/nurbs-plane-cell-rational-map3.ts": "46f894873a6b40788af98beaef4d47c96977ed8c23e165b004f972da08d1d1dc",
     "src/geometry/nurbs-plane-cell-source-nodes3.ts": "6a5c43c0a2d3344cabff6cfb006d044f75333d02b3ddc38a698e3c2f5da890d5",
     "src/geometry/nurbs-plane-split-faces3.ts": "08a74ad835dd6b55a30431a78c2c10181b99acc2aa43f076c8a8b3ae8de73423",
-    "src/geometry/sew-nurbs-plane-split-faces3.ts": "67b0b1addc867cd32f83b19e6f1f27171258585655cf3d4a6e490bd4b910f254"
+    "src/geometry/sew-nurbs-plane-split-faces3.ts": "2e02ce37b7e5e8bedc0ec45a8b1359046f297aaca18de061848bb806a6ea3d59",
+    "src/geometry/nurbs-plane-cap-boundary3.ts": "46d7d9e9e48c99825b04c8ed22513b820e711d4857009af22f5714bdc88fc380"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

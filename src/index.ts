@@ -553,3 +553,5 @@ export type {NurbsPlaneSplitFaceEdge3,NurbsPlaneSplitFaceSurface3,NurbsPlaneSpli
 
 export {sewNurbsPlaneSplitFaces3,sewnNurbsPlaneSplitEdgePoint3} from './geometry/sew-nurbs-plane-split-faces3.js';
 export type {SewnNurbsPlaneSplitEdge3,SewnNurbsPlaneSplitFaces3} from './geometry/sew-nurbs-plane-split-faces3.js';
+export {nurbsPlaneCapBoundary3,nurbsPlaneCapBoundaryPoint3} from './geometry/nurbs-plane-cap-boundary3.js';
+export type {NurbsPlaneCapBoundary3,NurbsPlaneCapBoundaryCertificate3} from './geometry/nurbs-plane-cap-boundary3.js';
