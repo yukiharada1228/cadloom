@@ -414,3 +414,5 @@ export {partitionNurbsSectionArcByDomain3} from './geometry/nurbs-section-arc-do
 export type {NurbsSectionArcDomainPartition3} from './geometry/nurbs-section-arc-domain3.js';
 export {intersectTrimmedNurbsSurfacePlane3,trimmedNurbsSectionEdgePoint3,trimmedNurbsSectionAreaPoint3} from './geometry/nurbs-trimmed-plane-section3.js';
 export type {TrimmedNurbsPlaneSection3,TrimmedNurbsSectionVertex3,TrimmedNurbsSectionEdge3,TrimmedNurbsSectionArea3} from './geometry/nurbs-trimmed-plane-section3.js';
+export {nurbsSurfacePointPreimages3,nurbsSurfacePreimageEdgePoint3,nurbsSurfacePreimagePatchPoint3} from './geometry/nurbs-surface-preimage3.js';
+export type {NurbsSurfacePointPreimages3,NurbsSurfacePreimagePatch3} from './geometry/nurbs-surface-preimage3.js';
