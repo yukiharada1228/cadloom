@@ -358,3 +358,5 @@ export {preparePlanarMaterialProgram3} from './geometry/planar-material-boundary
 export {prepareExtrudeMaterialProgram3} from './convert/circular-extrude-material3.js';
 export {intersectBodyLine3,intersectBodyRay3} from './ops/body-query3.js';
 export type {BodyBoundaryIntersection3} from './ops/body-query3.js';
+export {intersectBodyLineMaterial3} from './ops/body-query3.js';
+export type {BodyLineMaterialInterval3,BodyLineMaterialIntersection3} from './ops/body-query3.js';
