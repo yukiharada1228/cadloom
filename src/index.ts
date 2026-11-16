@@ -591,3 +591,5 @@ export {intersectCappedNurbsPlaneMaterialLine3} from './geometry/capped-nurbs-pl
 export type {CappedNurbsMaterialLine3,CappedNurbsMaterialLineHit3,CappedNurbsMaterialLineSpan3} from './geometry/capped-nurbs-plane-material-line3.js';
 export {intersectNurbsPlaneCapFacePlane3} from './geometry/nurbs-plane-cap-section3.js';
 export type {NurbsPlaneCapSection3,NurbsPlaneCapSectionEvent3,NurbsPlaneCapSectionSpan3} from './geometry/nurbs-plane-cap-section3.js';
+export {splitNurbsPlaneCapBoundaries3,nurbsCapSplitBoundaryPoint3} from './geometry/nurbs-plane-cap-split-boundaries3.js';
+export type {NurbsCapSplitBoundaries3,NurbsCapSplitBoundaryCurve3,NurbsCapSplitBoundaryEdge3} from './geometry/nurbs-plane-cap-split-boundaries3.js';
