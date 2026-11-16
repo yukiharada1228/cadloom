@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "079362e8de55336e8e911caa3155b7c120db78142ee9296e4750ca448c1485f4",
+    "src/index.ts": "3c58ff68e79ea2ac575243fa2fa2476ff0f866e4170912fd096e88acf7471b94",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -176,7 +176,8 @@
     "src/ops/planar-split-provenance3.ts": "be62cf38ee64fd11868f1bea3702b0dc6cb8f34bd80233d1541c1e973dfc5830",
     "src/ops/body-plane-split3.ts": "8ef738f985ebf202241c4248229f0c1822fb25bd0172a0282e4078addc4487c8",
     "src/geometry/compact-material-program3.ts": "e76c4e4d6452b2bba5c92f8ac189fb2f2a344fc66873961b517a74f981c13ed8",
-    "src/ops/body-split-interface3.ts": "1531f83be29c105aa8f81a3e9a92c2a74b0f47c31e95ccf2f1787543d9ff721c"
+    "src/ops/body-split-interface3.ts": "cf7a7d38d6563980b8f98e64ef4f23e11dfc85fc997a6a3ae4c52ec7ac249da6",
+    "src/ops/rejoin-body-split3.ts": "dd39039b612104709106554b39d9f76b8065f7e2840548ea9633d6af8507ce76"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

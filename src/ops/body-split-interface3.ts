@@ -35,7 +35,8 @@ export interface BodySplitInterface3 {
  locate(point:Point3|AlgebraicCoordinates3):CurveRegionLocation2;
 }
 const cache=new WeakMap<BodyPlaneSplit3,BodySplitInterface3>();
-function patch(body:KernelBody3,face:number):MixedBRepFace3 {
+/** Internal extraction; callers supply an owned split child and actual face ID. */
+export function bodySplitFacePatch3(body:KernelBody3,face:number):MixedBRepFace3 {
  const t=body.topology,f=t.faces[face]!;
  return {surface:f.surface,sense:f.sense,loops:f.loops.map(loop=>t.loops[loop]!.coedges.map(id=>{const h=t.coedges[id]!,c=t.edges[h.edge]!.curve,mixed=c.kind==='native'||c.kind==='cylinder-ssi'?c:nativeBRepCurve3(c);return h.direction===1?mixed:reverseBRepCurve3(mixed);} ))};
 }
@@ -53,7 +54,7 @@ export function bodySplitInterface3(split:BodyPlaneSplit3):BodySplitInterface3 {
  };
  const negativeFaces=select(split.negative,-1),positiveFaces=select(split.positive,1),rows=[...negativeFaces.map(face=>({side:-1 as const,body:split.negative,face})),...positiveFaces.map(face=>({side:1 as const,body:split.positive,face}))];
  for(const row of rows){const f=row.body.topology.faces[row.face]!;if(f.surface.kind!=='plane'||dot3(f.surface.plane.normal,split.plane.normal).sign()*f.sense!==-row.side)throw new Error('Cut interface face has an incorrect physical normal');}
- const sewn=sewMixedBRepFaces3(rows.map(row=>patch(row.body,row.face))),negativeCoedges:BodySplitInterfaceCoedge3[]=[],positiveCoedges:BodySplitInterfaceCoedge3[]=[];
+ const sewn=sewMixedBRepFaces3(rows.map(row=>bodySplitFacePatch3(row.body,row.face))),negativeCoedges:BodySplitInterfaceCoedge3[]=[],positiveCoedges:BodySplitInterfaceCoedge3[]=[];
  rows.forEach((row,index)=>{const t=row.body.topology;for(const [loopIndex,loop] of t.faces[row.face]!.loops.entries())for(const [i,coedge] of t.loops[loop]!.coedges.entries()){
   const h=t.coedges[coedge]!,entry=Object.freeze({face:row.face,loop,coedge,edge:h.edge,uses:sewn.sourceUses[index]![loopIndex]![i]!});(row.side===-1?negativeCoedges:positiveCoedges).push(entry);
  }});

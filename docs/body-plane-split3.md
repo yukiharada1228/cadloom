@@ -6,7 +6,8 @@
 const split = splitBodyByPlane3(body, plane3(1n, 0n, 1n));
 const restored = restoreBody3(serializeBody3(split.negative));
 const next = splitBodyByPlane3(restored, plane3(0n, 1n, 0n));
-const joined = booleanMaterialBodies3(split.negative, split.positive, 'union');
+const joined = rejoinBodyPlaneSplit3(split);
+// joined.body は独立した和、joined.sewing は界面を除いた子境界の再縫合。
 ```
 
 ## 経路と成立条件
