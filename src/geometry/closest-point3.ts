@@ -5,9 +5,10 @@ import type {Point3,Segment3} from './point3.js';
 import {line3,cylinder3} from './surface3.js';
 import type {Line3,Surface3} from './surface3.js';
 import {plane3} from './plane3.js';
-import {circle3} from './circle3.js';
-import type {Circle3} from './circle3.js';
-import {algebraicPoint3,algebraicCoordinates3} from './algebraic-point3.js';
+import {circle3,snapshotCircularArc3,pointOnArc3} from './circle3.js';
+import type {Circle3,CircularArc3} from './circle3.js';
+import {evaluatePlaneAtAlgebraicPoint3} from './algebraic-segment-plane3.js';
+import {compareAlgebraicPoints3,algebraicPoint3,algebraicCoordinates3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 export interface UniqueClosestPoint3 {readonly kind:'point';readonly point:AlgebraicCoordinates3;readonly squaredDistance:AlgebraicReal;}
 export interface LineClosestPoint3 extends UniqueClosestPoint3 {readonly parameter:Rational;}
@@ -41,4 +42,34 @@ export function closestPointOnSurface3(input:Point3,surface:Surface3):SurfaceClo
  if(rhoSquared.sign()===0)return Object.freeze({kind:'circle',circle:circle3(q,d,c.radiusSquared),squaredDistance:AlgebraicReal.fromRational(c.radiusSquared)});
  const scale=AlgebraicReal.fromRational(c.radiusSquared.div(rhoSquared)).sqrt();
  return Object.freeze({kind:'point',point:algebraicPoint3(q,radial,scale),squaredDistance:scale.affine(rhoSquared.mul(new Rational(-2n)),rhoSquared.add(c.radiusSquared))});
+}
+
+export type CircleClosestPoint3=UniqueClosestPoint3|{readonly kind:'circle';readonly circle:Circle3;readonly squaredDistance:AlgebraicReal;};
+export type CircularArcClosestPoint3=UniqueClosestPoint3
+ | {readonly kind:'points';readonly points:readonly [AlgebraicCoordinates3,AlgebraicCoordinates3];readonly squaredDistance:AlgebraicReal}
+ | {readonly kind:'arc';readonly arc:CircularArc3;readonly squaredDistance:AlgebraicReal};
+/** Exact nearest set on a full spatial circle, including its normal-axis family. */
+export function closestPointOnCircle3(input:Point3,inputCircle:Circle3):CircleClosestPoint3 {
+ const p=point3(input.x,input.y,input.z),c=circle3(inputCircle.center,inputCircle.normal,inputCircle.radiusSquared),v=subtract3(p,c.center),n=c.normal,rate=dot3(v,n).div(dot3(n,n)),w=subtract3(v,point3(n.x.mul(rate),n.y.mul(rate),n.z.mul(rate))),rhoSquared=dot3(w,w),constant=dot3(v,v).add(c.radiusSquared);
+ if(rhoSquared.sign()===0)return Object.freeze({kind:'circle',circle:c,squaredDistance:AlgebraicReal.fromRational(constant)});
+ const scale=AlgebraicReal.fromRational(c.radiusSquared.div(rhoSquared)).sqrt();
+ return Object.freeze({kind:'point',point:algebraicPoint3(c.center,w,scale),squaredDistance:scale.affine(rhoSquared.mul(new Rational(-2n)),constant)});
+}
+function circlePointDistance(p:Point3,c:Circle3,q:AlgebraicCoordinates3):AlgebraicReal {
+ const v=subtract3(p,c.center),constant=dot3(v,v).add(c.radiusSquared);
+ if(dot3(v,v).sign()===0)return AlgebraicReal.fromRational(constant);
+ return evaluatePlaneAtAlgebraicPoint3(plane3(v.x,v.y,v.z,dot3(v,c.center).neg()),q).affine(-2n,constant);
+}
+/** Exact nearest set on a closed arc. Equal endpoint minima and all-arc
+ * minima are represented explicitly, without picking an arbitrary winner. */
+export function closestPointOnCircularArc3(input:Point3,inputArc:CircularArc3):CircularArcClosestPoint3 {
+ const p=point3(input.x,input.y,input.z),arc=snapshotCircularArc3(inputArc);
+ if(!arc.fullCircle&&compareAlgebraicPoints3(arc.start,arc.end)===0)return Object.freeze({kind:'point',point:arc.start,squaredDistance:circlePointDistance(p,arc.circle,arc.start)});
+ const support=closestPointOnCircle3(p,arc.circle);
+ if(support.kind==='circle')return Object.freeze({kind:'arc',arc,squaredDistance:support.squaredDistance});
+ if(pointOnArc3(support.point,arc))return support;
+ const a=circlePointDistance(p,arc.circle,arc.start),b=circlePointDistance(p,arc.circle,arc.end),order=a.compare(b);
+ if(order!==0)return Object.freeze({kind:'point',point:order<0?arc.start:arc.end,squaredDistance:order<0?a:b});
+ const points=compareAlgebraicPoints3(arc.start,arc.end)<0?[arc.start,arc.end] as const:[arc.end,arc.start] as const;
+ return Object.freeze({kind:'points',points:Object.freeze(points),squaredDistance:a});
 }

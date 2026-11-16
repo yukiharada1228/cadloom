@@ -367,3 +367,5 @@ export {transformBody3} from './ops/body-transform3.js';
 export {composeSimilarityTransforms3,inverseSimilarityTransform3} from './geometry/similarity3.js';
 export {closestPointOnLine3,closestPointOnSegment3,closestPointOnSurface3} from './geometry/closest-point3.js';
 export type {UniqueClosestPoint3,LineClosestPoint3,SurfaceClosestPoint3} from './geometry/closest-point3.js';
+export {closestPointOnCircle3,closestPointOnCircularArc3} from './geometry/closest-point3.js';
+export type {CircleClosestPoint3,CircularArcClosestPoint3} from './geometry/closest-point3.js';
