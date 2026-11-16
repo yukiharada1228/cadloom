@@ -523,3 +523,6 @@ export type {NurbsPlaneDomain3} from './geometry/nurbs-plane-domain3.js';
 
 export {partitionNurbsSourceFaceByPlane3,nurbsSourcePlaneCellPoint3} from './geometry/nurbs-source-plane-cells3.js';
 export type {NurbsSourcePlaneCell3,NurbsSourcePlaneCells3} from './geometry/nurbs-source-plane-cells3.js';
+
+export {nurbsSourcePlaneCellBoundary3,nurbsSourcePlaneCellBoundaryPoint3} from './geometry/nurbs-source-plane-cell-boundary3.js';
+export type {NurbsSourcePlaneCellBoundary3,NurbsSourcePlaneCellBoundaryEdge3} from './geometry/nurbs-source-plane-cell-boundary3.js';

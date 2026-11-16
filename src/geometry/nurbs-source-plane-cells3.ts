@@ -24,6 +24,7 @@ export type NurbsSourcePlaneCells3=
  | Readonly<{kind:'unresolved';reason:'unprepared-complex'|'face-location'}>
  | Readonly<{kind:'partitioned';complex:Extract<NurbsSourceFaceComplex3,{kind:'prepared'}>;face:number;plane:Plane3;graphs:readonly AlgebraicCurveTopology2[];cells:readonly NurbsSourcePlaneCell3[]}>;
 const owned=new WeakSet<NurbsSourcePlaneCells3>();
+export function assertOwnedNurbsSourcePlaneCells3(report:NurbsSourcePlaneCells3):void {if(!owned.has(report))throw new RangeError('Expected factory-created plane cell partition');}
 const real=(x:AlgebraicReal|ExactInput)=>x instanceof AlgebraicReal?x:AlgebraicReal.fromRational(x);
 function between(a:AlgebraicReal,b:AlgebraicReal):AlgebraicReal {
  while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}
