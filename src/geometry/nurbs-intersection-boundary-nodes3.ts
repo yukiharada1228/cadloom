@@ -35,6 +35,19 @@ export function nurbsBoundaryCoordinateRoots3(s:NurbsSpan3,key:'x'|'y'|'z',value
  let f=new Polynomial();for(let i=0;i<=n;i++)f=f.add(NP[i]!.mul(WP[n-i]!).scale(P.coefficient(i)));
  return isolateRealRoots(f).map(t=>t.recognizeRational()).filter(t=>t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0&&t.signOf(W)!==0&&t.rationalFunction(N,W).compare(value)===0);
 }
+/** Internal joint inverse: intersect all coordinate norm equations before
+ * isolation, then filter the selected algebraic coordinate branches. */
+export function nurbsBoundaryCoordinatesRoots3(s:NurbsSpan3,constraints:readonly Readonly<{key:'x'|'y'|'z';value:AlgebraicReal}>[]):readonly AlgebraicReal[]|null {
+ const W=s.weight;let equation=new Polynomial();
+ for(const {key,value} of constraints){const N=s[key];
+  if(N.derivative().mul(W).sub(N.mul(W.derivative())).degree<0){const i=W.coefficients.findIndex(q=>q.sign()!==0);if(i<0)throw new RangeError('Rational coordinate requires a nonzero weight polynomial');if(real(N.coefficient(i).div(W.coefficient(i))).compare(value)!==0)return Object.freeze([]);continue;}
+  const P=value.recognizeRational().polynomial;let f=new Polynomial([P.coefficient(P.degree)]),power=one;
+  for(let i=P.degree-1;i>=0;i--){power=power.mul(W);f=f.mul(N).add(power.scale(P.coefficient(i)));}
+  equation=equation.gcd(f);if(equation.degree===0)return Object.freeze([]);
+ }
+ if(equation.degree<0)return null;
+ return Object.freeze(isolateRealRoots(equation).map(t=>t.recognizeRational()).filter(t=>t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0&&t.signOf(W)!==0&&constraints.every(({key,value})=>t.rationalFunction(s[key],W).compare(value)===0)));
+}
 /** Node every finite trim-boundary span at all refined intersection vertices.
  * Computes exact parameter preimages, including algebraic values and knots.
  * Does not infer interior face loops or merge coincident boundary/cut edges. */

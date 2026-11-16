@@ -32,7 +32,11 @@ function between(inputA:AlgebraicReal,inputB:AlgebraicReal):Rational {
   while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}
   return a.upper.add(b.lower).div(two);
 }
-function distinct(values:AlgebraicReal[]):AlgebraicReal[]{return values.sort((a,b)=>a.compare(b)).filter((v,i,all)=>i===0||v.compare(all[i-1]!)!==0);}
+function distinct(values:AlgebraicReal[]):AlgebraicReal[]{
+ const result:AlgebraicReal[]=[];
+ for(const value of values.sort((a,b)=>a.compare(b))){const last=result[result.length-1];if(last===undefined||value.compare(last)!==0)result.push(value);else if(value.polynomial.degree<last.polynomial.degree)result[result.length-1]=value;}
+ return result;
+}
 function fiber(H:BivariatePolynomial,u:AlgebraicReal,bounds:CurveRectangle2):readonly AlgebraicReal[] {
   const result=bivariateFiberRoots(H,u);if(result.kind==='whole')throw new Error('Primitive nonvertical curve has an identically zero fiber');
   return result.roots.filter(v=>v.compare(real(bounds.vMin))>=0&&v.compare(real(bounds.vMax))<=0);

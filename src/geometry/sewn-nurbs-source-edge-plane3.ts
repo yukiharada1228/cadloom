@@ -11,7 +11,7 @@ import {evaluateNurbsSpanPoint3} from './nurbs-curve3.js';
 import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import type {Point3} from './point3.js';
-import {nurbsBoundaryCoordinateRoots3} from './nurbs-intersection-boundary-nodes3.js';
+import {nurbsBoundaryCoordinatesRoots3} from './nurbs-intersection-boundary-nodes3.js';
 export interface NurbsSourcePlaneEdgeFragment3 {
  readonly parent:number;readonly source:SewnNurbsSourceEdge3;
  readonly lower:AlgebraicReal;readonly upper:AlgebraicReal;
@@ -92,10 +92,7 @@ export function nurbsSourcePlaneEdgeFragmentPoint3(edge:NurbsSourcePlaneEdgeFrag
 export function nurbsSourcePlaneEdgeFragmentPointPreimages3(edge:NurbsSourcePlaneEdgeFragment3,input:Point3|AlgebraicCoordinates3):readonly AlgebraicReal[] {
  if(!ownedFragments.has(edge))throw new RangeError('Expected factory-created plane edge fragment');
  const point=snapshotExactPoint3(input),span=edge.source.map.span;
- for(const key of ['x','y','z'] as const){
-  const roots=nurbsBoundaryCoordinateRoots3(span,key,point[key]);
-  if(roots===null)continue;
-  return Object.freeze(roots.filter(t=>t.compare(edge.lower)>=0&&t.compare(edge.upper)<=0&&compareAlgebraicPoints3(evaluateNurbsSpanPoint3(span,t),point)===0));
- }
+ const roots=nurbsBoundaryCoordinatesRoots3(span,(['x','y','z'] as const).map(key=>({key,value:point[key]})));
+ if(roots!==null)return Object.freeze(roots.filter(t=>t.compare(edge.lower)>=0&&t.compare(edge.upper)<=0&&compareAlgebraicPoints3(evaluateNurbsSpanPoint3(span,t),point)===0));
  throw new Error('An embedded source boundary unexpectedly has a constant spatial image');
 }

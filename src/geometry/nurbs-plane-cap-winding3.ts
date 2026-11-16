@@ -1,23 +1,23 @@
 import {assertOwnedNurbsPlaneCapBoundary3,nurbsPlaneCapBoundaryPoint3} from './nurbs-plane-cap-boundary3.js';
 import type {NurbsPlaneCapBoundaryCertificate3} from './nurbs-plane-cap-boundary3.js';
-import {partitionSewnNurbsSplitEdgeByPlane3} from './sewn-nurbs-split-edge-plane3.js';
-import {point2} from './point2.js';
+import {partitionSewnNurbsSplitEdgeByAlgebraicPlane3} from './sewn-nurbs-split-edge-plane3.js';
+import {snapshotExactPoint2} from './algebraic-point2.js';
+import type {AlgebraicCoordinates2} from './algebraic-point2.js';
 import type {Point2} from './point2.js';
 import {point3,dot3} from './point3.js';
-import {plane3} from './plane3.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {Rational} from '../numeric/rational.js';
 export type NurbsPlaneCapWinding3=
- | Readonly<{kind:'boundary';source:NurbsPlaneCapBoundaryCertificate3;point:Point2;loop:number;edge:number}>
- | Readonly<{kind:'located';source:NurbsPlaneCapBoundaryCertificate3;point:Point2;windings:readonly number[];slope:Rational;attempts:number}>
- | Readonly<{kind:'unresolved';source:NurbsPlaneCapBoundaryCertificate3;point:Point2;reason:'direction-budget';attempts:number}>;
-/** Exact per-loop winding at a rational cap-chart point. This is a curve query,
+ | Readonly<{kind:'boundary';source:NurbsPlaneCapBoundaryCertificate3;point:AlgebraicCoordinates2;loop:number;edge:number}>
+ | Readonly<{kind:'located';source:NurbsPlaneCapBoundaryCertificate3;point:AlgebraicCoordinates2;windings:readonly number[];slope:Rational;attempts:number}>
+ | Readonly<{kind:'unresolved';source:NurbsPlaneCapBoundaryCertificate3;point:AlgebraicCoordinates2;reason:'direction-budget';attempts:number}>;
+/** Exact per-loop winding at a real-algebraic cap-chart point. This is a curve query,
  * not a material/embedding certificate or a choice of polygonal fill. */
-export function queryNurbsPlaneCapWinding3(source:NurbsPlaneCapBoundaryCertificate3,input:Point2,options:Readonly<{maxDirections?:number}>={}):NurbsPlaneCapWinding3 {
- assertOwnedNurbsPlaneCapBoundary3(source);const point=point2(input.x,input.y),budget=options.maxDirections??16;
+export function queryNurbsPlaneCapWinding3(source:NurbsPlaneCapBoundaryCertificate3,input:Point2|AlgebraicCoordinates2,options:Readonly<{maxDirections?:number}>={}):NurbsPlaneCapWinding3 {
+ assertOwnedNurbsPlaneCapBoundary3(source);const point=snapshotExactPoint2(input),budget=options.maxDirections??16;
  if(!Number.isSafeInteger(budget)||budget<1)throw new RangeError('maxDirections must be a positive safe integer');
  const boundary=(loop:number,edge:number):NurbsPlaneCapWinding3=>Object.freeze({kind:'boundary',source,point,loop,edge});
- const real=(q:Rational)=>AlgebraicReal.fromRational(q),x=real(point.x),y=real(point.y),T=source.source.topology;
+ const x=point.x,y=point.y,T=source.source.topology;
  const at=(edge:number,t:AlgebraicReal)=>nurbsPlaneCapBoundaryPoint3(source,edge,t);
  // Catch query vertices independently of the retry direction.
  for(const [loop,uses] of source.loops.entries())for(const u of uses){const e=T.edges[u.edge]!.curve,q=at(u.edge,e.lower);if(q.x.compare(x)===0&&q.y.compare(y)===0)return boundary(loop,u.edge);}
@@ -27,11 +27,11 @@ export function queryNurbsPlaneCapWinding3(source:NurbsPlaneCapBoundaryCertifica
   // 0, +1, -1, +2, -2, ...; finitely many vertex slopes are excluded.
   const k=new Rational(attempt===0?0n:BigInt(Math.ceil(attempt/2))*(attempt%2===1?1n:-1n));
   const n=point3(...(['x','y','z'] as const).map(key=>v[key].div(vv).sub(u[key].mul(k).div(uu))) as Parameters<typeof point3>);
-  const plane=plane3(n.x,n.y,n.z,dot3(n,origin).neg().sub(point.y).add(k.mul(point.x))),windings:number[]=[];let retry=false;
+  const offset=AlgebraicReal.linearCombination([{value:point.y,coefficient:-1n},{value:point.x,coefficient:k}],dot3(n,origin).neg()),plane={normal:n,offset},windings:number[]=[];let retry=false;
   for(const [loop,uses] of source.loops.entries()){
    let winding=0;
    for(const use of uses){
-    const report=partitionSewnNurbsSplitEdgeByPlane3(T.edges[use.edge]!.curve,plane);
+    const report=partitionSewnNurbsSplitEdgeByAlgebraicPlane3(T.edges[use.edge]!.curve,plane);
     for(const vertex of report.vertices)if(vertex.sign===0){const q=at(use.edge,vertex.parameter);if(q.x.compare(x)===0)return boundary(loop,use.edge);}
     for(const interval of report.intervals)if(interval.sign===0){const a=at(use.edge,interval.lower),b=at(use.edge,interval.upper);if(a.x.compare(x)*b.x.compare(x)<=0)return boundary(loop,use.edge);retry=true;}
     if(report.vertices[0]!.sign===0||report.vertices[report.vertices.length-1]!.sign===0){retry=true;continue;}

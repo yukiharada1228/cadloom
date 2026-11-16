@@ -25,3 +25,7 @@ test('factored projection and fibers preserve expanded-product topology across c
 test('factored graphs retain zero loci for duplicates, vertical factors, empty products and zero factors',()=>{
  const a=traceAlgebraicCurveProduct2([U,U.scale(-2n),one.scale(3n)],box);audit(a);assert.equal(a.edges.length,1);assert.equal(a.edges[0]!.kind,'vertical');assert.equal(traceAlgebraicCurveProduct2([],box).edges.length,0);assert.equal(traceAlgebraicCurveProduct2([U,new BivariatePolynomial()],box).kind,'area');assert.throws(()=>traceAlgebraicCurveProduct2([U],{...box,uMax:-2n}),/rectangle/);
 });
+test('equal event fibers retain the lower-degree certificate from a crossing factor',()=>{
+ const circle=U.mul(U).add(V.mul(V)).sub(one),line=U.add(V).sub(one.scale('1/2')),g=traceAlgebraicCurveProduct2([circle,line],{uMin:-1n,uMax:1n,vMin:-1n,vMax:1n}),crossings=g.vertices.filter(p=>circle.evaluateAlgebraic(p.u,p.v).sign()===0&&line.evaluateAlgebraic(p.u,p.v).sign()===0);
+ assert.equal(crossings.length,2);for(const p of crossings){assert.equal(p.u.polynomial.degree,2);assert.equal(p.v.polynomial.degree,2);assert.equal(AlgebraicReal.linearCombination([{value:p.u,coefficient:1n},{value:p.v,coefficient:1n}]).rational?.toString(),'1/2');}
+});

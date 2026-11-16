@@ -1,10 +1,10 @@
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {Rational} from '../numeric/rational.js';
+import {nurbsBoundaryCoordinatesRoots3} from './nurbs-intersection-boundary-nodes3.js';
 import {assertOwnedNurbsSourcePlaneCellComplex3,nurbsSourcePlaneCellComplexEdgePoint3} from './nurbs-source-plane-cell-complex3.js';
 import type {NurbsSourcePlaneCellComplex3} from './nurbs-source-plane-cell-complex3.js';
 import {nurbsCurveSpans3,evaluateNurbsSpanPoint3} from './nurbs-curve3.js';
 import type {NurbsSpan3} from './nurbs-curve3.js';
-import {nurbsBoundaryCoordinateRoots3} from './nurbs-intersection-boundary-nodes3.js';
 import {nurbsParameterPolynomial3,composeNurbsSurfaceBoundarySpan3} from './nurbs-surface-boundary3.js';
 import {evaluateAlgebraicCurveEdge2} from './algebraic-curve-topology2.js';
 import {compareAlgebraicPoints3} from './algebraic-point3.js';
@@ -39,6 +39,13 @@ export function nurbsPlaneCellRationalMapPoint3(map:NurbsPlaneCellRationalMap3,i
 function between(a:AlgebraicReal,b:AlgebraicReal):AlgebraicReal {
  while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}return AlgebraicReal.fromRational(a.upper.add(b.lower).div(new Rational(2n)));
 }
+/** Internal exact UV inverse. Intersect both coordinate norm constraints
+ * before isolating roots, then select the actual coordinate branches. */
+export function nurbsTrimPointParameters3(span:NurbsSpan3,u:AlgebraicReal,v:AlgebraicReal):readonly AlgebraicReal[] {
+ const roots=nurbsBoundaryCoordinatesRoots3(span,[{key:'x',value:u},{key:'y',value:v}]);
+ if(roots===null)throw new RangeError('Trim inverse requires a nonconstant UV path');
+ return roots;
+}
 /** Recover a rational path from a constant coordinate or a finite original
  * Jordan trim. Polynomial identity and branch continuation certify the whole
  * open interval, not just an endpoint or midpoint coincidence. */
@@ -55,10 +62,7 @@ export function nurbsPlaneCellRationalMap3(cells:NurbsSourcePlaneCellComplex3,ed
  const domain=P.source.source.source.source.sharing.boundary.domain,first=cells.vertices[e.from]!.point,last=cells.vertices[e.to]!.point,matches:NurbsPlaneCellRationalMap3[]=[];
  for(const curve of [domain.outer,...domain.holes].flat())for(const span of nurbsCurveSpans3(curve)){
   if(nurbsParameterPolynomial3(g.polynomial,span).degree>=0)continue;
-  const inverse=(point:typeof first)=>{
-   const roots=nurbsBoundaryCoordinateRoots3(span,'x',point.u);if(roots===null)return [];
-   return roots.filter(t=>evaluateNurbsSpanPoint3(span,t).y.compare(point.v)===0);
-  };
+  const inverse=(point:typeof first)=>nurbsTrimPointParameters3(span,point.u,point.v);
   const D=span.x.derivative().mul(span.weight).sub(span.x.mul(span.weight.derivative()));if(D.degree<0)continue;
   const critical=D.degree>0?AlgebraicReal.isolate(D):[];
   for(const a of inverse(first))for(const b of inverse(last)){
@@ -70,7 +74,12 @@ export function nurbsPlaneCellRationalMap3(cells:NurbsSourcePlaneCellComplex3,ed
    // u is strictly monotone onto the cell's native interval. The trim lies
    // identically on the arrangement; with no projection event inside this
    // slab, its connected image cannot switch to another ordered root branch.
-   const lifted=composeNurbsSurfaceBoundarySpan3(p,span,lower,upper),spatial=Object.freeze({index:span.index,startParameter:span.startParameter,endParameter:span.endParameter,x:lifted.x,y:lifted.y,z:lifted.z,weight:lifted.weight});
+   const lifted=composeNurbsSurfaceBoundarySpan3(p,span,lower,upper),common=lifted.weight.gcd(lifted.x).gcd(lifted.y).gcd(lifted.z);
+   // Composition can introduce common homogeneous weight factors. They have
+   // no zeros on this owned finite path; removing them preserves its image
+   // and avoids extraneous parameter-relation components at inactive poles.
+   const primitive=(key:'x'|'y'|'z'|'weight')=>common.degree>0?lifted[key].divRem(common).quotient:lifted[key];
+   const spatial=Object.freeze({index:span.index,startParameter:span.startParameter,endParameter:span.endParameter,x:primitive('x'),y:primitive('y'),z:primitive('z'),weight:primitive('weight')});
    if(compareAlgebraicPoints3(evaluateNurbsSpanPoint3(spatial,t),nurbsSourcePlaneCellComplexEdgePoint3(cells,edge,uv.x).point)!==0)throw new Error('Recovered trim map lost its spatial lift');
    matches.push(Object.freeze({kind:'rational',span:spatial,lower,upper,direction,parameterSpan:span}));
   }
