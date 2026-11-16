@@ -416,3 +416,5 @@ export {intersectTrimmedNurbsSurfacePlane3,trimmedNurbsSectionEdgePoint3,trimmed
 export type {TrimmedNurbsPlaneSection3,TrimmedNurbsSectionVertex3,TrimmedNurbsSectionEdge3,TrimmedNurbsSectionArea3} from './geometry/nurbs-trimmed-plane-section3.js';
 export {nurbsSurfacePointPreimages3,nurbsSurfacePreimageEdgePoint3,nurbsSurfacePreimagePatchPoint3} from './geometry/nurbs-surface-preimage3.js';
 export type {NurbsSurfacePointPreimages3,NurbsSurfacePreimagePatch3} from './geometry/nurbs-surface-preimage3.js';
+export {trimNurbsSurfacePointPreimages3,nurbsTrimmedSurfacePointPreimages3,trimmedNurbsSurfacePreimageEdgePoint3,trimmedNurbsSurfacePreimagePatchPoint3} from './geometry/nurbs-trimmed-surface-preimage3.js';
+export type {TrimmedNurbsSurfacePointPreimages3,TrimmedNurbsPreimagePatch3,TrimmedNurbsPreimageVertex3} from './geometry/nurbs-trimmed-surface-preimage3.js';

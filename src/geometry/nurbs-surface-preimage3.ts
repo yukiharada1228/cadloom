@@ -60,8 +60,10 @@ export function nurbsSurfacePointPreimages3(input:NurbsSurface3,target:Point3|Al
  }
  const result=Object.freeze({surface,point,patches:Object.freeze(patches),empty:patches.length===0});owned.add(result);return result;
 }
+/** Internal guard for consumers of an actual inverse-image computation. */
+export function assertOwnedNurbsSurfacePointPreimages3(report:NurbsSurfacePointPreimages3):void {if(!owned.has(report))throw new RangeError('Operation requires a factory-created NURBS preimage report');}
 function at(report:NurbsSurfacePointPreimages3,patch:number):NurbsSurfacePreimagePatch3 {
- if(!owned.has(report))throw new RangeError('Operation requires a factory-created NURBS preimage report');if(!Number.isSafeInteger(patch)||patch<0||patch>=report.patches.length)throw new RangeError('Invalid preimage patch index');return report.patches[patch]!;
+ assertOwnedNurbsSurfacePointPreimages3(report);if(!Number.isSafeInteger(patch)||patch<0||patch>=report.patches.length)throw new RangeError('Invalid preimage patch index');return report.patches[patch]!;
 }
 export function nurbsSurfacePreimageEdgePoint3(report:NurbsSurfacePointPreimages3,patch:number,edge:number,parameter:AlgebraicReal|ExactInput):Readonly<{u:AlgebraicReal;v:AlgebraicReal;point:AlgebraicCoordinates3}> {
  const p=at(report,patch);if(!Number.isSafeInteger(edge)||edge<0||edge>=p.locusEdges.length||!p.locus)throw new RangeError('Invalid selected preimage edge');const q=evaluateAlgebraicCurveEdge2(p.locus,p.locusEdges[edge]!,parameter),point=liftNurbsSectionPatch3(p.patch,q.u,q.v);if(compareAlgebraicPoints3(point,report.point)!==0)throw new Error('Preimage edge evaluation changed target');return Object.freeze({...q,point});

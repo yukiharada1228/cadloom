@@ -1,4 +1,4 @@
-import {AlgebraicReal,isolateRealRoots} from '../numeric/real-roots.js';
+import {AlgebraicReal} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import type {Plane3} from './plane3.js';
 import {compareAlgebraicPoints3} from './algebraic-point3.js';
@@ -8,7 +8,7 @@ import {sewNurbsPlaneSection3} from './nurbs-section-seams3.js';
 import type {NurbsSectionComplex3} from './nurbs-section-seams3.js';
 import {prepareNurbsParameterDomain2} from './nurbs-parameter-domain2.js';
 import type {PreparedNurbsParameterDomain2,NurbsDomainLocation2} from './nurbs-parameter-domain2.js';
-import {nurbsCurveSpans3,evaluateNurbsSpanPoint3} from './nurbs-curve3.js';
+import {nurbsDomainPatchWitness3,locateNurbsDomainPatch3} from './nurbs-domain-patch3.js';
 import {nurbsSectionArc3,nurbsSectionArcPoint3} from './nurbs-section-arc3.js';
 import type {NurbsSectionArc3} from './nurbs-section-arc3.js';
 import {partitionValidatedNurbsSectionArcByDomain3} from './nurbs-section-arc-domain3.js';
@@ -34,16 +34,6 @@ export interface TrimmedNurbsPlaneSection3 {
  readonly curveComponents:readonly Readonly<{vertices:readonly number[];edges:readonly number[]}>[];
 }
 const owned=new WeakSet<TrimmedNurbsPlaneSection3>(),real=(x:AlgebraicReal|ExactInput)=>x instanceof AlgebraicReal?x:AlgebraicReal.fromRational(x);
-function inside(p:NurbsSurfacePatch3,u:AlgebraicReal,v:AlgebraicReal):boolean{return u.compare(real(p.startU))>=0&&u.compare(real(p.endU))<=0&&v.compare(real(p.startV))>=0&&v.compare(real(p.endV))<=0;}
-function witness(p:NurbsSurfacePatch3,d:PreparedNurbsParameterDomain2):Readonly<{u:AlgebraicReal;v:AlgebraicReal}>|null {
- const candidates:{u:AlgebraicReal;v:AlgebraicReal}[]=[{u:real(d.sample.u),v:real(d.sample.v)},...[p.startU,p.endU].flatMap(u=>[p.startV,p.endV].map(v=>({u:real(u),v:real(v)})))];
- for(const curve of [d.outer,...d.holes].flat())for(const span of nurbsCurveSpans3(curve)){
-  const lo=real(span.startParameter),hi=real(span.endParameter),ts=[lo,hi];
-  for(const [coordinate,limits] of [[span.x,[p.startU,p.endU]],[span.y,[p.startV,p.endV]]] as const)for(const limit of limits){const f=coordinate.sub(span.weight.scale(limit));if(f.degree>=0)ts.push(...isolateRealRoots(f).filter(t=>t.compare(lo)>=0&&t.compare(hi)<=0));}
-  for(const t of ts){const q=evaluateNurbsSpanPoint3(span,t);candidates.push({u:q.x,v:q.y});}
- }
- return candidates.find(q=>inside(p,q.u,q.v)&&d.locate(q.u,q.v)!=='outside')??null;
-}
 /** Complete trimmed section as a union of a parameter-seam curve graph and
  * implicit closed domain/contained-patch intersections. No spatial welding of
  * distinct parameters or general NURBS Body certificate is inferred. */
@@ -64,8 +54,8 @@ export function intersectTrimmedNurbsSurfacePlane3(surface:NurbsSurface3,input:P
   for(const part of partition.pieces)if(part.location!=='outside')edges.push(Object.freeze({from:endpoint(part.arc.lower),to:endpoint(part.arc.upper),arc:part.arc,sourceEdge,location:part.location}));
  });
  const areas:TrimmedNurbsSectionArea3[]=[];source.source.containedPatches.forEach((patch,sourceArea)=>{
-  const q=witness(patch,domain);if(!q)return;
-  const locate=(inputU:AlgebraicReal|ExactInput,inputV:AlgebraicReal|ExactInput):NurbsDomainLocation2=>{const u=real(inputU),v=real(inputV);if(!inside(patch,u,v))return 'outside';const loc=domain.locate(u,v);if(loc==='outside')return loc;return u.compare(real(patch.startU))===0||u.compare(real(patch.endU))===0||v.compare(real(patch.startV))===0||v.compare(real(patch.endV))===0?'boundary':loc;};
+  const q=nurbsDomainPatchWitness3(patch,domain);if(!q)return;
+  const locate=(u:AlgebraicReal|ExactInput,v:AlgebraicReal|ExactInput):NurbsDomainLocation2=>locateNurbsDomainPatch3(patch,domain,u,v);
   areas.push(Object.freeze({sourceArea,patch,witness:Object.freeze({...q,point:liftNurbsSectionPatch3(patch,q.u,q.v)}),locate}));
  });
  const parents=vertices.map((_,i)=>i),root=(id:number):number=>{while(parents[id]!==id){parents[id]=parents[parents[id]!]!;id=parents[id]!;}return id;};

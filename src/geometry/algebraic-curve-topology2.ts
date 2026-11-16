@@ -23,6 +23,8 @@ export interface AlgebraicCurveTopology2 {
 const owned=new WeakSet<AlgebraicCurveTopology2>(),two=new Rational(2n);
 const real=(value:AlgebraicReal|ExactInput)=>value instanceof AlgebraicReal?value:AlgebraicReal.fromRational(value);
 function finish(value:AlgebraicCurveTopology2):AlgebraicCurveTopology2 {const frozen=Object.freeze(value);owned.add(frozen);return frozen;}
+/** Internal provenance guard shared by exact graph restriction operations. */
+export function assertOwnedAlgebraicCurveTopology2(input:AlgebraicCurveTopology2):void {if(!owned.has(input))throw new RangeError('Curve evaluation requires a factory-created topology');}
 /** Density of Q, using only exact separating intervals. */
 function between(inputA:AlgebraicReal,inputB:AlgebraicReal):Rational {
   if(inputA.compare(inputB)>=0)throw new Error('Expected strictly ordered endpoints');let a=inputA,b=inputB;
@@ -88,7 +90,7 @@ export function traceAlgebraicCurve2(F:BivariatePolynomial,inputBounds:{readonly
 }
 /** Evaluate a branch by u, or a vertical edge by v, on its closed domain. */
 export function evaluateAlgebraicCurveEdge2(input:AlgebraicCurveTopology2,edge:number,parameter:AlgebraicReal|ExactInput):BivariateRoot {
-  if(!owned.has(input))throw new RangeError('Curve evaluation requires a factory-created topology');
+  assertOwnedAlgebraicCurveTopology2(input);
   if(!Number.isSafeInteger(edge)||edge<0||edge>=input.edges.length)throw new RangeError('Invalid curve edge index');
   const e=input.edges[edge]!,a=input.vertices[e.from]!,b=input.vertices[e.to]!,t=real(parameter),lo=e.kind==='branch'?a.u:a.v,hi=e.kind==='branch'?b.u:b.v;
   if(t.compare(lo)<0||t.compare(hi)>0)throw new RangeError('Curve parameter is outside the edge');
