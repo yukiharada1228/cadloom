@@ -573,3 +573,9 @@ export {locateNurbsPlaneSplitFace3} from './geometry/nurbs-plane-split-face-quer
 export type {NurbsPlaneSplitFaceLocation3} from './geometry/nurbs-plane-split-face-query3.js';
 export {locateCappedNurbsPlaneFace3,locateCappedNurbsPlaneMaterial3} from './geometry/capped-nurbs-plane-query3.js';
 export type {CappedNurbsPlaneFaceLocation3,CappedNurbsPlaneMaterialLocation3} from './geometry/capped-nurbs-plane-query3.js';
+export {certifyCappedNurbsPlaneEmbedding3} from './geometry/capped-nurbs-plane-embedding3.js';
+export type {CappedNurbsPlaneEmbedding3,CappedNurbsPlaneEmbeddingCertificate3} from './geometry/capped-nurbs-plane-embedding3.js';
+export {intersectCappedNurbsPlaneRay3,intersectCappedNurbsPlaneLine3,queryCappedNurbsPlaneShellParity3,queryCappedNurbsPlaneShellParityAuto3} from './geometry/capped-nurbs-plane-ray3.js';
+export type {CappedNurbsPlaneRay3,CappedNurbsPlaneRayHit3,CappedNurbsPlaneRayReason3,CappedNurbsPlaneShellParity3,CappedNurbsPlaneShellParitySearch3} from './geometry/capped-nurbs-plane-ray3.js';
+export {analyzeCappedNurbsPlaneContainment3} from './geometry/capped-nurbs-plane-containment3.js';
+export type {CappedNurbsPlaneContainment3,CappedNurbsPlaneContainmentCertificate3,CappedNurbsPlaneShellContainmentNode3} from './geometry/capped-nurbs-plane-containment3.js';
