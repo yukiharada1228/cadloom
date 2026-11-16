@@ -20,7 +20,12 @@ const real=(x:Parameters<typeof AlgebraicReal.fromRational>[0])=>AlgebraicReal.f
 /** Exact partition against validated rational NURBS parameter-space boundaries.
  * Ignores caller-provided locate/sample claims; this is not spatial embedding. */
 export function partitionNurbsSectionArcByDomain3(arc:NurbsSectionArc3,input:PreparedNurbsParameterDomain2):NurbsSectionArcDomainPartition3 {
- assertOwnedNurbsSectionArc3(arc);const domain=prepareNurbsParameterDomain2(input.outer,input.holes,input.sense),topology=arc.section.pieces[arc.piece]!.topology,cuts:AlgebraicReal[]=[arc.lower,arc.upper];
+ assertOwnedNurbsSectionArc3(arc);return partitionValidatedNurbsSectionArcByDomain3(arc,prepareNurbsParameterDomain2(input.outer,input.holes,input.sense));
+}
+/** Internal batching path. Caller constructs the validated immutable domain;
+ * this helper does not confer ownership or an embedding certificate. */
+export function partitionValidatedNurbsSectionArcByDomain3(arc:NurbsSectionArc3,domain:PreparedNurbsParameterDomain2):NurbsSectionArcDomainPartition3 {
+ assertOwnedNurbsSectionArc3(arc);const topology=arc.section.pieces[arc.piece]!.topology,cuts:AlgebraicReal[]=[arc.lower,arc.upper];
  const add=(u:AlgebraicReal,v:AlgebraicReal)=>{
   const parameter=arc.coordinate==='u'?u:v;if(parameter.compare(arc.lower)<0||parameter.compare(arc.upper)>0||cuts.some(t=>t.compare(parameter)===0))return;
   const on=evaluateAlgebraicCurveEdge2(topology,arc.edge,parameter);if(on.u.compare(u)===0&&on.v.compare(v)===0)cuts.push(parameter);
