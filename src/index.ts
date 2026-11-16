@@ -593,3 +593,7 @@ export {intersectNurbsPlaneCapFacePlane3} from './geometry/nurbs-plane-cap-secti
 export type {NurbsPlaneCapSection3,NurbsPlaneCapSectionEvent3,NurbsPlaneCapSectionSpan3} from './geometry/nurbs-plane-cap-section3.js';
 export {splitNurbsPlaneCapBoundaries3,nurbsCapSplitBoundaryPoint3} from './geometry/nurbs-plane-cap-split-boundaries3.js';
 export type {NurbsCapSplitBoundaries3,NurbsCapSplitBoundaryCurve3,NurbsCapSplitBoundaryEdge3} from './geometry/nurbs-plane-cap-split-boundaries3.js';
+export {queryNurbsCapSplitLoopWinding3,analyzeNurbsCapSplitDomains3} from './geometry/nurbs-plane-cap-split-domains3.js';
+export type {NurbsCapSplitLoopWinding3,NurbsCapSplitDomains3,NurbsCapSplitDomainsCertificate3} from './geometry/nurbs-plane-cap-split-domains3.js';
+export {locateNurbsCapSplitFace3} from './geometry/nurbs-plane-cap-split-domains3.js';
+export type {NurbsCapSplitFaceLocation3} from './geometry/nurbs-plane-cap-split-domains3.js';
