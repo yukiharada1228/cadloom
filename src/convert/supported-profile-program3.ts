@@ -1,4 +1,6 @@
 import {Rational} from '../numeric/rational.js';
+import {orient2d} from '../geometry/orient2d.js';
+import type {Circle2} from '../geometry/circle2.js';
 import {point2} from '../geometry/point2.js';
 import type {Point2} from '../geometry/point2.js';
 import {point3} from '../geometry/point3.js';
@@ -13,9 +15,18 @@ import {line3,cylinder3} from '../geometry/surface3.js';
 import {prepareFiniteCylinder3} from '../geometry/finite-cylinder-boolean3.js';
 import {prepareCylinderMaterialProgram3,booleanCylinderMaterialPrograms3} from '../geometry/cylinder-material-program3.js';
 import type {CylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
-const unsupported=()=>new RangeError('Extrude loop is not certified by its line/circle support intersection');
+const unsupported=()=>new RangeError('Extrude loop is not certified by its line/circle support combinations');
 const same=(a:Point2,b:Point2)=>a.x.equals(b.x)&&a.y.equals(b.y);
 function clean(points:Point2[]):Point2[]{const p=points.filter((v,i)=>i===0||!same(v,points[i-1]!));if(p.length>1&&same(p[0]!,p[p.length-1]!))p.pop();return p;}
+function hull(input:Point2[]):Point2[]{
+ const points=clean([...input].sort((a,b)=>a.x.compare(b.x)||a.y.compare(b.y)));
+ if(points.length<3)return points;
+ const chain=(p:Point2[])=>{const out:Point2[]=[];for(const q of p){while(out.length>=2&&orient2d(out[out.length-2]!,out[out.length-1]!,q)<=0)out.pop();out.push(q);}return out;};
+ const lower=chain(points),upper=chain([...points].reverse());return [...lower.slice(0,-1),...upper.slice(0,-1)];
+}
+type CircleStep={circle:Circle2;operation:'intersection'|'difference'|'union'};
+const polygonRegion=(polygon:Point2[]):CurveRegion2=>polygon.length<3?[]:[polygon.map((start,i)=>({kind:'segment' as const,segment:{start,end:polygon[(i+1)%polygon.length]!}}))];
+const applyCircles=(region:CurveRegion2,circles:CircleStep[]):CurveRegion2=>circles.reduce((p,c)=>booleanCurveRegions2(p,[[{kind:'arc',arc:fullCircleArc2(c.circle)}]],c.operation,'even-odd').rings,region);
 /** A sufficient analytic representation, accepted only after exact 2D set
  * equality. It is not a complete compiler for arbitrary line/arc profiles. */
 export function prepareSupportedProfileProgram3(ring:CurveRegion2[number],lower:Rational,upper:Rational):CylinderMaterialProgram3 {
@@ -38,15 +49,26 @@ export function prepareSupportedProfileProgram3(ring:CurveRegion2[number],lower:
    if(inside)next.push(a);
    if(inside!==other){const t=A.div(A.sub(B));next.push(point2(a.x.add(b.x.sub(a.x).mul(t)),a.y.add(b.y.sub(a.y).mul(t))));}
   }
-  polygon=clean(next);if(polygon.length<3)throw unsupported();
+  polygon=clean(next);if(polygon.length<3)break;
  }
- const loop=polygon.map((start,i)=>({kind:'segment' as const,segment:{start,end:polygon[(i+1)%polygon.length]!}}));
- let candidate:CurveRegion2=[loop];
- const circles=boundary.filter(c=>c.kind==='arc').map(c=>({circle:c.arc.circle,operation:c.arc.direction==='ccw'?'intersection' as const:'difference' as const}));
- for(const c of circles)candidate=booleanCurveRegions2(candidate,[[{kind:'arc',arc:fullCircleArc2(c.circle)}]],c.operation,'even-odd').rings;
- const difference=booleanCurveRegions2(candidate,filled.rings,'xor','even-odd');if(difference.rings.length||difference.selectedFaces.length)throw unsupported();
- const mesh=extrudePolygon([polygon],upper.sub(lower),{baseZ:lower});
- let program=preparePlanarMaterialProgram3(preparePlanarSolid3(mesh.triangles.map(t=>triangle3(mesh.vertices[t[0]]!,mesh.vertices[t[1]]!,mesh.vertices[t[2]]!))));
- for(const c of circles){const cylinder=prepareFiniteCylinder3(cylinder3(line3(point3(c.circle.center.x,c.circle.center.y,0n),point3(0n,0n,1n)),c.circle.radiusSquared),lower,upper);program=booleanCylinderMaterialPrograms3(program,prepareCylinderMaterialProgram3([cylinder],[],{kind:'cylinder',cylinder:0}),c.operation);}
- return program;
+ let circles:CircleStep[]=boundary.filter(c=>c.kind==='arc').map(c=>({circle:c.arc.circle,operation:c.arc.direction==='ccw'?'intersection':'difference'}));
+ const equivalent=(candidate:CurveRegion2)=>{const difference=booleanCurveRegions2(candidate,filled.rings,'xor','even-odd');return !difference.rings.length&&!difference.selectedFaces.length;};
+ if(!equivalent(applyCircles(polygonRegion(polygon),circles))){
+  const endpoints:Point2[]=[];
+  for(const c of boundary){
+   if(c.kind==='arc')continue;
+   if(c.kind==='segment'){endpoints.push(c.segment.start,c.segment.end);continue;}
+   for(const p of [c.interval.start,c.interval.end]){if(p.x.rational===null||p.y.rational===null)throw unsupported();endpoints.push(point2(p.x.rational,p.y.rational));}
+  }
+  polygon=hull(endpoints);
+  circles=[...circles.filter(c=>c.operation==='intersection').map(c=>({circle:c.circle,operation:'union' as const})),...circles.filter(c=>c.operation==='difference')];
+  if(!equivalent(applyCircles(polygonRegion(polygon),circles)))throw unsupported();
+ }
+ let program:CylinderMaterialProgram3|undefined;
+ if(polygon.length>=3){const mesh=extrudePolygon([polygon],upper.sub(lower),{baseZ:lower});program=preparePlanarMaterialProgram3(preparePlanarSolid3(mesh.triangles.map(t=>triangle3(mesh.vertices[t[0]]!,mesh.vertices[t[1]]!,mesh.vertices[t[2]]!))));}
+ for(const c of circles){
+  const cylinder=prepareFiniteCylinder3(cylinder3(line3(point3(c.circle.center.x,c.circle.center.y,0n),point3(0n,0n,1n)),c.circle.radiusSquared),lower,upper),operand=prepareCylinderMaterialProgram3([cylinder],[],{kind:'cylinder',cylinder:0});
+  if(program)program=booleanCylinderMaterialPrograms3(program,operand,c.operation);else if(c.operation==='union')program=operand;else throw unsupported();
+ }
+ if(!program)throw unsupported();return program;
 }

@@ -15,12 +15,27 @@ test('a two-circle lens with irrational endpoints matches independent disk inequ
   assert.equal(actual,a*a+b*b<256&&(a-16)**2+b*b<256?'inside':'outside');assert.equal(locateBody3(source,p),actual);count++;
  }assert.ok(count>250);
 });
-test('a stadium is rejected when intersection of its supports is not its filled region',()=>{
+test('a stadium uses a certified polygon/disk union and replays its curved common Body',()=>{
  const source=extrudeBody3([[{kind:'segment',segment:{start:point2(0n,-1n),end:point2(2n,-1n)}},{kind:'arc',arc:circularArc2(circle(2n),point2(2n,-1n),point2(2n,1n))},{kind:'segment',segment:{start:point2(2n,1n),end:point2(0n,1n)}},{kind:'arc',arc:circularArc2(circle(),point2(0n,1n),point2(0n,-1n))}]],2n);
- assert.equal(locateBody3(source,point3(1n,0n,1n)),'inside');assert.throws(()=>prepareExtrudeMaterialProgram3(source),/not certified/);
+ const program=prepareExtrudeMaterialProgram3(source),result=restoreBody3(serializeBody3(bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(program,{requireClosed:true}))));
+ for(const [p,expected] of [[point3(1n,0n,1n),'inside'],[point3('-1/2',0n,1n),'inside'],[point3('5/2',0n,1n),'inside'],[point3(1n,1n,1n),'boundary'],[point3(1n,'3/2',1n),'outside']] as const)assert.equal(locateBody3(result,p),expected);
 });
 test('clockwise circular notch lowers as a bounded difference rather than a filled disk',()=>{
  const p=[point2(1n,0n),point2(2n,0n),point2(2n,2n),point2(-2n,2n),point2(-2n,0n),point2(-1n,0n)],lines=p.slice(0,-1).map((start,i)=>({kind:'segment' as const,segment:{start,end:p[i+1]!}}));
  const source=extrudeBody3([[...lines,{kind:'arc',arc:circularArc2(circle(),point2(-1n,0n),point2(1n,0n),{direction:'cw'})}]],2n),program=prepareExtrudeMaterialProgram3(source);
  for(const [p,expected] of [[point3(0n,'1/2',1n),'outside'],[point3(0n,'3/2',1n),'inside'],[point3('3/2','1/2',1n),'inside']] as const){assert.equal(strictCylinderMaterialProgramLocation3(program,p),expected);assert.equal(locateBody3(source,p),expected);}
+});
+
+test('a concave rounded L rejects both insufficient support combinations',()=>{
+ const p=[point2(2n,'1/2'),point2(2n,1n),point2(1n,1n),point2(1n,2n),point2(0n,2n),point2(0n,0n),point2('3/2',0n)],lines=p.slice(0,-1).map((start,i)=>({kind:'segment' as const,segment:{start,end:p[i+1]!}}));
+ const source=extrudeBody3([[...lines,{kind:'arc',arc:circularArc2(circle2(point2('3/2','1/2'),'1/4'),point2('3/2',0n),point2(2n,'1/2'))}]],2n);
+ assert.equal(locateBody3(source,point3('1/2','3/2',1n)),'inside');assert.equal(locateBody3(source,point3('3/2','3/2',1n)),'outside');
+ assert.throws(()=>prepareExtrudeMaterialProgram3(source),/not certified/);
+});
+test('a union of two circular disks lowers without requiring a polygon seed',()=>{
+ const profile=booleanCurveRegions2(disk(),disk(1n),'union'),source=extrudeBody3(profile.rings,2n),program=prepareExtrudeMaterialProgram3(source);let count=0;
+ for(let x=-8;x<=16;x++)for(let y=-8;y<=8;y++){
+  const a=2*x+1,b=2*y+1,p=point3(`${a}/16`,`${b}/16`,1n),actual=strictCylinderMaterialProgramLocation3(program,p);if(actual===null)continue;
+  assert.equal(actual,a*a+b*b<256||(a-16)**2+b*b<256?'inside':'outside');count++;
+ }assert.ok(count>400);
 });
