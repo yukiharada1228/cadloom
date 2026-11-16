@@ -173,10 +173,11 @@
         "src/geometry/cylinder-intersection-support3.ts",
         "src/geometry/cylinder-intersection-face3.ts",
         "src/geometry/cylinder-intersection-cylinder3.ts",
-        "src/geometry/curve-noding3.ts"
+        "src/geometry/curve-noding3.ts",
+        "src/geometry/nurbs-source-face-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI recovery. Finite-cylinder expression plane sections and closed cut boundaries exist. General analytic/NURBS SSI, complete contact relations and broader clipped-material operations remain incomplete."
+      "gap": "Native analytic and existing NURBS intersections coexist with owned cylinder SSI graphs, exact plane trims and third-cylinder SSI recovery. Finite-cylinder expression plane sections and closed cut boundaries exist. General analytic/NURBS SSI, complete contact relations and broader clipped-material operations remain incomplete. Certified finite NURBS faces now expose exact plane-section vertices, trimmed implicit graph intervals and coplanar finite-face domains, including holes and isolated contacts. Cross-face section assembly, cap material selection and NURBS Body plane splitting remain incomplete."
     },
     {
       "id": "split-and-stitch",
@@ -312,10 +313,11 @@
         "src/geometry/sewn-nurbs-source-parity-search3.ts",
         "src/geometry/sewn-nurbs-source-material-query3.ts",
         "src/geometry/sewn-nurbs-source-material-line3.ts",
-        "src/model/nurbs-body3.ts"
+        "src/model/nurbs-body3.ts",
+        "src/geometry/nurbs-source-face-plane3.ts"
       ],
       "status": "partial",
-      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained."
+      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained. Owned finite-face plane section evaluators preserve native UV graph parameters, finite trim/approached-patch membership and full spatial plane equality."
     },
     {
       "id": "tessellation",
@@ -382,7 +384,8 @@
       "tests/nurbs-source-brep-record3.test.ts",
       "tests/sewn-nurbs-source-embedding3.test.ts",
       "tests/bivariate-equation-basis.test.ts",
-      "tests/bivariate-system.test.ts"
+      "tests/bivariate-system.test.ts",
+      "tests/nurbs-source-face-plane3.test.ts"
     ],
     "document": "docs/nurbs-source-cylinder-integration3.md",
     "materialBoundarySourceCommit": "30f6883",
@@ -392,7 +395,8 @@
       "docs/sewn-nurbs-source-material-query3.md",
       "docs/sewn-nurbs-source-material-line3.md",
       "docs/nurbs-body3.md",
-      "docs/nurbs-body-similarity3.md"
+      "docs/nurbs-body-similarity3.md",
+      "docs/nurbs-source-face-plane3.md"
     ]
   }
 }
