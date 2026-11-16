@@ -164,18 +164,17 @@ export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordin
   };
   const zero=new Rational(0n),cardinals=[onRay(one,zero),onRay(zero,one),onRay(one.neg(),zero),onRay(zero,one.neg())];
   const piece=splitEllipticArc3(a,cardinals.filter(p=>pointOnEllipticArc3(p,a)))[0]!;
-  const s=pointInPlaneFrame3(f,piece.start)!,t=pointInPlaneFrame3(f,piece.end)!;
+  const [U,V]=duals(e),linearSign=(p:AlgebraicCoordinates3,n:Vector3)=>signLinearAlgebraicPoint3(p,n,dot3(n,f.origin).neg());
   for(const [sx,sy] of [[1n,1n],[-1n,1n],[-1n,-1n],[1n,-1n]] as const){
-    if([s,t].some(p=>p.x.sign()*Number(sx)<0||p.y.sign()*Number(sy)<0))continue;
-    const phase=(p:AlgebraicCoordinates2,q:Rational)=>{
-      const X=q.mul(new Rational(-sx)),Y=one.sub(q).mul(new Rational(sy)),data=getPointParameterization2(p);
-      if(data)return data.parameter.signOf(new Polynomial([data.origin.x.mul(X).add(data.origin.y.mul(Y)),data.direction.x.mul(X).add(data.direction.y.mul(Y))]));
-      const source=p===s?piece.start:piece.end,[U,V]=duals(e),n=vector3(U.x.mul(X).add(V.x.mul(Y)),U.y.mul(X).add(V.y.mul(Y)),U.z.mul(X).add(V.z.mul(Y)));return classifyPointToSurface3(source,{kind:'plane',plane:plane3(n.x,n.y,n.z,dot3(n,f.origin).neg())});
+    if([piece.start,piece.end].some(p=>linearSign(p,U)*Number(sx)<0||linearSign(p,V)*Number(sy)<0))continue;
+    const phase=(p:AlgebraicCoordinates3,q:Rational)=>{
+      const X=q.mul(new Rational(-sx)),Y=one.sub(q).mul(new Rational(sy)),n=vector3(U.x.mul(X).add(V.x.mul(Y)),U.y.mul(X).add(V.y.mul(Y)),U.z.mul(X).add(V.z.mul(Y)));
+      return linearSign(p,n);
     };
     // Either endpoint may have the smaller phase, independently of traversal.
     let lo=zero,hi=one;
     while(true){
-      const q=lo.add(hi).div(two),S=phase(s,q),T=phase(t,q);
+      const q=lo.add(hi).div(two),S=phase(piece.start,q),T=phase(piece.end,q);
       if(S>=0&&T>=0){lo=q;continue;}
       if(S<=0&&T<=0){hi=q;continue;}
       const result=onRay(one.sub(q).mul(new Rational(sx)),q.mul(new Rational(sy)));
