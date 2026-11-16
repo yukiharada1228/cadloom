@@ -54,3 +54,5 @@ export function evaluateNurbsSourceComplexEdge3(complex:NurbsSourceFaceComplex3,
  if(!Number.isSafeInteger(use)||use<0||use>=e.uses.length)throw new RangeError('Invalid source complex use');const L=complex.source.source,p=L.edges[e.sourceEdge]!.pieces[e.sourcePiece]!,patch=e.uses[use]!.patch;
  return evaluateNurbsSourceLiftPiece3(L,e.sourceEdge,e.sourcePiece,p.patches.indexOf(patch),parameter);
 }
+/** Internal ownership guard shared by exact face queries. */
+export function assertOwnedNurbsSourceFaceComplex3(complex:NurbsSourceFaceComplex3):void {if(!owned.has(complex))throw new RangeError('Expected factory-created NURBS source face complex');}
