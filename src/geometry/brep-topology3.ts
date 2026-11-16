@@ -7,8 +7,8 @@ import {cylinder3} from './surface3.js';
 import type {Surface3} from './surface3.js';
 
 export interface BRepEdgeUse3 {readonly edge:number;readonly direction:1|-1;}
-export interface BRepFaceInput3 {
-  readonly surface:Surface3;
+export interface BRepFaceInput3<S=Surface3> {
+  readonly surface:S;
   /** Desired normal relative to the supporting surface. Geometric boundary/normal
    * agreement is not certified by incidence checks; loops explicitly give traversal.
    */
@@ -23,7 +23,7 @@ export interface BRepCoedge3 extends BRepEdgeUse3 {
   readonly twin:number|null;
 }
 export interface BRepLoop3 {readonly face:number;readonly coedges:readonly number[];}
-export interface BRepFace3 {readonly surface:Surface3;readonly sense:1|-1;readonly loops:readonly number[];readonly shell:number;}
+export interface BRepFace3<S=Surface3> {readonly surface:S;readonly sense:1|-1;readonly loops:readonly number[];readonly shell:number;}
 export interface BRepVertexLink3 {
   /** Edge-end ports: 2e at the curve start, 2e+1 at its end. They remain distinct
    * for a periodic edge whose start and end are the same geometric vertex.
@@ -48,13 +48,13 @@ export interface BRepShell3 {
 export type BRepIssue3=
  | {readonly kind:'unused-edge'|'boundary-edge'|'nonmanifold-edge'|'inconsistent-edge-orientation';readonly edge:number}
  | {readonly kind:'nonmanifold-vertex';readonly vertex:number};
-export interface BRepTopology3<C=Curve3> {
+export interface BRepTopology3<C=Curve3,S=Surface3> {
   readonly vertices:readonly AlgebraicCoordinates3[];
   readonly outgoing:readonly (readonly number[])[];
   readonly edges:readonly BRepEdge3<C>[];
   readonly coedges:readonly BRepCoedge3[];
   readonly loops:readonly BRepLoop3[];
-  readonly faces:readonly BRepFace3[];
+  readonly faces:readonly BRepFace3<S>[];
   readonly shells:readonly BRepShell3[];
   readonly vertexLinks:readonly BRepVertexLink3[];
   readonly issues:readonly BRepIssue3[];
@@ -85,6 +85,18 @@ export interface BRepCurveAdapter3<C> {
  * Faces must later be certified as connected surface domains with valid boundaries.
  */
 export function buildBRepTopologyWithAdapter3<C>(inputEdges:readonly C[],inputFaces:readonly BRepFaceInput3[],adapter:BRepCurveAdapter3<C>):BRepTopology3<C> {
+ return buildBRepTopologyWithGeometryAdapters3(inputEdges,inputFaces,{snapshot:c=>adapter.snapshot(c),endpoints:c=>adapter.endpoints(c),closed:c=>adapter.closed(c),onSurface:(c,s)=>adapter.onSurface(c,s),snapshotSurface});
+}
+/** Internal incidence engine for validated immutable geometry. Adapters carry
+ * whole-edge support checks; this function adds no embedding/material claim. */
+export interface BRepGeometryAdapter3<C,S> {
+ snapshot(input:C):C;
+ endpoints(curve:C):readonly [AlgebraicCoordinates3,AlgebraicCoordinates3];
+ closed(curve:C):boolean;
+ snapshotSurface(input:S):S;
+ onSurface(curve:C,surface:S):boolean;
+}
+export function buildBRepTopologyWithGeometryAdapters3<C,S>(inputEdges:readonly C[],inputFaces:readonly BRepFaceInput3<S>[],adapter:BRepGeometryAdapter3<C,S>):BRepTopology3<C,S> {
   const curves=inputEdges.map(c=>adapter.snapshot(c)),ends=curves.map(c=>adapter.endpoints(c));
   curves.forEach((curve,i)=>{
     const periodic=adapter.closed(curve);
@@ -101,7 +113,7 @@ export function buildBRepTopologyWithAdapter3<C>(inputEdges:readonly C[],inputFa
   edges.forEach((e,id)=>{ports[e.start]!.push(2*id);ports[e.end]!.push(2*id+1);});
   const coedges:{edge:number;direction:1|-1;origin:number;target:number;face:number;loop:number;next:number;previous:number;twin:number|null}[]=[],loops:BRepLoop3[]=[],faceLoops:number[][]=[];
   const faces=inputFaces.map((input,face)=>{
-    const surface=snapshotSurface(input.surface);
+    const surface=adapter.snapshotSurface(input.surface);
     if(input.sense!==1&&input.sense!==-1)throw new RangeError('Face sense must be +1 or -1');
     if(!input.loops.length)throw new RangeError('A bounded BRep face requires boundary loops');
     const ids:number[]=[],checked=new Set<number>();faceLoops.push(ids);

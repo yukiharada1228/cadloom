@@ -24,7 +24,7 @@ export interface AffineNurbsFace3 {
  readonly sample:AlgebraicCoordinates3;
 }
 const owned=new WeakSet<AffineNurbsFace3>();
-function guard(face:AffineNurbsFace3):void {if(!owned.has(face))throw new RangeError('Operation requires a factory-created affine NURBS face');}
+export function assertOwnedAffineNurbsFace3(face:AffineNurbsFace3):void {if(!owned.has(face))throw new RangeError('Operation requires a factory-created affine NURBS face');}
 /** The closed boundary is required to lie wholly in the support rectangle.
  * Since the rectangle is convex, its containment of a Jordan outer boundary
  * also contains the bounded interior. No silent clipping is performed. */
@@ -35,12 +35,12 @@ export function createAffineNurbsFace3(projection:NurbsAffineProjectionCertifica
 }
 /** Spatial membership uses both exact support equality and trim membership. */
 export function locateAffineNurbsFace3(face:AffineNurbsFace3,point:Point3|AlgebraicCoordinates3):NurbsDomainLocation2 {
- guard(face);const p=snapshotExactPoint3(point);if(locateAffineProjectedNurbsSurface3(face.projection,p)==='outside')return 'outside';const uv=nurbsAffineProjectionParameters3(face.projection,p);return face.domain.locate(uv.u,uv.v);
+ assertOwnedAffineNurbsFace3(face);const p=snapshotExactPoint3(point);if(locateAffineProjectedNurbsSurface3(face.projection,p)==='outside')return 'outside';const uv=nurbsAffineProjectionParameters3(face.projection,p);return face.domain.locate(uv.u,uv.v);
 }
 export function affineNurbsFacePoint3(face:AffineNurbsFace3,u:AlgebraicReal|ExactInput,v:AlgebraicReal|ExactInput):AlgebraicCoordinates3 {
- guard(face);if(face.domain.locate(u,v)==='outside')throw new RangeError('Parameter lies outside the trimmed face');return evaluateNurbsSurface3(face.projection.surface,u,v);
+ assertOwnedAffineNurbsFace3(face);if(face.domain.locate(u,v)==='outside')throw new RangeError('Parameter lies outside the trimmed face');return evaluateNurbsSurface3(face.projection.surface,u,v);
 }
 /** Reuses complete trimmed section construction; does not sew a solid. */
 export function intersectAffineNurbsFacePlane3(face:AffineNurbsFace3,plane:Plane3):TrimmedNurbsPlaneSection3 {
- guard(face);return intersectTrimmedNurbsSurfacePlane3(face.projection.surface,face.domain,plane);
+ assertOwnedAffineNurbsFace3(face);return intersectTrimmedNurbsSurfacePlane3(face.projection.surface,face.domain,plane);
 }
