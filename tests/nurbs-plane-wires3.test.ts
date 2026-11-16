@@ -1,3 +1,4 @@
+import {nurbsPlaneDomain3,locateNurbsPlaneDomain3,nurbsPlaneDomainEdgePoint3,pointInPlaneFrame3,mapPlanePoint3,dot3,cross3,point2} from '../dist/index.js';
 import {certifyNurbsBoundaryPlaneWires3} from '../dist/index.js';
 import {intersectSewnNurbsSourceBoundaryPlane3,nurbsBoundaryPlaneEdgePoint3,intersectNurbsBodyBoundaryPlane3} from '../dist/index.js';
 import test from 'node:test';
@@ -54,4 +55,20 @@ test('coplanar, tangent, isolated and vertex-contact cases remain unmodified but
  const m=materialOf(sewn(cube()));for(const p of [plane3(0n,0n,1n),plane3(1n,1n,1n),plane3(1n,1n,0n),plane3(1n,1n,1n,-1n)]){const raw=assembled(m,p),q=certifyNurbsBoundaryPlaneWires3(raw);assert.equal(q.kind,'not-certified');if(q.kind==='not-certified')assert.equal(q.source,raw);}
  const tangent=certifyNurbsBoundaryPlaneWires3(assembled(materialOf(cylinder()),plane3(1n,0n,0n,-1n)));assert.equal(tangent.kind,'not-certified');const raw=assembled(m,plane3(0n,0n,1n,'-1/2'));assert.throws(()=>certifyNurbsBoundaryPlaneWires3({...raw}),/factory/);
  const empty=wires(assembled(materialOf(sewn([])),plane3(0n,0n,1n)));assert.equal(empty.wires.length,0);
+});
+
+
+test('implicit cap domain preserves curved boundaries and exact material membership in an oriented chart',()=>{
+ const m=materialOf(cylinder()),raw=assembled(m,plane3(0n,0n,1n,'-1/2')),d=nurbsPlaneDomain3(wires(raw));
+ assert.ok(dot3(cross3(d.frame.u,d.frame.v),raw.plane.normal).sign()>0);
+ for(const [xyz,expected] of [[point3(0n,0n,'1/2'),'inside'],[point3(2n,0n,'1/2'),'outside'],[point3(1n,0n,'1/2'),'boundary']] as const){const uv=pointInPlaneFrame3(d.frame,xyz);assert.ok(uv);assert.equal(locateNurbsPlaneDomain3(d,uv).kind,expected);}
+ for(const [edge,e] of raw.edges.entries()){const part=e.section.edges[e.edge]!,uv=nurbsPlaneDomainEdgePoint3(d,edge,part.lower),p=mapPlanePoint3(d.frame,uv),q=raw.vertices[e.from]!.point;assert.equal(compareAlgebraicPoints3(p,q),0);}
+ const y=AlgebraicReal.isolate(new Polynomial([-3n,0n,4n]))[1]!,irrational=algebraicCoordinates3(AlgebraicReal.fromRational('1/2'),y,AlgebraicReal.fromRational('1/2')),local=pointInPlaneFrame3(d.frame,irrational);assert.ok(local);assert.equal(locateNurbsPlaneDomain3(d,local).kind,'boundary');assert.equal(compareAlgebraicPoints3(mapPlanePoint3(d.frame,local),irrational),0);
+ const retry=locateNurbsPlaneDomain3(d,point2(0n,0n),{maxDirections:1,directions:[point3(1n,0n,0n)]});assert.equal(retry.kind,'unresolved');
+ assert.throws(()=>nurbsPlaneDomain3({...d.boundary}),/factory/);assert.throws(()=>locateNurbsPlaneDomain3({...d},point2(0n,0n)),/factory/);
+});
+test('implicit cap domain retains cavity and island membership under an oblique chart',()=>{
+ const scaled=(scale:string,shift:string,reverse=false)=>transformCube(cube(),p=>{const f=(v:Rational)=>v.mul(Rational.parse(scale)).add(Rational.parse(shift));return point3(f(p.x),f(p.y),f(p.z));}).map(r=>reverse?buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1):r),m=materialOf(sewn([...cube(),...scaled('1/2','1/4',true),...scaled('1/4','3/8')]));
+ const raw=assembled(m,plane3(1n,0n,1n,'-11/10')),d=nurbsPlaneDomain3(wires(raw));
+ for(const [t,expected] of [['3/20','inside'],['2/5','outside'],['11/20','inside'],['2','outside']] as const){const x=Rational.parse(t),p=point3(x,x,Rational.parse('11/10').sub(x)),uv=pointInPlaneFrame3(d.frame,p);assert.ok(uv);assert.equal(locateNurbsPlaneDomain3(d,uv).kind,expected);}
 });

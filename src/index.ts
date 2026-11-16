@@ -517,3 +517,6 @@ export {intersectNurbsBodyBoundaryPlane3} from './ops/nurbs-body-boundary-plane3
 
 export {certifyNurbsBoundaryPlaneWires3} from './geometry/nurbs-plane-wires3.js';
 export type {NurbsPlaneWireEdge3,NurbsPlaneWire3,NurbsPlaneWiresCertificate3,NurbsPlaneWires3} from './geometry/nurbs-plane-wires3.js';
+
+export {nurbsPlaneDomain3,locateNurbsPlaneDomain3,nurbsPlaneDomainEdgePoint3} from './geometry/nurbs-plane-domain3.js';
+export type {NurbsPlaneDomain3} from './geometry/nurbs-plane-domain3.js';
