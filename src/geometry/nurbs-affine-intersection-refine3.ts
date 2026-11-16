@@ -55,8 +55,9 @@ export function refineNurbsAffineIntersectionComplex3(source:NurbsAffineIntersec
  }));
  const result=Object.freeze({source,vertices:Object.freeze(vertices.map(v=>Object.freeze({...v,events:Object.freeze(v.events)}))),edges:Object.freeze(edges),sourceEdges:Object.freeze(sourceEdges.map(ids=>Object.freeze(ids))),curveComponents,regions:source.regions});owned.add(result);return result;
 }
+export function assertOwnedRefinedNurbsAffineIntersectionComplex3(source:RefinedNurbsAffineIntersectionComplex3):void {if(!owned.has(source))throw new RangeError('Expected a factory-created refined intersection complex');}
 function selected(source:RefinedNurbsAffineIntersectionComplex3,edge:number,parameter:AlgebraicReal|ExactInput){
- if(!owned.has(source))throw new RangeError('Expected a factory-created refined intersection complex');
+ assertOwnedRefinedNurbsAffineIntersectionComplex3(source);
  if(!Number.isSafeInteger(edge)||edge<0||edge>=source.edges.length)throw new RangeError('Invalid refined intersection edge');
  const e=source.edges[edge]!,t=parameter instanceof AlgebraicReal?parameter:AlgebraicReal.fromRational(parameter);
  if(t.compare(e.lower)<0||t.compare(e.upper)>0)throw new RangeError('Parameter is outside the refined intersection edge');return {e,t};
