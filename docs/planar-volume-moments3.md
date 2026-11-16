@@ -1,7 +1,8 @@
 # Exact rational planar volume moments
 
-`planarVolumeMoments3` integrates an actual owned `PreparedPlanarSolid3`.
-`planarBodyVolumeMoments3` accepts an actual owned Body with a rational,
+`planarVolumeMoments3` integrates an actual owned `PreparedPlanarSolid3` or
+`PlanarSolidBooleanResult3`, including balanced contact boundaries.
+`planarBodyVolumeMoments3` accepts an actual owned `Body3` or `CellularBody3` with a rational,
 straight-edged planar representation, including native Box, straight-profile
 Extrude, native/consolidated planar and suitable wrapped material boundaries.
 Known prepared sources are reused; other Body boundaries are converted exactly
@@ -76,3 +77,21 @@ The existing constructed/planar Body regression invocation passed all 22 cases.
 Build, standalone strict typing and the existing scoped audit passed. The moment/source74 snapshot subsequently passed all 863 non-hard tests in one
 invocation, including these nine cases and historical Body readers. That snapshot
 predates later product-Extrude Boolean dispatch work.
+
+
+## Contact materials
+
+`planarMaterialVolumeMoments3` accepts an owned `PlanarMaterial3`. CellularBody
+measurements use the actual material boundary retained by that construction.
+Edge and vertex contacts have zero volume measure; they do not require splitting
+or silently changing the material. The signed boundary integration is unchanged.
+Its ownership guard now also accepts exact Boolean results whose balanced boundary
+and embedding were checked when constructed. It does not accept arbitrary polygon
+soups or copied objects. Cavities subtract, and overlapping operands are measured
+after regularized Boolean selection rather than summed blindly.
+
+The nearest-point API and moment API share the same owned rational planar material
+family. Similarity covariance is checked against independent cuboid integrals:
+volume scales by `|det L|`, centroid by `Lp+t`, and central inertia by
+`|det L| L I Lᵀ`. The latter identity applies to similarities, including reflection;
+it is not asserted here for arbitrary affine matrices.

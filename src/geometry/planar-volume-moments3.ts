@@ -1,8 +1,8 @@
 import {Rational} from '../numeric/rational.js';
 import {point3,subtract3,cross3,dot3} from './point3.js';
 import type {Point3} from './point3.js';
-import {assertOwnedPlanarSolid3} from './planar-solid3.js';
-import type {PreparedPlanarSolid3} from './planar-solid3.js';
+import {assertOwnedPlanarMaterialBoundary3} from './planar-solid-boolean3.js';
+import type {PlanarSolidBooleanOperand3} from './planar-solid-boolean3.js';
 
 type Row3=readonly [Rational,Rational,Rational];
 export type RationalMatrix3=readonly [Row3,Row3,Row3];
@@ -29,8 +29,8 @@ const inertia=(second:RationalMatrix3):RationalMatrix3=>{
  * material, including cavities, islands and disconnected components. Surface
  * triangles are integrated as signed tetrahedra, not treated as a volume mesh.
  * Curved-body integration and density conversion are separate operations. */
-export function planarVolumeMoments3(source:PreparedPlanarSolid3):PlanarVolumeMoments3 {
- assertOwnedPlanarSolid3(source);
+export function planarVolumeMoments3(source:PlanarSolidBooleanOperand3):PlanarVolumeMoments3 {
+ assertOwnedPlanarMaterialBoundary3(source);
  if(!source.triangles.length){const zeros=matrix(()=>zero);return Object.freeze({volume:zero,centroid:null,inertiaAtOrigin:zeros,inertiaAtCentroid:zeros});}
  // A nearby rational reference avoids large translation terms during the signed
  // accumulation. It need not be an interior point of any material component.

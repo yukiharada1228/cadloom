@@ -1,3 +1,5 @@
+import {closestPointOnPlanarSolidBoundary3} from '../geometry/closest-planar-solid3.js';
+import {planarVolumeMoments3} from '../geometry/planar-volume-moments3.js';
 import {assertOwnedSimilarityTransform3,transformPointBySimilarity3} from '../geometry/similarity3.js';
 import type {SimilarityTransform3} from '../geometry/similarity3.js';
 import {analyzePlanarMaterialRegions3} from '../geometry/planar-material-regions3.js';
@@ -115,3 +117,8 @@ export function transformPlanarMaterial3(material:PlanarMaterial3,transform:Simi
  }
  return values.get(root)!;
 }
+
+/** Exact global boundary minimum over the owned material's finite face pieces. */
+export function closestPointOnPlanarMaterialBoundary3(material:PlanarMaterial3,point:Point3){return closestPointOnPlanarSolidBoundary3(state(material).source,point);}
+/** Unit-density moments; balanced edge/vertex contacts have zero volume measure. */
+export function planarMaterialVolumeMoments3(material:PlanarMaterial3){return planarVolumeMoments3(state(material).source);}

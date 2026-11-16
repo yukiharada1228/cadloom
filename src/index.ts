@@ -384,3 +384,4 @@ export type {CellularBody3,CellularBodyDocument3,CellularBodyReadLimits3} from '
 
 export {transformPlanarMaterial3} from './ops/planar-material3.js';
 export type {BodyQuerySource3} from './ops/body-query3.js';
+export {closestPointOnPlanarMaterialBoundary3,planarMaterialVolumeMoments3} from './ops/planar-material3.js';

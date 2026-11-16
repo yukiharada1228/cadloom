@@ -35,3 +35,5 @@ const body = planarBodyFromMaterial3(remainder); // 多様体条件を再検査
 [CellularBody](cellular-body3.md)では、接触材料の有限面と両側の領域を共通境界表に保存し、構築定義からの再照合とBody間の再演算へ接続します。既存の多様体Bodyとは受理条件を区別します。
 
 `transformPlanarMaterial3` は検査済みの有理相似変換を構築DAG全体へ適用します。反射では各立体葉の面順を補正し、共有部分式と接触する材料を保持します。[共通Bodyの相似変換](body-similarity3.md)を参照してください。
+
+`closestPointOnPlanarMaterialBoundary3` と `planarMaterialVolumeMoments3` は、接触を含む実際の材料境界について厳密な最近点と単位密度の体積・重心・慣性を返します。共通Body／CellularBodyの計測入口も同じ材料を使います。
