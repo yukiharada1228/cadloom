@@ -49,7 +49,7 @@
     "src/geometry/plane-frame3.ts": "bf14b769553654b07e441fab4d7e9e74c2d103624cb0faed5b32073957a28b52",
     "src/geometry/plane-cylinder3.ts": "412516f87f5a3a710c35f93511910684d5d69727e3fa5f6ad7ddd3641557c13e",
     "src/geometry/algebraic-line3.ts": "871f5579828ba7b14b4e67bd77220330b1a172eafa334a834b2001c7b2efb39e",
-    "src/geometry/ellipse3.ts": "3fd82f49c373556b4b36177389b68c4a04645c5cb8b6521ccbb2bd3931aac9a3",
+    "src/geometry/ellipse3.ts": "71530d290eea6d1b52906ac09fb73644c088cca26604e9ff8ccc61cd46d78464",
     "src/geometry/cylinder-face-section3.ts": "ef19cd0ad09e117a4f0a28ad67481bd77ff1822c7cf5c39a6d44263873051e3f",
     "src/geometry/planar-cylinder-intersection3.ts": "4fc6659c481c5a98f3293dc02f41a8b3c5b1451ead93c225a0a41cc3731c11fa",
     "src/geometry/cylinder-plane-split3.ts": "b78cf2146fcf27990d6ca0b52c4e19f170d162b63a784c38ab667941f5f191ad",

@@ -26,14 +26,20 @@ import type {PointLocation} from './polygon-location.js';
  * orthogonal or unit. This represents arbitrary positive rational ellipse forms.
  */
 export interface Ellipse3 {readonly frame:PlaneFrame3;readonly radiusUSquared:Rational;readonly radiusVSquared:Rational;}
+const ownedEllipses=new WeakSet<Ellipse3>();
+const ellipsePlanes=new WeakMap<Ellipse3,Plane3>();
+const ellipseDuals=new WeakMap<Ellipse3,readonly [Vector3,Vector3]>();
+const ellipseLocations=new WeakMap<Ellipse3,WeakMap<AlgebraicCoordinates3,PointLocation>>();
+const ellipseAngles=new WeakMap<Ellipse3,WeakMap<AlgebraicCoordinates3,WeakMap<AlgebraicCoordinates3,Sign>>>();
+const ellipseHalves=new WeakMap<Ellipse3,WeakMap<AlgebraicCoordinates3,0|1>>();
 export function ellipse3(input:PlaneFrame3,inputU:ExactInput,inputV:ExactInput):Ellipse3 {
   const frame=planeFrame3(input.origin,input.u,input.v),radiusUSquared=exactRational(inputU),radiusVSquared=exactRational(inputV);
   if(radiusUSquared.sign()<=0||radiusVSquared.sign()<=0)throw new RangeError('Ellipse coordinate squared radii must be positive');
-  return Object.freeze({frame,radiusUSquared,radiusVSquared});
+  const result=Object.freeze({frame,radiusUSquared,radiusVSquared});ownedEllipses.add(result);return result;
 }
-function snapshot(e:Ellipse3):Ellipse3{return ellipse3(e.frame,e.radiusUSquared,e.radiusVSquared);}
+function snapshot(e:Ellipse3):Ellipse3{return ownedEllipses.has(e)?e:ellipse3(e.frame,e.radiusUSquared,e.radiusVSquared);}
 export function ellipsePlane3(input:Ellipse3):Plane3 {
-  const e=snapshot(input),n=cross3(e.frame.u,e.frame.v);return plane3(n.x,n.y,n.z,dot3(n,e.frame.origin).neg());
+  const e=snapshot(input),known=ellipsePlanes.get(e);if(known)return known;const n=cross3(e.frame.u,e.frame.v),result=plane3(n.x,n.y,n.z,dot3(n,e.frame.origin).neg());ellipsePlanes.set(e,result);return result;
 }
 function equation(o:Point2,d:Point2,e:Ellipse3):Polynomial {
   const a=e.radiusVSquared,b=e.radiusUSquared,two=new Rational(2n);
@@ -47,7 +53,11 @@ function localSign(p:AlgebraicCoordinates2,e:Ellipse3):Sign {
 }
 /** Location in the closed planar ellipse disk; off-plane points are outside. */
 export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,input:Ellipse3):PointLocation {
-  const e=snapshot(input),point=snapshotExactPoint3(inputPoint),rational=getRationalParameterization3(point);
+  const e=snapshot(input),point=snapshotExactPoint3(inputPoint);let cache=ellipseLocations.get(e);if(!cache){cache=new WeakMap();ellipseLocations.set(e,cache);}const known=cache.get(point);if(known!==undefined)return known;
+  const result=locateSnapshotInEllipse3(point,e);cache.set(point,result);return result;
+}
+function locateSnapshotInEllipse3(point:AlgebraicCoordinates3,e:Ellipse3):PointLocation {
+  const rational=getRationalParameterization3(point);
   const supports=cylinderIntersectionPointCylinders3(point);if(supports){
     if(classifyPointToSurface3(point,{kind:'plane',plane:ellipsePlane3(e)})!==0)return 'outside';
     for(const c of supports){const d=c.axis.direction,q=cross3(d,subtract3(e.frame.origin,c.axis.origin)),u=cross3(d,e.frame.u),v=cross3(d,e.frame.v),scale=dot3(u,u).mul(e.radiusUSquared);if(scale.sign()>0&&scale.compare(dot3(v,v).mul(e.radiusVSquared))===0&&dot3(q,u).sign()===0&&dot3(q,v).sign()===0&&dot3(u,v).sign()===0&&dot3(q,q).sub(c.radiusSquared.mul(dot3(d,d))).add(scale).sign()===0)return 'boundary';}
@@ -65,9 +75,10 @@ export function locatePointInEllipse3(inputPoint:Point3|AlgebraicCoordinates3,in
 }
 export function pointOnEllipse3(p:Point3|AlgebraicCoordinates3,e:Ellipse3):boolean{return locatePointInEllipse3(p,e)==='boundary';}
 function duals(e:Ellipse3):readonly [Vector3,Vector3] {
+  const known=ellipseDuals.get(e);if(known)return known;
   const u=e.frame.u,v=e.frame.v,A=dot3(u,u),B=dot3(v,v),C=dot3(u,v),det=A.mul(B).sub(C.mul(C));
   const component=(a:Vector3,b:Vector3,x:Rational,y:Rational)=>vector3(a.x.mul(x).sub(b.x.mul(y)).div(det),a.y.mul(x).sub(b.y.mul(y)).div(det),a.z.mul(x).sub(b.z.mul(y)).div(det));
-  return [component(u,v,B,C),component(v,u,A,C)];
+  const result=Object.freeze([component(u,v,B,C),component(v,u,A,C)] as const);ellipseDuals.set(e,result);return result;
 }
 /** Supporting point-set equality ignores chart reparameterization and orientation. */
 export function ellipsesCoincide3(inputA:Ellipse3,inputB:Ellipse3):boolean {
@@ -111,7 +122,12 @@ export function fullEllipseArc3(input:Ellipse3,direction:'ccw'|'cw'='ccw'):Ellip
   const e=snapshot(input),seam=algebraicPoint3(e.frame.origin,e.frame.u,AlgebraicReal.fromRational(e.radiusUSquared).sqrt());return ellipticArc3(e,seam,seam,{direction,fullEllipse:true});
 }
 function angleCompare(e:Ellipse3,a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
-  const [u,v]=duals(e),half=(p:AlgebraicCoordinates3)=>{const y=signLinearAlgebraicPoint3(p,v,dot3(e.frame.origin,v).neg());return y>0||y===0&&signLinearAlgebraicPoint3(p,u,dot3(e.frame.origin,u).neg())>=0?0:1;},ha=half(a),hb=half(b);if(ha!==hb)return ha<hb?-1:1;
+  let points=ellipseAngles.get(e);if(!points){points=new WeakMap();ellipseAngles.set(e,points);}let row=points.get(a);if(!row){row=new WeakMap();points.set(a,row);}const known=row.get(b);if(known!==undefined)return known;
+  const result=compareSnapshotAngles(e,a,b);row.set(b,result);return result;
+}
+function compareSnapshotAngles(e:Ellipse3,a:AlgebraicCoordinates3,b:AlgebraicCoordinates3):Sign {
+  const [u,v]=duals(e);let halves=ellipseHalves.get(e);if(!halves){halves=new WeakMap();ellipseHalves.set(e,halves);}
+  const half=(p:AlgebraicCoordinates3):0|1=>{const known=halves!.get(p);if(known!==undefined)return known;const y=signLinearAlgebraicPoint3(p,v,dot3(e.frame.origin,v).neg()),result=y>0||y===0&&signLinearAlgebraicPoint3(p,u,dot3(e.frame.origin,u).neg())>=0?0:1;halves!.set(p,result);return result;},ha=half(a),hb=half(b);if(ha!==hb)return ha<hb?-1:1;
   const c=compareLinearPoints3(a,b,u);return ha===0?c===0?0:c===1?-1:1:c;
 }
 export function comparePointsAroundEllipse3(input:Ellipse3,inputA:Point3|AlgebraicCoordinates3,inputB:Point3|AlgebraicCoordinates3):Sign {
