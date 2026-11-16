@@ -1,3 +1,4 @@
+import {locateNurbsPlaneSplitFaceParameters3} from './nurbs-plane-split-face-query3.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import {assertOwnedNurbsSourcePlaneCells3} from './nurbs-source-plane-cells3.js';
@@ -25,6 +26,7 @@ function point(source:Extract<NurbsSourcePlaneCells3,{kind:'partitioned'}>,cell:
  if(q.kind!=='point'||!q.images.some(x=>x.patch===patch))throw new Error('Closed cell boundary lost finite-face membership');
  const sign=AlgebraicReal.linearCombination([{value:q.point.x,coefficient:source.plane.normal.x},{value:q.point.y,coefficient:source.plane.normal.y},{value:q.point.z,coefficient:source.plane.normal.z}],source.plane.offset).sign();
  if(sign!==0&&sign!==source.cells[cell]!.sign)throw new Error('Closed cell boundary changed plane side');
+ if(source.restriction!==null){const old=locateNurbsPlaneSplitFaceParameters3(source.restriction,u,v);if(old.kind!=='located'||old.location==='outside')throw new Error('Closed refinement cell left its prior finite region');}
  return q;
 }
 /** Close one open strip, splitting its event sides at every arrangement vertex.

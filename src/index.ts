@@ -599,3 +599,4 @@ export {locateNurbsCapSplitFace3} from './geometry/nurbs-plane-cap-split-domains
 export type {NurbsCapSplitFaceLocation3} from './geometry/nurbs-plane-cap-split-domains3.js';
 export {buildNurbsCapSplitFaces3,locateNurbsCapSplitSurface3,nurbsCapSplitSurfacePoint3} from './geometry/nurbs-plane-cap-split-faces3.js';
 export type {NurbsCapSplitFaces3,NurbsCapSplitSurface3} from './geometry/nurbs-plane-cap-split-faces3.js';
+export {partitionNurbsSplitFaceByPlane3} from './geometry/nurbs-source-plane-cells3.js';
