@@ -606,3 +606,5 @@ export {coverNurbsRecutSectionEdges3} from './geometry/nurbs-recut-edge-coverage
 export type {NurbsRecutEdgeCoverage3,NurbsRecutEdgeCoverageCertificate3} from './geometry/nurbs-recut-edge-coverage3.js';
 export {alignNurbsRecutCapEdges3} from './geometry/nurbs-recut-edge-coverage3.js';
 export type {NurbsRecutCapEdgeAlignment3,NurbsRecutCapEdgeAlignmentCertificate3} from './geometry/nurbs-recut-edge-coverage3.js';
+export {joinNurbsRecutSourceCaps3,nurbsRecutJoinedCurvePoint3,locateNurbsRecutJoinedSurface3} from './geometry/nurbs-recut-face-join3.js';
+export type {NurbsRecutFaceJoin3,NurbsRecutJoinedCurve3,NurbsRecutJoinedSurface3} from './geometry/nurbs-recut-face-join3.js';
