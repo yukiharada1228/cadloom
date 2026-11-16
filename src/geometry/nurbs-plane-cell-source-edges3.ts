@@ -17,6 +17,8 @@ export interface NurbsPlaneCellSourceEdges3 {
  readonly vertices:NurbsPlaneCellSourceVertices3;readonly edges:readonly NurbsPlaneCellSourceEdge3[];
  readonly allOriginalBoundariesMatched:boolean;
 }
+const owned=new WeakSet<NurbsPlaneCellSourceEdges3>();
+export function assertOwnedNurbsPlaneCellSourceEdges3(report:NurbsPlaneCellSourceEdges3):void {if(!owned.has(report))throw new RangeError('Expected factory-created cell source-edge match');}
 function between(a:AlgebraicReal,b:AlgebraicReal):Rational {
  while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}
  return a.upper.add(b.lower).div(new Rational(2n));
@@ -46,5 +48,5 @@ export function matchNurbsPlaneCellSourceEdges3(source:SewnNurbsSourceEdgePlane3
   if(matches.length!==1)return Object.freeze({kind:'unresolved',edge,reason:matches.length?'ambiguous-source':'whole-curve-match'});
   return matches[0]!;
  });
- return Object.freeze({vertices,edges:Object.freeze(edges),allOriginalBoundariesMatched:edges.every(e=>e.kind!=='unresolved')});
+ const result=Object.freeze({vertices,edges:Object.freeze(edges),allOriginalBoundariesMatched:edges.every(e=>e.kind!=='unresolved')});owned.add(result);return result;
 }

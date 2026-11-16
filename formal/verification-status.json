@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "485880585ad008ea2d96f85bc5852acf0fe925c32a21c05b376fed72275e2d50",
+    "src/index.ts": "0032730001eca3a4eb49f28cc2d97740b2b786ae9fbc76384bcb45cd7211cc05",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -254,9 +254,10 @@
     "src/geometry/nurbs-source-plane-cell-complex3.ts": "43bbe1e29a095a214ce25e0dd7b45441ceaa1188a285207f3c8c3c23497a82ec",
     "src/geometry/sewn-nurbs-source-edge-plane3.ts": "e7f97a7e09288f6f8c60f06d7251dcd3cdafd837caf15783a50087d218c93b15",
     "src/geometry/nurbs-plane-cell-source-vertices3.ts": "66f401154a248e48bc9cc85a07aafeb13fe0a2e12aacaa5f8d0109bcc4c04760",
-    "src/geometry/nurbs-span-interval-match3.ts": "14b72242368f49d5a343145c1c0f503d92eb432d97cbe42885ab5614f5a95dde",
-    "src/geometry/nurbs-plane-cell-source-edges3.ts": "3c3cfe5cb06d7957bce56b1531be8c6e7d8ad584a80346c85423a8da221d9ecb",
-    "src/geometry/nurbs-plane-cell-rational-map3.ts": "46f894873a6b40788af98beaef4d47c96977ed8c23e165b004f972da08d1d1dc"
+    "src/geometry/nurbs-span-interval-match3.ts": "e2a74c887b25fea0cd30c6acad428f647380ecdbe2d0e89037cd770c44022fb2",
+    "src/geometry/nurbs-plane-cell-source-edges3.ts": "fc5cb25c7da3060f06070c3e9a98f7ea5ff5f0436ef28c224d87f8fc8c3b4396",
+    "src/geometry/nurbs-plane-cell-rational-map3.ts": "46f894873a6b40788af98beaef4d47c96977ed8c23e165b004f972da08d1d1dc",
+    "src/geometry/nurbs-plane-cell-source-nodes3.ts": "ffe3840adfdc7514062b7e0da2e06ac5fd21f151ad656c85852cdb93e57e95c0"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

@@ -1,6 +1,6 @@
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {Polynomial,exactRational} from '../numeric/polynomial.js';
-import {solveBivariateEquations} from '../numeric/bivariate-system.js';
+import {solveBivariateEquations,bivariateFiberRoots} from '../numeric/bivariate-system.js';
 import {bivariateEquationBasis} from '../numeric/bivariate-equation-basis.js';
 import {nurbsSpanPairEquations3} from './nurbs-curve-intersection3.js';
 import {evaluateNurbsSpanPoint3} from './nurbs-curve3.js';
@@ -53,4 +53,15 @@ export function nurbsSpanIntervalMatchPoint3(certificate:NurbsSpanIntervalMatchC
  const q=evaluateAlgebraicCurveEdge2(r.graph,e.sourceEdge,t),point=evaluateNurbsSpanPoint3(certificate.first.span,q.u);
  if(compareAlgebraicPoints3(point,evaluateNurbsSpanPoint3(certificate.second.span,q.v))!==0)throw new Error('Interval relation evaluation lost XYZ equality');
  return Object.freeze({firstParameter:q.u,secondParameter:q.v,point});
+}
+/** All opposite-side parameter preimages on the certified finite relation. */
+export function nurbsSpanIntervalMatchParameters3(certificate:NurbsSpanIntervalMatchCertificate3,side:'first'|'second',input:AlgebraicReal|ExactInput):readonly AlgebraicReal[] {
+ if(!owned.has(certificate))throw new RangeError('Expected factory-created curve interval match');
+ if(side!=='first'&&side!=='second')throw new RangeError('Invalid interval relation side');
+ const first=side==='first',from=first?certificate.first:certificate.second,to=first?certificate.second:certificate.first,t=real(input);
+ if(t.compare(from.lower)<0||t.compare(from.upper)>0)throw new RangeError('Parameter is outside the certified interval');
+ const f=certificate.relation.graph.polynomial,result=bivariateFiberRoots(first?f:f.transpose(),t);
+ if(result.kind==='whole')throw new Error('Nonconstant interval relation has a whole finite fiber');
+ const point=evaluateNurbsSpanPoint3(from.span,t);
+ return Object.freeze(result.roots.map(q=>q.recognizeRational()).filter(q=>q.compare(to.lower)>=0&&q.compare(to.upper)<=0&&compareAlgebraicPoints3(point,evaluateNurbsSpanPoint3(to.span,q))===0));
 }

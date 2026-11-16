@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Polynomial,Rational,AlgebraicReal,matchNurbsSpanIntervals3,nurbsSpanIntervalMatchPoint3} from '../dist/index.js';
+import {Polynomial,Rational,AlgebraicReal,matchNurbsSpanIntervals3,nurbsSpanIntervalMatchPoint3,nurbsSpanIntervalMatchParameters3} from '../dist/index.js';
 import type {NurbsSpan3} from '../dist/index.js';
 const span=(x:readonly bigint[],y:readonly bigint[]=[],z:readonly bigint[]=[],w:readonly bigint[]=[1n]):NurbsSpan3=>({index:0,startParameter:new Rational(0n),endParameter:new Rational(1n),x:new Polynomial(x),y:new Polynomial(y),z:new Polynomial(z),weight:new Polynomial(w)});
 function matched(r:ReturnType<typeof matchNurbsSpanIntervals3>){assert.equal(r.kind,'matched');if(r.kind!=='matched')throw Error('Expected whole interval match');return r.certificate;}
 test('nonlinear parameter correspondence covers both intervals including algebraic endpoints',()=>{
- const a=span([0n,1n],[0n,0n,1n]),b=span([0n,0n,1n],[0n,0n,0n,0n,1n]),alpha=AlgebraicReal.isolate(new Polynomial([-1n,0n,2n]))[1]!,c=matched(matchNurbsSpanIntervals3({span:a,lower:'1/2',upper:1n},{span:b,lower:alpha,upper:1n}));assert.equal(c.direction,1);assert.ok(c.relation.edges.length);
+ const a=span([0n,1n],[0n,0n,1n]),b=span([0n,0n,1n],[0n,0n,0n,0n,1n]),alpha=AlgebraicReal.isolate(new Polynomial([-1n,0n,2n]))[1]!,c=matched(matchNurbsSpanIntervals3({span:a,lower:'1/2',upper:1n},{span:b,lower:alpha,upper:1n}));assert.equal(c.direction,1);assert.ok(c.relation.edges.length);const forward=nurbsSpanIntervalMatchParameters3(c,'first','1/2'),back=nurbsSpanIntervalMatchParameters3(c,'second',alpha);assert.equal(forward.length,1);assert.equal(forward[0]!.compare(alpha),0);assert.equal(back.length,1);assert.equal(back[0]!.rational?.toString(),'1/2');assert.throws(()=>nurbsSpanIntervalMatchParameters3({...c},'first','1/2'),/factory/);assert.throws(()=>nurbsSpanIntervalMatchParameters3(c,'first',0n),/outside/);
  for(const [i,e] of c.relation.edges.entries())for(const t of [e.lower,e.upper]){const q=nurbsSpanIntervalMatchPoint3(c,i,t);assert.equal(q.firstParameter.compare(q.secondParameter.mul(q.secondParameter)),0);assert.equal(q.point.x.compare(q.firstParameter),0);}
  assert.throws(()=>nurbsSpanIntervalMatchPoint3({...c},0,c.relation.edges[0]!.lower),/factory/);assert.throws(()=>nurbsSpanIntervalMatchPoint3(c,0,-1n),/outside/);
 });

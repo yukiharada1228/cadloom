@@ -536,7 +536,7 @@ export type {NurbsSourcePlaneEdgeFragment3,SewnNurbsSourceEdgePlane3,SewnNurbsSo
 export {matchNurbsPlaneCellSourceVertices3,refineNurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-source-vertices3.js';
 export type {NurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-source-vertices3.js';
 
-export {matchNurbsSpanIntervals3,nurbsSpanIntervalMatchPoint3} from './geometry/nurbs-span-interval-match3.js';
+export {matchNurbsSpanIntervals3,nurbsSpanIntervalMatchPoint3,nurbsSpanIntervalMatchParameters3} from './geometry/nurbs-span-interval-match3.js';
 export type {NurbsSpanInterval3,NurbsSpanIntervalMatchCertificate3,NurbsSpanIntervalMatch3} from './geometry/nurbs-span-interval-match3.js';
 
 export {matchNurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-edges3.js';
@@ -544,3 +544,6 @@ export type {NurbsPlaneCellSourceEdge3,NurbsPlaneCellSourceEdges3} from './geome
 
 export {nurbsPlaneCellRationalMap3,nurbsPlaneCellRationalMapPoint3} from './geometry/nurbs-plane-cell-rational-map3.js';
 export type {NurbsPlaneCellRationalMap3,NurbsPlaneCellRationalMapResult3,NurbsPlaneCellRationalPoint3} from './geometry/nurbs-plane-cell-rational-map3.js';
+
+export {nodeNurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-nodes3.js';
+export type {NurbsPlaneCellSourceNodes3,NurbsPlaneCellSourceNoding3} from './geometry/nurbs-plane-cell-source-nodes3.js';
