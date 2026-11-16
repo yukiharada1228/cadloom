@@ -1,3 +1,5 @@
+import {assertOwnedNurbsPlaneSplitFaces3} from './nurbs-plane-split-faces3.js';
+import type {NurbsPlaneSplitFaces3} from './nurbs-plane-split-faces3.js';
 import {assertOwnedSewnNurbsPlaneSplitEdge3,sewnNurbsPlaneSplitEdgePoint3} from './sew-nurbs-plane-split-faces3.js';
 import type {SewnNurbsPlaneSplitEdge3} from './sew-nurbs-plane-split-faces3.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
@@ -43,13 +45,22 @@ export function partitionSewnNurbsSplitEdgeByAlgebraicPlane3(source:SewnNurbsPla
   const span=source.source.topology.edges[source.edge]!.curve.source.map.span,F=levelPolynomial(span.x.scale(n.x).add(span.y.scale(n.y)).add(span.z.scale(n.z)),span.weight,new Polynomial([1n]),offset);
   if(F.degree>0)AlgebraicReal.isolate(F).forEach(t=>add(t.recognizeRational()));
  }else {
-  const local=source.source.topology.edges[source.edge]!.curve,N=local.source,edge=N.edges[local.edge]!,cells=N.source.vertices.cells,E=cells.edges[edge.parent]!,boundary=cells.boundaries[E.boundary]!,path=boundary.edges[E.edge]!.path,cell=cells.source.cells[E.boundary]!,patch=cells.source.complex.source.source.patches[cell.patch]!;
-  const F=levelPolynomial(patch.x.scale(n.x).add(patch.y.scale(n.y)).add(patch.z.scale(n.z)),patch.weight,new BivariatePolynomial([[1n]]),offset);
-  if(path.kind==='curve')prepareAlgebraicCurvePolynomialCuts2(cell.graph,[F])(path.edge,source.lower,source.upper).forEach(add);
-  else {const roots=path.kind==='u'?bivariateFiberRoots(F,path.u):bivariateFiberRoots(F.transpose(),path.v);if(roots.kind==='finite')roots.roots.forEach(t=>add(t.recognizeRational()));}
+  nurbsSplitFaceEdgePlaneParameters3(source.source,source.edge,n,offset,source.lower,source.upper).forEach(add);
  }
  cuts.sort((a,b)=>a.compare(b));
  const vertices=cuts.map(parameter=>{const point=sewnNurbsPlaneSplitEdgePoint3(source,parameter);return Object.freeze({parameter,point,sign:sign(point)});});
  const intervals=cuts.slice(0,-1).map((lower,i)=>{const upper=cuts[i+1]!,sampleParameter=between(lower,upper),s=sign(sewnNurbsPlaneSplitEdgePoint3(source,sampleParameter));if(s===0&&(vertices[i]!.sign!==0||vertices[i+1]!.sign!==0))throw new Error('Plane-overlap interval lost its closed endpoints');return Object.freeze({lower,upper,sign:s,sampleParameter});});
  return Object.freeze({source,plane,vertices:Object.freeze(vertices),intervals:Object.freeze(intervals)});
+}
+
+/** Internal complete polynomial candidates for a finite owned local split edge.
+ * Callers filter the selected algebraic offset and their interval endpoints. */
+export function nurbsSplitFaceEdgePlaneParameters3(source:Extract<NurbsPlaneSplitFaces3,{kind:'built'}>,index:number,n:Vector3,offset:AlgebraicReal,lower:AlgebraicReal,upper:AlgebraicReal):readonly AlgebraicReal[] {
+ assertOwnedNurbsPlaneSplitFaces3(source);if(source.kind!=='built'||!Number.isSafeInteger(index)||index<0||index>=source.topology.edges.length)throw new RangeError('Invalid local split edge');plane3(n.x,n.y,n.z,0n);
+ const native=source.topology.edges[index]!.curve,N0=native.source.edges[native.edge]!;if(lower.compare(N0.lower)<0||upper.compare(N0.upper)>0||lower.compare(upper)>=0)throw new RangeError('Invalid local split interval');const result:AlgebraicReal[]=[],add=(t:AlgebraicReal)=>{result.push(t);};
+  const local=source.topology.edges[index]!.curve,N=local.source,edge=N.edges[local.edge]!,cells=N.source.vertices.cells,E=cells.edges[edge.parent]!,boundary=cells.boundaries[E.boundary]!,path=boundary.edges[E.edge]!.path,cell=cells.source.cells[E.boundary]!,patch=cells.source.complex.source.source.patches[cell.patch]!;
+  const F=levelPolynomial(patch.x.scale(n.x).add(patch.y.scale(n.y)).add(patch.z.scale(n.z)),patch.weight,new BivariatePolynomial([[1n]]),offset);
+  if(path.kind==='curve')prepareAlgebraicCurvePolynomialCuts2(cell.graph,[F])(path.edge,lower,upper).forEach(add);
+  else {const roots=path.kind==='u'?bivariateFiberRoots(F,path.u):bivariateFiberRoots(F.transpose(),path.v);if(roots.kind==='finite')roots.roots.forEach(t=>add(t.recognizeRational()));}
+ return Object.freeze(result);
 }

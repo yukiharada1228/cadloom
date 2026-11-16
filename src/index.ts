@@ -613,3 +613,7 @@ export {joinNurbsRecutAssembly3} from './geometry/nurbs-recut-face-join3.js';
 export type {NurbsRecutAssemblyJoin3} from './geometry/nurbs-recut-face-join3.js';
 export {selectNurbsRecutHalfBoundary3,nurbsRecutHalfCapBoundary3,nurbsRecutHalfCapBoundaryPoint3} from './geometry/nurbs-recut-half-boundary3.js';
 export type {NurbsRecutHalfBoundary3,NurbsRecutHalfCapBoundaryCertificate3} from './geometry/nurbs-recut-half-boundary3.js';
+export {partitionNurbsRecutCurveByAlgebraicPlane3} from './geometry/nurbs-recut-curve-plane3.js';
+export {queryNurbsRecutCapWinding3,queryNurbsRecutCapLoopWinding3} from './geometry/nurbs-recut-cap-winding3.js';
+export type {NurbsRecutCapWinding3,NurbsRecutCapLoopWinding3} from './geometry/nurbs-recut-cap-winding3.js';
+export type {NurbsRecutCurvePlane3} from './geometry/nurbs-recut-curve-plane3.js';
