@@ -465,3 +465,7 @@ export {analyzeNurbsSourceFaceInteriorRegularity3} from './geometry/nurbs-source
 export type {NurbsSourceFacePatchRegularity3,NurbsSourceFaceRegularity3} from './geometry/nurbs-source-face-regularity3.js';
 export {analyzeNurbsSourceFaceBoundaryRegularity3} from './geometry/nurbs-source-boundary-regularity3.js';
 export type {NurbsSourceBoundaryRankEvent3,NurbsSourceBoundaryRankUse3,NurbsSourceBoundaryRegularity3} from './geometry/nurbs-source-boundary-regularity3.js';
+export {analyzeNurbsSourceFaceVertexRegularity3} from './geometry/nurbs-source-vertex-regularity3.js';
+export type {NurbsSourceVertexSector3,NurbsSourceVertexRankEvent3,NurbsSourceVertexRegularity3} from './geometry/nurbs-source-vertex-regularity3.js';
+export {analyzeNurbsSourceFaceClosedRank3} from './geometry/nurbs-source-closed-rank3.js';
+export type {NurbsSourceClosedRank3} from './geometry/nurbs-source-closed-rank3.js';
