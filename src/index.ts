@@ -365,3 +365,5 @@ export type {SimilarityTransform3} from './geometry/similarity3.js';
 export {transformCylinderMaterialProgram3} from './geometry/transform-material-program3.js';
 export {transformBody3} from './ops/body-transform3.js';
 export {composeSimilarityTransforms3,inverseSimilarityTransform3} from './geometry/similarity3.js';
+export {closestPointOnLine3,closestPointOnSegment3,closestPointOnSurface3} from './geometry/closest-point3.js';
+export type {UniqueClosestPoint3,LineClosestPoint3,SurfaceClosestPoint3} from './geometry/closest-point3.js';
