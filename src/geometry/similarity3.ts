@@ -22,3 +22,16 @@ export function transformVectorBySimilarity3(transform:SimilarityTransform3,inpu
 export function transformPointBySimilarity3(transform:SimilarityTransform3,input:Point3):Point3 {
  const p=transformVectorBySimilarity3(transform,input),t=transform.translation;return point3(p.x.add(t.x),p.y.add(t.y),p.z.add(t.z));
 }
+/** Apply first, then second: second(first(p)). */
+export function composeSimilarityTransforms3(first:SimilarityTransform3,second:SimilarityTransform3):SimilarityTransform3 {
+ assertOwnedSimilarityTransform3(first);assertOwnedSimilarityTransform3(second);
+ const [a,b,c]=first.columns;
+ return similarityTransform3([transformVectorBySimilarity3(second,a),transformVectorBySimilarity3(second,b),transformVectorBySimilarity3(second,c)],transformPointBySimilarity3(second,first.translation));
+}
+/** L^-1=L^T/scaleSquared; inverse translation is -L^-1 t. */
+export function inverseSimilarityTransform3(transform:SimilarityTransform3):SimilarityTransform3 {
+ assertOwnedSimilarityTransform3(transform);const [a,b,c]=transform.columns,s=transform.scaleSquared;
+ const columns=[point3(a.x.div(s),b.x.div(s),c.x.div(s)),point3(a.y.div(s),b.y.div(s),c.y.div(s)),point3(a.z.div(s),b.z.div(s),c.z.div(s))] as const;
+ const linear=similarityTransform3(columns),p=transformVectorBySimilarity3(linear,transform.translation);
+ return similarityTransform3(columns,point3(p.x.neg(),p.y.neg(),p.z.neg()));
+}

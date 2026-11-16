@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "f5b1195411c9ac7d2b25a5cf6d3a9cf2f1edc86908a8ed5fbfc9132d2343afc3",
+    "src/index.ts": "4716d55bb3642795ae98617878e50b67b545a6fc8bfcc132d4cf564a575aeec5",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -161,7 +161,7 @@
     "src/convert/supported-profile-program3.ts": "ac7d9e5aa7a82a3618edf4081c2afb0fa7f7e3b5430785c9d10ed74b351484dd",
     "src/convert/chord-profile-program3.ts": "0a1ff52ebcb3cc9622e74be5af9e174a585eecb7b79c1899a565d2bc9a63bbfe",
     "src/ops/body-query3.ts": "2f159569ebf4e2cc3c4646b68a2221002f7cb42385035732d38fec12cc85b4a9",
-    "src/geometry/similarity3.ts": "63b15a724567cf3f0bf515e286b26d1d4220b2494017a01cbac06de6b1b76b4a",
+    "src/geometry/similarity3.ts": "61776190c43e21d6eb1d20f671497c17f47e3f76ee8fc5463c8376d1e107081b",
     "src/geometry/transform-material-program3.ts": "0a8b3c7124ff5be4d86046b1846912380c25a3671fbe858573bc33c2576dc177",
     "src/ops/body-transform3.ts": "776455906996212db436ff2c0b6efe97162271bfbbc7ab6f557413761708207e"
   },

@@ -364,3 +364,4 @@ export {similarityTransform3,transformPointBySimilarity3,transformVectorBySimila
 export type {SimilarityTransform3} from './geometry/similarity3.js';
 export {transformCylinderMaterialProgram3} from './geometry/transform-material-program3.js';
 export {transformBody3} from './ops/body-transform3.js';
+export {composeSimilarityTransforms3,inverseSimilarityTransform3} from './geometry/similarity3.js';
