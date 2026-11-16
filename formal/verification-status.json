@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "924e252a42dee1dc5d35ee2b80cfb97c466b19fba5fb10100518137bf6a957ab",
+    "src/index.ts": "b061c29706a974906a50617686923eee598d7aec14af6a0243dabcfc637116c0",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -179,7 +179,7 @@
     "src/ops/body-split-interface3.ts": "cf7a7d38d6563980b8f98e64ef4f23e11dfc85fc997a6a3ae4c52ec7ac249da6",
     "src/ops/rejoin-body-split3.ts": "dd39039b612104709106554b39d9f76b8065f7e2840548ea9633d6af8507ce76",
     "src/geometry/nurbs-surface-curvature3.ts": "0e8782ea317276e107dc01e84091d7ac42cdf9c741b016929820f68c9433248e",
-    "src/geometry/nurbs-section-differential3.ts": "90635c0ac5a09b2d3de8c42ddedc87b3151e6b66564fbcad27f1f6726f22e055",
+    "src/geometry/nurbs-section-differential3.ts": "b71cdd3269c96c50987c775ffbf629abf21b97683b7e8f7907907cd453c13757",
     "src/geometry/nurbs-section-arc3.ts": "20241099e6cc8afb8e41ca2ea95fdd8c27ffc69be3ad2b00208ff606480e213f",
     "src/geometry/nurbs-section-arc-plane3.ts": "5daf45be49feaa277e86126c31a143fc166b48b38262a7b6d5136954a3a5b919",
     "src/geometry/nurbs-section-arc-domain3.ts": "c8113108d9c00ef05ffeeab5721c3b09724329f6b345a5167e8067858a6b799e",
@@ -203,7 +203,8 @@
     "src/numeric/bivariate-substitution.ts": "94f1b4fac12630e05e2ac8a75827e639d37777a5a34f4769cdf513515cd35e11",
     "src/geometry/nurbs-domain-polynomial-partition2.ts": "dcb1abe124228936e6fded74b9097edc8c604309db0f75671e61c935954b2c1e",
     "src/geometry/nurbs-affine-intersection-trim3.ts": "a2d43a4feb00154504ba109ef80fac617e45ef319d236568f56dc158cdc0dce7",
-    "src/geometry/nurbs-affine-intersection-seams3.ts": "6ed31e29c065d65eb7cd3c2891c1575734c84caadfe19472bff5cb0d27d6c298"
+    "src/geometry/nurbs-affine-intersection-seams3.ts": "4fee3b617b0506253ca00cc25344e13f6d8ddd31de073ff56f511e58dd7551a8",
+    "src/geometry/nurbs-affine-intersection-differential3.ts": "79b92879a5ee4dfa7625e6678ec8eb677cfdf5466166aea4bd179a013b9db9c2"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

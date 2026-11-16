@@ -439,3 +439,5 @@ export {intersectAffineNurbsFaces3,trimNurbsAffineIntersection3,trimmedNurbsAffi
 export type {TrimmedNurbsAffineIntersectionPoint3,TrimmedNurbsAffineIntersectionEdge3,TrimmedNurbsAffineIntersectionPatch3,TrimmedNurbsAffineIntersection3} from './geometry/nurbs-affine-intersection-trim3.js';
 export {sewNurbsAffineIntersection3,nurbsAffineIntersectionComplexEdgePoint3} from './geometry/nurbs-affine-intersection-seams3.js';
 export type {NurbsIntersectionVertexUse3,NurbsIntersectionComplexVertex3,NurbsIntersectionComplexEdge3,NurbsAffineIntersectionComplex3} from './geometry/nurbs-affine-intersection-seams3.js';
+export {nurbsAffineIntersectionEdgeDifferential3,trimmedNurbsAffineIntersectionEdgeDifferential3,nurbsAffineIntersectionComplexEdgeDifferential3} from './geometry/nurbs-affine-intersection-differential3.js';
+export type {NurbsAffineIntersectionEdgeDifferential3,TrimmedNurbsAffineIntersectionEdgeDifferential3} from './geometry/nurbs-affine-intersection-differential3.js';
