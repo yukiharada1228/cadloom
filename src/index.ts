@@ -550,3 +550,6 @@ export type {NurbsPlaneCellSourceNodes3,NurbsPlaneCellSourceNoding3} from './geo
 
 export {buildNurbsPlaneSplitFaces3,nurbsPlaneSplitFaceEdgePoint3} from './geometry/nurbs-plane-split-faces3.js';
 export type {NurbsPlaneSplitFaceEdge3,NurbsPlaneSplitFaceSurface3,NurbsPlaneSplitFaces3} from './geometry/nurbs-plane-split-faces3.js';
+
+export {sewNurbsPlaneSplitFaces3,sewnNurbsPlaneSplitEdgePoint3} from './geometry/sew-nurbs-plane-split-faces3.js';
+export type {SewnNurbsPlaneSplitEdge3,SewnNurbsPlaneSplitFaces3} from './geometry/sew-nurbs-plane-split-faces3.js';

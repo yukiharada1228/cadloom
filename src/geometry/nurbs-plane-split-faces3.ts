@@ -17,12 +17,15 @@ export type NurbsPlaneSplitFaces3=
    /** Noded edge -> adopted topology edge; internal same-region seams are null. */
    sourceEdges:readonly (number|null)[];sourceVertices:readonly (number|null)[]}>;
 const ownedEdges=new WeakSet<NurbsPlaneSplitFaceEdge3>(),ownedSurfaces=new WeakSet<NurbsPlaneSplitFaceSurface3>();
+const owned=new WeakSet<NurbsPlaneSplitFaces3>();
+function own<T extends NurbsPlaneSplitFaces3>(report:T):T {owned.add(report);return report;}
+export function assertOwnedNurbsPlaneSplitFaces3(report:NurbsPlaneSplitFaces3):void {if(!owned.has(report))throw new RangeError('Expected factory-created split-face assembly');}
 /** Adopt oriented region loops into common BRep incidence. Original surface
  * restrictions/provenance remain owned; no cap or closed child Body is made. */
 export function buildNurbsPlaneSplitFaces3(source:NurbsPlaneCellSourceNoding3):NurbsPlaneSplitFaces3 {
  assertOwnedNurbsPlaneCellSourceNoding3(source);
- if(source.kind!=='noded')return Object.freeze({kind:'unresolved',source,reason:'edge-noding'});
- for(const [region,r] of source.regions.entries())if(r.cycles===null)return Object.freeze({kind:'unresolved',source,reason:'non-simple-region',region});
+ if(source.kind!=='noded')return own(Object.freeze({kind:'unresolved',source,reason:'edge-noding'}));
+ for(const [region,r] of source.regions.entries())if(r.cycles===null)return own(Object.freeze({kind:'unresolved',source,reason:'non-simple-region',region}));
  const selected=new Set(source.regions.flatMap(r=>r.cycles!.flatMap(c=>c.map(u=>u.edge)))),sourceEdges:(number|null)[]=source.edges.map(()=>null),curves:NurbsPlaneSplitFaceEdge3[]=[];
  for(const edge of [...selected].sort((a,b)=>a-b)){sourceEdges[edge]=curves.length;const curve=Object.freeze({source,edge});ownedEdges.add(curve);curves.push(curve);}
  const originalFace=source.source.vertices.face,sense=source.source.vertices.source.topology.faces[originalFace]!.sense;
@@ -39,7 +42,7 @@ export function buildNurbsPlaneSplitFaces3(source:NurbsPlaneCellSourceNoding3):N
  });
  if(!topology.consistentlyOriented)throw new Error('Split-face region orientation is inconsistent');
  const sourceVertices=source.vertices.map(v=>{const id=topology.vertices.findIndex(p=>p.x.compare(v.point.x)===0&&p.y.compare(v.point.y)===0&&p.z.compare(v.point.z)===0);return id<0?null:id;});
- return Object.freeze({kind:'built',source,topology,sourceEdges:Object.freeze(sourceEdges),sourceVertices:Object.freeze(sourceVertices)});
+ return own(Object.freeze({kind:'built',source,topology,sourceEdges:Object.freeze(sourceEdges),sourceVertices:Object.freeze(sourceVertices)}));
 }
 export function nurbsPlaneSplitFaceEdgePoint3(edge:NurbsPlaneSplitFaceEdge3,input:AlgebraicReal|ExactInput) {
  if(!ownedEdges.has(edge))throw new RangeError('Expected factory-created split-face edge');
