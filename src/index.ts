@@ -527,5 +527,5 @@ export type {NurbsSourcePlaneCell3,NurbsSourcePlaneCells3} from './geometry/nurb
 export {nurbsSourcePlaneCellBoundary3,nurbsSourcePlaneCellBoundaryPoint3} from './geometry/nurbs-source-plane-cell-boundary3.js';
 export type {NurbsSourcePlaneCellBoundary3,NurbsSourcePlaneCellBoundaryEdge3} from './geometry/nurbs-source-plane-cell-boundary3.js';
 
-export {buildNurbsSourcePlaneCellComplex3} from './geometry/nurbs-source-plane-cell-complex3.js';
+export {buildNurbsSourcePlaneCellComplex3,nurbsSourcePlaneCellComplexEdgePoint3} from './geometry/nurbs-source-plane-cell-complex3.js';
 export type {NurbsSourcePlaneCellComplex3} from './geometry/nurbs-source-plane-cell-complex3.js';
