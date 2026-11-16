@@ -451,3 +451,5 @@ export {matchNurbsIntersectionSourceBoundary3} from './geometry/nurbs-intersecti
 export type {NurbsSourceBoundarySharedInterval3,NurbsSourceBoundarySharing3} from './geometry/nurbs-intersection-boundary-sharing3.js';
 export {buildNurbsSourceBoundaryComplex3} from './geometry/nurbs-source-boundary-complex3.js';
 export type {NurbsSourceBoundaryComplexUse3,NurbsSourceBoundaryComplex3} from './geometry/nurbs-source-boundary-complex3.js';
+export {buildNurbsSourceHalfedges3} from './geometry/nurbs-source-halfedges3.js';
+export type {NurbsSourceHalfedge3,NurbsSourceHalfedges3} from './geometry/nurbs-source-halfedges3.js';

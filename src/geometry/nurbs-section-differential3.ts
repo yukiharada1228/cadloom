@@ -6,7 +6,6 @@ import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {evaluateAlgebraicCurveEdge2} from './algebraic-curve-topology2.js';
 import {assertOwnedNurbsPlaneSection3,liftNurbsSectionPatch3} from './nurbs-plane-section3.js';
 import type {NurbsPlaneSection3} from './nurbs-plane-section3.js';
-import {secondDifferentialNurbsSurfacePatch3} from './nurbs-surface3.js';
 import type {NurbsSurfacePatch3} from './nurbs-surface3.js';
 import type {AlgebraicCurveTopology2} from './algebraic-curve-topology2.js';
 
@@ -28,8 +27,7 @@ export type NurbsImplicitPatchEdgeDifferential3=
  | Extract<NurbsSectionEdgeDifferential3,{kind:'singular-parameter'}>
  | (Exclude<NurbsSectionEdgeDifferential3,{kind:'singular-parameter'}>&Readonly<{parameterDerivative:Readonly<{u:AlgebraicReal;v:AlgebraicReal}>;parameterSecondDerivative:Readonly<{u:AlgebraicReal;v:AlgebraicReal}>}>);
 const unit=AlgebraicReal.fromRational(1n);
-const one=new BivariatePolynomial([[1n]]),zero=AlgebraicReal.fromRational(0n),two=AlgebraicReal.fromRational(2n);
-const dot=(a:AlgebraicCoordinates3,b:AlgebraicCoordinates3)=>a.x.mul(b.x).add(a.y.mul(b.y)).add(a.z.mul(b.z));
+const one=new BivariatePolynomial([[1n]]),zero=AlgebraicReal.fromRational(0n);
 /** Differentiate a selected implicit branch on its actual one-sided patch.
  * Repeated plane-contact factors are removed by the owned topology. A zero
  * square-free gradient is unresolved, not a guessed tangent or an empty curve. */
@@ -41,16 +39,31 @@ export function nurbsPlaneSectionEdgeDifferential3(source:NurbsPlaneSection3,pie
 export function implicitNurbsPatchEdgeDifferential3(patch:NurbsSurfacePatch3,t:AlgebraicCurveTopology2,edge:number,parameter:AlgebraicReal|ExactInput):NurbsImplicitPatchEdgeDifferential3 {
  const parameterPoint=evaluateAlgebraicCurveEdge2(t,edge,parameter),{u,v}=parameterPoint,point=liftNurbsSectionPatch3(patch,u,v),base={point,parameterPoint};
  let coordinate:'u'|'v',slope:AlgebraicReal,second:AlgebraicReal;
+ let directionNumerator=new BivariatePolynomial(),directionDenominator=one;
  if(t.edges[edge]!.kind==='vertical'){coordinate='v';slope=zero;second=zero;}
  else {
   const F=t.nonvertical,Fu=F.derivativeU(),Fv=F.derivativeV(),at=(p:BivariatePolynomial)=>p.rationalImage(u,v,one),a=at(Fu),b=at(Fv);
-  if(b.sign()!==0){coordinate='u';slope=a.neg().div(b);second=at(Fu.derivativeU()).add(two.mul(at(Fu.derivativeV())).mul(slope)).add(at(Fv.derivativeV()).mul(slope.mul(slope))).neg().div(b);}
-  else if(a.sign()!==0){coordinate='v';slope=b.neg().div(a);second=at(Fv.derivativeV()).add(two.mul(at(Fu.derivativeV())).mul(slope)).add(at(Fu.derivativeU()).mul(slope.mul(slope))).neg().div(a);}
+  // Keep dependent algebraic values in a single rational expression. Separate
+  // resultant arithmetic can otherwise grow before exact cancellations occur.
+  const implicitJet=(n:BivariatePolynomial,d:BivariatePolynomial,nn:BivariatePolynomial,nd:BivariatePolynomial,dd:BivariatePolynomial)=>{
+   const numerator=nn.mul(d.mul(d)).sub(nd.mul(n).mul(d).scale(2n)).add(dd.mul(n.mul(n))).scale(-1n);
+   return {slope:n.scale(-1n).rationalImage(u,v,d),second:numerator.rationalImage(u,v,d.mul(d).mul(d))};
+  };
+  if(b.sign()!==0){coordinate='u';directionNumerator=Fu;directionDenominator=Fv;({slope,second}=implicitJet(Fu,Fv,Fu.derivativeU(),Fu.derivativeV(),Fv.derivativeV()));}
+  else if(a.sign()!==0){coordinate='v';directionNumerator=Fv;directionDenominator=Fu;({slope,second}=implicitJet(Fv,Fu,Fv.derivativeV(),Fu.derivativeV(),Fu.derivativeU()));}
   else return Object.freeze({...base,kind:'singular-parameter'});
  }
- const d=secondDifferentialNurbsSurfacePatch3(patch,u,v),A=coordinate==='u'?d.du:d.dv,B=coordinate==='u'?d.dv:d.du,AA=coordinate==='u'?d.duu:d.dvv,BB=coordinate==='u'?d.dvv:d.duu;
- const derivative=algebraicCoordinates3(A.x.add(B.x.mul(slope)),A.y.add(B.y.mul(slope)),A.z.add(B.z.mul(slope))),component=(k:'x'|'y'|'z')=>AA[k].add(two.mul(d.duv[k]).mul(slope)).add(BB[k].mul(slope.mul(slope))).add(B[k].mul(second)),secondDerivative=algebraicCoordinates3(component('x'),component('y'),component('z')),parameterDerivative=Object.freeze(coordinate==='u'?{u:unit,v:slope}:{u:slope,v:unit}),parameterSecondDerivative=Object.freeze(coordinate==='u'?{u:zero,v:second}:{u:second,v:zero}),jet={...base,coordinate,derivative,secondDerivative,parameterDerivative,parameterSecondDerivative},speed=dot(derivative,derivative);
- if(speed.sign()===0)return Object.freeze({...jet,kind:'stationary-image'});
- const cross=algebraicCoordinates3(derivative.y.mul(secondDerivative.z).sub(derivative.z.mul(secondDerivative.y)),derivative.z.mul(secondDerivative.x).sub(derivative.x.mul(secondDerivative.z)),derivative.x.mul(secondDerivative.y).sub(derivative.y.mul(secondDerivative.x)));
- return Object.freeze({...jet,kind:'regular',curvatureSquared:dot(cross,cross).div(speed.mul(speed).mul(speed))});
+ // Differentiate P/W along the selected implicit chart as rational
+ // polynomials before evaluating. This preserves cancellations such as the
+ // identically constant spatial coordinate on a surface intersection.
+ const D=(f:BivariatePolynomial)=>(coordinate==='u'?f.derivativeU():f.derivativeV()).mul(directionDenominator).sub((coordinate==='u'?f.derivativeV():f.derivativeU()).mul(directionNumerator)),W=patch.weight;
+ const Q=W.mul(W).mul(directionDenominator),T=Q.mul(Q).mul(directionDenominator);
+ const component=(k:'x'|'y'|'z')=>{const P=patch[k],R=D(P).mul(W).sub(P.mul(D(W))),S=D(R).mul(Q).sub(R.mul(D(Q)));return {R,S,first:R.rationalImage(u,v,Q),second:S.rationalImage(u,v,T)};};
+ const x=component('x'),y=component('y'),z=component('z'),derivative=algebraicCoordinates3(x.first,y.first,z.first),secondDerivative=algebraicCoordinates3(x.second,y.second,z.second),parameterDerivative=Object.freeze(coordinate==='u'?{u:unit,v:slope}:{u:slope,v:unit}),parameterSecondDerivative=Object.freeze(coordinate==='u'?{u:zero,v:second}:{u:second,v:zero}),jet={...base,coordinate,derivative,secondDerivative,parameterDerivative,parameterSecondDerivative};
+ const speed=x.R.mul(x.R).add(y.R.mul(y.R)).add(z.R.mul(z.R));
+ if(speed.rationalImage(u,v,one).sign()===0)return Object.freeze({...jet,kind:'stationary-image'});
+ const cross=[y.R.mul(z.S).sub(z.R.mul(y.S)),z.R.mul(x.S).sub(x.R.mul(z.S)),x.R.mul(y.S).sub(y.R.mul(x.S))],norm=cross.reduce((sum,f)=>sum.add(f.mul(f)),new BivariatePolynomial());
+ // Q^4 cancels exactly between |first x second|^2 and |first|^6.
+ const curvatureSquared=norm.rationalImage(u,v,directionDenominator.mul(directionDenominator).mul(speed).mul(speed).mul(speed));
+ return Object.freeze({...jet,kind:'regular',curvatureSquared});
 }

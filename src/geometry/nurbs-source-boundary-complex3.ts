@@ -15,6 +15,8 @@ export interface NurbsSourceBoundaryComplex3 {
  readonly rings:readonly (readonly Readonly<{edge:number;direction:1|-1}>[])[];
  readonly intersectionVertices:readonly number[];
 }
+const owned=new WeakSet<NurbsSourceBoundaryComplex3>();
+export function assertOwnedNurbsSourceBoundaryComplex3(source:NurbsSourceBoundaryComplex3):void {if(!owned.has(source))throw new RangeError('Expected a factory-created source boundary complex');}
 const sorted=(values:readonly AlgebraicReal[])=>values.slice().sort((a,b)=>a.compare(b)).filter((v,i,a)=>i===0||v.compare(a[i-1]!)!==0);
 /** Common source-UV atoms with certified boundary/intersection sharing.
  * This builds incidence, not cyclic branch order, face loops or a spatial BRep. */
@@ -47,5 +49,5 @@ export function buildNurbsSourceBoundaryComplex3(source:RefinedNurbsAffineInters
  }
  const rings=Object.freeze(boundary.rings.map(r=>Object.freeze(r.flatMap(id=>boundaryEdges[id]!.map(u=>Object.freeze({edge:u.edge,direction:u.direction}))))));
  for(const ring of rings)for(let i=0;i<ring.length;i++){const a=ring[i]!,b=ring[(i+1)%ring.length]!,A=edges[a.edge]!,B=edges[b.edge]!;if((a.direction===1?A.to:A.from)!==(b.direction===1?B.from:B.to))throw new Error('Common boundary atoms lost closed ring incidence');}
- return Object.freeze({source,sharing,vertices:Object.freeze(vertices.map(v=>Object.freeze({...v,intersectionVertices:Object.freeze(v.intersectionVertices)}))),edges:Object.freeze(edges.map(e=>Object.freeze({...e,boundaryUses:Object.freeze(e.boundaryUses),intersectionUses:Object.freeze(e.intersectionUses)}))),boundaryEdges:Object.freeze(boundaryEdges.map(u=>Object.freeze(u))),intersectionEdges:Object.freeze(intersectionEdges.map(u=>Object.freeze(u))),rings,intersectionVertices:Object.freeze(intersectionVertices)});
+ const result=Object.freeze({source,sharing,vertices:Object.freeze(vertices.map(v=>Object.freeze({...v,intersectionVertices:Object.freeze(v.intersectionVertices)}))),edges:Object.freeze(edges.map(e=>Object.freeze({...e,boundaryUses:Object.freeze(e.boundaryUses),intersectionUses:Object.freeze(e.intersectionUses)}))),boundaryEdges:Object.freeze(boundaryEdges.map(u=>Object.freeze(u))),intersectionEdges:Object.freeze(intersectionEdges.map(u=>Object.freeze(u))),rings,intersectionVertices:Object.freeze(intersectionVertices)});owned.add(result);return result;
 }

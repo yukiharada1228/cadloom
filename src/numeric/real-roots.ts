@@ -106,6 +106,23 @@ export class AlgebraicReal {
     }
     return terms.reduce((sum,t)=>sum.add(t.value.affine(t.coefficient)),AlgebraicReal.fromRational(offset));
   }
+  /** Exact opt-in sum of products in a factory-recorded common rational
+   * source. Existing ordinary arithmetic and its certificates are unchanged. */
+  static productCombination(input:readonly Readonly<{factors:readonly AlgebraicReal[];coefficient?:ExactInput}>[],offsetInput:ExactInput=0n):AlgebraicReal {
+    let offset=exactRational(offsetInput);const terms:{factors:AlgebraicReal[];coefficient:Rational}[]=[];
+    for(const term of input){let coefficient=exactRational(term.coefficient??1n);const factors:AlgebraicReal[]=[];
+      for(const value of term.factors){if(!realInstances.has(value))throw new RangeError('Product image requires factory-created algebraic values');if(value.rational!==null)coefficient=coefficient.mul(value.rational);else factors.push(value);}
+      if(coefficient.sign()===0)continue;if(!factors.length)offset=offset.add(coefficient);else terms.push({factors,coefficient});
+    }
+    if(!terms.length)return AlgebraicReal.fromRational(offset);
+    const forms=terms.map(t=>t.factors.map(realSource)),source=forms[0]![0]!.source;
+    if(forms.every(fs=>fs.every(f=>f.source===source))){
+      const reduce=(p:Polynomial)=>p.divRem(source.polynomial).remainder;let N=new Polynomial([offset]),D=sourceOne;
+      forms.forEach((fs,i)=>{let n=new Polynomial([terms[i]!.coefficient]),d=sourceOne;for(const f of fs){n=reduce(n.mul(f.numerator));d=reduce(d.mul(f.denominator));}N=reduce(N.mul(d).add(n.mul(D)));D=reduce(D.mul(d));});
+      return source.rationalFunction(N,D);
+    }
+    return terms.reduce((sum,t)=>sum.add(t.factors.reduce((product,f)=>product.mul(f),AlgebraicReal.fromRational(t.coefficient))),AlgebraicReal.fromRational(offset));
+  }
   /** Restore only after proving one root in the strict open interval. No
    * unrelated conjugate intervals need to be isolated to certify this root. */
   static fromIsolatingInterval(polynomial:Polynomial,lower:ExactInput,upper:ExactInput):AlgebraicReal {
