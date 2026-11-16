@@ -535,3 +535,6 @@ export type {NurbsSourcePlaneEdgeFragment3,SewnNurbsSourceEdgePlane3,SewnNurbsSo
 
 export {matchNurbsPlaneCellSourceVertices3,refineNurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-source-vertices3.js';
 export type {NurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-source-vertices3.js';
+
+export {matchNurbsSpanIntervals3,nurbsSpanIntervalMatchPoint3} from './geometry/nurbs-span-interval-match3.js';
+export type {NurbsSpanInterval3,NurbsSpanIntervalMatchCertificate3,NurbsSpanIntervalMatch3} from './geometry/nurbs-span-interval-match3.js';
