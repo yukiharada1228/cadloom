@@ -38,3 +38,5 @@ const moments = planarBodyVolumeMoments3(moved); // 対応する平面材料が�
 `BodyReadLimits3` は従来の `maxItems`・`maxNumericCharacters` に加え、JSON解析前の `maxChars`、材料構築の `material` 予算を持ちます。文字数制限の既定値は、従来と同じ `maxNumericCharacters + 64 * maxItems` です。CellularBodyでは同じレコード予算を構造検査へ渡し、`material.maxNodes`・`material.maxVertices`・`material.maxCoordinateChars` を構築DAGの読取制限へ渡します。各予算は計算時間の上限保証ではありません。
 
 専用のCellularBody保存復元APIは維持します。一般曲面のCellularBody、任意の輸入BRepの認定、すべての生成・編集操作の共通化は未完了です。対応する族の入口や受理条件を、位置判定・保存復元の共通化だけで拡大しません。
+
+有理平面材料の[平面切断と再結合](planar-body-split3.md)も共通のBody族を入力に取り、保存復元できるCellularBodyの子と切断面の対応を返します。

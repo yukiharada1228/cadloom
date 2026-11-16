@@ -389,3 +389,5 @@ export type {KernelBody3} from './model/body3.js';
 export type {KernelBodyDocument3,SerializedBody3,BodyReadLimits3} from './ops/body3.js';
 export {materialProgramOfPlanarMaterial3} from './ops/planar-material3.js';
 export type {MaterialBodyBooleanOptions3} from './ops/body3.js';
+export {splitPlanarBodyByPlane3,rejoinPlanarBodySplit3} from './ops/planar-body-split3.js';
+export type {PlanarBodyPlaneSplit3,PlanarBodySplitInterface3} from './ops/planar-body-split3.js';
