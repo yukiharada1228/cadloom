@@ -443,3 +443,5 @@ export {nurbsAffineIntersectionEdgeDifferential3,trimmedNurbsAffineIntersectionE
 export type {NurbsAffineIntersectionEdgeDifferential3,TrimmedNurbsAffineIntersectionEdgeDifferential3} from './geometry/nurbs-affine-intersection-differential3.js';
 export {analyzeNurbsAffineIntersectionEdgeEvents3,analyzeTrimmedNurbsAffineIntersectionEdgeEvents3,analyzeNurbsAffineIntersectionComplexEdgeEvents3} from './geometry/nurbs-affine-intersection-events3.js';
 export type {NurbsIntersectionDifferentialInterval3,NurbsIntersectionDifferentialEvents3,TrimmedNurbsIntersectionDifferentialEvents3,NurbsIntersectionComplexDifferentialEvents3} from './geometry/nurbs-affine-intersection-events3.js';
+export {refineNurbsAffineIntersectionComplex3,refinedNurbsAffineIntersectionEdgePoint3,refinedNurbsAffineIntersectionEdgeDifferential3} from './geometry/nurbs-affine-intersection-refine3.js';
+export type {RefinedNurbsIntersectionVertex3,RefinedNurbsIntersectionEdge3,RefinedNurbsAffineIntersectionComplex3} from './geometry/nurbs-affine-intersection-refine3.js';

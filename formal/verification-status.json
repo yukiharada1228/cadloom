@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "2b119aa9cfcecdd4187d7215ec10622cb0eda2d3965a4e59d74a5ced498d5b1d",
+    "src/index.ts": "840d04c9fcbab22d53f72ed6fe4f1d7439cdd7ff89d7559193a75db440653ac6",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -205,7 +205,8 @@
     "src/geometry/nurbs-affine-intersection-trim3.ts": "a2d43a4feb00154504ba109ef80fac617e45ef319d236568f56dc158cdc0dce7",
     "src/geometry/nurbs-affine-intersection-seams3.ts": "4fee3b617b0506253ca00cc25344e13f6d8ddd31de073ff56f511e58dd7551a8",
     "src/geometry/nurbs-affine-intersection-differential3.ts": "79b92879a5ee4dfa7625e6678ec8eb677cfdf5466166aea4bd179a013b9db9c2",
-    "src/geometry/nurbs-affine-intersection-events3.ts": "b14ab652e194fb016a336e6b1a6c76c060e1eef0198f91c8c19216cea36d37de"
+    "src/geometry/nurbs-affine-intersection-events3.ts": "b14ab652e194fb016a336e6b1a6c76c060e1eef0198f91c8c19216cea36d37de",
+    "src/geometry/nurbs-affine-intersection-refine3.ts": "05a8395aa30fb4916651aad6f885e07b571706e1b11d265e9b5aed261a5df3ec"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
