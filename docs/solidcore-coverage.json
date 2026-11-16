@@ -78,10 +78,13 @@
         "src/geometry/nurbs-edge3.ts",
         "src/geometry/brep-curve3.ts",
         "src/geometry/nurbs-source-brep3.ts",
-        "src/geometry/sew-nurbs-source-breps3.ts"
+        "src/geometry/sew-nurbs-source-breps3.ts",
+        "src/geometry/sewn-nurbs-source-embedding3.ts",
+        "src/geometry/sewn-nurbs-source-containment3.ts",
+        "src/geometry/sewn-nurbs-source-material3.ts"
       ],
       "status": "partial",
-      "gap": "Native, NURBS and mixed edge incidence exists. Certified finite source faces enter the shared engine, and supported rational boundary maps sew across sources with full interval coverage. Fixed nonlinear cube and weighted-cylinder shells close. General SSI map extraction, surface-interior/global embedding and material certification remain incomplete."
+      "gap": "Certified finite source faces enter shared incidence and supported rational maps sew across sources. Sufficient pairwise separation certificates now gate global embeddings, containment forests and alternating material orientation. Complete general embedding discovery, general SSI maps and common NURBS Body adoption remain incomplete."
     },
     {
       "id": "conversion",
@@ -298,10 +301,13 @@
         "src/geometry/nurbs-source-complex-face-query3.ts",
         "src/geometry/nurbs-source-complex-face-preimage3.ts",
         "src/geometry/nurbs-source-face-line3.ts",
-        "src/geometry/sewn-nurbs-source-ray3.ts"
+        "src/geometry/sewn-nurbs-source-ray3.ts",
+        "src/geometry/sewn-nurbs-source-parity-search3.ts",
+        "src/geometry/sewn-nurbs-source-material-query3.ts",
+        "src/geometry/sewn-nurbs-source-material-line3.ts"
       ],
       "status": "partial",
-      "gap": "Supported native/analytic queries and certified finite NURBS face evaluation, inverse membership, line/ray sections and guarded sewn-shell intersection parity exist. Tangencies, seams and overlaps remain explicit degeneracies. General nearest-point/measurement families, automatic ray selection, global shell validation and NURBS material classification remain incomplete."
+      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, common NURBS Body dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated."
     },
     {
       "id": "tessellation",
@@ -360,13 +366,21 @@
   ],
   "nurbsIntegrationEvidence": {
     "sourceCommit": "39257e5744ae9517e69bc1319eda8aeda9f2f43f",
-    "scope": "Constructed, positively certified NURBS face paths and fixed closed-shell regression examples only; no full SolidCraft parity or arbitrary material certificate",
+    "scope": "Constructed positively certified finite NURBS faces and disjoint embedded shells, with sufficient material certification and exact queries; no full SolidCraft parity or arbitrary imported-material certification",
     "tests": [
       "tests/nurbs-source-cylinder-integration3.test.ts",
       "tests/sew-nurbs-source-breps3.test.ts",
       "tests/sewn-nurbs-source-ray3.test.ts",
-      "tests/nurbs-source-brep-record3.test.ts"
+      "tests/nurbs-source-brep-record3.test.ts",
+      "tests/sewn-nurbs-source-embedding3.test.ts"
     ],
-    "document": "docs/nurbs-source-cylinder-integration3.md"
+    "document": "docs/nurbs-source-cylinder-integration3.md",
+    "materialBoundarySourceCommit": "30f6883",
+    "materialDocuments": [
+      "docs/sewn-nurbs-source-containment3.md",
+      "docs/sewn-nurbs-source-material3.md",
+      "docs/sewn-nurbs-source-material-query3.md",
+      "docs/sewn-nurbs-source-material-line3.md"
+    ]
   }
 }
