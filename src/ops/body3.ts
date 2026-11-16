@@ -1,3 +1,7 @@
+import {booleanCylinderMaterialPrograms3,clipCylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
+import type {CylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
+import {materialSurfaceSourceOfBody3} from '../model/body3.js';
+import {resolveCylinderMaterialProgram3,materialProgramFromOperand3} from '../geometry/cylinder-material-expression3.js';
 import {prepareCylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
 import {boundaryMaterialSurfaces3} from '../geometry/material-surface-boundary3.js';
 import type {MaterialSurfaceBoundary3} from '../geometry/material-surface-boundary3.js';
@@ -141,7 +145,7 @@ export function bodyFromClippedCylinder3(source:ClippedCylinderBRep3):Body3 {
 export function bodyFromFiniteCylinderBoolean3(source:FiniteCylinderBoolean3):Body3 {return adoptFiniteCylinderBooleanBody3(source);}
 /** Cylinder-family Booleans retain operand-local planes on previously cut Bodies. */
 export function booleanCylinderBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
- assertOwnedBody3(first);assertOwnedBody3(second);if(first.construction.kind==='box'||second.construction.kind==='box'||planarSourceOfBody3(first)||planarSourceOfBody3(second))throw new RangeError('Cylinder Body Boolean requires cylinder/halfspace operands; use booleanMixedBodies3 for planar operands');if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown cylinder Body operation');const mixed=(b:Body3)=>['clipped-cylinder','plane-cut-cylinder-expression','clipped-cylinder-expression','cylinder-material-expression'].includes(b.construction.kind);if(mixed(first)||mixed(second))return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
+ assertOwnedBody3(first);assertOwnedBody3(second);if(first.construction.kind==='box'||second.construction.kind==='box'||planarSourceOfBody3(first)||planarSourceOfBody3(second))throw new RangeError('Cylinder Body Boolean requires cylinder/halfspace operands; use booleanMixedBodies3 for planar operands');if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown cylinder Body operation');if(materialSurfaceSourceOfBody3(first)||materialSurfaceSourceOfBody3(second))return booleanSurfaceBodies3(first,second,operation);const mixed=(b:Body3)=>['clipped-cylinder','plane-cut-cylinder-expression','clipped-cylinder-expression','cylinder-material-expression'].includes(b.construction.kind);if(mixed(first)||mixed(second))return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
  const primitive=(body:Body3)=>{const s=cylinderSourceOfBody3(body);if(s.planes.length!==2)throw new RangeError('Cylinder Body Boolean requires an unclipped finite cylinder');return prepareFiniteCylinder3(s.cylinder,s.lower,s.upper);};
  const parts=(body:Body3):{operands:readonly FiniteCylinder3[];expression:FiniteCylinderExpression3}|null=>{const expression=finiteCylinderExpressionSourceOfBody3(body);if(expression)return expression;const binary=finiteCylinderBooleanSourceOfBody3(body);return binary?{operands:[binary.first,binary.second],expression:{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}}}:null;},a=parts(first),b=parts(second);
  if(!a&&!b)return bodyFromFiniteCylinderBoolean3(booleanFiniteCylinders3(primitive(first),primitive(second),operation));
@@ -158,7 +162,7 @@ export function bodyFromClippedCylinderExpression3(source:ClippedCylinderExpress
 /** Append halfspaces to owned cylinder-family Bodies, including restored previous
  * cut and mixed-predicate Boolean results, retaining each local formula. */
 export function clipCylinderExpressionBody3(body:Body3,halfspaces:readonly CylinderHalfSpace3[]):Body3 {
- assertOwnedBody3(body);const material=cylinderMaterialSourceOfBody3(body);if(material)return bodyFromCylinderMaterial3(clipCylinderMaterial3(material,halfspaces));const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return bodyFromClippedCylinderExpression3(refineClippedCylinderExpression3(clipped,halfspaces));const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(cut.source,[cut.cut,...halfspaces]));
+ assertOwnedBody3(body);const surface=materialSurfaceSourceOfBody3(body);if(surface)return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(clipCylinderMaterialProgram3(resolveCylinderMaterialProgram3(surface.material),halfspaces),{requireClosed:true}));const material=cylinderMaterialSourceOfBody3(body);if(material)return bodyFromCylinderMaterial3(clipCylinderMaterial3(material,halfspaces));const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return bodyFromClippedCylinderExpression3(refineClippedCylinderExpression3(clipped,halfspaces));const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(cut.source,[cut.cut,...halfspaces]));
  let source=finiteCylinderExpressionSourceOfBody3(body);const binary=finiteCylinderBooleanSourceOfBody3(body);if(!source&&binary)source=boundaryFiniteCylinderExpression3([binary.first,binary.second],{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}});
  if(source)return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(source,halfspaces));const primitive=cylinderSourceOfBody3(body),base=prepareFiniteCylinder3(primitive.cylinder,primitive.lower,primitive.upper),expression=boundaryFiniteCylinderExpression3([base],{kind:'operand',operand:0});return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(expression,[...primitive.planes.map(plane=>({plane,side:-1 as const})),...halfspaces]));
 }
@@ -175,6 +179,7 @@ function nativePlanarOperand3(body:Body3):boolean {
 export function booleanMixedBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
  assertOwnedBody3(first);assertOwnedBody3(second);
  if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown mixed Body operation');
+ if(materialSurfaceSourceOfBody3(first)||materialSurfaceSourceOfBody3(second))return booleanSurfaceBodies3(first,second,operation);
  if(nativePlanarOperand3(first)&&nativePlanarOperand3(second))return booleanPlanarBodies3(first,second,operation);
  return bodyFromCylinderMaterial3(booleanCylinderMaterials3(materialOperandOfBody3(first),materialOperandOfBody3(second),operation));
 }
@@ -188,3 +193,15 @@ function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
 }
 
 export function bodyFromMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3):Body3 {return adoptMaterialSurfaceBody3(source);}
+
+function programOfBody3(body:Body3):CylinderMaterialProgram3 {
+ const surface=materialSurfaceSourceOfBody3(body);if(surface)return resolveCylinderMaterialProgram3(surface.material);
+ if(body.construction.kind==='cylinder'){
+  const c=cylinderSourceOfBody3(body);return prepareCylinderMaterialProgram3([prepareFiniteCylinder3(c.cylinder,c.lower,c.upper)],[],{kind:'cylinder',cylinder:0});
+ }
+ return materialProgramFromOperand3(materialOperandOfBody3(body));
+}
+function booleanSurfaceBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
+ const program=booleanCylinderMaterialPrograms3(programOfBody3(first),programOfBody3(second),operation);
+ return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(program,{requireClosed:true}));
+}

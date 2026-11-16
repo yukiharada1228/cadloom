@@ -351,3 +351,4 @@ export type {MaterialSurfaceRegions3} from './geometry/finite-cylinder-regions3.
 export {strictCylinderMaterialProgramLocation3} from './geometry/cylinder-material-program3.js';
 export {locateMaterialSurfaceBoundary3} from './geometry/material-surface-boundary3.js';
 export {bodyFromMaterialSurfaceBoundary3} from './ops/body3.js';
+export {booleanCylinderMaterialPrograms3,clipCylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';

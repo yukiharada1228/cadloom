@@ -49,3 +49,21 @@ export function strictCylinderMaterialProgramLocation3(source:CylinderMaterialPr
  if(cylinders.includes('boundary')||planes.includes(0))return null;
  return evaluateCylinderMaterialExpression3(source.expression,cylinders.map(c=>c==='inside'),planes.map(s=>s<0))?'inside':'outside';
 }
+
+/** Compose complete local formulas; primitive identity sharing is optional,
+ * never a geometric equivalence assumption. No boundary is constructed here. */
+export function booleanCylinderMaterialPrograms3(a:CylinderMaterialProgram3,b:CylinderMaterialProgram3,operation:BooleanOperation):CylinderMaterialProgram3 {
+ assertOwnedCylinderMaterialProgram3(a);assertOwnedCylinderMaterialProgram3(b);
+ if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown material program operation');
+ const remap=(t:CylinderMaterialExpression3,c:number,p:number):CylinderMaterialExpression3=>t.kind==='cylinder'?{kind:t.kind,cylinder:t.cylinder+c}:t.kind==='halfspace'?{kind:t.kind,halfspace:t.halfspace+p}:{kind:t.kind,first:remap(t.first,c,p),second:remap(t.second,c,p)};
+ return prepareCylinderMaterialProgram3([...a.cylinders,...b.cylinders],[...a.planes,...b.planes],{kind:operation,first:a.expression,second:remap(b.expression,a.cylinders.length,a.planes.length)});
+}
+export function clipCylinderMaterialProgram3(source:CylinderMaterialProgram3,halfspaces:readonly import('./trimmed-cylinder3.js').CylinderHalfSpace3[]):CylinderMaterialProgram3 {
+ assertOwnedCylinderMaterialProgram3(source);const planes=[...source.planes];let expression=source.expression;
+ for(const h of halfspaces){
+  if(h.side!==-1&&h.side!==1)throw new RangeError('Halfspace side must be -1 or 1');
+  const p=h.plane,n=p.normal,plane=h.side===-1?plane3(n.x,n.y,n.z,p.offset):plane3(n.x.neg(),n.y.neg(),n.z.neg(),p.offset.neg()),halfspace=planes.length;
+  planes.push(plane);expression={kind:'intersection',first:expression,second:{kind:'halfspace',halfspace}};
+ }
+ return prepareCylinderMaterialProgram3(source.cylinders,planes,expression);
+}

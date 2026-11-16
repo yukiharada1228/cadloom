@@ -102,3 +102,8 @@ export function clipCylinderMaterial3(input:CylinderMaterialOperand3,halfspaces:
 export function strictCylinderMaterialLocation3(source:CylinderMaterialBoundary3,p:Point3):'inside'|'outside'|null {
  return strictCylinderMaterialProgramLocation3(materialProgramOfBoundary3(source),p);
 }
+
+/** Extract a definition from an already owned legacy operand without recomputing its boundary. */
+export function materialProgramFromOperand3(input:CylinderMaterialOperand3):CylinderMaterialProgram3 {
+ const p=parts(input);return prepareCylinderMaterialProgram3(p.cylinders,p.planes,p.expression);
+}
