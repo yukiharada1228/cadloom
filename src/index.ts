@@ -424,3 +424,6 @@ export {createAffineNurbsFace3,locateAffineNurbsFace3,affineNurbsFacePoint3,inte
 export type {AffineNurbsFace3} from './geometry/affine-nurbs-face3.js';
 export {sewAffineNurbsFaces3,affineNurbsBoundaryEdgePoint3} from './geometry/sew-affine-nurbs-faces3.js';
 export type {AffineNurbsBoundaryEdge3,SewnAffineNurbsFaces3} from './geometry/sew-affine-nurbs-faces3.js';
+export {readAffineNurbsFaceRecord3,readAffineNurbsFacesDocument3,parseAffineNurbsFacesDocument3} from './record/affine-nurbs-face3.js';
+export type {AffineNurbsFaceRecord3,AffineNurbsFacesDocument3} from './record/affine-nurbs-face3.js';
+export {encodeAffineNurbsFace3,decodeAffineNurbsFace3,affineNurbsFacesDocument3,serializeAffineNurbsFaces3,restoreAffineNurbsFaces3} from './convert/affine-nurbs-face3.js';
