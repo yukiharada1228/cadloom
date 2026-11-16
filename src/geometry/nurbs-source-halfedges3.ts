@@ -10,6 +10,8 @@ interface HalfedgeBase3 {readonly source:NurbsSourceBoundaryComplex3;readonly ha
 export type NurbsSourceHalfedges3=
  | Readonly<HalfedgeBase3&{kind:'unresolved';vertices:readonly Readonly<{vertex:number;halfedges:readonly number[]}>[];}>
  | Readonly<HalfedgeBase3&{kind:'ordered';rotation:readonly (readonly number[])[];next:readonly number[];cycles:readonly (readonly number[])[];}>;
+const owned=new WeakSet<NurbsSourceHalfedges3>();
+export function assertOwnedNurbsSourceHalfedges3(source:NurbsSourceHalfedges3):void {if(!owned.has(source))throw new RangeError('Expected factory-created source halfedges');}
 function between(a:AlgebraicReal,b:AlgebraicReal):Rational {while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}return a.upper.add(b.lower).div(new Rational(2n));}
 /** Counterclockwise germs in source UV, using common exact u-fibers rather
  * than floating angles or tangent-only sorting. Same-fiber ties stay unresolved.
@@ -36,8 +38,8 @@ export function buildNurbsSourceHalfedges3(source:NurbsSourceBoundaryComplex3):N
   const sorted=ids.slice().sort(compare);for(let i=1;i<sorted.length;i++)if(compare(sorted[i-1]!,sorted[i]!)===0)tied=true;
   if(tied)unresolved.push(Object.freeze({vertex,halfedges:Object.freeze(ids.slice())}));rotation.push(Object.freeze(sorted));
  }
- if(unresolved.length)return Object.freeze({source,halfedges,kind:'unresolved',vertices:Object.freeze(unresolved)});
+ if(unresolved.length){const result=Object.freeze({source,halfedges,kind:'unresolved' as const,vertices:Object.freeze(unresolved)});owned.add(result);return result;}
  const next=halfedges.map(h=>{const r=rotation[h.to]!,i=r.indexOf(h.twin);if(i<0)throw new Error('Missing outgoing twin');return r[(i+r.length-1)%r.length]!;}),seen=new Set<number>(),cycles:number[][]=[];
  for(let id=0;id<halfedges.length;id++)if(!seen.has(id)){const cycle:number[]=[];let h=id;while(!seen.has(h)){seen.add(h);cycle.push(h);h=next[h]!;}if(h!==id)throw new Error('Halfedge successor is not a disjoint cycle permutation');cycles.push(cycle);}
- return Object.freeze({source,halfedges,kind:'ordered',rotation:Object.freeze(rotation),next:Object.freeze(next),cycles:Object.freeze(cycles.map(c=>Object.freeze(c)))});
+ const result=Object.freeze({source,halfedges,kind:'ordered' as const,rotation:Object.freeze(rotation),next:Object.freeze(next),cycles:Object.freeze(cycles.map(c=>Object.freeze(c)))});owned.add(result);return result;
 }

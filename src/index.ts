@@ -453,3 +453,5 @@ export {buildNurbsSourceBoundaryComplex3} from './geometry/nurbs-source-boundary
 export type {NurbsSourceBoundaryComplexUse3,NurbsSourceBoundaryComplex3} from './geometry/nurbs-source-boundary-complex3.js';
 export {buildNurbsSourceHalfedges3} from './geometry/nurbs-source-halfedges3.js';
 export type {NurbsSourceHalfedge3,NurbsSourceHalfedges3} from './geometry/nurbs-source-halfedges3.js';
+export {classifyNurbsSourceFaces3} from './geometry/nurbs-source-faces3.js';
+export type {NurbsSourceFace3,NurbsSourceFaces3} from './geometry/nurbs-source-faces3.js';
