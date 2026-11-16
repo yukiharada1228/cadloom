@@ -491,3 +491,5 @@ export {sewNurbsSourceBReps3,sewnNurbsSourceEdgePoint3} from './geometry/sew-nur
 export type {SewnNurbsSourceBReps3,SewnNurbsSourceEdge3,SewnNurbsSourceFace3} from './geometry/sew-nurbs-source-breps3.js';
 export {intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3,querySewnNurbsSourceShellParity3} from './geometry/sewn-nurbs-source-ray3.js';
 export type {SewnNurbsSourceRay3,SewnNurbsSourceRayUse3,SewnNurbsSourceRayReason3,SewnNurbsShellParity3} from './geometry/sewn-nurbs-source-ray3.js';
+export {certifySewnNurbsSourceEmbedding3} from './geometry/sewn-nurbs-source-embedding3.js';
+export type {SewnNurbsSourceEmbedding3,SewnNurbsSourceEmbeddingCertificate3,NurbsSourceFaceSeparation3} from './geometry/sewn-nurbs-source-embedding3.js';
