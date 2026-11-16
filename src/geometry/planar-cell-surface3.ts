@@ -1,14 +1,15 @@
+import {commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {plane3,intersectPlanes3} from './plane3.js';
 import {cylinder3,classifyPointToSurface3} from './surface3.js';
 import type {Surface3} from './surface3.js';
-import {dot3} from './point3.js';
+import {point3,dot3} from './point3.js';
 import {algebraicLine3,algebraicLinePoint3} from './algebraic-line3.js';
 import type {AlgebraicLine3} from './algebraic-line3.js';
 import {pointInPlaneFrame3} from './plane-frame3.js';
-import {compareAlgebraicPoints3} from './algebraic-point3.js';
+import {algebraicCoordinates3,translateAlgebraicPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {algebraicSegment3,restrictAlgebraicSegment3} from './algebraic-segment3.js';
 import {fullEllipseArc3,splitEllipticArc3,interiorPointOnEllipticArc3} from './ellipse3.js';
@@ -57,7 +58,23 @@ export function classifyPlanarPartitionSurfaces3(source:PlanarFaceCurvePartition
     const segment=curve.segment,axis=(['x','y','z'] as const).find(k=>segment.start[k].compare(segment.end[k])!==0)!;
     const direction=segment.start[axis].compare(segment.end[axis])<0?1:-1;
     const points=[segment.start,...cuts,segment.end].sort((a,b)=>a[axis].compare(b[axis])*direction).filter((p,j,all)=>j===0||compareAlgebraicPoints3(p,all[j-1]!)!==0);
-    samples=points.slice(0,-1).map((p,j)=>witness({kind:'algebraic-segment',segment:restrictAlgebraicSegment3(segment,p,points[j+1]!)}));
+    samples=points.slice(0,-1).map((p,j)=>{
+     const q=points[j+1]!,axes=['x','y','z'] as const;
+     if(axes.every(k=>segment.start[k].rational!==null&&segment.end[k].rational!==null)){
+      let a=direction===1?p[axis]:q[axis],b=direction===1?q[axis]:p[axis];
+      while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}
+      const coordinate=a.upper.add(b.lower).div(new Rational(2n)),start=segment.start[axis].rational!,end=segment.end[axis].rational!,t=coordinate.sub(start).div(end.sub(start));
+      return algebraicCoordinates3(...axes.map(k=>segment.start[k].rational!.add(segment.end[k].rational!.sub(segment.start[k].rational!).mul(t))) as [Rational,Rational,Rational]);
+     }
+     const line=commonAlgebraicAxialLine3(segment.start,segment.end),sampleAxis=line?axes.find(k=>line.direction[k].sign()!==0&&line.base[k].rational!==null):undefined;
+     if(line&&sampleAxis!==undefined){
+      let a=p[sampleAxis],b=q[sampleAxis];if(a.compare(b)>0)[a,b]=[b,a];
+      while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}
+      const coordinate=a.upper.add(b.lower).div(new Rational(2n)),t=coordinate.sub(line.base[sampleAxis].rational!).div(line.direction[sampleAxis]);
+      return translateAlgebraicPoint3(line.base,point3(line.direction.x.mul(t),line.direction.y.mul(t),line.direction.z.mul(t)));
+     }
+     return witness({kind:'algebraic-segment',segment:restrictAlgebraicSegment3(segment,p,q)});
+    });
    }else throw new Error('Unexpected supporting zero curve');
    const point=samples.find(p=>cell.locate(p)==='inside');
    if(point)return Object.freeze({kind:'cut',point});

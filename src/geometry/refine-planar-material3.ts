@@ -19,7 +19,8 @@ export interface RefinedPlanarMaterial3 {
 export function refinePlanarMaterial3(source:PlanarPartitionMaterialClassification3):RefinedPlanarMaterial3 {
  assertOwnedPlanarPartitionMaterialClassification3(source);
  const surfaces=source.supports.surfaces,indices:number[]=[];
- source.supports.cells.forEach(row=>row.forEach((entry,i)=>{
+ source.supports.cells.forEach((row,cell)=>row.forEach((entry,i)=>{
+  if(source.cells[cell]!.kind!=='unresolved')return;
   if(entry.kind==='cut'&&!indices.some(j=>surfacesCoincide3(surfaces[j]!,surfaces[i]!)))indices.push(i);
  }));
  indices.sort((a,b)=>a-b);
