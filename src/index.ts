@@ -589,3 +589,5 @@ export {readCappedNurbsBodyDocument3} from './record/capped-nurbs-body3.js';
 export type {CappedNurbsBodyDocument3} from './record/capped-nurbs-body3.js';
 export {intersectCappedNurbsPlaneMaterialLine3} from './geometry/capped-nurbs-plane-material-line3.js';
 export type {CappedNurbsMaterialLine3,CappedNurbsMaterialLineHit3,CappedNurbsMaterialLineSpan3} from './geometry/capped-nurbs-plane-material-line3.js';
+export {intersectNurbsPlaneCapFacePlane3} from './geometry/nurbs-plane-cap-section3.js';
+export type {NurbsPlaneCapSection3,NurbsPlaneCapSectionEvent3,NurbsPlaneCapSectionSpan3} from './geometry/nurbs-plane-cap-section3.js';
