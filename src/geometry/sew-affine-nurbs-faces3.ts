@@ -3,6 +3,8 @@ import type {ExactInput} from './point2.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {Polynomial} from '../numeric/polynomial.js';
 import {compareAlgebraicPoints3} from './algebraic-point3.js';
+import {intersectAffineNurbsFaceBoundaries3} from './affine-nurbs-boundary-intersection3.js';
+import type {AffineNurbsBoundaryIntersection3} from './affine-nurbs-boundary-intersection3.js';
 import {assertOwnedAffineNurbsFace3} from './affine-nurbs-face3.js';
 import type {AffineNurbsFace3} from './affine-nurbs-face3.js';
 import {evaluateNurbsSurfaceBoundaryPiece3} from './nurbs-surface-boundary3.js';
@@ -13,6 +15,7 @@ import type {BRepTopology3,BRepEdgeUse3} from './brep-topology3.js';
 export interface AffineNurbsBoundaryEdge3 {readonly boundary:NurbsSurfaceBoundary3;readonly piece:number;readonly lower:AlgebraicReal;readonly upper:AlgebraicReal;}
 export interface SewnAffineNurbsFaces3 {
  readonly topology:BRepTopology3<AffineNurbsBoundaryEdge3,AffineNurbsFace3>;
+ readonly boundaryIntersections:readonly AffineNurbsBoundaryIntersection3[];
  /** Face, ring, original parameter curve, then ordered split-piece uses. */
  readonly sourceUses:readonly (readonly (readonly (readonly BRepEdgeUse3[])[])[])[];
 }
@@ -46,13 +49,15 @@ function preimages(e:AffineNurbsBoundaryEdge3,point:AlgebraicCoordinates3):reado
  if(f.degree<0)throw new Error('Nonconstant coordinate has an identically zero preimage polynomial');
  return isolateRealRoots(f).filter(t=>t.compare(e.lower)>=0&&t.compare(e.upper)<=0&&compareAlgebraicPoints3(evaluateNurbsSurfaceBoundaryPiece3(e.boundary,e.piece,t),point)===0);
 }
-/** All supplied boundary-piece endpoints are noded before whole-interval
- * polynomial matching. Missing interior/interior crossings and nonlinear
- * parameter correspondences are not discovered by this operation. */
+/** All endpoints and pairwise boundary-intersection events are noded before
+ * whole-interval matching. Nonlinear coincidence relations are reported but
+ * not merged by the rational-affine matching path. No surface-interior SSI. */
 export function sewAffineNurbsFaces3(input:readonly AffineNurbsFace3[]):SewnAffineNurbsFaces3 {
  const faces=Array.from(input,f=>{assertOwnedAffineNurbsFace3(f);return f;}),edges:AffineNurbsBoundaryEdge3[]=[];
  const original=faces.map(face=>face.boundaries.map(ring=>ring.map(boundary=>boundary.pieces.map((_,piece)=>edge(boundary,piece))))),points:AlgebraicCoordinates3[]=[];
  for(const e of original.flat(3))for(const p of ends(e))if(!points.some(q=>compareAlgebraicPoints3(p,q)===0))points.push(p);
+ const boundaryIntersections:AffineNurbsBoundaryIntersection3[]=[];
+ for(let i=0;i<faces.length;i++)for(let j=i+1;j<faces.length;j++){const report=intersectAffineNurbsFaceBoundaries3(faces[i]!,faces[j]!);boundaryIntersections.push(report);for(const item of report.points)if(!points.some(p=>compareAlgebraicPoints3(p,item.point)===0))points.push(item.point);}
  const split=original.map(rings=>rings.map(ring=>ring.map(pieces=>pieces.flatMap(e=>{
   const cuts=[e.lower,e.upper];for(const p of points)for(const t of preimages(e,p))if(t.compare(e.lower)>0&&t.compare(e.upper)<0&&!cuts.some(q=>t.compare(q)===0))cuts.push(t);
   cuts.sort((a,b)=>a.compare(b));return cuts.slice(0,-1).map((lower,i)=>edge(e.boundary,e.piece,lower,cuts[i+1]!));
@@ -66,7 +71,7 @@ export function sewAffineNurbsFaces3(input:readonly AffineNurbsFace3[]):SewnAffi
   snapshotSurface:(face:AffineNurbsFace3)=>{assertOwnedAffineNurbsFace3(face);return face;},
   onSurface:(e,face)=>split[faces.indexOf(face)]!.flat(2).some(candidate=>match(e,candidate)!==0),
  });
- return Object.freeze({topology,sourceUses});
+ return Object.freeze({topology,sourceUses,boundaryIntersections:Object.freeze(boundaryIntersections)});
 }
 /** Closed subinterval evaluation; structural copies cannot broaden the range. */
 export function affineNurbsBoundaryEdgePoint3(e:AffineNurbsBoundaryEdge3,parameter:AlgebraicReal|ExactInput):AlgebraicCoordinates3 {

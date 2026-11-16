@@ -15,7 +15,7 @@ test('six affine NURBS faces use common incidence for a closed oriented cube she
 });
 test('equal endpoints never merge distinct whole curves',()=>{
  const flat=(u:bigint,v:bigint)=>point3(u,v,0n),straight=rectangle().map(c=>nurbsCurve3(c.degree,c.controlPoints.map(p=>point3(p.x,p.y.div(new Rational(2n)),0n)),c.knots,c.weights)),a=face(flat,straight),ring=[...straight];ring[2]=nurbsCurve3(3,[point3(1n,'1/2',0n),point3('2/3','1/3',0n),point3('1/3','2/3',0n),point3(0n,'1/2',0n)],[0n,0n,0n,0n,1n,1n,1n,1n]);for(const t of [0n,'1/2',1n])assert.equal(compareAlgebraicPoints3(evaluateNurbsCurve3(straight[2]!,t),evaluateNurbsCurve3(ring[2]!,t)),0);const b=face(flat,ring),t=sewAffineNurbsFaces3([a,b]).topology;
- assert.equal(t.edges.length,5);assert.equal(t.edges.filter(e=>e.coedges.length===2).length,3);assert.equal(t.edges.filter(e=>e.coedges.length===1).length,2);assert.equal(t.closed,false);assert.ok(t.issues.some(i=>i.kind==='inconsistent-edge-orientation'));
+ assert.equal(t.edges.length,7);assert.equal(t.edges.filter(e=>e.coedges.length===2).length,3);assert.equal(t.edges.filter(e=>e.coedges.length===1).length,4);assert.equal(t.closed,false);assert.ok(t.issues.some(i=>i.kind==='inconsistent-edge-orientation'));
 });
 test('owned geometry is mandatory and boundary provenance remains frozen',()=>{
  const a=face((u,v)=>point3(u,v,u*v));assert.throws(()=>sewAffineNurbsFaces3([{...a}]),/factory/);const s=sewAffineNurbsFaces3([a]);assert.equal(s.topology.edges.length,4);assert.equal(s.topology.issues.filter(i=>i.kind==='boundary-edge').length,4);for(const r of s.sourceUses[0]!)for(const c of r){assert.ok(Object.isFrozen(c));for(const e of c)assert.ok(Object.isFrozen(e));}assert.equal(sewAffineNurbsFaces3([]).topology.faces.length,0);
