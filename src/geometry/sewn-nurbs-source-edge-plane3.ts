@@ -32,10 +32,13 @@ function between(a:AlgebraicReal,b:AlgebraicReal):Rational {
 /** Refine existing shared edges at every plane root, including tangent roots.
  * Original faces are retained: this is not an interior face or Body split. */
 export function refineSewnNurbsSourceEdgesByPlane3(source:SewnNurbsSourceBReps3,input:Plane3):SewnNurbsSourceEdgePlane3 {
+ return refine(source,input,[]);
+}
+function refine(source:SewnNurbsSourceBReps3,input:Plane3,extra:readonly (readonly AlgebraicReal[])[]):SewnNurbsSourceEdgePlane3 {
  assertOwnedSewnNurbsSourceBReps3(source);if(source.kind!=='sewn')throw new RangeError('Source boundary sewing is unresolved');
  const plane=plane3(input.normal.x,input.normal.y,input.normal.z,input.offset),T=source.topology,fragments:NurbsSourcePlaneEdgeFragment3[]=[],sourceUses:readonly BRepEdgeUse3[][]=T.edges.map((e,parent)=>{
   const s=e.curve,p=s.map.span,F=p.x.scale(plane.normal.x).add(p.y.scale(plane.normal.y)).add(p.z.scale(plane.normal.z)).add(p.weight.scale(plane.offset));
-  const cuts=[s.lower,s.upper,...(F.degree>0?AlgebraicReal.isolate(F):[]).filter(t=>t.compare(s.lower)>0&&t.compare(s.upper)<0)].sort((a,b)=>a.compare(b)).filter((t,i,all)=>i===0||t.compare(all[i-1]!)!==0),uses:BRepEdgeUse3[]=[];
+  const cuts=[s.lower,s.upper,...(extra[parent]??[]),...(F.degree>0?AlgebraicReal.isolate(F):[]).filter(t=>t.compare(s.lower)>0&&t.compare(s.upper)<0)].sort((a,b)=>a.compare(b)).filter((t,i,all)=>i===0||t.compare(all[i-1]!)!==0),uses:BRepEdgeUse3[]=[];
   for(let i=0;i+1<cuts.length;i++){
    const lower=cuts[i]!,upper=cuts[i+1]!,sampleParameter=between(lower,upper);
    if(p.weight.evaluate(sampleParameter).sign()<=0)throw new Error('Source boundary lost positive homogeneous weight');
@@ -52,6 +55,32 @@ export function refineSewnNurbsSourceEdgesByPlane3(source:SewnNurbsSourceBReps3,
  });
  if(T.closed&&!topology.closed||T.consistentlyOriented&&!topology.consistentlyOriented||T.manifoldVertices&&!topology.manifoldVertices)throw new Error('Shared edge refinement changed source incidence validity');
  const result=Object.freeze({source,plane,topology,sourceUses:Object.freeze(sourceUses.map(u=>Object.freeze(u)))});ownedReports.add(result);return result;
+}
+export interface SewnNurbsSourceEdgeParameterRefinement3 {
+ readonly previous:SewnNurbsSourceEdgePlane3;readonly refinement:SewnNurbsSourceEdgePlane3;
+ /** Previous fragment -> new children in increasing native parameter. */
+ readonly sourceUses:readonly (readonly BRepEdgeUse3[])[];
+}
+/** Add exact cuts to owned fragments, retaining all previous cuts and all
+ * original coedge uses. Parameters are validated before reconstruction. */
+export function refineNurbsSourcePlaneEdgeParameters3(previous:SewnNurbsSourceEdgePlane3,input:readonly Readonly<{edge:number;parameter:AlgebraicReal|ExactInput}>[]):SewnNurbsSourceEdgeParameterRefinement3 {
+ assertOwnedSewnNurbsSourceEdgePlane3(previous);
+ const extra=previous.source.topology.edges.map(()=>[] as AlgebraicReal[]);
+ for(const e of previous.topology.edges)extra[e.curve.parent]!.push(e.curve.lower,e.curve.upper);
+ for(const cut of input){
+  if(!Number.isSafeInteger(cut.edge)||cut.edge<0||cut.edge>=previous.topology.edges.length)throw new RangeError('Invalid plane edge cut');
+  const e=previous.topology.edges[cut.edge]!.curve,t=cut.parameter instanceof AlgebraicReal?cut.parameter:AlgebraicReal.fromRational(cut.parameter);
+  if(t.compare(e.lower)<0||t.compare(e.upper)>0)throw new RangeError('Cut parameter is outside the plane edge fragment');
+  extra[e.parent]!.push(t);
+ }
+ const refinement=refine(previous.source,previous.plane,extra),sourceUses=previous.topology.edges.map(e=>{
+  const old=e.curve,children=refinement.sourceUses[old.parent]!.filter(u=>{const c=refinement.topology.edges[u.edge]!.curve;return c.lower.compare(old.lower)>=0&&c.upper.compare(old.upper)<=0;});
+  if(!children.length)throw new Error('Parameter refinement lost a previous fragment');
+  let cursor=old.lower;for(const u of children){const c=refinement.topology.edges[u.edge]!.curve;if(c.lower.compare(cursor)!==0||c.sign!==old.sign)throw new Error('Parameter refinement lost interval coverage or plane sign');cursor=c.upper;}
+  if(cursor.compare(old.upper)!==0)throw new Error('Parameter refinement lost the last endpoint');
+  return Object.freeze(children);
+ });
+ return Object.freeze({previous,refinement,sourceUses:Object.freeze(sourceUses)});
 }
 export function nurbsSourcePlaneEdgeFragmentPoint3(edge:NurbsSourcePlaneEdgeFragment3,input:AlgebraicReal|ExactInput):ReturnType<typeof evaluateNurbsSpanPoint3> {
  if(!ownedFragments.has(edge))throw new RangeError('Expected factory-created plane edge fragment');
