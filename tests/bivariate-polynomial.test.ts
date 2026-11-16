@@ -24,3 +24,10 @@ test('algebraic evaluation preserves diagonal dependence and unrelated quadratic
   assert.equal(squares.rationalImage(u,rational,new BivariatePolynomial([[1n]])).compare(AlgebraicReal.fromRational('9/4')),0);
   assert.ok(squares.specializeU(0n).equals(new Polynomial([0n,0n,1n])));
 });
+test('correlated rational UV images keep a common cubic source through division',()=>{
+ const t=AlgebraicReal.isolate(new Polynomial([-2n,0n,0n,1n]))[0]!,v=t.affine(1n,1n),N=new BivariatePolynomial([[0n,0n,1n],[0n,1n]]),D=new BivariatePolynomial([[1n],[0n,1n]]);
+ // v=t+1 gives N=2t²+3t+1 and D=t²+t+1.
+ const expected=t.rationalFunction(new Polynomial([1n,3n,2n]),new Polynomial([1n,1n,1n])),actual=N.rationalImage(t,v,D);
+ assert.equal(actual.compare(expected),0);assert.ok(actual.polynomial.degree<=3);
+ const zero=new BivariatePolynomial([[-1n,1n],[-1n]]);assert.throws(()=>N.rationalImage(t,v,zero),/zero/);
+});

@@ -22,6 +22,7 @@ const ownedReports=new WeakSet<SewnNurbsPlaneSplitFaces3>();
 function own<T extends SewnNurbsPlaneSplitFaces3>(report:T):T {ownedReports.add(report);return report;}
 export function assertOwnedSewnNurbsPlaneSplitFaces3(report:SewnNurbsPlaneSplitFaces3):void {if(!ownedReports.has(report))throw new RangeError('Expected factory-created sewn split faces');}
 const ownedEdges=new WeakSet<SewnNurbsPlaneSplitEdge3>();
+export function assertOwnedSewnNurbsPlaneSplitEdge3(edge:SewnNurbsPlaneSplitEdge3):void {if(!ownedEdges.has(edge))throw new RangeError('Expected factory-created sewn split edge');}
 /** Sew all original finite-face subdivisions using canonical shared curve
  * intervals. Optional side selection leaves open section boundaries, not caps. */
 export function sewNurbsPlaneSplitFaces3(source:SewnNurbsSourceEdgePlane3,input:readonly NurbsPlaneSplitFaces3[],side?:1|-1):SewnNurbsPlaneSplitFaces3 {

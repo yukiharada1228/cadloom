@@ -22,6 +22,7 @@ export type NurbsPlaneCapBoundary3=
  | Readonly<{kind:'certified';certificate:NurbsPlaneCapBoundaryCertificate3}>
  | Readonly<{kind:'unresolved';source:SewnNurbsPlaneSplitFaces3;reason:'face-sewing'|'side-required'|'open-parent'|'nonmanifold-boundary'|'non-section-boundary';edge?:number}>;
 const owned=new WeakSet<NurbsPlaneCapBoundaryCertificate3>();
+export function assertOwnedNurbsPlaneCapBoundary3(certificate:NurbsPlaneCapBoundaryCertificate3):void {if(!owned.has(certificate))throw new RangeError('Expected factory-created plane cap boundary');}
 /** Derive cap-directed exact boundary curves. Whole-edge plane membership
  * follows from opposite signed face closures, or a coplanar source fragment;
  * it is never inferred from endpoint/sample plane tests. */

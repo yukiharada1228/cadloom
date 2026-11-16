@@ -56,6 +56,8 @@ export class BivariatePolynomial {
     if(u.rational!==null)return v.rationalFunction(this.specializeU(u.rational),denominator.specializeU(u.rational));
     if(v.rational!==null)return u.rationalFunction(this.specializeV(v.rational),denominator.specializeV(v.rational));
     if(u.compare(v)===0)return u.rationalFunction(this.diagonal(),denominator.diagonal());
-    return this.evaluateAlgebraic(u,v).div(denominator.evaluateAlgebraic(u,v));
+    // Preserve a recorded common source for correlated UV coordinates. Treating
+    // numerator and denominator as independent multiplies elimination degrees.
+    return AlgebraicReal.productCombination([{factors:[this.evaluateAlgebraic(u,v),denominator.evaluateAlgebraic(u,v).reciprocal()]}]);
   }
 }

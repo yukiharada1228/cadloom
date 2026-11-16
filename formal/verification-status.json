@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "88a17887ebe7a949c7663a6b6b43f5fd341d09c9a7f3296b3bd912b2caddb20c",
+    "src/index.ts": "1c82bb9cb78987bebaf43fe2b766b114abdeae693921d3c8386dc98e63f29e58",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -62,7 +62,7 @@
     "src/geometry/convex-section-polygon3.ts": "7073ec307dc471fbd9ece6b9345cd6466e0e8e3cb90543a782b374d13bd12843",
     "src/geometry/clipped-cylinder-split3.ts": "884fb3ad64d96ca5f745ac706f2ca934c3851e8ec19eb1ec8b321212aa861744",
     "src/geometry/nurbs-curve3.ts": "63bf10e3c1b99466dd837ff5b5f2e0a46a386f7d35caf9ed9f8e6a386ba7e836",
-    "src/numeric/bivariate-polynomial.ts": "6e8d34940a8fd02caad20fa558776fd13791cbef4d53d74fd92774c257134a5b",
+    "src/numeric/bivariate-polynomial.ts": "b2352cfdb974606adfbc77f9857089880bf4246ab372cc14350dbd6adf991f34",
     "src/geometry/nurbs-surface3.ts": "0eacc073fb22c757cb7bd2a13a2095a1fccb0b481058473f9fd60182254e819f",
     "src/numeric/bivariate-system.ts": "dbf9a64df11effd7b07992362b7a666e64710fba71d3c19f0debfda2bf64e264",
     "src/geometry/nurbs-plane-section3.ts": "b286bf499537d17cb5cb7a8e611b4b730a66849d83bc641497744c4ec3be4db8",
@@ -259,8 +259,10 @@
     "src/geometry/nurbs-plane-cell-rational-map3.ts": "46f894873a6b40788af98beaef4d47c96977ed8c23e165b004f972da08d1d1dc",
     "src/geometry/nurbs-plane-cell-source-nodes3.ts": "6a5c43c0a2d3344cabff6cfb006d044f75333d02b3ddc38a698e3c2f5da890d5",
     "src/geometry/nurbs-plane-split-faces3.ts": "08a74ad835dd6b55a30431a78c2c10181b99acc2aa43f076c8a8b3ae8de73423",
-    "src/geometry/sew-nurbs-plane-split-faces3.ts": "2e02ce37b7e5e8bedc0ec45a8b1359046f297aaca18de061848bb806a6ea3d59",
-    "src/geometry/nurbs-plane-cap-boundary3.ts": "46d7d9e9e48c99825b04c8ed22513b820e711d4857009af22f5714bdc88fc380"
+    "src/geometry/sew-nurbs-plane-split-faces3.ts": "6b604bd9559220d57883fd682763a1d38bd8daae3e99a805622f98ecf2ca273f",
+    "src/geometry/nurbs-plane-cap-boundary3.ts": "775bc8d1761dcb63acec8ef53149991ecb721f05535af93a77a17395593556b1",
+    "src/geometry/sewn-nurbs-split-edge-plane3.ts": "428b167400df0a9e02442262f6d49659e7dde32d239d6b1182170e4c39daf12f",
+    "src/geometry/nurbs-plane-cap-winding3.ts": "057cfd1d6d9f926bc4354e3371de9e4c667afff98599b1ade6161a2379725eda"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
