@@ -10,14 +10,15 @@ type Prepared=Extract<NurbsSourceFaceComplex3,{kind:'prepared'}>;
 export interface NurbsSourceBRepEdge3 {readonly complex:Prepared;readonly edge:number;}
 export interface NurbsSourceBRepFace3 {readonly complex:Prepared;readonly face:number;}
 export interface NurbsSourceBRep3 {
- readonly complex:Prepared;readonly topology:BRepTopology3<NurbsSourceBRepEdge3,NurbsSourceBRepFace3>;
+ readonly sense:1|-1;readonly complex:Prepared;readonly topology:BRepTopology3<NurbsSourceBRepEdge3,NurbsSourceBRepFace3>;
  /** Complex vertex -> topology vertex; exact spatial coincidences may weld
   * distinct UV vertices. This mapping preserves that distinction in source. */
  readonly sourceVertices:readonly number[];
  /** Topology face -> original source UV face ID (not its array ordinal). */
  readonly sourceFaces:readonly number[];
 }
-const ownedEdges=new WeakSet<NurbsSourceBRepEdge3>(),ownedFaces=new WeakSet<NurbsSourceBRepFace3>();
+const owned=new WeakSet<NurbsSourceBRep3>(),ownedEdges=new WeakSet<NurbsSourceBRepEdge3>(),ownedFaces=new WeakSet<NurbsSourceBRepFace3>();
+export function assertOwnedNurbsSourceBRep3(input:NurbsSourceBRep3):void {if(!owned.has(input))throw new RangeError('Expected factory-created NURBS source BRep');}
 /** Bridge certified finite source faces to the shared incidence engine.
  * Whole-edge membership comes from validated complex incidences, not samples.
  * No new spatial edge coincidence or global solid certificate is inferred. */
@@ -31,7 +32,7 @@ export function buildNurbsSourceBRep3(complex:NurbsSourceFaceComplex3,sense:1|-1
   onSurface:(e,f)=>e.complex===f.complex&&e.complex.edges[e.edge]!.uses.some(u=>u.face===f.face),
  });
  const sourceVertices=complex.vertices.map(v=>{const id=topology.vertices.findIndex(q=>compareAlgebraicPoints3(q,v.point)===0);if(id<0)throw new Error('Source BRep lost a boundary vertex');return id;});
- return Object.freeze({complex,topology,sourceVertices:Object.freeze(sourceVertices),sourceFaces:Object.freeze(faces.map(f=>f.face))});
+ const result=Object.freeze({sense,complex,topology,sourceVertices:Object.freeze(sourceVertices),sourceFaces:Object.freeze(faces.map(f=>f.face))});owned.add(result);return result;
 }
 export function nurbsSourceBRepEdgePoint3(edge:NurbsSourceBRepEdge3,input:AlgebraicReal|ExactInput):AlgebraicCoordinates3 {
  if(!ownedEdges.has(edge))throw new RangeError('Expected factory-created source BRep edge');return evaluateNurbsSourceComplexEdge3(edge.complex,edge.edge,0,input).point;

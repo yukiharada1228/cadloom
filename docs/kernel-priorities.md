@@ -7,6 +7,10 @@ cadloomの中心は、形状表現と幾何演算、それらの成立条件を�
 
 完了した全体回帰の対象コミットと再ビルド照合は [版164〜172の監査](kernel-regression-audit191.md)と[版173〜175の監査](kernel-regression-audit199.md)に記録します。版176以降と最新版の全体成功とは区別します。
 
+## NURBS構築入力の保存・再検証
+
+[認定面B-repの構築レシピ](nurbs-source-brep-record3.md)を追加中です。source/target・両トリム・senseを保存し、交差から面の成立検査と接続まで全て再計算して復元します。保存した認定フラグで受理しません。任意B-rep輸入や材料認定は対象外です。
+
 ## 共通B-rep接続への統合
 
 [認定NURBS面のB-repアダプター](nurbs-source-brep3.md)を追加中です。非線形面と暗黙SSI境界を近似せず保持し、既存エンジンのcoedge・loop・shell・頂点リンクへ接続します。面群の大域的交差・殻の成立・材料・Body採用は別途必要です。

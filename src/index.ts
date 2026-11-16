@@ -482,3 +482,6 @@ export {nurbsSourceComplexFacePointPreimage3} from './geometry/nurbs-source-comp
 export type {NurbsSourceComplexFacePreimage3} from './geometry/nurbs-source-complex-face-preimage3.js';
 export {buildNurbsSourceBRep3,nurbsSourceBRepEdgePoint3} from './geometry/nurbs-source-brep3.js';
 export type {NurbsSourceBRep3,NurbsSourceBRepEdge3,NurbsSourceBRepFace3} from './geometry/nurbs-source-brep3.js';
+export {readNurbsSourceBRepRecord3,parseNurbsSourceBRepRecord3} from './record/nurbs-source-brep3.js';
+export type {NurbsSourceBRepRecord3,NurbsSourceDomainRecord3} from './record/nurbs-source-brep3.js';
+export {encodeNurbsSourceBRep3,decodeNurbsSourceBRep3,stringifyNurbsSourceBRep3,restoreNurbsSourceBRep3} from './convert/nurbs-source-brep3.js';
