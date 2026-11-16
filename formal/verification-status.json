@@ -190,7 +190,7 @@
     "src/geometry/nurbs-trimmed-surface-preimage3.ts": "44ccb19143c59528bbba2b10fcc1dbb23532c33041f15899dd0a3b234382aa86",
     "src/geometry/nurbs-affine-projection3.ts": "5113b9935fe109ec6928cdffbc39c47663cd73f3ecc5e6857f07da574370949e",
     "src/geometry/affine-nurbs-face3.ts": "685f26be3d7e897cd7e005888e1d0998b42c37b9ece29c16b32a67fe9491acad",
-    "src/geometry/sew-affine-nurbs-faces3.ts": "eee6669c734f29e1493b90bb45978fee2f7b41628568b0a6b8fc68845b0c591b",
+    "src/geometry/sew-affine-nurbs-faces3.ts": "d515d5f838faa4c4ba83f6f1c5861eb4b2b65bf014245a84c9cc227ccd37cb27",
     "src/record/affine-nurbs-face3.ts": "a7a67443127aaff466410150f8f9cdd60ed8368a2a61c8100bf86e877ce3fd17",
     "src/convert/affine-nurbs-face3.ts": "b48bd9e5a53b70c2db6b74f405c04a92f2e036bd238242bf0c25c6d66e809f89",
     "src/geometry/algebraic-curve-rectangle2.ts": "e4240183987e5b9569e1df479292fc882079eefccf186e1b9756c648a79eb0d3",
