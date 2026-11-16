@@ -1,6 +1,8 @@
+import {assertOwnedSimilarityTransform3,transformPointBySimilarity3} from '../geometry/similarity3.js';
+import type {SimilarityTransform3} from '../geometry/similarity3.js';
 import {analyzePlanarMaterialRegions3} from '../geometry/planar-material-regions3.js';
 import {Rational} from '../numeric/rational.js';
-import {point3} from '../geometry/point3.js';
+import {point3,cross3,dot3} from '../geometry/point3.js';
 import type {Point3} from '../geometry/point3.js';
 import type {AlgebraicCoordinates3} from '../geometry/algebraic-point3.js';
 import {preparePlanarSolid3} from '../geometry/planar-solid3.js';
@@ -100,3 +102,16 @@ export function restorePlanarMaterial3(input:unknown,limits:PlanarMaterialReadLi
 
 /** Open material/void components, including contacts and bounded cavities. */
 export function planarMaterialRegions3(material:PlanarMaterial3){return analyzePlanarMaterialRegions3(state(material).source);}
+
+/** Transform the complete construction DAG, retaining contacts and shared operands. */
+export function transformPlanarMaterial3(material:PlanarMaterial3,transform:SimilarityTransform3):PlanarMaterial3 {
+ const root=state(material).recipe;assertOwnedSimilarityTransform3(transform);
+ const [a,b,c]=transform.columns,reverse=dot3(a,cross3(b,c)).sign()<0,values=new Map<Recipe,PlanarMaterial3>(),stack:[Recipe,boolean][]=[[root,false]];
+ while(stack.length){
+  const [r,ready]=stack.pop()!;if(values.has(r))continue;
+  if(r.kind==='boolean'&&!ready){stack.push([r,true],[r.right,false],[r.left,false]);continue;}
+  const result=r.kind==='solid'?createPlanarMaterial3(r.source.polygons.map(p=>{const points=p.map(q=>transformPointBySimilarity3(transform,q));return reverse?points.reverse():points;})):booleanPlanarMaterials3(values.get(r.left)!,values.get(r.right)!,r.operation);
+  values.set(r,result);
+ }
+ return values.get(root)!;
+}

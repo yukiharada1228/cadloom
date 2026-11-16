@@ -24,6 +24,8 @@ export interface CellularBody3 {
  readonly interiorSamples:readonly Point3[];
 }
 const states=new WeakMap<CellularBody3,PlanarMaterial3>();
+/** Internal ownership dispatch for shared Body operations. */
+export function isOwnedCellularBody3(value:unknown):value is CellularBody3 {return value!==null&&typeof value==='object'&&states.has(value as CellularBody3);}
 function material(body:CellularBody3):PlanarMaterial3 {const m=states.get(body);if(!m)throw new RangeError('Operation requires a factory-created cellular Body');return m;}
 /** Adopt only geometry-derived owned material; no caller region table is trusted. */
 export function cellularBodyFromPlanarMaterial3(source:PlanarMaterial3):CellularBody3 {

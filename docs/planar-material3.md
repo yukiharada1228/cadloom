@@ -33,3 +33,5 @@ const body = planarBodyFromMaterial3(remainder); // 多様体条件を再検査
 [領域解析](planar-material-regions3.md)は、接触する材料・空洞の開領域を分離し、境界片の両側対応と有限領域の厳密な体積を返します。Body自体の非多様体領域への採用は引き続き未完了です。
 
 [CellularBody](cellular-body3.md)では、接触材料の有限面と両側の領域を共通境界表に保存し、構築定義からの再照合とBody間の再演算へ接続します。既存の多様体Bodyとは受理条件を区別します。
+
+`transformPlanarMaterial3` は検査済みの有理相似変換を構築DAG全体へ適用します。反射では各立体葉の面順を補正し、共有部分式と接触する材料を保持します。[共通Bodyの相似変換](body-similarity3.md)を参照してください。

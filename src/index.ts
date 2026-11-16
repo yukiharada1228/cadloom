@@ -381,3 +381,6 @@ export {readCellularBodyRecord3,parseCellularBodyRecord3} from './record/cellula
 export type {CellularBoundaryRecord3,CellularRegionRecord3,CellularBodyRecord3} from './record/cellular-body3.js';
 export {cellularBodyFromPlanarMaterial3,cellularBodyFromBody3,planarMaterialOfCellularBody3,locateCellularBody3,booleanCellularBodies3,cellularBodyDocument3,serializeCellularBody3,restoreCellularBody3} from './ops/cellular-body3.js';
 export type {CellularBody3,CellularBodyDocument3,CellularBodyReadLimits3} from './ops/cellular-body3.js';
+
+export {transformPlanarMaterial3} from './ops/planar-material3.js';
+export type {BodyQuerySource3} from './ops/body-query3.js';
