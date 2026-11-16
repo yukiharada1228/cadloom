@@ -1,3 +1,7 @@
+import {prepareCylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
+import {boundaryMaterialSurfaces3} from '../geometry/material-surface-boundary3.js';
+import type {MaterialSurfaceBoundary3} from '../geometry/material-surface-boundary3.js';
+import {adoptMaterialSurfaceBody3} from '../model/body3.js';
 import {boundaryPlanarMaterial3} from '../geometry/planar-material-boundary3.js';
 import {boundaryCircularExtrudeMaterial3} from '../convert/circular-extrude-material3.js';
 import {boundaryBoxMaterial3} from '../geometry/box-material3.js';
@@ -63,6 +67,7 @@ export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);
 export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
+    case 'surface-material-expression':{const cylinders=construction.cylinders.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper));return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(prepareCylinderMaterialProgram3(cylinders,construction.planes.map(p=>plane3(p.normal[0],p.normal[1],p.normal[2],p.offset)),construction.expression),{requireClosed:true}));}
     case 'cylinder-material-expression':{const cylinders=construction.cylinders.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper));return bodyFromCylinderMaterial3(boundaryCylinderMaterialExpression3(cylinders,construction.planes.map(p=>plane3(p.normal[0],p.normal[1],p.normal[2],p.offset)),construction.expression));}
     case 'clipped-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper)),source=boundaryFiniteCylinderExpression3(operands,construction.expression);return bodyFromClippedCylinderExpression3(clipFiniteCylinderExpression3(source,construction.halfspaces.map(h=>({plane:plane3(h.normal[0],h.normal[1],h.normal[2],h.offset),side:h.side}))));}
     case 'plane-cut-cylinder-expression':{const operands=construction.operands.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper)),source=boundaryFiniteCylinderExpression3(operands,construction.expression),cut=construction.cut,split=splitFiniteCylinderExpressionByPlane3(source,plane3(cut.normal[0],cut.normal[1],cut.normal[2],cut.offset));return bodyFromCylinderExpressionSplit3(split,cut.side);}
@@ -181,3 +186,5 @@ function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
  if(body.construction.kind==='box'){const c=body.construction;return boundaryBoxMaterial3(decodeRationalPoint3(c.origin),c.size[0],c.size[1],c.size[2]);}
  const material=cylinderMaterialSourceOfBody3(body);if(material)return material;const clipped=clippedCylinderExpressionSourceOfBody3(body);if(clipped)return clipped;const cut=planeCutCylinderExpressionSourceOfBody3(body);if(cut)return clipFiniteCylinderExpression3(cut.source,[cut.cut]);let source=finiteCylinderExpressionSourceOfBody3(body);const binary=finiteCylinderBooleanSourceOfBody3(body);if(!source&&binary)source=boundaryFiniteCylinderExpression3([binary.first,binary.second],{kind:binary.operation,first:{kind:'operand',operand:0},second:{kind:'operand',operand:1}});if(source)return clipFiniteCylinderExpression3(source,[]);const c=cylinderSourceOfBody3(body),base=prepareFiniteCylinder3(c.cylinder,c.lower,c.upper);if(body.construction.kind==='cylinder')return boundaryCylinderMaterialExpression3([base],[],{kind:'cylinder',cylinder:0});return clipFiniteCylinderExpression3(boundaryFiniteCylinderExpression3([base],{kind:'operand',operand:0}),c.planes.map(plane=>({plane,side:-1 as const})));
 }
+
+export function bodyFromMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3):Body3 {return adoptMaterialSurfaceBody3(source);}
