@@ -477,3 +477,6 @@ export {prepareNurbsSourceFaceComplex3,evaluateNurbsSourceComplexEdge3} from './
 export type {NurbsSourceFaceComplex3,NurbsSourceComplexVertex3,NurbsSourceComplexEdge3} from './geometry/nurbs-source-face-complex3.js';
 export {evaluateNurbsSourceComplexFace3} from './geometry/nurbs-source-complex-face-query3.js';
 export type {NurbsSourceComplexFacePoint3} from './geometry/nurbs-source-complex-face-query3.js';
+export {nurbsSurfaceRectanglePointPreimages3} from './geometry/nurbs-surface-preimage3.js';
+export {nurbsSourceComplexFacePointPreimage3} from './geometry/nurbs-source-complex-face-preimage3.js';
+export type {NurbsSourceComplexFacePreimage3} from './geometry/nurbs-source-complex-face-preimage3.js';
