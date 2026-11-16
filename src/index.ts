@@ -619,3 +619,5 @@ export type {NurbsRecutCapWinding3,NurbsRecutCapLoopWinding3} from './geometry/n
 export type {NurbsRecutCurvePlane3} from './geometry/nurbs-recut-curve-plane3.js';
 export {certifyNurbsRecutAssemblyEmbedding3,analyzeNurbsRecutCapDomains3,locateNurbsRecutCapFace3} from './geometry/nurbs-recut-cap-domains3.js';
 export type {NurbsRecutAssemblyEmbeddingCertificate3,NurbsRecutAssemblyEmbedding3,NurbsRecutCapDomainsCertificate3,NurbsRecutCapDomains3,NurbsRecutCapFaceLocation3} from './geometry/nurbs-recut-cap-domains3.js';
+export {capNurbsRecutHalf3,locateNurbsRecutClosedSurface3,nurbsRecutNewCapPoint3} from './geometry/cap-nurbs-recut-half3.js';
+export type {CappedNurbsRecutHalf3,NurbsRecutClosedSurface3,NurbsRecutNewCapSurface3} from './geometry/cap-nurbs-recut-half3.js';

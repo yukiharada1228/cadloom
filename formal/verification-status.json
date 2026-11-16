@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "ec9cf51a0744433072df96515ab9daa581bb5327ab0a908ef90d1083f128f810",
+    "src/index.ts": "93044d153eaad794cb2a75acf0927dd56cc7088bfec2ce3ccdc8cf45f5281487",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -282,11 +282,12 @@
     "src/geometry/nurbs-plane-cap-split-faces3.ts": "25d2f5f839dca48b7c518babfed973ee702287472b56f3f8cea0b415b67c8e3a",
     "src/geometry/nurbs-recut-edge-match3.ts": "59e3d539211e56388a9a93259ef9a2c3cb007eba1d23dfa30b5d0ee7ea3d100e",
     "src/geometry/nurbs-recut-edge-coverage3.ts": "6631e6cf792f40defe24ca044ff1450e421edb66ad69e4c3f37dfc2b0ff5bae2",
-    "src/geometry/nurbs-recut-face-join3.ts": "b9c90ac03914bf5af1e09aacd17dfc9ec0bc943a387e64b129f7d0a9fa35bc08",
+    "src/geometry/nurbs-recut-face-join3.ts": "0ec08937779b0558ebe1e1bbf5b10dc4f5b27196e304b977ca7e9e7af7dbc572",
     "src/geometry/nurbs-recut-half-boundary3.ts": "1d02cdf99ad155084e693930b20ded134bb7effb16250ce79d7a515521d4786f",
     "src/geometry/nurbs-recut-curve-plane3.ts": "69e674cc84cac1ebd445a094b846f53367c2b59b69e3d95ba3735408a1120746",
     "src/geometry/nurbs-recut-cap-winding3.ts": "96ea7045f66e3a8a6fabf3d5729a623e0b28cd75e7a684994cb09cdb715b50bc",
-    "src/geometry/nurbs-recut-cap-domains3.ts": "00829ffc56a413f98ac36ee88d536615ec5905ffb8ae7e9531434aa1c6b105bd"
+    "src/geometry/nurbs-recut-cap-domains3.ts": "00829ffc56a413f98ac36ee88d536615ec5905ffb8ae7e9531434aa1c6b105bd",
+    "src/geometry/cap-nurbs-recut-half3.ts": "9539d71d4dcede4a564dd050a6d749c909f64d1dbbc1fd7065bd41e1e23e8ec9"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
