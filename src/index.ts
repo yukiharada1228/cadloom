@@ -431,3 +431,5 @@ export {intersectAffineNurbsFaceBoundaries3,affineNurbsBoundaryRelationPoint3} f
 export type {AffineNurbsBoundaryRef3,AffineNurbsBoundaryPairPoint3,AffineNurbsBoundaryRelation3,AffineNurbsBoundaryIntersection3} from './geometry/affine-nurbs-boundary-intersection3.js';
 export {nurbsAffineIntersectionEquations3,nurbsAffineIntersectionContains3,nurbsAffineIntersectionPoint3} from './geometry/nurbs-affine-intersection-equations3.js';
 export type {NurbsAffineIntersectionEquationPatch3,NurbsAffineIntersectionEquations3,NurbsAffineIntersectionPoint3} from './geometry/nurbs-affine-intersection-equations3.js';
+export {solveNurbsAffineIntersectionEquations3,intersectNurbsSurfaceAffineTarget3,nurbsAffineIntersectionEdgePoint3,nurbsAffineIntersectionRegionPoint3} from './geometry/nurbs-affine-intersection3.js';
+export type {NurbsAffineIntersectionEdge3,NurbsAffineIntersectionPatch3,NurbsAffineIntersection3} from './geometry/nurbs-affine-intersection3.js';

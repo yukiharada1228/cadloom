@@ -43,8 +43,9 @@ export function nurbsAffineIntersectionEquations3(input:NurbsSurface3,target:Nur
  }
  const report=Object.freeze({source,target,pairs:Object.freeze(pairs)});owned.add(report);return report;
 }
+export function assertOwnedNurbsAffineIntersectionEquations3(report:NurbsAffineIntersectionEquations3):void {if(!owned.has(report))throw new RangeError('Operation requires factory-created NURBS intersection equations');}
 function pairAt(report:NurbsAffineIntersectionEquations3,pair:number):NurbsAffineIntersectionEquationPatch3 {
- if(!owned.has(report))throw new RangeError('Operation requires factory-created NURBS intersection equations');if(!Number.isSafeInteger(pair)||pair<0||pair>=report.pairs.length)throw new RangeError('Invalid intersection patch pair');return report.pairs[pair]!;
+ assertOwnedNurbsAffineIntersectionEquations3(report);if(!Number.isSafeInteger(pair)||pair<0||pair>=report.pairs.length)throw new RangeError('Invalid intersection patch pair');return report.pairs[pair]!;
 }
 const real=(t:AlgebraicReal|ExactInput)=>t instanceof AlgebraicReal?t:AlgebraicReal.fromRational(t);
 function inside(p:NurbsSurfacePatch3,u:AlgebraicReal,v:AlgebraicReal):boolean {return u.compare(real(p.startU))>=0&&u.compare(real(p.endU))<=0&&v.compare(real(p.startV))>=0&&v.compare(real(p.endV))<=0;}
