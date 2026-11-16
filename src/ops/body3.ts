@@ -1,3 +1,10 @@
+import {isOwnedCellularBody3} from '../model/cellular-body3.js';
+import type {CellularBody3} from '../model/cellular-body3.js';
+import type {KernelBody3} from '../model/body3.js';
+import {cellularBodyDocument3,restoreCellularBody3} from './cellular-body3.js';
+import type {CellularBodyDocument3} from './cellular-body3.js';
+import type {PlanarMaterialReadLimits3} from './planar-material3.js';
+import {RecordReader3} from '../record/schema.js';
 import {booleanCylinderMaterialPrograms3,clipCylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
 import type {CylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
 import {materialSurfaceSourceOfBody3} from '../model/body3.js';
@@ -48,7 +55,7 @@ import type {Body3} from '../model/body3.js';
 import {encodeRationalPoint3,decodeRationalPoint3} from '../convert/exact3.js';
 import {encodeBodyProfile3,decodeBodyProfile3} from '../convert/body-profile3.js';
 import {constructionRecordsAgree3} from '../convert/body-equivalence3.js';
-import {parseBodyDocument3,readBodyDocument3} from '../record/body-document3.js';
+import {readBodyDocument3} from '../record/body-document3.js';
 import type {BodyConstructionRecord3,BodyDocument3} from '../record/body-document3.js';
 import type {RecordReadLimits3} from '../record/schema.js';
 import {line3,cylinder3} from '../geometry/surface3.js';
@@ -67,8 +74,23 @@ export function extrudeBody3(profile:CurveRegion2,height:ExactInput,options:Extr
 function adoptExtrusion(solid:ReturnType<typeof extrudeCurveRegionBRep3>):Body3 {
   return adoptExtrudedBody3(solid,{kind:'extrude',profile:encodeBodyProfile3(solid.region.rings),lower:solid.zMin.toString(),upper:solid.zMax.toString()});
 }
-export function bodyDocument3(body:Body3):BodyDocument3 {assertOwnedBody3(body);return readBodyDocument3({version:1,construction:body.construction,body:body.record});}
-export function serializeBody3(body:Body3):string{return JSON.stringify(bodyDocument3(body));}
+export type KernelBodyDocument3=BodyDocument3|CellularBodyDocument3;
+declare const serializedBodyType:unique symbol;
+/** String carrying the checked source family at compile time; no runtime metadata. */
+export type SerializedBody3<T extends KernelBody3=KernelBody3>=string&{readonly [serializedBodyType]:T};
+type RestoredFamily3<T extends KernelBody3>=T extends CellularBody3?CellularBody3:Body3;
+export interface BodyReadLimits3 extends RecordReadLimits3 {
+ readonly maxChars?:number;
+ readonly material?:Omit<PlanarMaterialReadLimits3,'maxChars'>;
+}
+export function bodyDocument3(body:CellularBody3):CellularBodyDocument3;
+export function bodyDocument3(body:Body3):BodyDocument3;
+export function bodyDocument3(body:KernelBody3):KernelBodyDocument3;
+export function bodyDocument3(body:KernelBody3):KernelBodyDocument3 {
+ if(isOwnedCellularBody3(body))return cellularBodyDocument3(body);
+ assertOwnedBody3(body);return readBodyDocument3({version:1,construction:body.construction,body:body.record});
+}
+export function serializeBody3<T extends KernelBody3>(body:T):SerializedBody3<RestoredFamily3<T>>{return JSON.stringify(bodyDocument3(body)) as SerializedBody3<RestoredFamily3<T>>;}
 function replay(construction:BodyConstructionRecord3):Body3 {
   switch(construction.kind){
     case 'surface-material-expression':{const cylinders=construction.cylinders.map(p=>prepareFiniteCylinder3(cylinder3(line3(decodeRationalPoint3(p.origin),decodeRationalPoint3(p.direction)),p.radiusSquared),p.lower,p.upper));return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(prepareCylinderMaterialProgram3(cylinders,construction.planes.map(p=>plane3(p.normal[0],p.normal[1],p.normal[2],p.offset)),construction.expression),{requireClosed:true}));}
@@ -89,9 +111,17 @@ function replay(construction:BodyConstructionRecord3):Body3 {
  * construction label or closed-incidence flag never suffices for certification.
  * This imports supported construction documents, not arbitrary BodyRecord3 data.
  */
-export function restoreBody3(input:unknown,limits:RecordReadLimits3={}):Body3 {
-  const document=typeof input==='string'?parseBodyDocument3(input,limits):readBodyDocument3(input,limits),body=replay(document.construction);
-  if(!constructionRecordsAgree3(document.body,body.record))throw new RangeError('Stored Body record does not match its reconstructed material');return body;
+export function restoreBody3<T extends KernelBody3>(input:SerializedBody3<T>,limits?:BodyReadLimits3):T;
+export function restoreBody3(input:CellularBodyDocument3,limits?:BodyReadLimits3):CellularBody3;
+export function restoreBody3(input:BodyDocument3,limits?:BodyReadLimits3):Body3;
+export function restoreBody3(input:unknown,limits?:BodyReadLimits3):KernelBody3;
+export function restoreBody3(input:unknown,limits:BodyReadLimits3={}):KernelBody3 {
+ const reader=new RecordReader3(limits),maxChars=limits.maxChars??reader.maxNumericCharacters+reader.maxItems*64;
+ if(!Number.isSafeInteger(maxChars)||maxChars<1)throw new RangeError('Invalid Body document character limit');
+ if(typeof input==='string'){if(input.length>maxChars)throw new RangeError('Body document text budget exceeded');input=JSON.parse(input);}
+ if(input!==null&&typeof input==='object'&&Object.hasOwn(input,'kind')&&(input as {kind:unknown}).kind==='cellular-body-document')return restoreCellularBody3(input,{...limits.material,record:limits,maxChars});
+ const document=readBodyDocument3(input,limits),body=replay(document.construction);
+ if(!constructionRecordsAgree3(document.body,body.record))throw new RangeError('Stored Body record does not match its reconstructed material');return body;
 }
 
 /** Validated manifold rational polygonal material, including cavities/islands. */

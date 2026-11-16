@@ -42,3 +42,5 @@ const remainder = booleanCellularBodies3(replayed, b, 'difference');
 既存Bodyの全公開操作がCellularBodyを受けるようになったわけではありません。直線・レイ・材料区間の照会と相似変換は、既存Bodyと同じ入口へ接続しました。平面境界の最近点と体積・重心・慣性も共通入口へ接続しました。一般曲面の領域解析、曲面を含むCellularBody、任意の輸入BRepの認定、曲面の最近点・質量特性は後続です。Body型を無条件に読み替える処理は追加しません。
 
 平面配置と再構築・面領域の照合には時間とメモリが必要で、大規模モデルの性能上限は未保証です。構築DAGの制限は `CellularBodyReadLimits3`、レコードの構造予算はその `record` オプションで指定します。これらは実行時間の上限保証ではありません。
+
+[共通Bodyの位置判定・保存復元](common-body-facade3.md)では、既存の `locateBody3`・`locateBodyFace3`・`bodyDocument3`・`serializeBody3`・`restoreBody3` からCellularBodyも扱えます。所有と材料の成立条件は維持します。

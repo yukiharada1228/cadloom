@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "972f956ace074b28d044ab7644ee48202a8c82da1d978fb939c80bf7c3454602",
+    "src/index.ts": "c23f880ce5420688ad6f4c1758d793fa1f9d90dc7dee2090d3325d498361de11",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -84,8 +84,8 @@
     "src/convert/body3.ts": "0c7ebd2d21698235c338ccd5888b267110f88532433e82f10b2a515b64ca0c23",
     "src/convert/exact3.ts": "a2f90ce6fc15317d35b0fe03124324b18f5d1d088fe06fff35df52e3830dc694",
     "src/record/body-document3.ts": "b78d7eb5b2b053de789c084a784c87aa30ad0ceeef4999204f5c4e75013608ba",
-    "src/model/body3.ts": "9bde5ecf3f91d27e22f99ae0dc32f3228be4c4fbb12c9384620e4be9a531516f",
-    "src/ops/body3.ts": "19d31db2dabcc52cdbd02a6f0b6341e4092d995c97beaa5ff06ac783e271c895",
+    "src/model/body3.ts": "70662fa870dcd7962a1e3cc09fbdd30bbad358a34ba0ee343bbe1e79a299a175",
+    "src/ops/body3.ts": "33876092a70f65bdcffc739b19ec4c8898fd8174423b5ac42351dad31cdc454a",
     "src/geometry/box-brep3.ts": "1d3e8395f4d0dfdac5359672f051afc6a3b63c81e8cc77c6ab84678d0e83c938",
     "src/convert/native-boundary3.ts": "bf554a7865790e7391da62adf73ae30d25c9942feeed6693a2fb7450167a475f",
     "src/convert/body-profile3.ts": "b5497e86346a9008c57c7fd48eaf3e91d6c3d5fd07bd153375ea151e59a534b2",
@@ -170,7 +170,8 @@
     "src/ops/planar-material3.ts": "e2472961901462ba13c68f82658ef5dca8c6a300ca6320102877b21d892ed90f",
     "src/geometry/planar-material-regions3.ts": "dec0170314beed57f1116de972d75feb47879231182953e92c9cb23918660a71",
     "src/record/cellular-body3.ts": "3152680022faf8565384d936ceccf4af050df0e77b8f8b5326feb7807d30cbe4",
-    "src/ops/cellular-body3.ts": "192a115db4fc75f0e5ef7810d2dad95e9680f6863d4e9fe05eab65428b255d46"
+    "src/ops/cellular-body3.ts": "f7529043c4c15561065bd8893bd44f42c0cdba09be67a3569497985e6da413c8",
+    "src/model/cellular-body3.ts": "600c5168f559c687efa54bc47e48110a894b10df8d138c2768f447e5db0a07b9"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

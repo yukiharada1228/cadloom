@@ -1,3 +1,5 @@
+import {isOwnedCellularBody3,locateOwnedCellularBody3,locateOwnedCellularBodyFace3} from './cellular-body3.js';
+import type {CellularBody3} from './cellular-body3.js';
 import {locateMaterialSurfaceBoundary3} from '../geometry/material-surface-boundary3.js';
 import type {MaterialSurfaceBoundary3} from '../geometry/material-surface-boundary3.js';
 import {resolveCylinderMaterialProgram3} from '../geometry/cylinder-material-expression3.js';
@@ -49,13 +51,15 @@ export interface Body3 {
   readonly construction:BodyConstructionRecord3;
   readonly interiorSamples:readonly AlgebraicCoordinates3[];readonly faces:readonly (DecodedFaceDomain3|DecodedMixedFaceDomain3)[];
 }
+export type KernelBody3=Body3|CellularBody3;
 type Location=(point:Point3|AlgebraicCoordinates3)=>CurveRegionLocation2;
 const states=new WeakMap<Body3,{locate:Location;faces:readonly Location[];planar:PreparedPlanarSolid3|undefined;cylinder:ClippedCylinderBRep3|undefined;nativeTopology:BRepTopology3|undefined;finiteCylinderBoolean:FiniteCylinderBoolean3|undefined;finiteCylinderExpression?:FiniteCylinderExpressionBoundary3;clippedExpression?:ClippedCylinderExpression3;material?:CylinderMaterialBoundary3;materialSurface?:MaterialSurfaceBoundary3;planeCutExpression?:Readonly<{source:FiniteCylinderExpressionBoundary3;cut:CylinderHalfSpace3}>}>();
 function state(body:Body3){const data=states.get(body);if(!data)throw new RangeError('Operation requires a factory-created Body');return data;}
 export function assertOwnedBody3(body:Body3):void {state(body);}
-export function locateBody3(body:Body3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2{return state(body).locate(point);}
+export function locateBody3(body:KernelBody3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2{return isOwnedCellularBody3(body)?locateOwnedCellularBody3(body,point):state(body).locate(point);}
 /** Location relative to one bounded face, not relative to solid material. */
-export function locateBodyFace3(body:Body3,face:number,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
+export function locateBodyFace3(body:KernelBody3,face:number,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {
+  if(isOwnedCellularBody3(body))return locateOwnedCellularBodyFace3(body,face,point);
   const s=state(body);if(!Number.isSafeInteger(face)||face<0||face>=s.faces.length)throw new RangeError('Invalid Body face index');return s.faces[face]!(point);
 }
 function publish(topology:BRepTopology3,locate:Location,domains:readonly FaceDomainRecord3[],samples:readonly AlgebraicCoordinates3[],construction:BodyConstructionRecord3,material?:{regions:readonly BodyRegionRecord3[];planar:PreparedPlanarSolid3},cylinder?:ClippedCylinderBRep3):Body3 {

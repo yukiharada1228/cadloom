@@ -41,7 +41,7 @@ test('replay rejects altered geometry, region semantics, orientation and mismatc
   for(const change of [(d:any)=>{d.body.vertices[0]={kind:'coordinates',x:{kind:'rational',value:'99'},y:{kind:'rational',value:'0'},z:{kind:'rational',value:'0'}};},(d:any)=>d.body.regions[1].void=true,(d:any)=>d.body.shells[0].faces[0].direction=-1,(d:any)=>d.construction.size[0]='3']){const d=clone(original);change(d);assert.ok(readBodyDocument3(d));assert.throws(()=>restoreBody3(d),/does not match/);}
 });
 test('semantically equal exact scalar/point encodings are accepted instead of comparing JSON bytes',()=>{
-  const d=clone(bodyDocument3(box())) as any;d.body.curves[0].origin[0]='0/7';d.body.vertices=d.body.vertices.map((p:any)=>{const q=decodeExactPoint3(p);return encodeExactPoint3(algebraicCoordinates3(q.x,q.y,q.z));});assert.notEqual(JSON.stringify(d),serializeBody3(box()));common(restoreBody3(d));
+  const d=clone(bodyDocument3(box())) as any;d.body.curves[0].origin[0]='0/7';d.body.vertices=d.body.vertices.map((p:any)=>{const q=decodeExactPoint3(p);return encodeExactPoint3(algebraicCoordinates3(q.x,q.y,q.z));});assert.notEqual(JSON.stringify(d),serializeBody3(box()));common(restoreBody3(readBodyDocument3(d)));
 });
 test('native boundary reconstruction checks endpoints, whole support and actual connected shells',()=>{
   const b=box(),r=clone(b.record) as any;r.vertices[0]={kind:'coordinates',x:{kind:'rational',value:'99'},y:{kind:'rational',value:'0'},z:{kind:'rational',value:'0'}};assert.ok(readBodyRecord3(r));assert.throws(()=>restoreNativeBRepBoundary3(r),/vertices/);

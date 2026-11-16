@@ -136,3 +136,5 @@ tests; it is not a new Lean proof or whole-TypeScript verification. Arbitrary
 record-to-solid certification, general face-domain import, complete pcurves,
 closed-void containment and broader operations remain outstanding. SolidCore's
 native file format and API are not claimed compatible.
+
+[共通入口](common-body-facade3.md)は、接触境界を持つCellularBodyの位置判定・保存復元も受けます。従来のBody保存形式と多様体条件は維持し、未知入力の復元戻り値は安全のため `KernelBody3` です。

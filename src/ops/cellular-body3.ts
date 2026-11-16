@@ -1,9 +1,12 @@
+import {adoptCellularBody3,locateOwnedCellularBody3} from '../model/cellular-body3.js';
+import type {CellularBody3} from '../model/cellular-body3.js';
+export {isOwnedCellularBody3} from '../model/cellular-body3.js';
+export type {CellularBody3} from '../model/cellular-body3.js';
 import {partitionPlanarBRepFaces3} from '../geometry/planar-brep-partition3.js';
 import {bodyRecordFromTopology3} from '../convert/body3.js';
 import {encodePlanarPolygonDomain3} from '../convert/planar-body3.js';
 import {encodeRationalPoint3} from '../convert/exact3.js';
 import {restoreNativeBRepFaces3} from '../convert/native-faces3.js';
-import type {NativeBRepFaces3} from '../convert/native-faces3.js';
 import {readCellularBodyRecord3,cellularBoundaryAsBodyRecord3} from '../record/cellular-body3.js';
 import type {CellularBodyRecord3} from '../record/cellular-body3.js';
 import {RecordReader3,objectSchema3,literalSchema3} from '../record/schema.js';
@@ -15,17 +18,7 @@ import type {Point3} from '../geometry/point3.js';
 import type {AlgebraicCoordinates3} from '../geometry/algebraic-point3.js';
 import type {BooleanOperation} from '../geometry/polygon-boolean.js';
 
-/** Owned planar cellular Body. Contacts retain explicit face-to-region incidence. */
-export interface CellularBody3 {
- readonly kind:'cellular-body';readonly record:CellularBodyRecord3;
- readonly topology:NativeBRepFaces3['boundary']['topology'];readonly faces:NativeBRepFaces3['faces'];
- /** Saved face index → source planar material polygon index. */
- readonly materialFaces:readonly number[];
- readonly interiorSamples:readonly Point3[];
-}
 const states=new WeakMap<CellularBody3,PlanarMaterial3>();
-/** Internal ownership dispatch for shared Body operations. */
-export function isOwnedCellularBody3(value:unknown):value is CellularBody3 {return value!==null&&typeof value==='object'&&states.has(value as CellularBody3);}
 function material(body:CellularBody3):PlanarMaterial3 {const m=states.get(body);if(!m)throw new RangeError('Operation requires a factory-created cellular Body');return m;}
 /** Adopt only geometry-derived owned material; no caller region table is trusted. */
 export function cellularBodyFromPlanarMaterial3(source:PlanarMaterial3):CellularBody3 {
@@ -38,11 +31,11 @@ export function cellularBodyFromPlanarMaterial3(source:PlanarMaterial3):Cellular
  // Balanced contact edges are allowed; open or inconsistently oriented boundaries are not.
  if(restored.boundary.topology.edges.some(e=>e.coedges.length<2||e.coedges.reduce((sum,id)=>sum+restored.boundary.topology.coedges[id]!.direction,0)!==0))throw new Error('Cellular Body has an unbalanced boundary');
  const result:CellularBody3=Object.freeze({kind:'cellular-body',record,topology:restored.boundary.topology,faces:restored.faces,materialFaces:Object.freeze(analysis.boundaryUses.map(u=>u.face)),interiorSamples:Object.freeze(analysis.regions.filter(r=>r.material).map(r=>r.sample))});
- states.set(result,source);return result;
+ states.set(result,source);return adoptCellularBody3(result,p=>locatePlanarMaterial3(source,p));
 }
 export function cellularBodyFromBody3(body:Body3):CellularBody3 {return cellularBodyFromPlanarMaterial3(planarMaterialFromBody3(body));}
 export function planarMaterialOfCellularBody3(body:CellularBody3):PlanarMaterial3 {return material(body);}
-export function locateCellularBody3(body:CellularBody3,point:Point3|AlgebraicCoordinates3){return locatePlanarMaterial3(material(body),point);}
+export function locateCellularBody3(body:CellularBody3,point:Point3|AlgebraicCoordinates3){return locateOwnedCellularBody3(body,point);}
 export function booleanCellularBodies3(a:CellularBody3|Body3,b:CellularBody3|Body3,operation:BooleanOperation):CellularBody3 {
  const resolve=(v:CellularBody3|Body3)=>states.has(v as CellularBody3)?material(v as CellularBody3):planarMaterialFromBody3(v as Body3);
  return cellularBodyFromPlanarMaterial3(booleanPlanarMaterials3(resolve(a),resolve(b),operation));
