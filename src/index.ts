@@ -429,3 +429,5 @@ export type {AffineNurbsFaceRecord3,AffineNurbsFacesDocument3} from './record/af
 export {encodeAffineNurbsFace3,decodeAffineNurbsFace3,affineNurbsFacesDocument3,serializeAffineNurbsFaces3,restoreAffineNurbsFaces3} from './convert/affine-nurbs-face3.js';
 export {intersectAffineNurbsFaceBoundaries3,affineNurbsBoundaryRelationPoint3} from './geometry/affine-nurbs-boundary-intersection3.js';
 export type {AffineNurbsBoundaryRef3,AffineNurbsBoundaryPairPoint3,AffineNurbsBoundaryRelation3,AffineNurbsBoundaryIntersection3} from './geometry/affine-nurbs-boundary-intersection3.js';
+export {nurbsAffineIntersectionEquations3,nurbsAffineIntersectionContains3,nurbsAffineIntersectionPoint3} from './geometry/nurbs-affine-intersection-equations3.js';
+export type {NurbsAffineIntersectionEquationPatch3,NurbsAffineIntersectionEquations3,NurbsAffineIntersectionPoint3} from './geometry/nurbs-affine-intersection-equations3.js';
