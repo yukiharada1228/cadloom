@@ -449,3 +449,5 @@ export {nodeNurbsIntersectionBoundary3} from './geometry/nurbs-intersection-boun
 export type {NurbsIntersectionBoundaryVertex2,NurbsIntersectionBoundaryEdge2,NurbsIntersectionBoundaryNodes3} from './geometry/nurbs-intersection-boundary-nodes3.js';
 export {matchNurbsIntersectionSourceBoundary3} from './geometry/nurbs-intersection-boundary-sharing3.js';
 export type {NurbsSourceBoundarySharedInterval3,NurbsSourceBoundarySharing3} from './geometry/nurbs-intersection-boundary-sharing3.js';
+export {buildNurbsSourceBoundaryComplex3} from './geometry/nurbs-source-boundary-complex3.js';
+export type {NurbsSourceBoundaryComplexUse3,NurbsSourceBoundaryComplex3} from './geometry/nurbs-source-boundary-complex3.js';
