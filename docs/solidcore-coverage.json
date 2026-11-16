@@ -337,10 +337,12 @@
         "src/model/nurbs-body3.ts",
         "src/geometry/nurbs-source-face-plane3.ts",
         "src/geometry/sewn-nurbs-source-boundary-plane3.ts",
-        "src/ops/nurbs-body-boundary-plane3.ts"
+        "src/ops/nurbs-body-boundary-plane3.ts",
+        "src/geometry/nurbs-plane-split-face-query3.ts",
+        "src/geometry/capped-nurbs-plane-query3.ts"
       ],
       "status": "partial",
-      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained. Owned finite-face plane section evaluators preserve native UV graph parameters, finite trim/approached-patch membership and full spatial plane equality."
+      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained. Owned finite-face plane section evaluators preserve native UV graph parameters, finite trim/approached-patch membership and full spatial plane equality. Closed capped split results now query finite original UV-region unions and cap domains through spatial face IDs, then classify the regularized source-material halfspace selection with retained-boundary checks. Opposite-side tangential contacts are not inherited as boundary; unresolved inverse/winding/material queries propagate. This does not yet issue a new child embedding/material certificate or join common Body dispatch."
     },
     {
       "id": "tessellation",
@@ -430,7 +432,8 @@
       "tests/nurbs-plane-cap-winding3.test.ts",
       "tests/nurbs-plane-cap-algebraic-winding3.test.ts",
       "tests/nurbs-plane-cap-containment3.test.ts",
-      "tests/cap-nurbs-plane-split-faces3.test.ts"
+      "tests/cap-nurbs-plane-split-faces3.test.ts",
+      "tests/capped-nurbs-plane-query3.test.ts"
     ],
     "document": "docs/nurbs-source-cylinder-integration3.md",
     "materialBoundarySourceCommit": "30f6883",
@@ -462,7 +465,8 @@
       "docs/nurbs-plane-cap-winding3.md",
       "docs/nurbs-plane-cap-algebraic-winding3.md",
       "docs/nurbs-plane-cap-containment3.md",
-      "docs/cap-nurbs-plane-split-faces3.md"
+      "docs/cap-nurbs-plane-split-faces3.md",
+      "docs/capped-nurbs-plane-query3.md"
     ]
   }
 }

@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "3753a1caba1d79d0fc1e2f7f4484acb4ca6c2a73b07ed1788b6d8cb09d7b49a0",
+    "src/index.ts": "c1c115c9b80acfa7fd951c8f138de5ec45d56449112ecef7e3f1f1a7b3773e34",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -258,14 +258,16 @@
     "src/geometry/nurbs-plane-cell-source-edges3.ts": "fc5cb25c7da3060f06070c3e9a98f7ea5ff5f0436ef28c224d87f8fc8c3b4396",
     "src/geometry/nurbs-plane-cell-rational-map3.ts": "1f517ce105b660ca818d4408ee370506a6f6ced1cae9b89680033bb99eaf3db9",
     "src/geometry/nurbs-plane-cell-source-nodes3.ts": "6a5c43c0a2d3344cabff6cfb006d044f75333d02b3ddc38a698e3c2f5da890d5",
-    "src/geometry/nurbs-plane-split-faces3.ts": "08a74ad835dd6b55a30431a78c2c10181b99acc2aa43f076c8a8b3ae8de73423",
+    "src/geometry/nurbs-plane-split-faces3.ts": "1aaafb0bdca1d83528bfdea9f332ff53a7494e55808b889c75f34f45e7c25e25",
     "src/geometry/sew-nurbs-plane-split-faces3.ts": "6b604bd9559220d57883fd682763a1d38bd8daae3e99a805622f98ecf2ca273f",
     "src/geometry/nurbs-plane-cap-boundary3.ts": "775bc8d1761dcb63acec8ef53149991ecb721f05535af93a77a17395593556b1",
     "src/geometry/sewn-nurbs-split-edge-plane3.ts": "5922edb6e4c4d774c440059bbddb86ac5d24ecd934f8f6061c1dd964cbfe142c",
     "src/geometry/nurbs-plane-cap-winding3.ts": "74a5f681159640b5fe118be6349c4c590f09079f194848b78f2f1a645f736f71",
     "src/geometry/nurbs-plane-cap-containment3.ts": "e22e3377543228db615aefca4199b46f9c1de919e6af9cd090afaa34ea558715",
     "src/geometry/cap-nurbs-plane-split-faces3.ts": "c975b6ad9527433b0323acbf25cf90fb774da97cb2fc102d34b4b03292749a85",
-    "src/geometry/nurbs-plane-cap-face-query3.ts": "9dda8b16f050481ca3384b93ba1ad2f47ea57c6dfb620dd33268928520a8f853"
+    "src/geometry/nurbs-plane-cap-face-query3.ts": "9dda8b16f050481ca3384b93ba1ad2f47ea57c6dfb620dd33268928520a8f853",
+    "src/geometry/nurbs-plane-split-face-query3.ts": "ea313a6f810d1b838319955741c843f7f94ef8cd8c944431b1e03eae2463f07b",
+    "src/geometry/capped-nurbs-plane-query3.ts": "024b6d4b9595a1587ad2bb3d88834f8c44b5b43f699fd9752c4f6ea49f9470ea"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

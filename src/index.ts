@@ -569,3 +569,7 @@ export {capNurbsPlaneSplitFaces3} from './geometry/cap-nurbs-plane-split-faces3.
 export type {CappedNurbsPlaneSplitFaces3,CappedNurbsPlaneFaceSurface3,NurbsPlaneCapFaceSurface3} from './geometry/cap-nurbs-plane-split-faces3.js';
 export {locateNurbsPlaneCapFace3,nurbsPlaneCapFacePoint3} from './geometry/nurbs-plane-cap-face-query3.js';
 export type {NurbsPlaneCapFaceLocation3} from './geometry/nurbs-plane-cap-face-query3.js';
+export {locateNurbsPlaneSplitFace3} from './geometry/nurbs-plane-split-face-query3.js';
+export type {NurbsPlaneSplitFaceLocation3} from './geometry/nurbs-plane-split-face-query3.js';
+export {locateCappedNurbsPlaneFace3,locateCappedNurbsPlaneMaterial3} from './geometry/capped-nurbs-plane-query3.js';
+export type {CappedNurbsPlaneFaceLocation3,CappedNurbsPlaneMaterialLocation3} from './geometry/capped-nurbs-plane-query3.js';

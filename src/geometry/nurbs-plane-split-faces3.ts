@@ -17,6 +17,7 @@ export type NurbsPlaneSplitFaces3=
    /** Noded edge -> adopted topology edge; internal same-region seams are null. */
    sourceEdges:readonly (number|null)[];sourceVertices:readonly (number|null)[]}>;
 const ownedEdges=new WeakSet<NurbsPlaneSplitFaceEdge3>(),ownedSurfaces=new WeakSet<NurbsPlaneSplitFaceSurface3>();
+export function assertOwnedNurbsPlaneSplitFaceSurface3(surface:NurbsPlaneSplitFaceSurface3):void {if(!ownedSurfaces.has(surface))throw new RangeError('Expected factory-created split-face surface');}
 const owned=new WeakSet<NurbsPlaneSplitFaces3>();
 function own<T extends NurbsPlaneSplitFaces3>(report:T):T {owned.add(report);return report;}
 export function assertOwnedNurbsPlaneSplitFaces3(report:NurbsPlaneSplitFaces3):void {if(!owned.has(report))throw new RangeError('Expected factory-created split-face assembly');}
