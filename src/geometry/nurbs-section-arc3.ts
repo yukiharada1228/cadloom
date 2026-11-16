@@ -15,7 +15,8 @@ export interface NurbsSectionArc3 {
  readonly direction:1|-1;readonly start:AlgebraicCoordinates3;readonly end:AlgebraicCoordinates3;
 }
 const owned=new WeakSet<NurbsSectionArc3>(),real=(p:AlgebraicReal|ExactInput)=>p instanceof AlgebraicReal?p:AlgebraicReal.fromRational(p);
-function guard(arc:NurbsSectionArc3):void {if(!owned.has(arc))throw new RangeError('Operation requires a factory-created NURBS section arc');}
+/** Internal provenance guard for operations on finite implicit arcs. */
+export function assertOwnedNurbsSectionArc3(arc:NurbsSectionArc3):void {if(!owned.has(arc))throw new RangeError('Operation requires a factory-created NURBS section arc');}
 function finish(arc:NurbsSectionArc3):NurbsSectionArc3 {const value=Object.freeze(arc);owned.add(value);return value;}
 export function nurbsSectionArc3(section:NurbsPlaneSection3,piece:number,edge:number,lower?:AlgebraicReal|ExactInput,upper?:AlgebraicReal|ExactInput,direction:1|-1=1):NurbsSectionArc3 {
  assertOwnedNurbsPlaneSection3(section);if(direction!==1&&direction!==-1)throw new RangeError('Section arc direction must be +1 or -1');
@@ -28,7 +29,7 @@ export function nurbsSectionArc3(section:NurbsPlaneSection3,piece:number,edge:nu
  return finish({section,piece,edge,coordinate,lower:lo,upper:hi,direction,start:direction===1?A:B,end:direction===1?B:A});
 }
 function checkedParameter(arc:NurbsSectionArc3,parameter:AlgebraicReal|ExactInput):AlgebraicReal {
- guard(arc);const t=real(parameter);if(t.compare(arc.lower)<0||t.compare(arc.upper)>0)throw new RangeError('Parameter is outside the section arc');return t;
+ assertOwnedNurbsSectionArc3(arc);const t=real(parameter);if(t.compare(arc.lower)<0||t.compare(arc.upper)>0)throw new RangeError('Parameter is outside the section arc');return t;
 }
 export function nurbsSectionArcPoint3(arc:NurbsSectionArc3,parameter:AlgebraicReal|ExactInput):AlgebraicCoordinates3 {
  const t=checkedParameter(arc,parameter);return nurbsPlaneSectionEdgePoint3(arc.section,arc.piece,arc.edge,t);
@@ -39,15 +40,15 @@ export function nurbsSectionArcDifferential3(arc:NurbsSectionArc3,parameter:Alge
  const t=checkedParameter(arc,parameter);return nurbsPlaneSectionEdgeDifferential3(arc.section,arc.piece,arc.edge,t);
 }
 export function reverseNurbsSectionArc3(arc:NurbsSectionArc3):NurbsSectionArc3 {
- guard(arc);return finish({...arc,direction:arc.direction===1?-1:1,start:arc.end,end:arc.start});
+ assertOwnedNurbsSectionArc3(arc);return finish({...arc,direction:arc.direction===1?-1:1,start:arc.end,end:arc.start});
 }
 export function restrictNurbsSectionArc3(arc:NurbsSectionArc3,lower:AlgebraicReal|ExactInput,upper:AlgebraicReal|ExactInput):NurbsSectionArc3 {
- guard(arc);const lo=real(lower),hi=real(upper);if(lo.compare(arc.lower)<0||hi.compare(arc.upper)>0)throw new RangeError('Restriction is outside the section arc');return nurbsSectionArc3(arc.section,arc.piece,arc.edge,lo,hi,arc.direction);
+ assertOwnedNurbsSectionArc3(arc);const lo=real(lower),hi=real(upper);if(lo.compare(arc.lower)<0||hi.compare(arc.upper)>0)throw new RangeError('Restriction is outside the section arc');return nurbsSectionArc3(arc.section,arc.piece,arc.edge,lo,hi,arc.direction);
 }
 /** Endpoints and repeated cuts are harmless; out-of-range cuts fail. Output is
  * ordered by traversal, while each fragment retains increasing source bounds. */
 export function splitNurbsSectionArc3(arc:NurbsSectionArc3,input:readonly (AlgebraicReal|ExactInput)[]):readonly NurbsSectionArc3[] {
- guard(arc);const values=[arc.lower,arc.upper,...Array.from(input,real)];for(const t of values)if(t.compare(arc.lower)<0||t.compare(arc.upper)>0)throw new RangeError('Cut is outside the section arc');
+ assertOwnedNurbsSectionArc3(arc);const values=[arc.lower,arc.upper,...Array.from(input,real)];for(const t of values)if(t.compare(arc.lower)<0||t.compare(arc.upper)>0)throw new RangeError('Cut is outside the section arc');
  const sorted=values.sort((a,b)=>a.compare(b)).filter((p,i,a)=>i===0||p.compare(a[i-1]!)!==0),parts=sorted.slice(0,-1).map((p,i)=>nurbsSectionArc3(arc.section,arc.piece,arc.edge,p,sorted[i+1]!,arc.direction));
  return Object.freeze(arc.direction===1?parts:parts.reverse());
 }

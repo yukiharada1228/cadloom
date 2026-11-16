@@ -408,3 +408,5 @@ export {nurbsPlaneSectionEdgeDifferential3} from './geometry/nurbs-section-diffe
 export type {NurbsSectionEdgeDifferential3} from './geometry/nurbs-section-differential3.js';
 export {nurbsSectionArc3,nurbsSectionArcPoint3,nurbsSectionArcDifferential3,reverseNurbsSectionArc3,restrictNurbsSectionArc3,splitNurbsSectionArc3} from './geometry/nurbs-section-arc3.js';
 export type {NurbsSectionArc3} from './geometry/nurbs-section-arc3.js';
+export {intersectNurbsSectionArcPlane3,splitNurbsSectionArcByPlane3} from './geometry/nurbs-section-arc-plane3.js';
+export type {NurbsSectionArcPlaneIntersection3,NurbsSectionArcPlanePoint3,NurbsSectionArcPlaneSplit3} from './geometry/nurbs-section-arc-plane3.js';
