@@ -473,3 +473,5 @@ export {certifyNurbsSurfaceTriangularProjection3,evaluateNurbsTriangularSurface3
 export type {NurbsTriangularProjectionCertificate3,NurbsTriangularProjectionResult3} from './geometry/nurbs-triangular-projection3.js';
 export {certifyNurbsSourceFaceEmbedding3} from './geometry/nurbs-source-face-embedding3.js';
 export type {NurbsSourceEmbeddedFace3,NurbsSourceFaceEmbedding3} from './geometry/nurbs-source-face-embedding3.js';
+export {prepareNurbsSourceFaceComplex3,evaluateNurbsSourceComplexEdge3} from './geometry/nurbs-source-face-complex3.js';
+export type {NurbsSourceFaceComplex3,NurbsSourceComplexVertex3,NurbsSourceComplexEdge3} from './geometry/nurbs-source-face-complex3.js';

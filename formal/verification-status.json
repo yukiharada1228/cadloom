@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "fc0d13924c0552db9182368214135fe77993a9192b4b392812ce028b8b84728b",
+    "src/index.ts": "feadaf62f4ad01106d3f478642203eee22afb2a3d6b129cf3b4c457a6ec8e34c",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -222,7 +222,8 @@
     "src/geometry/nurbs-source-closed-rank3.ts": "a212b5fa2dba3a4776bfec0ee1ae98642b55dc56d0e1c8379dc232d9f5ad2e4a",
     "src/geometry/nurbs-triangular-projection3.ts": "9f6ac5d6f9d7b8c76ab23560690e45db242c1bf7e9d3aab9b315de216ddfa2a0",
     "src/geometry/nurbs-source-face-embedding3.ts": "ed9fc7d4cc3b0c6bf0198edcf4d1b9283892ec4a846282e57c1d2517be74320a",
-    "src/numeric/rational-nullspace.ts": "4877d7d0c0d701e0a9c788e543b1d2dc7dbf61c08530ad745833e297568be4bc"
+    "src/numeric/rational-nullspace.ts": "4877d7d0c0d701e0a9c788e543b1d2dc7dbf61c08530ad745833e297568be4bc",
+    "src/geometry/nurbs-source-face-complex3.ts": "c3c2c7c5452d452e220936afe13c28a720c37ac2758d9d3d7a521b70f3269241"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
