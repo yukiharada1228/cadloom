@@ -53,6 +53,8 @@ function candidate(p:NurbsAffineIntersectionEquationPatch3,u:AlgebraicReal,v:Alg
  if(!inside(p.sourcePatch,u,v))return null;const targetU=p.uNumerator.rationalImage(u,v,p.sourcePatch.weight),targetV=p.vNumerator.rationalImage(u,v,p.sourcePatch.weight);if(!inside(p.targetPatch,targetU,targetV)||p.equations.some(f=>f.evaluateAlgebraic(u,v).sign()!==0))return null;
  const point=liftNurbsSectionPatch3(p.sourcePatch,u,v),other=liftNurbsSectionPatch3(p.targetPatch,targetU,targetV);if(compareAlgebraicPoints3(point,other)!==0)throw new Error('Eliminated intersection equations failed exact spatial equality');return Object.freeze({u,v,targetU,targetV,point});
 }
+/** Internal single-evaluation path for owned downstream trim classification. */
+export function nurbsAffineIntersectionCandidate3(report:NurbsAffineIntersectionEquations3,pair:number,u:AlgebraicReal|ExactInput,v:AlgebraicReal|ExactInput):NurbsAffineIntersectionPoint3|null {return candidate(pairAt(report,pair),real(u),real(v));}
 export function nurbsAffineIntersectionContains3(report:NurbsAffineIntersectionEquations3,pair:number,u:AlgebraicReal|ExactInput,v:AlgebraicReal|ExactInput):boolean {return candidate(pairAt(report,pair),real(u),real(v))!==null;}
 export function nurbsAffineIntersectionPoint3(report:NurbsAffineIntersectionEquations3,pair:number,u:AlgebraicReal|ExactInput,v:AlgebraicReal|ExactInput):NurbsAffineIntersectionPoint3 {
  const result=candidate(pairAt(report,pair),real(u),real(v));if(!result)throw new RangeError('Parameters do not represent a closed patch intersection');return result;

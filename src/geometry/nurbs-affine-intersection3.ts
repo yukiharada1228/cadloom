@@ -38,8 +38,9 @@ export function solveNurbsAffineIntersectionEquations3(equations:NurbsAffineInte
  const report=Object.freeze({equations,patches:Object.freeze(patches),empty:patches.length===0});owned.add(report);return report;
 }
 export function intersectNurbsSurfaceAffineTarget3(source:NurbsSurface3,target:NurbsAffineProjectionCertificate3):NurbsAffineIntersection3 {return solveNurbsAffineIntersectionEquations3(nurbsAffineIntersectionEquations3(source,target));}
+export function assertOwnedNurbsAffineIntersection3(report:NurbsAffineIntersection3):void {if(!owned.has(report))throw new RangeError('Operation requires a factory-created NURBS affine intersection');}
 function patchAt(report:NurbsAffineIntersection3,patch:number):NurbsAffineIntersectionPatch3 {
- if(!owned.has(report))throw new RangeError('Operation requires a factory-created NURBS affine intersection');if(!Number.isSafeInteger(patch)||patch<0||patch>=report.patches.length)throw new RangeError('Invalid intersection patch index');return report.patches[patch]!;
+ assertOwnedNurbsAffineIntersection3(report);if(!Number.isSafeInteger(patch)||patch<0||patch>=report.patches.length)throw new RangeError('Invalid intersection patch index');return report.patches[patch]!;
 }
 /** u on a normal graph branch, v on a vertical branch; closed retained range. */
 export function nurbsAffineIntersectionEdgePoint3(report:NurbsAffineIntersection3,patch:number,edge:number,parameter:AlgebraicReal|ExactInput):NurbsAffineIntersectionPoint3 {
