@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "6ae731a10e4a82fa563adef4c2bcc1b770e5e0dab4354367d5aa1e3440de19af",
+    "src/index.ts": "c3f90574dab3e2b8f30c08a07ddda2ec895e20a59e40e7b131ee13aeb3111ca9",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -27,7 +27,7 @@
     "src/geometry/surface-location3.ts": "367745afeff743741bfa3851d54455723bdff32f4dd1271744bba8d4ac1e0094",
     "src/geometry/solid-boolean3.ts": "2354a04904c94c4003bfb6621659666ec5cc9fcc543f84bca447507d0454b2f1",
     "src/numeric/polynomial.ts": "54a4d89dff48a4ebd4e2825cd80532616a433cb7c010dd5635c83ab7dbb51650",
-    "src/numeric/real-roots.ts": "da4e57600af44ec56692e01384234679c670b8382f7ef8435e383d2d13b27360",
+    "src/numeric/real-roots.ts": "f3ab3c3a8af6a4643e87cc325578e199ffe8add0c81ec675672f8fdbfc98925a",
     "src/geometry/algebraic-point2.ts": "f26fc55bd108af49edd944dad81cb8478bdd06826a4b1b7503f99885a1704dec",
     "src/geometry/circle2.ts": "29443ea2c7508f0011a8c1c37926b61bca7453fc853c519d7e4700bdcdf473b4",
     "src/numeric/resultant.ts": "f3756924c33ec134fcca49f722fd47a79292df6fb827133f7e4c6df702961545",
@@ -187,7 +187,8 @@
     "src/geometry/nurbs-surface-preimage3.ts": "9e0bd144848a80f6ff5c1d40fb3486d16a636cd530fe6def82f9172f563723d8",
     "src/geometry/nurbs-domain-graph-edge2.ts": "33e2bca384b32c48a117c03470c18606c3009a39f72d1a9d2188cedf120032e5",
     "src/geometry/nurbs-domain-patch3.ts": "695d0eae0406d2679337b4bf5aca87e88fdac6fca8cefddb4e1f285297765524",
-    "src/geometry/nurbs-trimmed-surface-preimage3.ts": "44ccb19143c59528bbba2b10fcc1dbb23532c33041f15899dd0a3b234382aa86"
+    "src/geometry/nurbs-trimmed-surface-preimage3.ts": "44ccb19143c59528bbba2b10fcc1dbb23532c33041f15899dd0a3b234382aa86",
+    "src/geometry/nurbs-affine-projection3.ts": "b949bc61075e77da7a8f8eede05842b9e01982e136896406a2454a392a02ebe4"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

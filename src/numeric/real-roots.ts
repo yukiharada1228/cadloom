@@ -68,6 +68,24 @@ function integerSquareRoot(n:bigint):bigint {
  * is used. Arithmetic uses exact polynomial elimination and interval branch selection.
  */
 const realInstances=new WeakSet<AlgebraicReal>(),comparisons=new WeakMap<AlgebraicReal,WeakMap<AlgebraicReal,Sign>>(),refinements=new WeakMap<AlgebraicReal,AlgebraicReal>();
+interface RationalRealSource {readonly source:AlgebraicReal;readonly numerator:Polynomial;readonly denominator:Polynomial;}
+// Private provenance only; legacy arithmetic certificates and intervals do not change.
+const rationalRealSources=new WeakMap<AlgebraicReal,RationalRealSource>(),sourceVariable=new Polynomial([0n,1n]),sourceOne=new Polynomial([1n]);
+function realSource(value:AlgebraicReal):RationalRealSource {return rationalRealSources.get(value)??{source:value,numerator:sourceVariable,denominator:sourceOne};}
+function rememberReal(result:AlgebraicReal,form:RationalRealSource):AlgebraicReal {
+ if(result!==form.source&&result.rational===null&&realInstances.has(result)&&realInstances.has(form.source))rationalRealSources.set(result,Object.freeze({source:form.source,numerator:form.numerator.divRem(form.source.polynomial).remainder,denominator:form.denominator.divRem(form.source.polynomial).remainder}));return result;
+}
+function rememberAffineReal(result:AlgebraicReal,value:AlgebraicReal,scale:Rational,offset:Rational):AlgebraicReal {
+ if(!realInstances.has(value))return result;const f=realSource(value);return rememberReal(result,{source:f.source,numerator:f.numerator.scale(scale).add(f.denominator.scale(offset)),denominator:f.denominator});
+}
+function rememberBinaryReal(result:AlgebraicReal,a:AlgebraicReal,b:AlgebraicReal,operation:'sum'|'product'):AlgebraicReal {
+ if(!realInstances.has(a)||!realInstances.has(b)||a.rational!==null||b.rational!==null)return result;const A=realSource(a),B=realSource(b);if(A.source!==B.source)return result;
+ return rememberReal(result,{source:A.source,numerator:operation==='sum'?A.numerator.mul(B.denominator).add(B.numerator.mul(A.denominator)):A.numerator.mul(B.numerator),denominator:A.denominator.mul(B.denominator)});
+}
+function rememberRationalReal(result:AlgebraicReal,value:AlgebraicReal,numerator:Polynomial,denominator:Polynomial):AlgebraicReal {
+ if(!realInstances.has(value))return result;const f=realSource(value),degree=Math.max(numerator.degree,denominator.degree),A=[sourceOne],B=[sourceOne];for(let i=1;i<=degree;i++){A.push(A[i-1]!.mul(f.numerator));B.push(B[i-1]!.mul(f.denominator));}
+ const compose=(p:Polynomial)=>p.coefficients.reduce((sum,c,i)=>sum.add(A[i]!.mul(B[degree-i]!).scale(c)),new Polynomial());return rememberReal(result,{source:f.source,numerator:compose(numerator),denominator:compose(denominator)});
+}
 export class AlgebraicReal {
   private constructor(readonly polynomial:Polynomial,readonly lower:Rational,readonly upper:Rational){Object.freeze(this);realInstances.add(this);}
   /** Null means not yet represented as a rational point, not a proof of irrationality. */
@@ -75,6 +93,18 @@ export class AlgebraicReal {
   static fromRational(input:ExactInput):AlgebraicReal {
     const value=exactRational(input);
     return new AlgebraicReal(new Polynomial([value.neg(),1n]),value,value);
+  }
+  /** Exact opt-in linear image using a factory-recorded common rational source.
+   * Ordinary arithmetic certificates stay unchanged. Unrelated sources use
+   * the complete existing arithmetic fallback. */
+  static linearCombination(input:readonly Readonly<{value:AlgebraicReal;coefficient:ExactInput}>[],offsetInput:ExactInput=0n):AlgebraicReal {
+    let offset=exactRational(offsetInput);const terms:{value:AlgebraicReal;coefficient:Rational}[]=[];
+    for(const term of input){const value=term.value,coefficient=exactRational(term.coefficient);if(!realInstances.has(value))throw new RangeError('Linear image requires factory-created algebraic values');if(coefficient.sign()===0)continue;if(value.rational!==null)offset=offset.add(coefficient.mul(value.rational));else terms.push({value,coefficient});}
+    if(!terms.length)return AlgebraicReal.fromRational(offset);const forms=terms.map(t=>realSource(t.value)),source=forms[0]!.source;
+    if(forms.every(f=>f.source===source)){
+      let N=new Polynomial([offset]),D=sourceOne;forms.forEach((f,i)=>{N=N.mul(f.denominator).add(f.numerator.scale(terms[i]!.coefficient).mul(D)).divRem(source.polynomial).remainder;D=D.mul(f.denominator).divRem(source.polynomial).remainder;});return source.rationalFunction(N,D);
+    }
+    return terms.reduce((sum,t)=>sum.add(t.value.affine(t.coefficient)),AlgebraicReal.fromRational(offset));
   }
   /** Restore only after proving one root in the strict open interval. No
    * unrelated conjugate intervals need to be isolated to certify this root. */
@@ -120,7 +150,7 @@ export class AlgebraicReal {
     const mid=this.lower.add(this.upper).div(new Rational(2n)),value=this.polynomial.evaluate(mid).sign();
     const result=value===0?new AlgebraicReal(this.polynomial,mid,mid):value===this.polynomial.evaluate(this.lower).sign()?
       new AlgebraicReal(this.polynomial,mid,this.upper):new AlgebraicReal(this.polynomial,this.lower,mid);
-    if(realInstances.has(this))refinements.set(this,result);return result;
+    if(realInstances.has(this)){refinements.set(this,result);rememberReal(result,realSource(this));}return result;
   }
   /** Recover an exact rational root, even from a nonminimal certificate.
    * Acceptance checks the polynomial and isolating interval; otherwise an
@@ -151,7 +181,7 @@ export class AlgebraicReal {
     let polynomial=new Polynomial();
     for(let i=this.polynomial.degree;i>=0;i--)polynomial=polynomial.mul(substitute).add(new Polynomial([this.polynomial.coefficients[i]!]));
     const a=map(this.lower),b=map(this.upper);
-    return scale.sign()>0?new AlgebraicReal(polynomial.monic(),a,b):new AlgebraicReal(polynomial.monic(),b,a);
+    return rememberAffineReal(scale.sign()>0?new AlgebraicReal(polynomial.monic(),a,b):new AlgebraicReal(polynomial.monic(),b,a),this,scale,offset);
   }
   sign():Sign{return this.signOf(new Polynomial([0n,1n]));}
   equals(other:AlgebraicReal):boolean{return this.compare(other)===0;}
@@ -207,7 +237,7 @@ export class AlgebraicReal {
     if(root.rational!==null)return AlgebraicReal.fromRational(one.div(root.rational));
     const polynomial=new Polynomial([...root.polynomial.coefficients].reverse()).monic();
     if(polynomial.degree===1)return AlgebraicReal.fromRational(polynomial.coefficient(0).neg().div(polynomial.coefficient(1)));
-    return new AlgebraicReal(polynomial,one.div(root.upper),one.div(root.lower));
+    const result=new AlgebraicReal(polynomial,one.div(root.upper),one.div(root.lower)),form=realSource(this);return rememberReal(result,{source:form.source,numerator:form.denominator,denominator:form.numerator});
   }
   private combine(other:AlgebraicReal,operation:'sum'|'product'):AlgebraicReal {
     let a:AlgebraicReal=this,b=other;
@@ -237,7 +267,7 @@ export class AlgebraicReal {
         // Preserve canonical zero: a unique represented root in this interval
         // is exactly zero when zero is itself a root inside the interval.
         if(certificate.coefficient(0).sign()===0&&lo.sign()<0&&hi.sign()>0)return AlgebraicReal.fromRational(0n);
-        return new AlgebraicReal(certificate,lo,hi);
+        return rememberBinaryReal(new AlgebraicReal(certificate,lo,hi),this,other,operation);
       }}
       if(a.upper.sub(a.lower).compare(b.upper.sub(b.lower))>=0)a=a.refine();else b=b.refine();
     }
@@ -269,7 +299,7 @@ export class AlgebraicReal {
       // Positive padding places the actual image strictly inside. Nonroot
       // endpoints and exactly one open root give the usual sign-changing
       // certificate required by refine(), with no approximate selection.
-      if(certificate.evaluate(lo).sign()!==0&&certificate.evaluate(hi).sign()!==0){const count=countOpen(sequence,lo,hi);if(count===0)throw new Error('Rational image lost its represented root');if(count===1)return new AlgebraicReal(certificate,lo,hi);}
+      if(certificate.evaluate(lo).sign()!==0&&certificate.evaluate(hi).sign()!==0){const count=countOpen(sequence,lo,hi);if(count===0)throw new Error('Rational image lost its represented root');if(count===1)return rememberRationalReal(new AlgebraicReal(certificate,lo,hi),this,n,d);}
       root=root.refine();
     }
   }

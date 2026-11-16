@@ -418,3 +418,5 @@ export {nurbsSurfacePointPreimages3,nurbsSurfacePreimageEdgePoint3,nurbsSurfaceP
 export type {NurbsSurfacePointPreimages3,NurbsSurfacePreimagePatch3} from './geometry/nurbs-surface-preimage3.js';
 export {trimNurbsSurfacePointPreimages3,nurbsTrimmedSurfacePointPreimages3,trimmedNurbsSurfacePreimageEdgePoint3,trimmedNurbsSurfacePreimagePatchPoint3} from './geometry/nurbs-trimmed-surface-preimage3.js';
 export type {TrimmedNurbsSurfacePointPreimages3,TrimmedNurbsPreimagePatch3,TrimmedNurbsPreimageVertex3} from './geometry/nurbs-trimmed-surface-preimage3.js';
+export {certifyNurbsSurfaceAffineProjection3,nurbsAffineProjectionParameters3,locateAffineProjectedNurbsSurface3} from './geometry/nurbs-affine-projection3.js';
+export type {NurbsAffineParameterRow3,NurbsAffineProjectionCertificate3,NurbsAffineProjectionResult3} from './geometry/nurbs-affine-projection3.js';
