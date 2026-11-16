@@ -44,3 +44,5 @@ const remainder = booleanCellularBodies3(replayed, b, 'difference');
 平面配置と再構築・面領域の照合には時間とメモリが必要で、大規模モデルの性能上限は未保証です。構築DAGの制限は `CellularBodyReadLimits3`、レコードの構造予算はその `record` オプションで指定します。これらは実行時間の上限保証ではありません。
 
 [共通Bodyの位置判定・保存復元](common-body-facade3.md)では、既存の `locateBody3`・`locateBodyFace3`・`bodyDocument3`・`serializeBody3`・`restoreBody3` からCellularBodyも扱えます。所有と材料の成立条件は維持します。
+
+[共通Boolean入口](material-body-entry3.md)は、平面接触の明示的な保持と、CellularBody入力からの再演算に対応します。曲面と組み合わせた結果は多様体認定を要求し、未対応の曲面接触を黙って落としません。

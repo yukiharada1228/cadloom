@@ -1,7 +1,8 @@
+import {materialProgramOfPlanarMaterial3,booleanPlanarMaterials3,planarMaterialFromBody3} from './planar-material3.js';
 import {isOwnedCellularBody3} from '../model/cellular-body3.js';
 import type {CellularBody3} from '../model/cellular-body3.js';
 import type {KernelBody3} from '../model/body3.js';
-import {cellularBodyDocument3,restoreCellularBody3} from './cellular-body3.js';
+import {cellularBodyDocument3,restoreCellularBody3,planarMaterialOfCellularBody3,cellularBodyFromPlanarMaterial3} from './cellular-body3.js';
 import type {CellularBodyDocument3} from './cellular-body3.js';
 import type {PlanarMaterialReadLimits3} from './planar-material3.js';
 import {RecordReader3} from '../record/schema.js';
@@ -224,7 +225,8 @@ function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
 
 export function bodyFromMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3):Body3 {return adoptMaterialSurfaceBody3(source);}
 
-export function materialProgramOfBody3(body:Body3):CylinderMaterialProgram3 {
+export function materialProgramOfBody3(body:KernelBody3):CylinderMaterialProgram3 {
+ if(isOwnedCellularBody3(body))return materialProgramOfPlanarMaterial3(planarMaterialOfCellularBody3(body));
  assertOwnedBody3(body);
  if(nativePlanarOperand3(body))return preparePlanarMaterialProgram3(planarSourceOfBody3(body)??planarSolidFromBoundary3(body.topology));
  const surface=materialSurfaceSourceOfBody3(body);if(surface)return resolveCylinderMaterialProgram3(surface.material);
@@ -238,14 +240,30 @@ export function materialProgramOfBody3(body:Body3):CylinderMaterialProgram3 {
  }
  return materialProgramFromOperand3(materialOperandOfBody3(body));
 }
-function booleanSurfaceBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
+function booleanSurfaceBodies3(first:KernelBody3,second:KernelBody3,operation:BooleanOperation):Body3 {
  const program=booleanCylinderMaterialPrograms3(materialProgramOfBody3(first),materialProgramOfBody3(second),operation);
  return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(program,{requireClosed:true}));
 }
 
-/** Explicit common definition-driven kernel path, including pairs of legacy Bodies. */
-export function booleanMaterialBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
- assertOwnedBody3(first);assertOwnedBody3(second);
+export interface MaterialBodyBooleanOptions3 {readonly contacts?:'reject'|'preserve';}
+function rationalPlanarBody3(body:KernelBody3):boolean {
+ if(isOwnedCellularBody3(body))return true;
+ return body.topology.faces.every(f=>f.surface.kind==='plane')&&body.topology.vertices.every(p=>p.x.rational!==null&&p.y.rational!==null&&p.z.rational!==null)&&body.topology.edges.every(e=>{const c=e.curve.kind==='native'?e.curve.curve:e.curve;return c.kind==='line'||c.kind==='algebraic-segment';});
+}
+/** Common exact material Boolean. Legacy manifold-only calls retain their
+ * contract; explicit preservation and cellular inputs retain planar contacts. */
+export function booleanMaterialBodies3(first:Body3,second:Body3,operation:BooleanOperation,options?:{readonly contacts?:'reject'}):Body3;
+export function booleanMaterialBodies3(first:KernelBody3,second:KernelBody3,operation:BooleanOperation,options?:MaterialBodyBooleanOptions3):KernelBody3;
+export function booleanMaterialBodies3(first:KernelBody3,second:KernelBody3,operation:BooleanOperation,options:MaterialBodyBooleanOptions3={}):KernelBody3 {
+ const cellA=isOwnedCellularBody3(first),cellB=isOwnedCellularBody3(second);
+ if(!cellA)assertOwnedBody3(first as Body3);if(!cellB)assertOwnedBody3(second as Body3);
  if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown material Body operation');
+ const mode=options.contacts??(cellA||cellB?'preserve':'reject');
+ if(mode!=='reject'&&mode!=='preserve')throw new RangeError('Unknown material Body contact policy');
+ if(mode==='preserve'&&rationalPlanarBody3(first)&&rationalPlanarBody3(second)){
+  const a=cellA?planarMaterialOfCellularBody3(first as CellularBody3):planarMaterialFromBody3(first as Body3),b=cellB?planarMaterialOfCellularBody3(second as CellularBody3):planarMaterialFromBody3(second as Body3);
+  return cellularBodyFromPlanarMaterial3(booleanPlanarMaterials3(a,b,operation));
+ }
+ // Curved results still require the geometric manifold region certificate.
  return booleanSurfaceBodies3(first,second,operation);
 }

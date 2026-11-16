@@ -37,3 +37,5 @@ const body = planarBodyFromMaterial3(remainder); // 多様体条件を再検査
 `transformPlanarMaterial3` は検査済みの有理相似変換を構築DAG全体へ適用します。反射では各立体葉の面順を補正し、共有部分式と接触する材料を保持します。[共通Bodyの相似変換](body-similarity3.md)を参照してください。
 
 `closestPointOnPlanarMaterialBoundary3` と `planarMaterialVolumeMoments3` は、接触を含む実際の材料境界について厳密な最近点と単位密度の体積・重心・慣性を返します。共通Body／CellularBodyの計測入口も同じ材料を使います。
+
+`materialProgramOfPlanarMaterial3` は、接触を含む材料の検査済み立体葉と局所式を共通の有界材料定義へ変換します。[共通Boolean入口](material-body-entry3.md)から曲面と組み合わせ、結果が多様体なら通常Bodyへ接続できます。曲面の非多様体結果の認定は後続です。

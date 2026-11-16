@@ -1,3 +1,7 @@
+import {preparePlanarMaterialProgram3} from '../geometry/planar-material-boundary3.js';
+import {booleanCylinderMaterialPrograms3} from '../geometry/cylinder-material-program3.js';
+import type {CylinderMaterialProgram3} from '../geometry/cylinder-material-program3.js';
+import type {PreparedPlanarSolid3} from '../geometry/planar-solid3.js';
 import {closestPointOnPlanarSolidBoundary3} from '../geometry/closest-planar-solid3.js';
 import {planarVolumeMoments3} from '../geometry/planar-volume-moments3.js';
 import {assertOwnedSimilarityTransform3,transformPointBySimilarity3} from '../geometry/similarity3.js';
@@ -24,7 +28,7 @@ export interface PlanarMaterial3 {
  readonly volume:Rational;
  readonly boundaryKind:'manifold'|'contact';
 }
-type Recipe={kind:'solid';source:PlanarSolidBooleanOperand3}|{kind:'boolean';operation:BooleanOperation;left:Recipe;right:Recipe};
+type Recipe={kind:'solid';source:PreparedPlanarSolid3}|{kind:'boolean';operation:BooleanOperation;left:Recipe;right:Recipe};
 type State={source:PlanarSolidBooleanOperand3;recipe:Recipe;locate?:ReturnType<typeof createExactPlanarLocator3>};
 const states=new WeakMap<PlanarMaterial3,State>();
 function state(m:PlanarMaterial3):State {const s=states.get(m);if(!s)throw new RangeError('Operation requires a factory-created planar material');return s;}
@@ -122,3 +126,15 @@ export function transformPlanarMaterial3(material:PlanarMaterial3,transform:Simi
 export function closestPointOnPlanarMaterialBoundary3(material:PlanarMaterial3,point:Point3){return closestPointOnPlanarSolidBoundary3(state(material).source,point);}
 /** Unit-density moments; balanced edge/vertex contacts have zero volume measure. */
 export function planarMaterialVolumeMoments3(material:PlanarMaterial3){return planarVolumeMoments3(state(material).source);}
+
+/** Compile owned solid leaves and their complete local Boolean formulas.
+ * The result is a bounded material definition, not a sewn boundary certificate. */
+export function materialProgramOfPlanarMaterial3(material:PlanarMaterial3):CylinderMaterialProgram3 {
+ const root=state(material).recipe,values=new Map<Recipe,CylinderMaterialProgram3>(),stack:[Recipe,boolean][]=[[root,false]];
+ while(stack.length){
+  const [r,ready]=stack.pop()!;if(values.has(r))continue;
+  if(r.kind==='boolean'&&!ready){stack.push([r,true],[r.right,false],[r.left,false]);continue;}
+  values.set(r,r.kind==='solid'?preparePlanarMaterialProgram3(r.source):booleanCylinderMaterialPrograms3(values.get(r.left)!,values.get(r.right)!,r.operation));
+ }
+ return values.get(root)!;
+}
