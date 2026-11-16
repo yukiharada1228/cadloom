@@ -1,3 +1,4 @@
+import {prepareChordProfileProgram3} from './chord-profile-program3.js';
 import {Rational} from '../numeric/rational.js';
 import {orient2d} from '../geometry/orient2d.js';
 import type {Circle2} from '../geometry/circle2.js';
@@ -62,7 +63,7 @@ export function prepareSupportedProfileProgram3(ring:CurveRegion2[number],lower:
   }
   polygon=hull(endpoints);
   circles=[...circles.filter(c=>c.operation==='intersection').map(c=>({circle:c.circle,operation:'union' as const})),...circles.filter(c=>c.operation==='difference')];
-  if(!equivalent(applyCircles(polygonRegion(polygon),circles)))throw unsupported();
+  if(!equivalent(applyCircles(polygonRegion(polygon),circles)))return prepareChordProfileProgram3(boundary,lower,upper);
  }
  let program:CylinderMaterialProgram3|undefined;
  if(polygon.length>=3){const mesh=extrudePolygon([polygon],upper.sub(lower),{baseZ:lower});program=preparePlanarMaterialProgram3(preparePlanarSolid3(mesh.triangles.map(t=>triangle3(mesh.vertices[t[0]]!,mesh.vertices[t[1]]!,mesh.vertices[t[2]]!))));}

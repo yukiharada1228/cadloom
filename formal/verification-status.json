@@ -158,7 +158,8 @@
     "src/geometry/material-surface-boundary3.ts": "79d94b073f608315296af63107f9735b57e8f793c69ebeb8ca50583bd3dafc13",
     "src/geometry/cylinder-material-program3.ts": "d12d447ad8510d1a171706046f7a7a2c95a2596b3676ffb1110a2369f2fa1997",
     "src/convert/material-surface-boundary3.ts": "f5bb8d5f863649ac7f4786c53607ddfba85f206bc511a79ca42a14f7239ec9bc",
-    "src/convert/supported-profile-program3.ts": "e49f8f70f65681131004138d0bf9e90e929a0889dc1db4dafec4739859e468dc"
+    "src/convert/supported-profile-program3.ts": "ac7d9e5aa7a82a3618edf4081c2afb0fa7f7e3b5430785c9d10ed74b351484dd",
+    "src/convert/chord-profile-program3.ts": "0a1ff52ebcb3cc9622e74be5af9e174a585eecb7b79c1899a565d2bc9a63bbfe"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
