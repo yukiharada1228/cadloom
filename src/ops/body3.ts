@@ -8,7 +8,7 @@ import type {MaterialSurfaceBoundary3} from '../geometry/material-surface-bounda
 import {adoptMaterialSurfaceBody3} from '../model/body3.js';
 import {boundaryPlanarMaterial3} from '../geometry/planar-material-boundary3.js';
 import {boundaryCircularExtrudeMaterial3} from '../convert/circular-extrude-material3.js';
-import {boundaryBoxMaterial3} from '../geometry/box-material3.js';
+import {prepareBoxMaterialProgram3,boundaryBoxMaterial3} from '../geometry/box-material3.js';
 import {boundaryCylinderMaterialExpression3,booleanCylinderMaterials3,clipCylinderMaterial3} from '../geometry/cylinder-material-expression3.js';
 import type {CylinderMaterialBoundary3,CylinderMaterialOperand3} from '../geometry/cylinder-material-expression3.js';
 import {adoptCylinderMaterialBody3,cylinderMaterialSourceOfBody3} from '../model/body3.js';
@@ -196,12 +196,23 @@ export function bodyFromMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3
 
 function programOfBody3(body:Body3):CylinderMaterialProgram3 {
  const surface=materialSurfaceSourceOfBody3(body);if(surface)return resolveCylinderMaterialProgram3(surface.material);
- if(body.construction.kind==='cylinder'){
-  const c=cylinderSourceOfBody3(body);return prepareCylinderMaterialProgram3([prepareFiniteCylinder3(c.cylinder,c.lower,c.upper)],[],{kind:'cylinder',cylinder:0});
+ if(body.construction.kind==='box'){
+  const c=body.construction;return prepareBoxMaterialProgram3(decodeRationalPoint3(c.origin),c.size[0],c.size[1],c.size[2]);
+ }
+ if(body.construction.kind==='cylinder'||body.construction.kind==='clipped-cylinder'){
+  const c=cylinderSourceOfBody3(body),base=prepareCylinderMaterialProgram3([prepareFiniteCylinder3(c.cylinder,c.lower,c.upper)],[],{kind:'cylinder',cylinder:0});
+  return body.construction.kind==='cylinder'?base:clipCylinderMaterialProgram3(base,c.planes.map(plane=>({plane,side:-1 as const})));
  }
  return materialProgramFromOperand3(materialOperandOfBody3(body));
 }
 function booleanSurfaceBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
  const program=booleanCylinderMaterialPrograms3(programOfBody3(first),programOfBody3(second),operation);
  return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(program,{requireClosed:true}));
+}
+
+/** Explicit common definition-driven kernel path, including pairs of legacy Bodies. */
+export function booleanMaterialBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
+ assertOwnedBody3(first);assertOwnedBody3(second);
+ if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown material Body operation');
+ return booleanSurfaceBodies3(first,second,operation);
 }
