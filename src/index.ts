@@ -355,3 +355,4 @@ export {booleanCylinderMaterialPrograms3,clipCylinderMaterialProgram3} from './g
 export {booleanMaterialBodies3} from './ops/body3.js';
 export {prepareBoxMaterialProgram3} from './geometry/box-material3.js';
 export {preparePlanarMaterialProgram3} from './geometry/planar-material-boundary3.js';
+export {prepareExtrudeMaterialProgram3} from './convert/circular-extrude-material3.js';
