@@ -459,3 +459,5 @@ export {locateNurbsSourceFace3} from './geometry/nurbs-source-face-location3.js'
 export type {NurbsSourceFaceLocation3} from './geometry/nurbs-source-face-location3.js';
 export {liftNurbsSourceFaceBoundaries3,evaluateNurbsSourceLiftPiece3} from './geometry/nurbs-source-face-lift3.js';
 export type {NurbsSourceLiftEvent3,NurbsSourceLiftEdge3,NurbsSourceFaceLift3} from './geometry/nurbs-source-face-lift3.js';
+export {selectNurbsSourceFacePatches3} from './geometry/nurbs-source-face-patches3.js';
+export type {NurbsSourceFacePatchUse3,NurbsSourceFaceSeamInterval3,NurbsSourceFacePatchSelection3,NurbsSourceFacePatches3} from './geometry/nurbs-source-face-patches3.js';

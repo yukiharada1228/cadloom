@@ -20,6 +20,7 @@ export type NurbsSourceFaceLift3=
  | Readonly<{kind:'lifted';source:Classified;patches:readonly NurbsSurfacePatch3[];edges:readonly NurbsSourceLiftEdge3[];vertices:readonly Readonly<{images:NurbsSourceLiftEvent3['images'];continuous:boolean}>[];cycles:readonly (readonly Readonly<{edge:number;piece:number;direction:1|-1}>[])[];continuous:boolean}>;
 const owned=new WeakSet<NurbsSourceFaceLift3>(),real=(q:Rational)=>AlgebraicReal.fromRational(q);
 const between=(a:AlgebraicReal,b:AlgebraicReal):Rational=>{while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}return a.upper.add(b.lower).div(new Rational(2n));};
+export function assertOwnedNurbsSourceFaceLift3(source:NurbsSourceFaceLift3):void {if(!owned.has(source))throw new RangeError('Expected factory-created source face boundary lift');}
 function own<T extends NurbsSourceFaceLift3>(value:T):T {owned.add(value);return value;}
 /** Lift every source-UV boundary atom through all incident one-sided patches.
  * Knot preimages split atoms; disagreement is retained, never averaged. */
@@ -51,7 +52,7 @@ export function liftNurbsSourceFaceBoundaries3(source:NurbsSourceFaces3):NurbsSo
  return own(Object.freeze({kind:'lifted',source,patches,edges:Object.freeze(edges),vertices:vs,cycles,continuous:vs.every(v=>v.continuous)&&edges.every(e=>e.pieces.every(p=>p.continuous)&&e.events.every(q=>q.continuous))}));
 }
 export function evaluateNurbsSourceLiftPiece3(source:NurbsSourceFaceLift3,edge:number,piece:number,use:number,parameter:AlgebraicReal|ExactInput):Readonly<{u:AlgebraicReal;v:AlgebraicReal;patch:number;point:AlgebraicCoordinates3}> {
- if(!owned.has(source))throw new RangeError('Expected factory-created source face boundary lift');if(source.kind!=='lifted')throw new RangeError('Source face boundary lift is unresolved');
+ assertOwnedNurbsSourceFaceLift3(source);if(source.kind!=='lifted')throw new RangeError('Source face boundary lift is unresolved');
  if(!Number.isSafeInteger(edge)||edge<0||edge>=source.edges.length)throw new RangeError('Invalid lifted edge');const e=source.edges[edge]!;
  if(!Number.isSafeInteger(piece)||piece<0||piece>=e.pieces.length)throw new RangeError('Invalid lifted piece');const p=e.pieces[piece]!;
  if(!Number.isSafeInteger(use)||use<0||use>=p.patches.length)throw new RangeError('Invalid lifted patch use');const t=parameter instanceof AlgebraicReal?parameter:AlgebraicReal.fromRational(parameter);
