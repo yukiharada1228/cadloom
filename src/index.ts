@@ -602,3 +602,7 @@ export type {NurbsCapSplitFaces3,NurbsCapSplitSurface3} from './geometry/nurbs-p
 export {partitionNurbsSplitFaceByPlane3} from './geometry/nurbs-source-plane-cells3.js';
 export {matchNurbsRecutSectionEdge3,nurbsRecutEdgeMatchPoint3} from './geometry/nurbs-recut-edge-match3.js';
 export type {NurbsRecutEdgeMatch3,NurbsRecutEdgeMatchCertificate3} from './geometry/nurbs-recut-edge-match3.js';
+export {coverNurbsRecutSectionEdges3} from './geometry/nurbs-recut-edge-coverage3.js';
+export type {NurbsRecutEdgeCoverage3,NurbsRecutEdgeCoverageCertificate3} from './geometry/nurbs-recut-edge-coverage3.js';
+export {alignNurbsRecutCapEdges3} from './geometry/nurbs-recut-edge-coverage3.js';
+export type {NurbsRecutCapEdgeAlignment3,NurbsRecutCapEdgeAlignmentCertificate3} from './geometry/nurbs-recut-edge-coverage3.js';
