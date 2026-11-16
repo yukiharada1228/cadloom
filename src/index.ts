@@ -617,3 +617,5 @@ export {partitionNurbsRecutCurveByAlgebraicPlane3} from './geometry/nurbs-recut-
 export {queryNurbsRecutCapWinding3,queryNurbsRecutCapLoopWinding3} from './geometry/nurbs-recut-cap-winding3.js';
 export type {NurbsRecutCapWinding3,NurbsRecutCapLoopWinding3} from './geometry/nurbs-recut-cap-winding3.js';
 export type {NurbsRecutCurvePlane3} from './geometry/nurbs-recut-curve-plane3.js';
+export {certifyNurbsRecutAssemblyEmbedding3,analyzeNurbsRecutCapDomains3,locateNurbsRecutCapFace3} from './geometry/nurbs-recut-cap-domains3.js';
+export type {NurbsRecutAssemblyEmbeddingCertificate3,NurbsRecutAssemblyEmbedding3,NurbsRecutCapDomainsCertificate3,NurbsRecutCapDomains3,NurbsRecutCapFaceLocation3} from './geometry/nurbs-recut-cap-domains3.js';
