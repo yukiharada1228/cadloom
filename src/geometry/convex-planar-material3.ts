@@ -1,3 +1,5 @@
+import {prepareCylinderMaterialProgram3} from './cylinder-material-program3.js';
+import type {CylinderMaterialProgram3} from './cylinder-material-program3.js';
 import {assertOwnedPlanarSolid3} from './planar-solid3.js';
 import type {PreparedPlanarSolid3} from './planar-solid3.js';
 import {point3} from './point3.js';
@@ -21,7 +23,7 @@ export function isConvexPlanarMaterial3(source:PreparedPlanarSolid3):boolean {
 
 /** Lower an owned convex rational polyhedron to its exact supporting halfspaces.
  * Concave material, multiple shells and voids require a richer decomposition. */
-export function boundaryConvexPlanarMaterial3(source:PreparedPlanarSolid3):CylinderMaterialBoundary3 {
+export function prepareConvexPlanarMaterialProgram3(source:PreparedPlanarSolid3):CylinderMaterialProgram3 {
  assertOwnedPlanarSolid3(source);
  if(source.shells.length!==1||source.shells[0]!.depth!==0||source.volume.sign()<=0)throw new RangeError('Expected one nonempty convex planar material shell');
  if(!isConvexPlanarMaterial3(source))throw new RangeError('Planar material is not convex');
@@ -37,5 +39,9 @@ export function boundaryConvexPlanarMaterial3(source:PreparedPlanarSolid3):Cylin
  const guard=prepareFiniteCylinder3(cylinder3(line3(point3(lo.x,lo.y,0n),point3(0n,0n,1n)),w.mul(w).add(d.mul(d)).add(one)),lo.z.sub(one),hi.z.add(one));
  let expression:CylinderMaterialExpression3={kind:'cylinder',cylinder:0};
  planes.forEach((_,halfspace)=>{expression={kind:'intersection',first:expression,second:{kind:'halfspace',halfspace}};});
- return boundaryCylinderMaterialExpression3([guard],planes,expression);
+ return prepareCylinderMaterialProgram3([guard],planes,expression);
+}
+
+export function boundaryConvexPlanarMaterial3(source:PreparedPlanarSolid3):CylinderMaterialBoundary3 {
+ const p=prepareConvexPlanarMaterialProgram3(source);return boundaryCylinderMaterialExpression3(p.cylinders,p.planes,p.expression);
 }

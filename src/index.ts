@@ -354,3 +354,4 @@ export {bodyFromMaterialSurfaceBoundary3} from './ops/body3.js';
 export {booleanCylinderMaterialPrograms3,clipCylinderMaterialProgram3} from './geometry/cylinder-material-program3.js';
 export {booleanMaterialBodies3} from './ops/body3.js';
 export {prepareBoxMaterialProgram3} from './geometry/box-material3.js';
+export {preparePlanarMaterialProgram3} from './geometry/planar-material-boundary3.js';
