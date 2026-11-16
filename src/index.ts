@@ -600,3 +600,5 @@ export type {NurbsCapSplitFaceLocation3} from './geometry/nurbs-plane-cap-split-
 export {buildNurbsCapSplitFaces3,locateNurbsCapSplitSurface3,nurbsCapSplitSurfacePoint3} from './geometry/nurbs-plane-cap-split-faces3.js';
 export type {NurbsCapSplitFaces3,NurbsCapSplitSurface3} from './geometry/nurbs-plane-cap-split-faces3.js';
 export {partitionNurbsSplitFaceByPlane3} from './geometry/nurbs-source-plane-cells3.js';
+export {matchNurbsRecutSectionEdge3,nurbsRecutEdgeMatchPoint3} from './geometry/nurbs-recut-edge-match3.js';
+export type {NurbsRecutEdgeMatch3,NurbsRecutEdgeMatchCertificate3} from './geometry/nurbs-recut-edge-match3.js';
