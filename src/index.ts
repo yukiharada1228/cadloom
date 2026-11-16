@@ -469,3 +469,7 @@ export {analyzeNurbsSourceFaceVertexRegularity3} from './geometry/nurbs-source-v
 export type {NurbsSourceVertexSector3,NurbsSourceVertexRankEvent3,NurbsSourceVertexRegularity3} from './geometry/nurbs-source-vertex-regularity3.js';
 export {analyzeNurbsSourceFaceClosedRank3} from './geometry/nurbs-source-closed-rank3.js';
 export type {NurbsSourceClosedRank3} from './geometry/nurbs-source-closed-rank3.js';
+export {certifyNurbsSurfaceTriangularProjection3,evaluateNurbsTriangularSurface3} from './geometry/nurbs-triangular-projection3.js';
+export type {NurbsTriangularProjectionCertificate3,NurbsTriangularProjectionResult3} from './geometry/nurbs-triangular-projection3.js';
+export {certifyNurbsSourceFaceEmbedding3} from './geometry/nurbs-source-face-embedding3.js';
+export type {NurbsSourceEmbeddedFace3,NurbsSourceFaceEmbedding3} from './geometry/nurbs-source-face-embedding3.js';

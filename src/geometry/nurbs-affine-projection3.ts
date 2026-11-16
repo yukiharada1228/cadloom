@@ -1,4 +1,5 @@
 import {Rational} from '../numeric/rational.js';
+import {rationalNullspace} from '../numeric/rational-nullspace.js';
 import {BivariatePolynomial} from '../numeric/bivariate-polynomial.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {point3} from './point3.js';
@@ -16,24 +17,13 @@ export interface NurbsAffineProjectionCertificate3 {readonly surface:NurbsSurfac
 export type NurbsAffineProjectionResult3=
  | Readonly<{kind:'certified';certificate:NurbsAffineProjectionCertificate3}>
  | Readonly<{kind:'not-certified';surface:NurbsSurface3;reason:'discontinuous-seam'|'no-affine-projection'}>;
-const zero=new Rational(0n),one=new Rational(1n),U=new BivariatePolynomial([[0n],[1n]]),V=new BivariatePolynomial([[0n,1n]]),owned=new WeakSet<NurbsAffineProjectionCertificate3>();
-/** Exact RREF of six-column homogeneous constraints. Discovery is followed by
- * independent polynomial identity checks before any certificate is owned. */
-function nullspace(input:readonly Rational[][]):Rational[][] {
- const rows=input.map(row=>[...row]),pivots:number[]=[];let r=0;
- for(let col=0;col<6&&r<rows.length;col++){
-  const at=rows.findIndex((row,i)=>i>=r&&row[col]!.sign()!==0);if(at<0)continue;[rows[r],rows[at]]=[rows[at]!,rows[r]!];const divisor=rows[r]![col]!;rows[r]=rows[r]!.map(x=>x.div(divisor));
-  for(let i=0;i<rows.length;i++)if(i!==r){const factor=rows[i]![col]!;if(factor.sign()!==0)rows[i]=rows[i]!.map((x,j)=>x.sub(factor.mul(rows[r]![j]!)));}
-  pivots.push(col);r++;
- }
- const result:Rational[][]=[];for(let free=0;free<6;free++)if(!pivots.includes(free)){const vector=Array.from({length:6},()=>zero);vector[free]=one;pivots.forEach((pivot,i)=>{vector[pivot]=rows[i]![free]!.neg();});result.push(vector);}return result;
-}
+const U=new BivariatePolynomial([[0n],[1n]]),V=new BivariatePolynomial([[0n,1n]]),owned=new WeakSet<NurbsAffineProjectionCertificate3>();
 export function certifyNurbsSurfaceAffineProjection3(input:NurbsSurface3):NurbsAffineProjectionResult3 {
  const surface=nurbsSurface3(input.degreeU,input.degreeV,input.controlPoints,input.knotsU,input.knotsV,input.weights),patches=nurbsSurfacePatches3(surface);
  if(nurbsSurfaceSeams3(patches).some(s=>!s.continuous))return Object.freeze({kind:'not-certified',surface,reason:'discontinuous-seam'});
  const rows:Rational[][]=[];
  for(const p of patches){const terms=[p.x,p.y,p.z,p.weight.scale(-1n),U.mul(p.weight).scale(-1n),V.mul(p.weight).scale(-1n)],m=Math.max(...terms.map(p=>p.degreeU)),n=Math.max(...terms.map(p=>p.degreeV));for(let i=0;i<=m;i++)for(let j=0;j<=n;j++){const row=terms.map(p=>p.coefficient(i,j));if(row.some(q=>q.sign()!==0))rows.push(row);}}
- const basis=nullspace(rows);
+ const basis=rationalNullspace(rows,6);
  for(let i=0;i<basis.length;i++)for(let j=i+1;j<basis.length;j++){
   const a=basis[i]!,b=basis[j]!,det=a[4]!.mul(b[5]!).sub(a[5]!.mul(b[4]!));if(det.sign()===0)continue;
   const row=(axis:'u'|'v'):NurbsAffineParameterRow3=>{const values=[0,1,2].map(k=>axis==='u'?b[5]!.mul(a[k]!).sub(a[5]!.mul(b[k]!)).div(det):a[4]!.mul(b[k]!).sub(b[4]!.mul(a[k]!)).div(det)),offset=axis==='u'?a[5]!.mul(b[3]!).sub(b[5]!.mul(a[3]!)).div(det):b[4]!.mul(a[3]!).sub(a[4]!.mul(b[3]!)).div(det);return Object.freeze({normal:point3(values[0]!,values[1]!,values[2]!),offset});};
