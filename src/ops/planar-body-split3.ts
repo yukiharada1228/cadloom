@@ -6,6 +6,7 @@ import type {Plane3} from '../geometry/plane3.js';
 import {surfacesCoincide3} from '../geometry/surface3.js';
 import {partitionConvexPolygonByPlanes3} from '../geometry/convex-polygon-plane-arrangement3.js';
 import type {KernelBody3} from '../model/body3.js';
+import {isOwnedNurbsBody3} from '../model/nurbs-body3.js';
 import {isOwnedCellularBody3} from '../model/cellular-body3.js';
 import type {CellularBody3} from '../model/cellular-body3.js';
 import {cellularBodyFromPlanarMaterial3,planarMaterialOfCellularBody3} from './cellular-body3.js';
@@ -60,6 +61,7 @@ function polygonKey(points:readonly Point3[]):string {
  * Exact Boolean selection retains cavities, holes, disconnected components and contacts.
  * Curved/nonrational boundaries require other backends and fail explicitly. */
 export function splitPlanarBodyByPlane3(body:KernelBody3,inputPlane:Plane3):PlanarBodyPlaneSplit3 {
+ if(isOwnedNurbsBody3(body))throw new RangeError('Planar splitting does not support a NURBS Body');
  const material=isOwnedCellularBody3(body)?planarMaterialOfCellularBody3(body):planarMaterialFromBody3(body),plane=plane3(inputPlane.normal.x,inputPlane.normal.y,inputPlane.normal.z,inputPlane.offset),points=material.polygons.flat();
  let negativeMaterial:PlanarMaterial3,positiveMaterial:PlanarMaterial3;
  if(!points.length){negativeMaterial=material;positiveMaterial=material;}

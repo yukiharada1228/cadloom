@@ -64,10 +64,11 @@
         "src/record/exact3.ts",
         "src/record/schema.ts",
         "src/record/face-domain3.ts",
-        "src/record/nurbs-source-brep3.ts"
+        "src/record/nurbs-source-brep3.ts",
+        "src/record/nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete."
+      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete. A NURBS Body recipe document now replays all source faces, sewing, global embedding, containment, orientation and region-sample checks through common Body restoration."
     },
     {
       "id": "topology",
@@ -81,10 +82,11 @@
         "src/geometry/sew-nurbs-source-breps3.ts",
         "src/geometry/sewn-nurbs-source-embedding3.ts",
         "src/geometry/sewn-nurbs-source-containment3.ts",
-        "src/geometry/sewn-nurbs-source-material3.ts"
+        "src/geometry/sewn-nurbs-source-material3.ts",
+        "src/model/nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Certified finite source faces enter shared incidence and supported rational maps sew across sources. Sufficient pairwise separation certificates now gate global embeddings, containment forests and alternating material orientation. Complete general embedding discovery, general SSI maps and common NURBS Body adoption remain incomplete."
+      "gap": "Certified finite source faces enter shared incidence and supported rational maps sew across sources. Sufficient pairwise separation certificates now gate global embeddings, containment forests and alternating material orientation. Complete general embedding discovery, general SSI maps and full NURBS operation dispatch remain incomplete."
     },
     {
       "id": "conversion",
@@ -108,7 +110,7 @@
         "src/convert/nurbs-source-brep3.ts"
       ],
       "status": "partial",
-      "gap": "Supported analytic domains and constructed NURBS source recipes reconstruct geometry and re-run applicable face and boundary checks. Weighted wall/circular-cap recipes rebuild exact sewn queries in regression. Arbitrary imported face/shell certification, independent pcurves, global void containment and common NURBS Body adoption remain incomplete."
+      "gap": "Supported analytic domains and constructed NURBS source recipes reconstruct geometry and re-run applicable face and boundary checks. Weighted wall/circular-cap recipes rebuild exact sewn queries in regression. Arbitrary imported face/shell certification, independent pcurves, complete imported-data void containment and full NURBS operation dispatch remain incomplete."
     },
     {
       "id": "ops",
@@ -119,10 +121,11 @@
         "src/geometry/clipped-cylinder-brep3.ts",
         "src/ops/body3.ts",
         "src/model/body3.ts",
-        "src/record/body-document3.ts"
+        "src/record/body-document3.ts",
+        "src/ops/nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing."
+      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing. Certified NURBS materials now join KernelBody3 with owned topology, cavity-aware region samples, point/face/line/ray queries and replayed source-only persistence. General NURBS Booleans, splitting, transformations and mass properties remain incomplete."
     },
     {
       "id": "primitive",
@@ -304,10 +307,11 @@
         "src/geometry/sewn-nurbs-source-ray3.ts",
         "src/geometry/sewn-nurbs-source-parity-search3.ts",
         "src/geometry/sewn-nurbs-source-material-query3.ts",
-        "src/geometry/sewn-nurbs-source-material-line3.ts"
+        "src/geometry/sewn-nurbs-source-material-line3.ts",
+        "src/model/nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, common NURBS Body dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated."
+      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated."
     },
     {
       "id": "tessellation",
@@ -380,7 +384,8 @@
       "docs/sewn-nurbs-source-containment3.md",
       "docs/sewn-nurbs-source-material3.md",
       "docs/sewn-nurbs-source-material-query3.md",
-      "docs/sewn-nurbs-source-material-line3.md"
+      "docs/sewn-nurbs-source-material-line3.md",
+      "docs/nurbs-body3.md"
     ]
   }
 }

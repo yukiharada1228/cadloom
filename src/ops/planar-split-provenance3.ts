@@ -6,6 +6,7 @@ import type {Plane3} from '../geometry/plane3.js';
 import {partitionConvexPolygonByPlanes3} from '../geometry/convex-polygon-plane-arrangement3.js';
 import {planarBoundaryPolygonsWithFaceOrigins3} from '../convert/planar-body3.js';
 import type {KernelBody3} from '../model/body3.js';
+import {isOwnedNurbsBody3} from '../model/nurbs-body3.js';
 import type {CellularBody3} from '../model/cellular-body3.js';
 import {assertOwnedPlanarBodySplit3} from './planar-body-split3.js';
 import type {PlanarBodyPlaneSplit3} from './planar-body-split3.js';
@@ -80,7 +81,7 @@ const ids=(input:readonly number[])=>Object.freeze([...new Set(input)].sort((a,b
  * This optional analysis can be expensive and is cached only for an owned split. */
 export function planarBodySplitProvenance3(split:PlanarBodyPlaneSplit3):PlanarBodySplitProvenance3 {
  assertOwnedPlanarBodySplit3(split);const known=cache.get(split);if(known)return known;
- const parent=split.parent,pv=vertices(parent),raw=planarBoundaryPolygonsWithFaceOrigins3(parent.topology),pe=parent.topology.edges.map(e=>({a:pv[e.start]!,b:pv[e.end]!}));
+ const parent=split.parent;if(isOwnedNurbsBody3(parent))throw new RangeError('NURBS Body planar split provenance is not implemented');const pv=vertices(parent),raw=planarBoundaryPolygonsWithFaceOrigins3(parent.topology),pe=parent.topology.edges.map(e=>({a:pv[e.start]!,b:pv[e.end]!}));
  const groups=new Map<string,{plane:Plane3;pieces:{face:number;polygon:readonly Point3[];planes:readonly Plane3[]}[]}>();
  raw.polygons.forEach((p,i)=>{const face=raw.faceOrigins[i]!,support=parent.topology.faces[face]!.surface;if(support.kind!=='plane')throw new Error('Planar provenance has a curved parent');const key=planeKey(support.plane);let group=groups.get(key);if(!group){group={plane:support.plane,pieces:[]};groups.set(key,group);}group.pieces.push({face,polygon:p,planes:edgePlanes(p)});});
  const analyze=(body:CellularBody3,cutFaces:ReadonlySet<number>):PlanarSplitChildProvenance3=>{

@@ -1,4 +1,5 @@
 import type {KernelBody3,Body3} from '../model/body3.js';
+import {isOwnedNurbsBody3} from '../model/nurbs-body3.js';
 import {assertOwnedBody3} from '../model/body3.js';
 import {isOwnedCellularBody3} from '../model/cellular-body3.js';
 import {plane3} from '../geometry/plane3.js';
@@ -21,6 +22,7 @@ export function assertOwnedBodyPlaneSplit3(split:BodyPlaneSplit3):void {if(!owne
  * meshes. Curved children must pass the existing closed manifold certificate.
  * Optional bodySplitInterface3 derives common finite cut-boundary atom maps. */
 export function splitBodyByPlane3(body:KernelBody3,input:Plane3):BodyPlaneSplit3 {
+ if(isOwnedNurbsBody3(body))throw new RangeError('NURBS Body plane splitting is not implemented');
  const cell=isOwnedCellularBody3(body);if(!cell)assertOwnedBody3(body as Body3);
  const plane=plane3(input.normal.x,input.normal.y,input.normal.z,input.offset);
  const planar=rationalPlanarBody3(body);

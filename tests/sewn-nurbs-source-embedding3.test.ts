@@ -3,6 +3,8 @@ import {analyzeSewnNurbsSourceContainment3} from '../dist/index.js';
 import {certifySewnNurbsSourceMaterial3,querySewnNurbsSourceShellParityAuto3} from '../dist/index.js';
 import {locateSewnNurbsSourceMaterial3,algebraicCoordinates3,Polynomial} from '../dist/index.js';
 import {intersectSewnNurbsSourceMaterialLine3} from '../dist/index.js';
+import {bodyFromNurbsMaterial3,locateBody3,locateBodyFace3,bodyDocument3,serializeBody3,restoreBody3,intersectBodyLine3,intersectBodyRay3,intersectBodyLineMaterial3,booleanMaterialBodies3,splitBodyByPlane3,createBoxBody3,plane3,readNurbsBodyDocument3} from '../dist/index.js';
+import type {KernelBody3,NurbsBody3} from '../dist/index.js';
 import assert from 'node:assert/strict';
 import {certifySewnNurbsSourceEmbedding3,encodeNurbsSourceBRep3,restoreNurbsSourceBRep3,stringifyNurbsSourceBRep3,nurbsSourceComplexFacePointPreimage3,intersectSewnNurbsSourceRay3,intersectSewnNurbsSourceLine3,querySewnNurbsSourceShellParity3,line3,sewNurbsSourceBReps3,sewnNurbsSourceEdgePoint3,buildNurbsSourceBRep3,nurbsSourceBRepEdgePoint3,prepareNurbsSourceFaceComplex3,evaluateNurbsSourceComplexEdge3,certifyNurbsSurfaceTriangularProjection3,evaluateNurbsTriangularSurface3,certifyNurbsSourceFaceEmbedding3,evaluateNurbsSurface3,analyzeNurbsSourceFaceClosedRank3,analyzeNurbsSourceFaceVertexRegularity3,analyzeNurbsSourceFaceBoundaryRegularity3,analyzeNurbsSourceFaceInteriorRegularity3,selectNurbsSourceFacePatches3,liftNurbsSourceFaceBoundaries3,evaluateNurbsSourceLiftPiece3,compareAlgebraicPoints3,locateNurbsSourceFace3,reverseNurbsCurve3,classifyNurbsSourceFaces3,buildNurbsSourceHalfedges3,buildNurbsSourceBoundaryComplex3,matchNurbsIntersectionSourceBoundary3,insertNurbsKnot3,point3,nurbsCurve3,nurbsSurface3,prepareNurbsParameterDomain2,certifyNurbsSurfaceAffineProjection3,intersectNurbsSurfaceAffineTarget3,trimNurbsAffineIntersection3,sewNurbsAffineIntersection3,refineNurbsAffineIntersectionComplex3,nodeNurbsIntersectionBoundary3,AlgebraicReal,Rational} from '../dist/index.js';
 import type {NurbsSurface3,NurbsIntersectionBoundaryNodes3,PreparedNurbsParameterDomain2} from '../dist/index.js';
@@ -91,6 +93,9 @@ test('reversed exterior orientation, budgets and copied containment are handled 
 });
 
 function materialOf(r:ReturnType<typeof sewn>){const q=certifySewnNurbsSourceMaterial3(containmentOf(r));assert.equal(q.kind,'certified');if(q.kind!=='certified')throw Error('Expected material boundary');return q.certificate;}
+test('empty certified NURBS material is an empty common Body after replay',()=>{
+ const body=bodyFromNurbsMaterial3(materialOf(sewn([]))),restored=restoreBody3(serializeBody3(body));assert.equal(restored.kind,'nurbs-body');assert.equal(restored.regions.length,0);assert.equal(restored.interiorSamples.length,0);assert.equal(locateBody3(restored,point3(0n,0n,0n)),'outside');const q=intersectBodyLineMaterial3(restored,point3(0n,0n,0n),point3(1n,0n,0n));assert.equal(q.kind,'resolved');if(q.kind==='resolved'){assert.equal(q.intervals.length,0);assert.equal(q.isolated.length,0);}
+});
 test('material membership distinguishes exterior, solid, cavity, island and closed boundaries',()=>{
  const scaled=(scale:string,shift:string,reverse=false)=>transformCube(cube(true),p=>{const f=(v:Rational)=>v.mul(Rational.parse(scale)).add(Rational.parse(shift));return point3(f(p.x),f(p.y),f(p.z));}).map(r=>reverse?buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1):r);
  const m=materialOf(sewn([...cube(true),...scaled('1/2','1/4',true),...scaled('1/4','3/8')]));
@@ -131,4 +136,28 @@ test('curved line scan keeps algebraic endpoints, seam crossings, tangency and b
  const tangent=intersectSewnNurbsSourceMaterialLine3(m,line3(point3(0n,1n,'1/2'),point3(1n,0n,0n)));assert.equal(tangent.kind,'resolved');if(tangent.kind==='resolved'){assert.equal(tangent.intervals.length,0);assert.equal(tangent.isolated.length,1);assert.equal(tangent.isolated[0]!.parameter.sign(),0);}
  const overlap=intersectSewnNurbsSourceMaterialLine3(m,line3(point3(1n,0n,-1n),point3(0n,0n,1n)));assert.equal(overlap.kind,'resolved');if(overlap.kind==='resolved'){assert.equal(overlap.intervals.length,1);assert.equal(overlap.isolated.length,0);assert.ok(overlap.intervals[0]!.spans.every(s=>s.location==='boundary'));assert.deepEqual([overlap.intervals[0]!.start.parameter,overlap.intervals[0]!.end.parameter].map(t=>t.recognizeRational().rational?.toString()),['1','2']);}
  const limited=intersectSewnNurbsSourceMaterialLine3(m,line3(point3(0n,0n,'1/2'),point3(1n,0n,0n)),{maxDirections:1});assert.equal(limited.kind,'unresolved');if(limited.kind==='unresolved')assert.equal(limited.reason,'material-query');
+});
+
+test('NURBS material enters common Body point, bounded-face, line and ray dispatch',()=>{
+ const body=bodyFromNurbsMaterial3(materialOf(sewn(cube(true)))),common:KernelBody3=body;
+ assert.equal(body.kind,'nurbs-body');assert.equal(body.regions.length,1);assert.equal(body.faces.length,6);assert.equal(locateBody3(common,point3('1/2','1/2','1/2')),'inside');assert.equal(locateBody3(common,point3(2n,0n,0n)),'outside');assert.equal(locateBody3(common,point3(0n,0n,0n)),'boundary');
+ assert.equal(locateBodyFace3(body,0,point3('1/2','1/2',0n)),'inside');assert.equal(locateBodyFace3(body,0,point3(0n,'1/2',0n)),'boundary');assert.equal(locateBodyFace3(body,0,point3(2n,'1/2',0n)),'outside');
+ const line=intersectBodyLine3(body,point3('1/2','1/2','1/2'),point3(1n,0n,0n)),ray=intersectBodyRay3(body,point3('1/2','1/2','1/2'),point3(1n,0n,0n)),material=intersectBodyLineMaterial3(body,point3('1/2','1/2','1/2'),point3(1n,0n,0n));assert.equal(line.kind,'regular');assert.equal(line.hits.length,2);assert.equal(ray.kind,'regular');assert.equal(ray.hits.length,1);assert.equal(material.kind,'resolved');if(material.kind==='resolved')assert.equal(material.intervals.length,1);
+ assert.ok(Object.isFrozen(body)&&Object.isFrozen(body.regions)&&Object.isFrozen(body.interiorSamples));assert.throws(()=>locateBodyFace3(body,99,point3(0n,0n,0n)),/face index/);assert.throws(()=>locateBody3({...body},point3(0n,0n,0n)),/factory/);
+});
+test('common NURBS Body persistence replays weighted curved source recipes and geometric certification',()=>{
+ const body=bodyFromNurbsMaterial3(materialOf(cylinder())),document=bodyDocument3(body),text=serializeBody3(body),restored:NurbsBody3=restoreBody3(text);
+ assert.equal(document.kind,'nurbs-body-document');assert.equal(document.sources.length,6);assert.equal(restored.kind,'nurbs-body');assert.equal(restored.topology.closedOrientedIncidence,true);assert.equal(serializeBody3(restored),text);
+ for(const p of [point3(0n,0n,'1/2'),point3(1n,0n,'1/2'),point3(2n,0n,'1/2')])assert.equal(locateBody3(restored,p),locateBody3(body,p));
+ const root=AlgebraicReal.isolate(new Polynomial([-2n,0n,1n])).find(q=>q.sign()>0)!.affine('1/2');assert.equal(locateBody3(restored,algebraicCoordinates3(root,root,'1/2')),'boundary');
+ const scan=intersectBodyLineMaterial3(restored,point3(0n,1n,'1/2'),point3(1n,0n,0n));assert.equal(scan.kind,'resolved');if(scan.kind==='resolved')assert.equal(scan.isolated.length,1);
+ assert.throws(()=>restoreBody3(text,{maxChars:10}),/text budget/);assert.throws(()=>restoreBody3(document,{maxItems:10}),/budget/);assert.throws(()=>readNurbsBodyDocument3({...document,certified:true}),/unknown field/);
+ const reversed={...document,sources:document.sources.map(s=>({...s,sense:-s.sense}))};assert.throws(()=>restoreBody3(reversed),/material not certified/);
+});
+test('common NURBS Body derives material-region samples outside cavities and reconstructs material islands',()=>{
+ const scaled=(scale:string,shift:string,reverse=false)=>transformCube(cube(true),p=>{const f=(v:Rational)=>v.mul(Rational.parse(scale)).add(Rational.parse(shift));return point3(f(p.x),f(p.y),f(p.z));}).map(r=>reverse?buildNurbsSourceBRep3(r.complex,r.sense===1?-1:1):r);
+ const material=materialOf(sewn([...cube(true),...scaled('1/2','1/4',true),...scaled('1/4','3/8')])),body=bodyFromNurbsMaterial3(material);
+ assert.equal(body.regions.length,2);assert.deepEqual(body.regions.map(r=>r.cavities.length),[1,0]);for(const region of body.regions){const q=locateSewnNurbsSourceMaterial3(material,region.sample);assert.equal(q.kind,'inside');if(q.kind==='inside')assert.equal(q.deepestShell,region.shell);}
+ const restored=restoreBody3(serializeBody3(body));assert.equal(restored.regions.length,2);for(const x of ['1/8','1/3','1/2'])assert.equal(locateBody3(restored,point3(x,'1/2','1/2')),locateBody3(body,point3(x,'1/2','1/2')));
+ const box=createBoxBody3(point3(0n,0n,0n),1n,1n,1n);assert.throws(()=>booleanMaterialBodies3(body,box,'union'),/NURBS Body Boolean/);assert.throws(()=>booleanMaterialBodies3(box,body,'difference'),/NURBS Body Boolean/);assert.throws(()=>splitBodyByPlane3(body,plane3(1n,0n,0n,'-1/2')),/NURBS Body plane splitting/);
 });

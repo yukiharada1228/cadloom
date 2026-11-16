@@ -2,6 +2,10 @@ import {materialProgramOfPlanarMaterial3,booleanPlanarMaterials3,planarMaterialF
 import {isOwnedCellularBody3} from '../model/cellular-body3.js';
 import type {CellularBody3} from '../model/cellular-body3.js';
 import type {KernelBody3} from '../model/body3.js';
+import {isOwnedNurbsBody3} from '../model/nurbs-body3.js';
+import type {NurbsBody3} from '../model/nurbs-body3.js';
+import {restoreNurbsBody3} from './nurbs-body3.js';
+import type {NurbsBodyDocument3} from '../record/nurbs-body3.js';
 import {cellularBodyDocument3,restoreCellularBody3,planarMaterialOfCellularBody3,cellularBodyFromPlanarMaterial3} from './cellular-body3.js';
 import type {CellularBodyDocument3} from './cellular-body3.js';
 import type {PlanarMaterialReadLimits3} from './planar-material3.js';
@@ -75,19 +79,21 @@ export function extrudeBody3(profile:CurveRegion2,height:ExactInput,options:Extr
 function adoptExtrusion(solid:ReturnType<typeof extrudeCurveRegionBRep3>):Body3 {
   return adoptExtrudedBody3(solid,{kind:'extrude',profile:encodeBodyProfile3(solid.region.rings),lower:solid.zMin.toString(),upper:solid.zMax.toString()});
 }
-export type KernelBodyDocument3=BodyDocument3|CellularBodyDocument3;
+export type KernelBodyDocument3=BodyDocument3|CellularBodyDocument3|NurbsBodyDocument3;
 declare const serializedBodyType:unique symbol;
 /** String carrying the checked source family at compile time; no runtime metadata. */
 export type SerializedBody3<T extends KernelBody3=KernelBody3>=string&{readonly [serializedBodyType]:T};
-type RestoredFamily3<T extends KernelBody3>=T extends CellularBody3?CellularBody3:Body3;
+type RestoredFamily3<T extends KernelBody3>=T extends NurbsBody3?NurbsBody3:T extends CellularBody3?CellularBody3:Body3;
 export interface BodyReadLimits3 extends RecordReadLimits3 {
  readonly maxChars?:number;
  readonly material?:Omit<PlanarMaterialReadLimits3,'maxChars'>;
 }
 export function bodyDocument3(body:CellularBody3):CellularBodyDocument3;
+export function bodyDocument3(body:NurbsBody3):NurbsBodyDocument3;
 export function bodyDocument3(body:Body3):BodyDocument3;
 export function bodyDocument3(body:KernelBody3):KernelBodyDocument3;
 export function bodyDocument3(body:KernelBody3):KernelBodyDocument3 {
+ if(isOwnedNurbsBody3(body))return body.record;
  if(isOwnedCellularBody3(body))return cellularBodyDocument3(body);
  assertOwnedBody3(body);return readBodyDocument3({version:1,construction:body.construction,body:body.record});
 }
@@ -114,12 +120,14 @@ function replay(construction:BodyConstructionRecord3):Body3 {
  */
 export function restoreBody3<T extends KernelBody3>(input:SerializedBody3<T>,limits?:BodyReadLimits3):T;
 export function restoreBody3(input:CellularBodyDocument3,limits?:BodyReadLimits3):CellularBody3;
+export function restoreBody3(input:NurbsBodyDocument3,limits?:BodyReadLimits3):NurbsBody3;
 export function restoreBody3(input:BodyDocument3,limits?:BodyReadLimits3):Body3;
 export function restoreBody3(input:unknown,limits?:BodyReadLimits3):KernelBody3;
 export function restoreBody3(input:unknown,limits:BodyReadLimits3={}):KernelBody3 {
  const reader=new RecordReader3(limits),maxChars=limits.maxChars??reader.maxNumericCharacters+reader.maxItems*64;
  if(!Number.isSafeInteger(maxChars)||maxChars<1)throw new RangeError('Invalid Body document character limit');
  if(typeof input==='string'){if(input.length>maxChars)throw new RangeError('Body document text budget exceeded');input=JSON.parse(input);}
+ if(input!==null&&typeof input==='object'&&Object.hasOwn(input,'kind')&&(input as {kind:unknown}).kind==='nurbs-body-document')return restoreNurbsBody3(input,limits);
  if(input!==null&&typeof input==='object'&&Object.hasOwn(input,'kind')&&(input as {kind:unknown}).kind==='cellular-body-document')return restoreCellularBody3(input,{...limits.material,record:limits,maxChars});
  const document=readBodyDocument3(input,limits),body=replay(document.construction);
  if(!constructionRecordsAgree3(document.body,body.record))throw new RangeError('Stored Body record does not match its reconstructed material');return body;
@@ -226,6 +234,7 @@ function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
 export function bodyFromMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3):Body3 {return adoptMaterialSurfaceBody3(source);}
 
 export function materialProgramOfBody3(body:KernelBody3):CylinderMaterialProgram3 {
+ if(isOwnedNurbsBody3(body))throw new RangeError('NURBS Body lowering to analytic material programs is not implemented');
  if(isOwnedCellularBody3(body))return materialProgramOfPlanarMaterial3(planarMaterialOfCellularBody3(body));
  assertOwnedBody3(body);
  if(nativePlanarOperand3(body))return preparePlanarMaterialProgram3(planarSourceOfBody3(body)??planarSolidFromBoundary3(body.topology));
@@ -248,6 +257,7 @@ function booleanSurfaceBodies3(first:KernelBody3,second:KernelBody3,operation:Bo
 export interface MaterialBodyBooleanOptions3 {readonly contacts?:'reject'|'preserve';}
 /** Internal common dispatch predicate; ownership must be checked by the caller. */
 export function rationalPlanarBody3(body:KernelBody3):boolean {
+ if(isOwnedNurbsBody3(body))return false;
  if(isOwnedCellularBody3(body))return true;
  return body.topology.faces.every(f=>f.surface.kind==='plane')&&body.topology.vertices.every(p=>p.x.rational!==null&&p.y.rational!==null&&p.z.rational!==null)&&body.topology.edges.every(e=>{const c=e.curve.kind==='native'?e.curve.curve:e.curve;return c.kind==='line'||c.kind==='algebraic-segment';});
 }
@@ -256,6 +266,7 @@ export function rationalPlanarBody3(body:KernelBody3):boolean {
 export function booleanMaterialBodies3(first:Body3,second:Body3,operation:BooleanOperation,options?:{readonly contacts?:'reject'}):Body3;
 export function booleanMaterialBodies3(first:KernelBody3,second:KernelBody3,operation:BooleanOperation,options?:MaterialBodyBooleanOptions3):KernelBody3;
 export function booleanMaterialBodies3(first:KernelBody3,second:KernelBody3,operation:BooleanOperation,options:MaterialBodyBooleanOptions3={}):KernelBody3 {
+ if(isOwnedNurbsBody3(first)||isOwnedNurbsBody3(second))throw new RangeError('NURBS Body Boolean operations are not implemented');
  const cellA=isOwnedCellularBody3(first),cellB=isOwnedCellularBody3(second);
  if(!cellA)assertOwnedBody3(first as Body3);if(!cellB)assertOwnedBody3(second as Body3);
  if(!['union','intersection','difference','xor'].includes(operation))throw new RangeError('Unknown material Body operation');

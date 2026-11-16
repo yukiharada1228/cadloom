@@ -2,6 +2,7 @@ import {assertOwnedBodyPlaneSplit3} from './body-plane-split3.js';
 import type {BodyPlaneSplit3} from './body-plane-split3.js';
 import {locateBody3,locateBodyFace3} from '../model/body3.js';
 import type {KernelBody3} from '../model/body3.js';
+import {isOwnedNurbsBody3} from '../model/nurbs-body3.js';
 import {dot3} from '../geometry/point3.js';
 import type {Point3} from '../geometry/point3.js';
 import {classifyPointToSurface3,surfacesCoincide3} from '../geometry/surface3.js';
@@ -37,6 +38,7 @@ export interface BodySplitInterface3 {
 const cache=new WeakMap<BodyPlaneSplit3,BodySplitInterface3>();
 /** Internal extraction; callers supply an owned split child and actual face ID. */
 export function bodySplitFacePatch3(body:KernelBody3,face:number):MixedBRepFace3 {
+ if(isOwnedNurbsBody3(body))throw new RangeError('NURBS Body split interfaces are not implemented');
  const t=body.topology,f=t.faces[face]!;
  return {surface:f.surface,sense:f.sense,loops:f.loops.map(loop=>t.loops[loop]!.coedges.map(id=>{const h=t.coedges[id]!,c=t.edges[h.edge]!.curve,mixed=c.kind==='native'||c.kind==='cylinder-ssi'?c:nativeBRepCurve3(c);return h.direction===1?mixed:reverseBRepCurve3(mixed);} ))};
 }
@@ -46,6 +48,7 @@ export function bodySplitFacePatch3(body:KernelBody3,face:number):MixedBRepFace3
 export function bodySplitInterface3(split:BodyPlaneSplit3):BodySplitInterface3 {
  assertOwnedBodyPlaneSplit3(split);const known=cache.get(split);if(known)return known;
  const select=(body:KernelBody3,side:-1|1):readonly number[]=>{
+  if(isOwnedNurbsBody3(body))throw new RangeError('NURBS Body split interfaces are not implemented');
   if(split.representation==='planar')return Object.freeze(split.planar.shared.map(p=>side===-1?p.negativeFace:p.positiveFace));
   // Generated surface-material faces are cells refined by every source support.
   // Source membership is constant on a cut cell's relative interior; samples
@@ -53,7 +56,7 @@ export function bodySplitInterface3(split:BodyPlaneSplit3):BodySplitInterface3 {
   return Object.freeze(body.topology.faces.flatMap((f,id)=>f.surface.kind==='plane'&&surfacesCoincide3(f.surface,{kind:'plane',plane:split.plane})&&locateBody3(split.parent,body.faces[id]!.sample)==='inside'?[id]:[]));
  };
  const negativeFaces=select(split.negative,-1),positiveFaces=select(split.positive,1),rows=[...negativeFaces.map(face=>({side:-1 as const,body:split.negative,face})),...positiveFaces.map(face=>({side:1 as const,body:split.positive,face}))];
- for(const row of rows){const f=row.body.topology.faces[row.face]!;if(f.surface.kind!=='plane'||dot3(f.surface.plane.normal,split.plane.normal).sign()*f.sense!==-row.side)throw new Error('Cut interface face has an incorrect physical normal');}
+ for(const row of rows){if(isOwnedNurbsBody3(row.body))throw new RangeError('NURBS Body split interfaces are not implemented');const f=row.body.topology.faces[row.face]!;if(f.surface.kind!=='plane'||dot3(f.surface.plane.normal,split.plane.normal).sign()*f.sense!==-row.side)throw new Error('Cut interface face has an incorrect physical normal');}
  const sewn=sewMixedBRepFaces3(rows.map(row=>bodySplitFacePatch3(row.body,row.face))),negativeCoedges:BodySplitInterfaceCoedge3[]=[],positiveCoedges:BodySplitInterfaceCoedge3[]=[];
  rows.forEach((row,index)=>{const t=row.body.topology;for(const [loopIndex,loop] of t.faces[row.face]!.loops.entries())for(const [i,coedge] of t.loops[loop]!.coedges.entries()){
   const h=t.coedges[coedge]!,entry=Object.freeze({face:row.face,loop,coedge,edge:h.edge,uses:sewn.sourceUses[index]![loopIndex]![i]!});(row.side===-1?negativeCoedges:positiveCoedges).push(entry);

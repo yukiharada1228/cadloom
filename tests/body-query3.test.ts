@@ -5,7 +5,7 @@ import type {CylinderMaterialExpression3} from '../dist/index.js';
 const O=point3(0n,0n,0n),X=point3(1n,0n,0n),Z=point3(0n,0n,1n),leaf:CylinderMaterialExpression3={kind:'cylinder',cylinder:0};
 const c=(x=0n,r=1n,lo=-1n,hi=1n)=>prepareFiniteCylinder3(cylinder3(line3(point3(x,0n,0n),Z),r),lo,hi);
 const body=(cylinders:ReturnType<typeof c>[],expression:CylinderMaterialExpression3)=>bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(prepareCylinderMaterialProgram3(cylinders,[],expression)));
-const parameters=(r:ReturnType<typeof intersectBodyLine3>)=>r.hits.map(h=>h.parameter.rational?.toString());
+const parameters=(r:ReturnType<typeof intersectBodyLine3>)=>{assert.ok(r.kind!=='unresolved');return r.hits.map(h=>h.parameter.rational?.toString());};
 test('native box line and forward ray queries preserve signed parameters and direction scaling',()=>{
  const box=restoreBody3(serializeBody3(createBoxBody3(O,1n,1n,1n))),origin=point3('-1/2','1/3','2/5');
  const result=intersectBodyLine3(box,origin,point3(2n,0n,0n));assert.equal(result.kind,'regular');assert.deepEqual(parameters(result),['1/4','3/4']);

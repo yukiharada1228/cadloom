@@ -15,7 +15,8 @@ export interface NurbsSourceBRepRecord3 {
 const curve:Schema3=(v,p,r)=>{const c=curveSchema3(v,p,r) as CurveRecord3;if(c.kind!=='nurbs')recordError3(p,'expected a NURBS parameter curve');return c;};
 const surface:Schema3=(v,p,r)=>{const s=surfaceSchema3(v,p,r) as SurfaceRecord3;if(s.kind!=='nurbs')recordError3(p,'expected a NURBS surface');return s;};
 const domain=objectSchema3({outer:arraySchema3(curve,1),holes:arraySchema3(arraySchema3(curve,1)),sense:directionSchema3});
-const schema=objectSchema3({version:literalSchema3(1),kind:literalSchema3('nurbs-source-brep'),source:surface,target:surface,sourceDomain:domain,targetDomain:domain,sense:directionSchema3});
+export const nurbsSourceBRepRecordSchema3=objectSchema3({version:literalSchema3(1),kind:literalSchema3('nurbs-source-brep'),source:surface,target:surface,sourceDomain:domain,targetDomain:domain,sense:directionSchema3});
+const schema=nurbsSourceBRepRecordSchema3;
 export function readNurbsSourceBRepRecord3(input:unknown,limits:RecordReadLimits3={}):NurbsSourceBRepRecord3 {return schema(input,'sourceBRep',new RecordReader3(limits)) as NurbsSourceBRepRecord3;}
 export function parseNurbsSourceBRepRecord3(json:string,limits:RecordReadLimits3={}):NurbsSourceBRepRecord3 {
  const r=new RecordReader3(limits);if(typeof json!=='string'||json.length>r.maxNumericCharacters+r.maxItems*64)throw new RangeError('NURBS source BRep text budget exceeded');return readNurbsSourceBRepRecord3(JSON.parse(json),limits);

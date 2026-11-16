@@ -3,6 +3,13 @@ import type {CellularBody3} from './cellular-body3.js';
 import {cellularBoundaryAsBodyRecord3} from '../record/cellular-body3.js';
 import {assertOwnedBody3,locateBody3} from '../model/body3.js';
 import type {Body3} from '../model/body3.js';
+import type {KernelBody3} from '../model/body3.js';
+import {isOwnedNurbsBody3,materialOfNurbsBody3} from '../model/nurbs-body3.js';
+import type {NurbsBody3} from '../model/nurbs-body3.js';
+import {intersectSewnNurbsSourceLine3,intersectSewnNurbsSourceRay3} from '../geometry/sewn-nurbs-source-ray3.js';
+import type {SewnNurbsSourceRay3} from '../geometry/sewn-nurbs-source-ray3.js';
+import {intersectSewnNurbsSourceMaterialLine3} from '../geometry/sewn-nurbs-source-material-line3.js';
+import type {SewnNurbsMaterialLine3} from '../geometry/sewn-nurbs-source-material-line3.js';
 import {restoreMixedBRepFaces3} from '../convert/mixed-faces3.js';
 import type {MixedBRepFaces3} from '../convert/mixed-faces3.js';
 import {intersectMixedBoundaryLine3,intersectMixedBoundaryRay3} from '../geometry/mixed-shell-ray3.js';
@@ -13,6 +20,8 @@ import type {AlgebraicReal} from '../numeric/real-roots.js';
 import type {MixedBoundaryRayHit3,MixedBoundaryRay3} from '../geometry/mixed-shell-ray3.js';
 import type {Point3,Vector3} from '../geometry/point3.js';
 export type BodyBoundaryIntersection3=MixedBoundaryRay3;
+/** Legacy analytic/cellular query sources. The common intersection overloads
+ * additionally accept NurbsBody3 and preserve its unresolved/event reports. */
 export type BodyQuerySource3=Body3|CellularBody3;
 function assertSource(body:BodyQuerySource3):void {if(!isOwnedCellularBody3(body))assertOwnedBody3(body as Body3);}
 function locateSource(body:BodyQuerySource3,point:Point3){return isOwnedCellularBody3(body)?locateCellularBody3(body,point):locateBody3(body,point);}
@@ -24,11 +33,19 @@ function faces(body:BodyQuerySource3):MixedBRepFaces3 {
 /** Exact boundary events for p(t)=origin+t*direction, including negative t.
  * Shared-edge/vertex hits and contained supports retain explicit degeneracy.
  * Shell selection uses the owned Body's shell table, not caller geometry. */
-export function intersectBodyLine3(body:BodyQuerySource3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3 {
+export function intersectBodyLine3(body:NurbsBody3,origin:Point3,direction:Vector3,shell?:number):SewnNurbsSourceRay3;
+export function intersectBodyLine3(body:BodyQuerySource3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3;
+export function intersectBodyLine3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3;
+export function intersectBodyLine3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3 {
+ if(isOwnedNurbsBody3(body))return intersectSewnNurbsSourceLine3(materialOfNurbsBody3(body).containment.embedding.source,line3(origin,direction),shell);
  return intersectMixedBoundaryLine3(faces(body),origin,direction,shell);
 }
 /** Forward events t>=0. Parameters are not distances for a nonunit direction. */
-export function intersectBodyRay3(body:BodyQuerySource3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3 {
+export function intersectBodyRay3(body:NurbsBody3,origin:Point3,direction:Vector3,shell?:number):SewnNurbsSourceRay3;
+export function intersectBodyRay3(body:BodyQuerySource3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3;
+export function intersectBodyRay3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3;
+export function intersectBodyRay3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3 {
+ if(isOwnedNurbsBody3(body))return intersectSewnNurbsSourceRay3(materialOfNurbsBody3(body).containment.embedding.source,line3(origin,direction),shell);
  return intersectMixedBoundaryRay3(faces(body),origin,direction,shell);
 }
 
@@ -47,7 +64,11 @@ function strictlyBetween(a:AlgebraicReal,b:AlgebraicReal):Rational {
 /** Closed material/line intersection for bounded owned Bodies. All boundary
  * events are required; selecting one shell would lose cavity boundaries.
  * Degenerate surface/edge events never become guessed material intervals. */
-export function intersectBodyLineMaterial3(body:BodyQuerySource3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3 {
+export function intersectBodyLineMaterial3(body:NurbsBody3,origin:Point3,direction:Vector3):SewnNurbsMaterialLine3;
+export function intersectBodyLineMaterial3(body:BodyQuerySource3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3;
+export function intersectBodyLineMaterial3(body:KernelBody3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3|SewnNurbsMaterialLine3;
+export function intersectBodyLineMaterial3(body:KernelBody3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3|SewnNurbsMaterialLine3 {
+ if(isOwnedNurbsBody3(body))return intersectSewnNurbsSourceMaterialLine3(materialOfNurbsBody3(body),line3(origin,direction));
  assertSource(body);const line=line3(origin,direction),boundary=intersectBodyLine3(body,line.origin,line.direction);
  if(boundary.kind==='degenerate')return Object.freeze({kind:'degenerate',boundary});
  const pieces:{first:number;last:number;sample:Point3}[]=[],covered=new Set<number>(),hits=boundary.hits;
