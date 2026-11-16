@@ -530,5 +530,8 @@ export type {NurbsSourcePlaneCellBoundary3,NurbsSourcePlaneCellBoundaryEdge3} fr
 export {buildNurbsSourcePlaneCellComplex3,nurbsSourcePlaneCellComplexEdgePoint3} from './geometry/nurbs-source-plane-cell-complex3.js';
 export type {NurbsSourcePlaneCellComplex3} from './geometry/nurbs-source-plane-cell-complex3.js';
 
-export {refineSewnNurbsSourceEdgesByPlane3,nurbsSourcePlaneEdgeFragmentPoint3} from './geometry/sewn-nurbs-source-edge-plane3.js';
+export {refineSewnNurbsSourceEdgesByPlane3,nurbsSourcePlaneEdgeFragmentPoint3,nurbsSourcePlaneEdgeFragmentPointPreimages3} from './geometry/sewn-nurbs-source-edge-plane3.js';
 export type {NurbsSourcePlaneEdgeFragment3,SewnNurbsSourceEdgePlane3} from './geometry/sewn-nurbs-source-edge-plane3.js';
+
+export {matchNurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-source-vertices3.js';
+export type {NurbsPlaneCellSourceVertices3} from './geometry/nurbs-plane-cell-source-vertices3.js';

@@ -23,12 +23,17 @@ export interface NurbsIntersectionBoundaryNodes3 {
  readonly intersectionVertices:readonly (number|null)[];
 }
 const real=(x:Parameters<typeof AlgebraicReal.fromRational>[0])=>AlgebraicReal.fromRational(x),one=new Polynomial([1n]);
-export function nurbsBoundaryCoordinateRoots3(s:NurbsSpan3,key:'x'|'y',value:AlgebraicReal):readonly AlgebraicReal[]|null {
+export function nurbsBoundaryCoordinateRoots3(s:NurbsSpan3,key:'x'|'y'|'z',value:AlgebraicReal):readonly AlgebraicReal[]|null {
  const N=s[key],W=s.weight;
- if(N.derivative().mul(W).sub(N.mul(W.derivative())).degree<0)return real(N.evaluate(s.startParameter).div(W.evaluate(s.startParameter))).compare(value)===0?null:[];
+ if(N.derivative().mul(W).sub(N.mul(W.derivative())).degree<0){
+  // Composed finite maps can have a pole outside their restricted interval,
+  // including at startParameter. A coefficient ratio avoids evaluating there.
+  const i=W.coefficients.findIndex(q=>q.sign()!==0);if(i<0)throw new RangeError('Rational coordinate requires a nonzero weight polynomial');
+  return real(N.coefficient(i).div(W.coefficient(i))).compare(value)===0?null:[];
+ }
  const P=value.recognizeRational().polynomial,n=P.degree,NP=[one],WP=[one];for(let i=1;i<=n;i++){NP.push(NP[i-1]!.mul(N));WP.push(WP[i-1]!.mul(W));}
  let f=new Polynomial();for(let i=0;i<=n;i++)f=f.add(NP[i]!.mul(WP[n-i]!).scale(P.coefficient(i)));
- return isolateRealRoots(f).filter(t=>t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0&&t.rationalFunction(N,W).compare(value)===0);
+ return isolateRealRoots(f).filter(t=>t.compare(real(s.startParameter))>=0&&t.compare(real(s.endParameter))<=0&&t.signOf(W)!==0&&t.rationalFunction(N,W).compare(value)===0);
 }
 /** Node every finite trim-boundary span at all refined intersection vertices.
  * Computes exact parameter preimages, including algebraic values and knots.

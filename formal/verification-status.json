@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "4bd93b31e3ae857b5e40d09286f4326c2a1482eb4494770594f8233ae3477204",
+    "src/index.ts": "78a6ec36538544846779d2dc6bf00e9fccb0d984d48d1372c67ec9d392a8a3ea",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -207,7 +207,7 @@
     "src/geometry/nurbs-affine-intersection-differential3.ts": "cef9458ca7b9c8ccc5647bc6dcc2749571e77b15290b21ab7c7dba2c976304c5",
     "src/geometry/nurbs-affine-intersection-events3.ts": "b14ab652e194fb016a336e6b1a6c76c060e1eef0198f91c8c19216cea36d37de",
     "src/geometry/nurbs-affine-intersection-refine3.ts": "819679ea239cf970413003064594facdcbb498619bbe774d1d3cfcb75cba78dd",
-    "src/geometry/nurbs-intersection-boundary-nodes3.ts": "f75453dd172bd5eed2569f7abb61cf4abb80cfa9ca464905b7b0e6b059bc2df9",
+    "src/geometry/nurbs-intersection-boundary-nodes3.ts": "6db415a9d4f3d8d5b20446990a5e56af9b56ae37f92ceeee70a6f0c20fd3efef",
     "src/geometry/nurbs-intersection-boundary-sharing3.ts": "c0d4c420f4c4c3bfbd85bf3eaa8a5feed0b78f3c54b38f2feb75adfad6f32b3e",
     "src/geometry/nurbs-source-boundary-complex3.ts": "6bc2e3c8e3f158a9dc96f03c54921e6df90bec9f8b18bc8f6c6c841cce472a34",
     "src/geometry/nurbs-source-halfedges3.ts": "765fcd6d393505549d3e79692acec138a4288dd9e4f90d6ad2250a13be47a8c4",
@@ -251,8 +251,9 @@
     "src/geometry/nurbs-plane-domain3.ts": "7474fbf57dffa225dd3a659b9be313481e80610d5b1471656f8a178a52795004",
     "src/geometry/nurbs-source-plane-cells3.ts": "7ed60fb8e1b44f05febf0c2b30174e4e905470e15128bd0f146edd1292ade287",
     "src/geometry/nurbs-source-plane-cell-boundary3.ts": "2c89739d579d20d000ce4e2600d300f7f320cfef4fa0b18e6cd2335bf7603ba9",
-    "src/geometry/nurbs-source-plane-cell-complex3.ts": "1d1f8b6dec15bedd0cb4bad42808bfb39c5dd9b8110e54da48d3b840d56b67a0",
-    "src/geometry/sewn-nurbs-source-edge-plane3.ts": "478edfec144fb1e169c1e11303b8282c6c974a1b53ad4beae0e82cecaf3304f1"
+    "src/geometry/nurbs-source-plane-cell-complex3.ts": "43bbe1e29a095a214ce25e0dd7b45441ceaa1188a285207f3c8c3c23497a82ec",
+    "src/geometry/sewn-nurbs-source-edge-plane3.ts": "0e7d3bb75261af3d574a55b6d4e7917bb5c0a797b36f773ff4b1b78e966a5c4d",
+    "src/geometry/nurbs-plane-cell-source-vertices3.ts": "91820781326bf2bf3e264beb06b176ec2875c51c5e3f761aca59063e04a0811c"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

@@ -8,6 +8,10 @@ import type {SewnNurbsSourceBReps3,SewnNurbsSourceEdge3,SewnNurbsSourceFace3} fr
 import {buildBRepTopologyWithGeometryAdapters3} from './brep-topology3.js';
 import type {BRepTopology3,BRepEdgeUse3} from './brep-topology3.js';
 import {evaluateNurbsSpanPoint3} from './nurbs-curve3.js';
+import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import type {AlgebraicCoordinates3} from './algebraic-point3.js';
+import type {Point3} from './point3.js';
+import {nurbsBoundaryCoordinateRoots3} from './nurbs-intersection-boundary-nodes3.js';
 export interface NurbsSourcePlaneEdgeFragment3 {
  readonly parent:number;readonly source:SewnNurbsSourceEdge3;
  readonly lower:AlgebraicReal;readonly upper:AlgebraicReal;
@@ -19,7 +23,8 @@ export interface SewnNurbsSourceEdgePlane3 {
  /** Original topology edge -> children in increasing canonical native parameter. */
  readonly sourceUses:readonly (readonly BRepEdgeUse3[])[];
 }
-const ownedFragments=new WeakSet<NurbsSourcePlaneEdgeFragment3>();
+const ownedFragments=new WeakSet<NurbsSourcePlaneEdgeFragment3>(),ownedReports=new WeakSet<SewnNurbsSourceEdgePlane3>();
+export function assertOwnedSewnNurbsSourceEdgePlane3(report:SewnNurbsSourceEdgePlane3):void {if(!ownedReports.has(report))throw new RangeError('Expected factory-created source edge plane refinement');}
 function between(a:AlgebraicReal,b:AlgebraicReal):Rational {
  while(a.upper.compare(b.lower)>=0){a=a.refine();b=b.refine();}
  return a.upper.add(b.lower).div(new Rational(2n));
@@ -46,10 +51,22 @@ export function refineSewnNurbsSourceEdgesByPlane3(source:SewnNurbsSourceBReps3,
   onSurface:(e,f)=>T.edges[e.parent]!.coedges.some(c=>T.faces[T.coedges[c]!.face]!.surface===f),
  });
  if(T.closed&&!topology.closed||T.consistentlyOriented&&!topology.consistentlyOriented||T.manifoldVertices&&!topology.manifoldVertices)throw new Error('Shared edge refinement changed source incidence validity');
- return Object.freeze({source,plane,topology,sourceUses:Object.freeze(sourceUses.map(u=>Object.freeze(u)))});
+ const result=Object.freeze({source,plane,topology,sourceUses:Object.freeze(sourceUses.map(u=>Object.freeze(u)))});ownedReports.add(result);return result;
 }
 export function nurbsSourcePlaneEdgeFragmentPoint3(edge:NurbsSourcePlaneEdgeFragment3,input:AlgebraicReal|ExactInput):ReturnType<typeof evaluateNurbsSpanPoint3> {
  if(!ownedFragments.has(edge))throw new RangeError('Expected factory-created plane edge fragment');
  const t=input instanceof AlgebraicReal?input:AlgebraicReal.fromRational(input);if(t.compare(edge.lower)<0||t.compare(edge.upper)>0)throw new RangeError('Parameter is outside the plane edge fragment');
  return evaluateNurbsSpanPoint3(edge.source.map.span,t);
+}
+/** Complete finite parameter preimages of an exact spatial point. Norm roots
+ * are filtered against the selected real coordinate and then full XYZ. */
+export function nurbsSourcePlaneEdgeFragmentPointPreimages3(edge:NurbsSourcePlaneEdgeFragment3,input:Point3|AlgebraicCoordinates3):readonly AlgebraicReal[] {
+ if(!ownedFragments.has(edge))throw new RangeError('Expected factory-created plane edge fragment');
+ const point=snapshotExactPoint3(input),span=edge.source.map.span;
+ for(const key of ['x','y','z'] as const){
+  const roots=nurbsBoundaryCoordinateRoots3(span,key,point[key]);
+  if(roots===null)continue;
+  return Object.freeze(roots.filter(t=>t.compare(edge.lower)>=0&&t.compare(edge.upper)<=0&&compareAlgebraicPoints3(evaluateNurbsSpanPoint3(span,t),point)===0));
+ }
+ throw new Error('An embedded source boundary unexpectedly has a constant spatial image');
 }

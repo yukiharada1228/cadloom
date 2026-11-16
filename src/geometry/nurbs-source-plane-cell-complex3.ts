@@ -17,6 +17,7 @@ export interface NurbsSourcePlaneCellComplex3 {
  readonly regions:readonly Readonly<{sign:-1|0|1;cells:readonly number[];boundary:readonly Readonly<{edge:number;direction:1|-1}>[];cycles:readonly (readonly Readonly<{edge:number;direction:1|-1}>[])[]|null}>[];
 }
 const owned=new WeakSet<NurbsSourcePlaneCellComplex3>();
+export function assertOwnedNurbsSourcePlaneCellComplex3(complex:NurbsSourcePlaneCellComplex3):void {if(!owned.has(complex))throw new RangeError('Expected factory-created plane cell complex');}
 function samePath(a:NurbsSourcePlaneCellBoundaryEdge3,b:NurbsSourcePlaneCellBoundaryEdge3):boolean {
  const x=a.path,y=b.path;
  if(x.kind!==y.kind)return false;
