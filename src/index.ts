@@ -391,3 +391,5 @@ export {materialProgramOfPlanarMaterial3} from './ops/planar-material3.js';
 export type {MaterialBodyBooleanOptions3} from './ops/body3.js';
 export {splitPlanarBodyByPlane3,rejoinPlanarBodySplit3} from './ops/planar-body-split3.js';
 export type {PlanarBodyPlaneSplit3,PlanarBodySplitInterface3} from './ops/planar-body-split3.js';
+export {planarBodySplitProvenance3} from './ops/planar-split-provenance3.js';
+export type {PlanarBodySplitProvenance3,PlanarSplitChildProvenance3,SplitFaceOrigin3,SplitEdgeOrigin3,SplitCoedgeOrigin3,SplitVertexOrigin3,SplitParameterInterval3,SplitParentEdgeInterval3,SplitParentCoedgeInterval3} from './ops/planar-split-provenance3.js';

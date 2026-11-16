@@ -28,6 +28,8 @@ export interface PlanarBodyPlaneSplit3 {
  readonly shared:readonly PlanarBodySplitInterface3[];
 }
 const sources=new WeakMap<PlanarBodyPlaneSplit3,PlanarMaterial3>(),axes=['x','y','z'] as const,one=new Rational(1n);
+/** Internal guard for geometry-derived split metadata. */
+export function assertOwnedPlanarBodySplit3(split:PlanarBodyPlaneSplit3):void {if(!sources.has(split))throw new RangeError('Operation requires a factory-created planar Body split');}
 const key=(p:Point3)=>`${p.x},${p.y},${p.z}`;
 const average=(p:readonly Point3[])=>point3(...axes.map(k=>p.reduce((sum,v)=>sum.add(v[k]),new Rational(0n)).div(new Rational(BigInt(p.length)))) as [Rational,Rational,Rational]);
 function boxFaces(lo:Point3,hi:Point3):readonly (readonly Point3[])[] {

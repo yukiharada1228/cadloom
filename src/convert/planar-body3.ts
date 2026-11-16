@@ -19,8 +19,9 @@ export function encodePlanarPolygonDomain3(polygon:readonly Point3[],normal:Poin
 /** Convert already owned/validated Body boundary data into rational planar
  * material geometry. Nonconvex faces and holes are decomposed exactly in charts;
  * curved edges/surfaces and nonrational vertices fail explicitly.
+ * This decomposition alone creates no shell or material certificate.
  */
-export function planarSolidWithFaceOrigins3(t:BRepTopology3<Curve3|BRepCurve3>){
+export function planarBoundaryPolygonsWithFaceOrigins3(t:BRepTopology3<Curve3|BRepCurve3>){
   const polygons:Point3[][]=[],faceOrigins:number[]=[];
   for(const [faceId,face] of t.faces.entries()){
     if(face.surface.kind!=='plane')throw new RangeError('Planar Body operations do not support curved surfaces');
@@ -38,7 +39,9 @@ export function planarSolidWithFaceOrigins3(t:BRepTopology3<Curve3|BRepCurve3>){
     const mesh=triangulatePolygon(rings);
     for(const ids of mesh.triangles){const p=ids.map(id=>lift(mesh.vertices[id]!));polygons.push(face.sense===1?p:p.reverse());faceOrigins.push(faceId);}
   }
-  return Object.freeze({solid:preparePlanarSolid3(polygons),faceOrigins:Object.freeze(faceOrigins)});
+  return Object.freeze({polygons:Object.freeze(polygons.map(p=>Object.freeze(p))),faceOrigins:Object.freeze(faceOrigins)});
 }
 
+/** The face decomposition above does not certify a material or manifold. */
+export function planarSolidWithFaceOrigins3(t:BRepTopology3<Curve3|BRepCurve3>){const data=planarBoundaryPolygonsWithFaceOrigins3(t);return Object.freeze({solid:preparePlanarSolid3(data.polygons),faceOrigins:data.faceOrigins});}
 export function planarSolidFromBoundary3(t:BRepTopology3<Curve3|BRepCurve3>){return planarSolidWithFaceOrigins3(t).solid;}
