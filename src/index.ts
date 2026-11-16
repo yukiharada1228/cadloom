@@ -547,3 +547,6 @@ export type {NurbsPlaneCellRationalMap3,NurbsPlaneCellRationalMapResult3,NurbsPl
 
 export {nodeNurbsPlaneCellSourceEdges3} from './geometry/nurbs-plane-cell-source-nodes3.js';
 export type {NurbsPlaneCellSourceNodes3,NurbsPlaneCellSourceNoding3} from './geometry/nurbs-plane-cell-source-nodes3.js';
+
+export {buildNurbsPlaneSplitFaces3,nurbsPlaneSplitFaceEdgePoint3} from './geometry/nurbs-plane-split-faces3.js';
+export type {NurbsPlaneSplitFaceEdge3,NurbsPlaneSplitFaceSurface3,NurbsPlaneSplitFaces3} from './geometry/nurbs-plane-split-faces3.js';
