@@ -623,3 +623,5 @@ export {capNurbsRecutHalf3,locateNurbsRecutClosedSurface3,nurbsRecutNewCapPoint3
 export type {CappedNurbsRecutHalf3,NurbsRecutClosedSurface3,NurbsRecutNewCapSurface3} from './geometry/cap-nurbs-recut-half3.js';
 export {analyzeNurbsSourcePlaneZeroSet3} from './geometry/nurbs-source-plane-zero-set3.js';
 export type {NurbsSourcePlaneZeroSet3,NurbsSourcePlaneZeroSetCertificate3} from './geometry/nurbs-source-plane-zero-set3.js';
+export {inspectNurbsRecutSourceCapContacts3} from './geometry/nurbs-recut-source-cap-contacts3.js';
+export type {NurbsRecutSourceCapContacts3,NurbsRecutCapContactWitness3} from './geometry/nurbs-recut-source-cap-contacts3.js';
