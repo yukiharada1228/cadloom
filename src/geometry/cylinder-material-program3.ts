@@ -1,3 +1,6 @@
+import {evaluateCylinderMaterialExpression3} from './material-expression-eval3.js';
+import {classifyPointToSurface3} from './surface3.js';
+import type {Point3} from './point3.js';
 import {assertOwnedFiniteCylinder3} from './finite-cylinder-boolean3.js';
 import type {FiniteCylinder3} from './finite-cylinder-boolean3.js';
 import {plane3} from './plane3.js';
@@ -37,4 +40,12 @@ export function prepareCylinderMaterialProgram3(input:readonly FiniteCylinder3[]
  const expression=snapshot(tree,cylinders.length,planes.length);
  if(exterior(expression).hi)throw new RangeError('Material expression is not certified bounded by its finite cylinders');
  const result=Object.freeze({cylinders,planes,expression});owned.add(result);return result;
+}
+
+/** Strict witness classification. Primitive support zeros require another witness. */
+export function strictCylinderMaterialProgramLocation3(source:CylinderMaterialProgram3,p:Point3):'inside'|'outside'|null {
+ assertOwnedCylinderMaterialProgram3(source);
+ const cylinders=source.cylinders.map(c=>c.locate(p)),planes=source.planes.map(plane=>classifyPointToSurface3(p,{kind:'plane',plane}));
+ if(cylinders.includes('boundary')||planes.includes(0))return null;
+ return evaluateCylinderMaterialExpression3(source.expression,cylinders.map(c=>c==='inside'),planes.map(s=>s<0))?'inside':'outside';
 }

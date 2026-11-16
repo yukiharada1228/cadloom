@@ -345,3 +345,7 @@ export type {CylinderMaterialDefinition3} from './geometry/cylinder-material-exp
 export {encodePlanarCurveCellDomain3} from './convert/mixed-face-domain3.js';
 export type {PlanarCurveCellDomainRecord3} from './record/face-domain3.js';
 export {bodyRecordFromMaterialSurfaceBoundary3} from './convert/material-surface-boundary3.js';
+
+export {materialSurfaceRegions3} from './geometry/finite-cylinder-regions3.js';
+export type {MaterialSurfaceRegions3} from './geometry/finite-cylinder-regions3.js';
+export {strictCylinderMaterialProgramLocation3} from './geometry/cylinder-material-program3.js';

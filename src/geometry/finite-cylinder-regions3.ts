@@ -1,3 +1,8 @@
+import {assertOwnedMaterialSurfaceBoundary3} from './material-surface-boundary3.js';
+import type {MaterialSurfaceBoundary3} from './material-surface-boundary3.js';
+import {resolveCylinderMaterialProgram3} from './cylinder-material-expression3.js';
+import {strictCylinderMaterialProgramLocation3} from './cylinder-material-program3.js';
+import {bodyRecordFromMaterialSurfaceBoundary3} from '../convert/material-surface-boundary3.js';
 import {assertOwnedCylinderMaterialBoundary3,strictCylinderMaterialLocation3} from './cylinder-material-expression3.js';
 import type {CylinderMaterialBoundary3} from './cylinder-material-expression3.js';
 import {bodyRecordFromCylinderMaterial3} from '../convert/cylinder-material3.js';
@@ -39,7 +44,7 @@ export interface FiniteCylinderBooleanRegions3 {
 }
 const regionFaces=new WeakMap<object,MixedBRepFaces3>();
 /** Internal access requires an actual constructive region result, not a record. */
-export function finiteCylinderRegionFaces3(input:FiniteCylinderBooleanRegions3|FiniteCylinderExpressionRegions3|FiniteCylinderExpressionSplitRegions3|ClippedCylinderExpressionRegions3|CylinderMaterialRegions3):MixedBRepFaces3 {const faces=regionFaces.get(input);if(!faces)throw new RangeError('Expected factory-created cylinder region analysis');return faces;}
+export function finiteCylinderRegionFaces3(input:FiniteCylinderBooleanRegions3|FiniteCylinderExpressionRegions3|FiniteCylinderExpressionSplitRegions3|ClippedCylinderExpressionRegions3|CylinderMaterialRegions3|MaterialSurfaceRegions3):MixedBRepFaces3 {const faces=regionFaces.get(input);if(!faces)throw new RangeError('Expected factory-created cylinder region analysis');return faces;}
 const cache=new WeakMap<FiniteCylinderBoolean3,FiniteCylinderBooleanRegions3>(),two=new Rational(2n),one=new Rational(1n),axes=['x','y','z'] as const;
 function between(a:AlgebraicReal,b:AlgebraicReal):Rational {let lo=a,hi=b;while(lo.upper.compare(hi.lower)>=0){lo=lo.refine();hi=hi.refine();}return lo.upper.add(hi.lower).div(two);}
 function at(o:Point3,d:Point3,t:Rational):Point3 {return point3(...axes.map(k=>o[k].add(d[k].mul(t))) as [Rational,Rational,Rational]);}
@@ -99,6 +104,20 @@ export interface CylinderMaterialRegions3 extends Omit<FiniteCylinderBooleanRegi
 const materialCache=new WeakMap<CylinderMaterialBoundary3,CylinderMaterialRegions3>();
 export function cylinderMaterialRegions3(source:CylinderMaterialBoundary3):CylinderMaterialRegions3 {
  assertOwnedCylinderMaterialBoundary3(source);if(!source.manifold)throw new RangeError('Material regions require a manifold cylinder material boundary');const known=materialCache.get(source);if(known)return known;const ids=source.sewn.topology.shells.map((_,i)=>i),raw=bodyRecordFromCylinderMaterial3(source,[{shells:ids,void:false}]),locate=(p:Point3)=>strictCylinderMaterialLocation3(source,p),data=regionData(raw,locate,(a,b)=>locate(a)!==null&&locate(b)!==null),result=Object.freeze({source,...data});regionFaces.set(result,regionFaces.get(data)!);materialCache.set(source,result);return result;
+}
+export interface MaterialSurfaceRegions3 extends Omit<FiniteCylinderBooleanRegions3,'source'> {readonly source:MaterialSurfaceBoundary3;}
+const surfaceMaterialCache=new WeakMap<MaterialSurfaceBoundary3,MaterialSurfaceRegions3>();
+/** Constructive plane/cylinder material family only. Arbitrary restored closed
+ * topology cannot enter this path or acquire ownership through a copied object. */
+export function materialSurfaceRegions3(source:MaterialSurfaceBoundary3):MaterialSurfaceRegions3 {
+ assertOwnedMaterialSurfaceBoundary3(source);
+ if(!source.closedOrientedIncidence)throw new RangeError('Material regions require a manifold material surface boundary');
+ const known=surfaceMaterialCache.get(source);if(known)return known;
+ const program=resolveCylinderMaterialProgram3(source.material),ids=source.sewn.topology.shells.map((_,i)=>i);
+ const raw=bodyRecordFromMaterialSurfaceBoundary3(source,[{shells:ids,void:false}]);
+ const locate=(p:Point3)=>strictCylinderMaterialProgramLocation3(program,p);
+ const data=regionData(raw,locate,(a,b)=>locate(a)!==null&&locate(b)!==null),result=Object.freeze({source,...data});
+ regionFaces.set(result,regionFaces.get(data)!);surfaceMaterialCache.set(source,result);return result;
 }
 /** Private core: public entry points first establish constructive ownership. */
 function regionData(raw:BodyRecord3,locate:(p:Point3)=>'inside'|'outside'|'boundary'|null,acceptSamples:(a:Point3,b:Point3)=>boolean){

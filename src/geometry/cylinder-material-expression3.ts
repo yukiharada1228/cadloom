@@ -4,7 +4,7 @@ import {assertOwnedClippedCylinderExpression3} from './clipped-cylinder-expressi
 import type {ClippedCylinderExpression3} from './clipped-cylinder-expression3.js';
 import type {FiniteCylinderExpression3} from './finite-cylinder-expression3.js';
 import type {CylinderHalfSpace3} from './trimmed-cylinder3.js';
-import {prepareCylinderMaterialProgram3,assertOwnedCylinderMaterialProgram3} from './cylinder-material-program3.js';
+import {prepareCylinderMaterialProgram3,assertOwnedCylinderMaterialProgram3,strictCylinderMaterialProgramLocation3} from './cylinder-material-program3.js';
 import type {CylinderMaterialProgram3,CylinderMaterialExpression3} from './cylinder-material-program3.js';
 import type {FiniteCylinder3} from './finite-cylinder-boolean3.js';
 import {plane3} from './plane3.js';
@@ -100,5 +100,5 @@ export function clipCylinderMaterial3(input:CylinderMaterialOperand3,halfspaces:
 
 /** Internal strict witness classifier; primitive-boundary cases must retry. */
 export function strictCylinderMaterialLocation3(source:CylinderMaterialBoundary3,p:Point3):'inside'|'outside'|null {
- assertOwnedCylinderMaterialBoundary3(source);const c=source.cylinders.map(v=>v.locate(p)),planes=source.planes.map(plane=>classifyPointToSurface3(p,{kind:'plane',plane}));return c.includes('boundary')||planes.includes(0)?null:truth(source.expression,c.map(v=>v==='inside'),planes.map(v=>v<0))?'inside':'outside';
+ return strictCylinderMaterialProgramLocation3(materialProgramOfBoundary3(source),p);
 }
