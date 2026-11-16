@@ -21,7 +21,7 @@ test('owned geometry is mandatory and boundary provenance remains frozen',()=>{
  const a=face((u,v)=>point3(u,v,u*v));assert.throws(()=>sewAffineNurbsFaces3([{...a}]),/factory/);const s=sewAffineNurbsFaces3([a]);assert.equal(s.topology.edges.length,4);assert.equal(s.topology.issues.filter(i=>i.kind==='boundary-edge').length,4);for(const r of s.sourceUses[0]!)for(const c of r){assert.ok(Object.isFrozen(c));for(const e of c)assert.ok(Object.isFrozen(e));}assert.equal(sewAffineNurbsFaces3([]).topology.faces.length,0);
 });
 
-test('unmatched subdivisions stay explicit instead of claiming complete automatic sewing',()=>{
+test('other boundary endpoints node mismatched subdivisions into shared intervals',()=>{
  const a=face((u,v)=>point3(u,v,u*v)),ring=rectangle(),p=point3(0n,'1/2',0n);ring.splice(3,1,nurbsCurve3(1,[point3(0n,1n,0n),p],K),nurbsCurve3(1,[p,point3(0n,0n,0n)],K));const b=face((u,v)=>point3(1n+u,v,(1n+u)*v),ring),t=sewAffineNurbsFaces3([a,b]).topology;
- assert.equal(t.edges.length,9);assert.equal(t.vertices.length,7);assert.equal(t.closed,false);assert.equal(t.closedOrientedIncidence,false);assert.equal(t.edges.filter(e=>e.coedges.length===2).length,0);
+ assert.equal(t.edges.length,8);assert.equal(t.vertices.length,7);assert.equal(t.closed,false);assert.equal(t.closedOrientedIncidence,false);assert.equal(t.edges.filter(e=>e.coedges.length===2).length,2);
 });

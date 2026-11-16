@@ -422,5 +422,5 @@ export {certifyNurbsSurfaceAffineProjection3,nurbsAffineProjectionParameters3,lo
 export type {NurbsAffineParameterRow3,NurbsAffineProjectionCertificate3,NurbsAffineProjectionResult3} from './geometry/nurbs-affine-projection3.js';
 export {createAffineNurbsFace3,locateAffineNurbsFace3,affineNurbsFacePoint3,intersectAffineNurbsFacePlane3} from './geometry/affine-nurbs-face3.js';
 export type {AffineNurbsFace3} from './geometry/affine-nurbs-face3.js';
-export {sewAffineNurbsFaces3} from './geometry/sew-affine-nurbs-faces3.js';
+export {sewAffineNurbsFaces3,affineNurbsBoundaryEdgePoint3} from './geometry/sew-affine-nurbs-faces3.js';
 export type {AffineNurbsBoundaryEdge3,SewnAffineNurbsFaces3} from './geometry/sew-affine-nurbs-faces3.js';
