@@ -437,3 +437,5 @@ export {implicitizeNurbsParameterCurve2,implicitNurbsParameterSpanPoint2} from '
 export type {ImplicitNurbsParameterSpan2,ImplicitNurbsParameterCurve2} from './geometry/nurbs-parameter-implicit2.js';
 export {intersectAffineNurbsFaces3,trimNurbsAffineIntersection3,trimmedNurbsAffineIntersectionEdgePoint3,trimmedNurbsAffineIntersectionRegionPoint3} from './geometry/nurbs-affine-intersection-trim3.js';
 export type {TrimmedNurbsAffineIntersectionPoint3,TrimmedNurbsAffineIntersectionEdge3,TrimmedNurbsAffineIntersectionPatch3,TrimmedNurbsAffineIntersection3} from './geometry/nurbs-affine-intersection-trim3.js';
+export {sewNurbsAffineIntersection3,nurbsAffineIntersectionComplexEdgePoint3} from './geometry/nurbs-affine-intersection-seams3.js';
+export type {NurbsIntersectionVertexUse3,NurbsIntersectionComplexVertex3,NurbsIntersectionComplexEdge3,NurbsAffineIntersectionComplex3} from './geometry/nurbs-affine-intersection-seams3.js';
