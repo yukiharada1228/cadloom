@@ -2,6 +2,7 @@ import {Rational} from '../numeric/rational.js';
 import {BivariatePolynomial} from '../numeric/bivariate-polynomial.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {solveBivariateEquations} from '../numeric/bivariate-system.js';
+import {bivariateEquationBasis} from '../numeric/bivariate-equation-basis.js';
 import type {ExactInput} from './point2.js';
 import type {Point3} from './point3.js';
 import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
@@ -46,7 +47,7 @@ function pointPreimages(input:NurbsSurface3,target:Point3|AlgebraicCoordinates3,
   const min=(a:Rational,b:Rational)=>a.compare(b)<0?a:b,max=(a:Rational,b:Rational)=>a.compare(b)>0?a:b;
   const patch=bounds?Object.freeze({...original,startU:max(original.startU,bounds.uMin),endU:min(original.endU,bounds.uMax),startV:max(original.startV,bounds.vMin),endV:min(original.endV,bounds.vMax)}):original;
   if(patch.startU.compare(patch.endU)>=0||patch.startV.compare(patch.endV)>=0)continue;
-  const solutions=solveBivariateEquations((['x','y','z'] as const).map(k=>equation(patch[k],patch.weight,point[k]))),matches=(u:AlgebraicReal,v:AlgebraicReal)=>compareAlgebraicPoints3(liftNurbsSectionPatch3(patch,u,v),point)===0;
+  const solutions=solveBivariateEquations(bivariateEquationBasis((['x','y','z'] as const).map(k=>equation(patch[k],patch.weight,point[k])))),matches=(u:AlgebraicReal,v:AlgebraicReal)=>compareAlgebraicPoints3(liftNurbsSectionPatch3(patch,u,v),point)===0;
   const points=Object.freeze(solutions.points.filter(q=>inside(patch,q.u,q.v)&&matches(q.u,q.v)).map(q=>Object.freeze({...q,point:liftNurbsSectionPatch3(patch,q.u,q.v)})));
   let wholePatch=false,locus:AlgebraicCurveTopology2|null=null;const locusVertices:number[]=[],locusEdges:number[]=[];
   if(solutions.kind==='all'){

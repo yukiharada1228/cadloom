@@ -506,4 +506,4 @@ export type {SewnNurbsMaterialLocation3} from './geometry/sewn-nurbs-source-mate
 export {intersectSewnNurbsSourceMaterialLine3} from './geometry/sewn-nurbs-source-material-line3.js';
 export type {SewnNurbsMaterialLineHit3,SewnNurbsMaterialLineSpan3,SewnNurbsMaterialLineInterval3,SewnNurbsMaterialLine3} from './geometry/sewn-nurbs-source-material-line3.js';
 export {certifySewnNurbsSourceEmbedding3} from './geometry/sewn-nurbs-source-embedding3.js';
-export type {SewnNurbsSourceEmbedding3,SewnNurbsSourceEmbeddingCertificate3,NurbsSourceFaceSeparation3} from './geometry/sewn-nurbs-source-embedding3.js';
+export type {SewnNurbsSourceEmbedding3,SewnNurbsSourceEmbeddingCertificate3,NurbsSourceFaceSeparation3,NurbsSourceFaceSeparationHint3} from './geometry/sewn-nurbs-source-embedding3.js';

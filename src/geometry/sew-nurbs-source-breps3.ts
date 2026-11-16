@@ -1,5 +1,8 @@
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {solveBivariateEquations} from '../numeric/bivariate-system.js';
+import {bivariateEquationBasis} from '../numeric/bivariate-equation-basis.js';
+import {Polynomial} from '../numeric/polynomial.js';
+import {rationalNullspace} from '../numeric/rational-nullspace.js';
 import type {ExactInput} from './point2.js';
 import {compareAlgebraicPoints3} from './algebraic-point3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
@@ -30,9 +33,26 @@ export function sewNurbsSourceBReps3(input:readonly NurbsSourceBRep3[]):SewnNurb
  const sources=Object.freeze(Array.from(input,s=>{assertOwnedNurbsSourceBRep3(s);return s;})),maps:NurbsSourceBoundaryMap3[]=[],references:{source:NurbsSourceBRep3;sourceEdge:number}[]=[],indices:number[][]=[];
  for(const [i,s] of sources.entries()){const ids:number[]=[];for(let edge=0;edge<s.complex.edges.length;edge++){const map=nurbsSourceBoundaryMap3(s,edge);if(map===null)return own(Object.freeze({kind:'unresolved',reason:'rational-map-unavailable',input:i,edge}));ids.push(maps.length);maps.push(map);references.push({source:s,sourceEdge:edge});}indices.push(ids);}
  const cuts=maps.map(m=>[m.lower,m.upper]),relations:{a:number;b:number;locus:RestrictedAlgebraicCurve2}[]=[];
+ // A rational plane identity for one curve reduces separation from another
+ // to a univariate zero test. In particular, disjoint parallel curved edges
+ // never enter a needlessly large bivariate resultant after spatial rotation.
+ const coordinates=['x','y','z','weight'] as const,planes=maps.map(m=>{
+  const p=m.span,degree=Math.max(...coordinates.map(k=>p[k].degree)),rows=Array.from({length:degree+1},(_,i)=>coordinates.map(k=>p[k].coefficient(i)));
+  return rationalNullspace(rows,4).map(n=>{
+   const first=n.find(q=>q.sign()!==0)!;n=n.map(q=>q.div(first));
+   const identity=coordinates.reduce((sum,k,i)=>sum.add(p[k].scale(n[i]!)),new Polynomial());
+   if(identity.degree>=0)throw new Error('Curve separation plane lost its exact identity');return n;
+  });
+ }),separationCache=new Map<string,boolean>();
+ const separated=(a:number,b:number)=>planes[a]!.some(n=>{
+  const key=n.map(q=>q.toString()).join(',')+'|'+b,prior=separationCache.get(key);if(prior!==undefined)return prior;
+  const B=maps[b]!,p=coordinates.reduce((sum,k,i)=>sum.add(B.span[k].scale(n[i]!)),new Polynomial());
+  const result=p.degree>=0&&!AlgebraicReal.isolate(p).some(t=>t.compare(B.lower)>=0&&t.compare(B.upper)<=0);separationCache.set(key,result);return result;
+ });
  const add=(id:number,t:AlgebraicReal)=>{const m=maps[id]!;if(t.compare(m.lower)>=0&&t.compare(m.upper)<=0&&!cuts[id]!.some(q=>q.compare(t)===0))cuts[id]!.push(t);};
  for(let a=0;a<maps.length;a++)for(let b=a+1;b<maps.length;b++){
-  const A=maps[a]!,B=maps[b]!,r=solveBivariateEquations(nurbsSpanPairEquations3(A.span,B.span)),point=(u:AlgebraicReal,v:AlgebraicReal)=>{if(u.compare(A.lower)<0||u.compare(A.upper)>0||v.compare(B.lower)<0||v.compare(B.upper)>0)return;if(compareAlgebraicPoints3(evaluateNurbsSpanPoint3(A.span,u),evaluateNurbsSpanPoint3(B.span,v))!==0)throw new Error('Source boundary intersection lost XYZ equality');add(a,u);add(b,v);};
+  if(separated(a,b)||separated(b,a))continue;
+  const A=maps[a]!,B=maps[b]!,r=solveBivariateEquations(bivariateEquationBasis(nurbsSpanPairEquations3(A.span,B.span))),point=(u:AlgebraicReal,v:AlgebraicReal)=>{if(u.compare(A.lower)<0||u.compare(A.upper)>0||v.compare(B.lower)<0||v.compare(B.upper)>0)return;if(compareAlgebraicPoints3(evaluateNurbsSpanPoint3(A.span,u),evaluateNurbsSpanPoint3(B.span,v))!==0)throw new Error('Source boundary intersection lost XYZ equality');add(a,u);add(b,v);};
   r.points.forEach(q=>point(q.u,q.v));if(r.kind!=='finite'){if(r.kind==='all')throw new Error('Embedded finite boundaries cannot both be constant');const graph=traceAlgebraicCurve2(r.commonFactor,{uMin:A.span.startParameter,uMax:A.span.endParameter,vMin:B.span.startParameter,vMax:B.span.endParameter}),locus=restrictAlgebraicCurveRectangle2(graph,{uMin:A.lower,uMax:A.upper,vMin:B.lower,vMax:B.upper});locus.vertices.forEach(q=>point(q.u,q.v));if(locus.edges.length)relations.push({a,b,locus});}
  }
  const edges:SewnNurbsSourceEdge3[]=[],edgeMaps:number[]=[];

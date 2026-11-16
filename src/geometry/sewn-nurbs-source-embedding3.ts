@@ -17,6 +17,8 @@ export interface NurbsSourceFaceSeparation3 {
  /** The zero section on this face lies only on declared shared incidence. */
  readonly coveredBy:'first'|'second';
 }
+/** Search inputs only: every proposed plane is checked over whole faces. */
+export interface NurbsSourceFaceSeparationHint3 {readonly first:number;readonly second:number;readonly normal:Point3;readonly offset:Rational;}
 export interface SewnNurbsSourceEmbeddingCertificate3 {readonly source:Extract<SewnNurbsSourceBReps3,{kind:'sewn'}>;readonly separations:readonly NurbsSourceFaceSeparation3[];}
 export type SewnNurbsSourceEmbedding3=
  | Readonly<{kind:'certified';certificate:SewnNurbsSourceEmbeddingCertificate3}>
@@ -25,9 +27,16 @@ const owned=new WeakSet<SewnNurbsSourceEmbeddingCertificate3>(),one=new Bivariat
 export function assertOwnedSewnNurbsSourceEmbedding3(c:SewnNurbsSourceEmbeddingCertificate3):void {if(!owned.has(c))throw new RangeError('Expected factory-created sewn NURBS embedding certificate');}
 /** Sufficient pairwise geometric embedding certificate. Failure of the finite
  * plane search is not a claim that the input actually self-intersects. */
-export function certifySewnNurbsSourceEmbedding3(input:SewnNurbsSourceBReps3):SewnNurbsSourceEmbedding3 {
+export function certifySewnNurbsSourceEmbedding3(input:SewnNurbsSourceBReps3,hints:readonly NurbsSourceFaceSeparationHint3[]=[]):SewnNurbsSourceEmbedding3 {
  assertOwnedSewnNurbsSourceBReps3(input);if(input.kind!=='sewn')return Object.freeze({kind:'not-certified',source:input,reason:'unresolved-sewing'});
  const T=input.topology;if(!T.closedOrientedIncidence)return Object.freeze({kind:'not-certified',source:input,reason:'open-or-nonmanifold-incidence'});
+ const planes=new Map<string,Readonly<{normal:Point3;offset:Rational}>[]>();
+ for(const h of hints){
+  if(!Number.isSafeInteger(h.first)||!Number.isSafeInteger(h.second)||h.first<0||h.first>=h.second||h.second>=T.faces.length)throw new RangeError('Invalid NURBS separation hint face pair');
+  const normal=point3(h.normal.x,h.normal.y,h.normal.z),offset=point3(h.offset,0n,0n).x;
+  if([normal.x,normal.y,normal.z].every(q=>q.sign()===0))throw new RangeError('NURBS separation hint normal must be nonzero');
+  const key=h.first+'|'+h.second,list=planes.get(key)??[];list.push(Object.freeze({normal,offset}));planes.set(key,list);
+ }
  const real=(q:Rational)=>AlgebraicReal.fromRational(q),min=(a:Rational,b:Rational)=>a.compare(b)<0?a:b,max=(a:Rational,b:Rational)=>a.compare(b)>0?a:b;
  const owners=input.sources.flatMap((source,index)=>source.topology.faces.map(()=>({source,index}))),contexts=T.faces.map((face,id)=>{
   const owner=owners[id]!;if(owner.source!==face.surface.source)throw new Error('Sewn face input order changed');const source=owner.source,complex=source.complex,L=complex.source.source,F=L.source,sourceFace=face.surface.face,proof=complex.embedding.faces.find(f=>f.face===sourceFace),rank=complex.embedding.rank;
@@ -68,7 +77,12 @@ export function certifySewnNurbsSourceEmbedding3(input:SewnNurbsSourceBReps3):Se
  for(let a=0;a<contexts.length;a++)for(let b=a+1;b<contexts.length;b++){
   const A=contexts[a]!,B=contexts[b]!,normals:Point3[]=[];for(const q of [A.normal,B.normal,...base]){const n=normalise(q);if(n&&!normals.some(p=>keys.every(k=>p[k].compare(n[k])===0)))normals.push(n);}
   let found:NurbsSourceFaceSeparation3|undefined;
-  outer:for(const normal of normals){const x=dot(normal,A.point),y=dot(normal,B.point),offsets=[x,y,x.add(y).div(new Rational(2n)),new Rational(0n)].filter((c,i,all)=>all.findIndex(q=>q.compare(c)===0)===i);
+  hinted:for(const {normal,offset} of planes.get(a+'|'+b)??[])for(const firstSign of [1,-1] as const){
+   if(!half(A,normal,offset,firstSign)||!half(B,normal,offset,(-firstSign) as 1|-1))continue;
+   if(covered(A,B,normal,offset)){found=Object.freeze({first:a,second:b,normal,offset,firstSign,coveredBy:'first'});break hinted;}
+   if(covered(B,A,normal,offset)){found=Object.freeze({first:a,second:b,normal,offset,firstSign,coveredBy:'second'});break hinted;}
+  }
+  if(!found)outer:for(const normal of normals){const x=dot(normal,A.point),y=dot(normal,B.point),offsets=[x,y,x.add(y).div(new Rational(2n)),new Rational(0n)].filter((c,i,all)=>all.findIndex(q=>q.compare(c)===0)===i);
    for(const offset of offsets)for(const firstSign of [1,-1] as const){if(!half(A,normal,offset,firstSign)||!half(B,normal,offset,(-firstSign) as 1|-1))continue;
     if(covered(A,B,normal,offset)){found=Object.freeze({first:a,second:b,normal,offset,firstSign,coveredBy:'first'});break outer;}if(covered(B,A,normal,offset)){found=Object.freeze({first:a,second:b,normal,offset,firstSign,coveredBy:'second'});break outer;}
    }

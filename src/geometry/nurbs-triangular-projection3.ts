@@ -34,11 +34,15 @@ export function certifyNurbsSurfaceTriangularProjection3(input:NurbsSurface3,inp
  const jets=patches.map(({p})=>({u:keys.map(k=>p[k].derivativeU().mul(p.weight).sub(p[k].mul(p.weight.derivativeU()))),v:keys.map(k=>p[k].derivativeV().mul(p.weight).sub(p[k].mul(p.weight.derivativeV())))}));
  const dot=(n:readonly Rational[],fs:readonly BivariatePolynomial[])=>fs.reduce((sum,f,i)=>sum.add(f.scale(n[i]!)),new BivariatePolynomial());
  const strictSign=(fs:readonly BivariatePolynomial[]):1|-1|0=>{const b=patches[0]!.bounds,s=fs[0]!.evaluate(b.uMin.add(b.uMax).div(new Rational(2n)),b.vMin.add(b.vMax).div(new Rational(2n))).sign();if(s===0)return 0;return fs.some((f,i)=>witnessBivariateInequalities2([s===1?f.scale(-1n):f],patches[i]!.bounds)!==null)?0:s;};
+ const derivativeRows=(parameter:'u'|'v')=>{const rows:Rational[][]=[];for(const j of jets){const fs=j[parameter],du=Math.max(...fs.map(f=>f.degreeU)),dv=Math.max(...fs.map(f=>f.degreeV));for(let u=0;u<=du;u++)for(let v=0;v<=dv;v++){const row=fs.map(f=>f.coefficient(u,v));if(row.some(q=>q.sign()!==0))rows.push(row);}}return rows;};
  for(const firstParameter of ['u','v'] as const){const second=firstParameter==='u'?'v':'u',rows:Rational[][]=[];
   for(const j of jets){const fs=j[second],du=Math.max(...fs.map(f=>f.degreeU)),dv=Math.max(...fs.map(f=>f.degreeV));for(let u=0;u<=du;u++)for(let v=0;v<=dv;v++){const row=fs.map(f=>f.coefficient(u,v));if(row.some(q=>q.sign()!==0))rows.push(row);}}
   const basis=rationalNullspace(rows,3),candidates=basis.map(v=>v.slice());for(let i=0;i<basis.length;i++)for(let j=i+1;j<basis.length;j++){candidates.push(basis[i]!.map((q,k)=>q.add(basis[j]![k]!)));candidates.push(basis[i]!.map((q,k)=>q.sub(basis[j]![k]!)));}
   for(const n of candidates){if(jets.some(j=>dot(n,j[second]).degreeU>=0))throw new Error('Triangular independence discovery failed exact identity');const firstSign=strictSign(jets.map(j=>dot(n,j[firstParameter])));if(!firstSign)continue;
-   const ms:Rational[][]=keys.map((_,i)=>keys.map((_,k)=>new Rational(i===k?1n:0n)));jets.forEach((j,i)=>{const b=patches[i]!.bounds,u=b.uMin.add(b.uMax).div(new Rational(2n)),v=b.vMin.add(b.vMax).div(new Rational(2n));ms.push(j[second].map(f=>f.evaluate(u,v)));});
+   // Product charts admit a second projection independent of the first
+   // parameter too. Preserve that structure under spatial rotation instead
+   // of unnecessarily coupling two algebraic parameter coordinates.
+   const ms:Rational[][]=rationalNullspace(derivativeRows(firstParameter),3);if(ms.some(m=>jets.some(j=>dot(m,j[firstParameter]).degreeU>=0)))throw new Error('Product projection discovery failed exact identity');ms.push(...keys.map((_,i)=>keys.map((_,k)=>new Rational(i===k?1n:0n))));jets.forEach((j,i)=>{const b=patches[i]!.bounds,u=b.uMin.add(b.uMax).div(new Rational(2n)),v=b.vMin.add(b.vMax).div(new Rational(2n));ms.push(j[second].map(f=>f.evaluate(u,v)));});
    for(const m of ms){const secondSign=strictSign(jets.map(j=>dot(m,j[second])));if(!secondSign)continue;const certificate=Object.freeze({surface,bounds,firstParameter,firstNormal:point3(n[0]!,n[1]!,n[2]!),secondNormal:point3(m[0]!,m[1]!,m[2]!),firstSign,secondSign,patches:Object.freeze(patches.map(p=>Object.freeze({patch:p.patch,bounds:p.bounds})))});owned.add(certificate);return Object.freeze({kind:'certified',certificate});}
   }
  }

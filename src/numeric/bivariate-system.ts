@@ -107,7 +107,8 @@ export function solveBivariateSystem(first:BivariatePolynomial,second:BivariateP
     const a=specializedDegree(A,u),b=specializedDegree(B,u);if(a===0||b===0)continue;
     if(a<0&&b<0)throw new Error('Coprime residual equations cannot share a vertical fiber');
     const f=a<0?G:b<0?F:a<=b?F:G;
-    for(const v of fiberCandidates(f,u)){
+    const fiber=bivariateFiberRoots(f,u);if(fiber.kind==='whole')throw new Error('Selected residual equation cannot have a whole fiber');
+    for(const v of fiber.roots){
       if(F.evaluateAlgebraic(u,v).sign()!==0||G.evaluateAlgebraic(u,v).sign()!==0)continue;
       if(kind==='shared'&&commonFactor.evaluateAlgebraic(u,v).sign()===0)continue;
       if(!points.some(p=>p.u.compare(u)===0&&p.v.compare(v)===0))points.push(Object.freeze({u,v}));

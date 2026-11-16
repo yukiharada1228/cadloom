@@ -1,7 +1,11 @@
-import type {AlgebraicReal} from '../numeric/real-roots.js';
+import {AlgebraicReal} from '../numeric/real-roots.js';
 import type {ExactInput} from './point2.js';
 import type {Point3} from './point3.js';
-import {snapshotExactPoint3,compareAlgebraicPoints3} from './algebraic-point3.js';
+import {snapshotExactPoint3,compareAlgebraicPoints3,algebraicCoordinates3} from './algebraic-point3.js';
+import {cross3,dot3,point3} from './point3.js';
+import {nurbsSurface3} from './nurbs-surface3.js';
+import type {NurbsSurface3} from './nurbs-surface3.js';
+import type {NurbsTriangularProjectionCertificate3} from './nurbs-triangular-projection3.js';
 import type {AlgebraicCoordinates3} from './algebraic-point3.js';
 import {assertOwnedNurbsSourceFaceComplex3} from './nurbs-source-face-complex3.js';
 import type {NurbsSourceFaceComplex3} from './nurbs-source-face-complex3.js';
@@ -9,6 +13,16 @@ import {evaluateNurbsSourceComplexFace3} from './nurbs-source-complex-face-query
 import type {NurbsSourceComplexFacePoint3} from './nurbs-source-complex-face-query3.js';
 import {nurbsAffineProjectionParameters3} from './nurbs-affine-projection3.js';
 import {nurbsSurfaceRectanglePointPreimages3} from './nurbs-surface-preimage3.js';
+const projected=new WeakMap<NurbsTriangularProjectionCertificate3,Readonly<{surface:NurbsSurface3;axes:readonly [Point3,Point3,Point3]}>>();
+function triangularCoordinates(c:NurbsTriangularProjectionCertificate3){
+ let data=projected.get(c);if(data)return data;
+ const n=c.firstNormal,m=c.secondNormal,k=cross3(n,m);
+ // Independence follows from n.S_other=0 and m.S_other having strict sign.
+ // The frame determinant is |n x m|^2, hence nonzero and invertible.
+ if(dot3(k,k).sign()===0)throw new Error('Triangular projection normals lost independence');
+ const axes=[n,m,k] as const,s=c.surface,surface=nurbsSurface3(s.degreeU,s.degreeV,s.controlPoints.map(row=>row.map(p=>point3(dot3(n,p),dot3(m,p),dot3(k,p)))),s.knotsU,s.knotsV,s.weights);
+ data=Object.freeze({surface,axes});projected.set(c,data);return data;
+}
 export type NurbsSourceComplexFacePreimage3=
  | Extract<NurbsSourceComplexFacePoint3,{kind:'point'|'unresolved'}>
  | Readonly<{kind:'outside';face:number;point:AlgebraicCoordinates3}>;
@@ -24,7 +38,8 @@ export function nurbsSourceComplexFacePointPreimage3(complex:NurbsSourceFaceComp
  };
  if(proof.method==='affine'){const q=nurbsAffineProjectionParameters3(proof.certificate,point),unknown=accept(q.u,q.v);if(unknown)return unknown;}
  else {
-  const report=nurbsSurfaceRectanglePointPreimages3(proof.certificate.surface,proof.certificate.bounds,point);
+  const frame=triangularCoordinates(proof.certificate),coordinates=frame.axes.map(n=>AlgebraicReal.linearCombination([{value:point.x,coefficient:n.x},{value:point.y,coefficient:n.y},{value:point.z,coefficient:n.z}])),target=algebraicCoordinates3(coordinates[0]!,coordinates[1]!,coordinates[2]!);
+  const report=nurbsSurfaceRectanglePointPreimages3(frame.surface,proof.certificate.bounds,target);
   for(const p of report.patches){if(p.wholePatch||p.locusEdges.length)throw new Error('Certified embedding has a nonfinite point fiber');
    for(const q of [...p.points,...p.locusVertices.map(id=>p.locus!.vertices[id]!)]){const unknown=accept(q.u,q.v);if(unknown)return unknown;}
   }

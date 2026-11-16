@@ -46,11 +46,11 @@ export class BivariatePolynomial {
     // Keep each univariate image in its own source field before combining
     // genuinely mixed terms. Recover rational images rather than carrying
     // nonminimal certificates for rational powers into field products.
-    let result=AlgebraicReal.fromRational(0n);
+    const terms:{factors:readonly AlgebraicReal[]}[]=[];
     this.rows.forEach((row,i)=>{
       if(row.degree<0)return;const coefficient=v.rationalFunction(row).recognizeRational();if(coefficient.sign()===0)return;
-      const power=i===0?AlgebraicReal.fromRational(1n):u.rationalFunction(new Polynomial([...Array.from({length:i},()=>0n),1n])).recognizeRational();result=result.add(power.mul(coefficient));
-    });return result;
+      const power=i===0?AlgebraicReal.fromRational(1n):u.rationalFunction(new Polynomial([...Array.from({length:i},()=>0n),1n])).recognizeRational();terms.push({factors:[power,coefficient]});
+    });return AlgebraicReal.productCombination(terms);
   }
   rationalImage(u:AlgebraicReal,v:AlgebraicReal,denominator:BivariatePolynomial):AlgebraicReal {
     if(u.rational!==null)return v.rationalFunction(this.specializeU(u.rational),denominator.specializeU(u.rational));

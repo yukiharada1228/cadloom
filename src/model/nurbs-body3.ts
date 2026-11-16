@@ -9,6 +9,7 @@ import {encodeNurbsSourceBRep3} from '../convert/nurbs-source-brep3.js';
 import {readNurbsBodyDocument3} from '../record/nurbs-body3.js';
 import type {NurbsBodyDocument3} from '../record/nurbs-body3.js';
 import type {CurveRegionLocation2} from '../geometry/curve-boolean2.js';
+import {encodeRationalPoint3} from '../convert/exact3.js';
 export interface NurbsBodyRegion3 {readonly shell:number;readonly cavities:readonly number[];readonly sample:Point3;}
 export interface NurbsBody3 {
  readonly kind:'nurbs-body';readonly record:NurbsBodyDocument3;
@@ -31,7 +32,7 @@ export function adoptNurbsBody3(material:SewnNurbsSourceMaterialCertificate3,inp
   if(q.kind!=='inside'||q.deepestShell!==node.shell)throw new RangeError('NURBS Body region sample is not in the claimed material region');
   return Object.freeze({shell:node.shell,cavities:Object.freeze(material.containment.shells.filter(s=>s.parent===node.shell).map(s=>s.shell)),sample});
  }));
- const record=readNurbsBodyDocument3({version:1,kind:'nurbs-body-document',sources:source.sources.map(encodeNurbsSourceBRep3)}),body=Object.freeze({kind:'nurbs-body' as const,record,topology:source.topology,faces:Object.freeze(source.topology.faces.map(f=>f.surface)),regions,interiorSamples:Object.freeze(samples)});
+ const record=readNurbsBodyDocument3({version:1,kind:'nurbs-body-document',sources:source.sources.map(encodeNurbsSourceBRep3),separators:material.containment.embedding.separations.map(p=>({first:p.first,second:p.second,normal:encodeRationalPoint3(p.normal),offset:p.offset.toString()}))}),body=Object.freeze({kind:'nurbs-body' as const,record,topology:source.topology,faces:Object.freeze(source.topology.faces.map(f=>f.surface)),regions,interiorSamples:Object.freeze(samples)});
  sources.set(body,material);return body;
 }
 export function locateOwnedNurbsBody3(body:NurbsBody3,point:Point3|AlgebraicCoordinates3):CurveRegionLocation2 {

@@ -23,10 +23,13 @@
       "localPaths": [
         "src/numeric/rational.ts",
         "src/numeric/polynomial.ts",
-        "src/numeric/real-roots.ts"
+        "src/numeric/real-roots.ts",
+        "src/numeric/bivariate-equation-basis.ts",
+        "src/numeric/bivariate-system.ts",
+        "src/numeric/bivariate-polynomial.ts"
       ],
       "status": "partial",
-      "gap": "Exact rational/algebraic arithmetic exists; general rounded intervals, transcendental enclosures and certified approximation policy are not implemented."
+      "gap": "Exact rational/algebraic arithmetic, canonical equation bases, and correlated linear/quadratic fiber reconstruction exist; general rounded intervals, transcendental enclosures and a certified approximation policy remain incomplete."
     },
     {
       "id": "geometry",
@@ -68,7 +71,7 @@
         "src/record/nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete. A NURBS Body recipe document now replays all source faces, sewing, global embedding, containment, orientation and region-sample checks through common Body restoration."
+      "gap": "Exact geometry/topology records and supported analytic face definitions exist; constructed NURBS source BRep recipes replay source/target and both trim domains without serialized certification claims. Arbitrary imported NURBS/procedural domains, independent pcurves and persistent feature IDs remain incomplete. A NURBS Body recipe document now replays all source faces, sewing, global embedding, containment, orientation and region-sample checks through common Body restoration. Optional rational separation planes are untrusted search hints checked against whole finite faces during replay; they are not stored proof flags."
     },
     {
       "id": "topology",
@@ -122,10 +125,11 @@
         "src/ops/body3.ts",
         "src/model/body3.ts",
         "src/record/body-document3.ts",
-        "src/ops/nurbs-body3.ts"
+        "src/ops/nurbs-body3.ts",
+        "src/ops/body-transform3.ts"
       ],
       "status": "partial",
-      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing. Certified NURBS materials now join KernelBody3 with owned topology, cavity-aware region samples, point/face/line/ray queries and replayed source-only persistence. General NURBS Booleans, splitting, transformations and mass properties remain incomplete."
+      "gap": "Box, finite/clipped Cylinder, vertical Extrude, planar materials, manifold finite-cylinder expressions and repeated halfspace-clipped expressions share owned Body records, derived regions, bounded-face queries and replay-checked persistence. Restored cylinder-family Bodies can append cuts. Clipped-leaf Boolean reuse, general curved operations, arbitrary record-to-solid certification and feature history remain missing. Certified NURBS materials now join KernelBody3 with owned topology, cavity-aware region samples, point/face/line/ray queries and replayed source-only persistence. NURBS similarity transforms now rebuild exact source/target controls, flip reflected face senses, and revalidate covariantly transformed separation-plane hints. General NURBS Booleans, splitting, arbitrary affine transforms and mass properties remain incomplete."
     },
     {
       "id": "primitive",
@@ -311,7 +315,7 @@
         "src/model/nurbs-body3.ts"
       ],
       "status": "partial",
-      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated."
+      "gap": "Certified finite NURBS face evaluation, inverse membership and line/ray sections now feed owned globally embedded material boundaries. Budgeted rational ray retries, containment/orientation, rational and algebraic material membership, and closed line-material intervals with isolated tangent contacts and boundary-contained spans exist. General nearest-point/measurement families, complete arbitrary imported shell certification, full NURBS operation dispatch and general NURBS Booleans remain incomplete. Degenerate boundary provenance is retained; unresolved computations are propagated. Certified triangular coordinates and independent product projections now precondition source-face inverse queries, with full original XYZ checks retained."
     },
     {
       "id": "tessellation",
@@ -376,7 +380,9 @@
       "tests/sew-nurbs-source-breps3.test.ts",
       "tests/sewn-nurbs-source-ray3.test.ts",
       "tests/nurbs-source-brep-record3.test.ts",
-      "tests/sewn-nurbs-source-embedding3.test.ts"
+      "tests/sewn-nurbs-source-embedding3.test.ts",
+      "tests/bivariate-equation-basis.test.ts",
+      "tests/bivariate-system.test.ts"
     ],
     "document": "docs/nurbs-source-cylinder-integration3.md",
     "materialBoundarySourceCommit": "30f6883",
@@ -385,7 +391,8 @@
       "docs/sewn-nurbs-source-material3.md",
       "docs/sewn-nurbs-source-material-query3.md",
       "docs/sewn-nurbs-source-material-line3.md",
-      "docs/nurbs-body3.md"
+      "docs/nurbs-body3.md",
+      "docs/nurbs-body-similarity3.md"
     ]
   }
 }

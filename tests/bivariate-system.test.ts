@@ -2,6 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Rational,Polynomial,BivariatePolynomial,AlgebraicReal,divideBivariateExact,gcdBivariate,resultantBivariate,solveBivariateSystem,solveBivariateEquations} from '../dist/index.js';
 const q=(n:bigint,d=1n)=>new Rational(n,d),U=new BivariatePolynomial([[],[1n]]),V=new BivariatePolynomial([[0n,1n]]),one=new BivariatePolynomial([[1n]]),zero=new BivariatePolynomial(),real=(n:bigint|string)=>AlgebraicReal.fromRational(n);
+test('linear fibers preserve correlated algebraic coordinates through mixed polynomial images',()=>{
+ const relation=V.sub(U).sub(one),result=solveBivariateSystem(U.mul(U).sub(one.scale(2n)),relation);assert.equal(result.kind,'finite');assert.equal(result.points.length,2);
+ const numerator=relation.mul(relation).mul(relation).add(one),denominator=U.mul(V).add(one.scale(3n));
+ for(const p of result.points){assert.equal(p.v.compare(p.u.affine(1n,1n)),0);assert.equal(numerator.evaluateAlgebraic(p.u,p.v).compare(real(1n)),0);assert.equal(numerator.rationalImage(p.u,p.v,denominator).compare(p.u.rationalFunction(new Polynomial([1n]),new Polynomial([5n,1n]))),0);}
+});
+test('quadratic fibers retain only real roots and keep double roots distinct as points',()=>{
+ const projection=U.mul(U).sub(one.scale(2n)),result=solveBivariateSystem(projection,V.mul(V).sub(U));assert.equal(result.points.length,2);for(const p of result.points){assert.equal(p.u.sign(),1);assert.equal(p.v.mul(p.v).compare(p.u),0);}assert.deepEqual(result.points.map(p=>p.v.sign()),[-1,1]);
+ const repeated=solveBivariateSystem(projection,V.sub(U).mul(V.sub(U)));assert.equal(repeated.points.length,2);for(const p of repeated.points)assert.equal(p.u.compare(p.v),0);
+});
 function certified(F:BivariatePolynomial,G:BivariatePolynomial){const result=solveBivariateSystem(F,G);assert.ok(Object.isFrozen(result)&&Object.isFrozen(result.points));for(const p of result.points){assert.ok(Object.isFrozen(p));assert.equal(F.evaluateAlgebraic(p.u,p.v).sign(),0);assert.equal(G.evaluateAlgebraic(p.u,p.v).sign(),0);assert.notEqual(result.commonFactor.evaluateAlgebraic(p.u,p.v).sign(),0);}return result;}
 function det(input:Rational[][]):Rational {const a=input.map(row=>[...row]);let result=q(1n);for(let k=0;k<a.length;k++){let r=k;while(r<a.length&&a[r]![k]!.sign()===0)r++;if(r===a.length)return q(0n);if(r!==k){[a[r],a[k]]=[a[k]!,a[r]!];result=result.neg();}const pivot=a[k]![k]!;result=result.mul(pivot);for(let i=k+1;i<a.length;i++){const factor=a[i]![k]!.div(pivot);for(let j=k+1;j<a.length;j++)a[i]![j]=a[i]![j]!.sub(factor.mul(a[k]![j]!));}}return result;}
 test('bivariate exact division and primitive PRS recover known common factors including vertical content',()=>{

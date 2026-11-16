@@ -2,6 +2,7 @@ import {Rational} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
 import {BivariatePolynomial} from '../numeric/bivariate-polynomial.js';
 import {solveBivariateEquations} from '../numeric/bivariate-system.js';
+import {bivariateEquationBasis} from '../numeric/bivariate-equation-basis.js';
 import {line3} from './surface3.js';
 import type {Line3} from './surface3.js';
 import {compareAlgebraicPoints3,algebraicCoordinates3} from './algebraic-point3.js';
@@ -40,7 +41,7 @@ function section(complex:NurbsSourceFaceComplex3,face:number,input:Line3,forward
  const min=(a:Rational,b:Rational)=>a.compare(b)<0?a:b,max=(a:Rational,b:Rational)=>a.compare(b)>0?a:b;
  for(const [patch,p] of L.patches.entries()){
   const bounds={uMin:max(p.startU,b.uMin),uMax:min(p.endU,b.uMax),vMin:max(p.startV,b.vMin),vMax:min(p.endV,b.vMax)};if(bounds.uMin.compare(bounds.uMax)>=0||bounds.vMin.compare(bounds.vMax)>=0)continue;
-  const N=p[pivot].sub(p.weight.scale(line.origin[pivot])).scale(new Rational(1n).div(line.direction[pivot])),equations=keys.filter(k=>k!==pivot).map(k=>p[k].sub(p.weight.scale(line.origin[k])).sub(N.scale(line.direction[k]))),solutions=solveBivariateEquations(equations);
+  const N=p[pivot].sub(p.weight.scale(line.origin[pivot])).scale(new Rational(1n).div(line.direction[pivot])),equations=keys.filter(k=>k!==pivot).map(k=>p[k].sub(p.weight.scale(line.origin[k])).sub(N.scale(line.direction[k]))),solutions=solveBivariateEquations(bivariateEquationBasis(equations));
   const at=(u:AlgebraicReal,v:AlgebraicReal):NurbsSourceLineVertex3|null=>{
    if(u.compare(real(bounds.uMin))<0||u.compare(real(bounds.uMax))>0||v.compare(real(bounds.vMin))<0||v.compare(real(bounds.vMax))>0)return null;
    const parameter=N.rationalImage(u,v,p.weight);if(forward&&parameter.sign()<0)return null;const q=evaluateNurbsSourceComplexFace3(complex,face,u,v);if(q.kind==='unresolved'){unresolved=true;return null;}if(q.kind!=='point'||!q.images.some(image=>image.patch===patch))return null;if(compareAlgebraicPoints3(q.point,liftNurbsSectionPatch3(p,u,v))!==0)throw new Error('Approached line patch lost its face image');
