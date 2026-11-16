@@ -229,10 +229,12 @@
         "src/geometry/nurbs-plane-cap-boundary3.ts",
         "src/geometry/sewn-nurbs-split-edge-plane3.ts",
         "src/geometry/nurbs-plane-cap-winding3.ts",
-        "src/geometry/nurbs-plane-cap-containment3.ts"
+        "src/geometry/nurbs-plane-cap-containment3.ts",
+        "src/geometry/cap-nurbs-plane-split-faces3.ts",
+        "src/geometry/nurbs-plane-cap-face-query3.ts"
       ],
       "status": "partial",
-      "gap": "Supported analytic finite-cylinder/halfspace boundaries share planar conic and curved-wall partitions, strict two-sided material selection, native/SSI provenance and balanced sewing with incidence diagnostics. General curved embeddings, maximal consolidation and common adoption of arbitrary assembled solids remain incomplete. Certified NURBS materials support finite-face plane loci and sufficient oriented section wires, with degenerate cases retained. Signed UV cells now close, join across patch seams, match recovered original rational trim paths to canonical source curves, insert shared-edge refinements, adopt region loops into BRep split faces and sew all original faces using interval endpoint unions. Cap boundary curves retain native intervals; complete plane events and independent algebraic point queries provide exact per-loop winding with budgeted retries. Boundaries tied to the same globally embedded, oriented material now yield checked containment forests and outer/hole domain groups, including nested islands and disconnected components. General non-domain implicit SSI source correspondence, coplanar side ownership, actual BRep cap construction/sewing, certified child Bodies, common persistence and repeated general NURBS cutting remain incomplete. Domain groups are not yet closed child solids."
+      "gap": "Supported analytic finite-cylinder/halfspace boundaries share planar conic and curved-wall partitions, strict two-sided material selection, native/SSI provenance and balanced sewing with incidence diagnostics. General curved embeddings, maximal consolidation and common adoption of arbitrary assembled solids remain incomplete. Certified NURBS materials support finite-face plane loci and sufficient oriented section wires, with degenerate cases retained. Signed UV cells now close, join across patch seams, match recovered original rational trim paths to canonical source curves, insert shared-edge refinements, adopt region loops into BRep split faces and sew all original faces using interval endpoint unions. Cap boundary curves retain native intervals; complete plane events and independent algebraic point queries provide exact per-loop winding with budgeted retries. Boundaries tied to the same globally embedded, oriented material now yield checked containment forests and outer/hole domain groups, including nested islands and disconnected components. General non-domain implicit SSI source correspondence, coplanar side ownership, certified child Bodies, common persistence and repeated general NURBS cutting remain incomplete. Outer/hole cap groups now adopt as finite planar BRep faces, reuse exact source boundary curves and sew to closed oriented incidence with vertex links rechecked. Cap faces support exact algebraic point location and finite-domain XYZ evaluation, retaining unresolved query budgets. Closed incidence is not yet a newly certified child solid."
     },
     {
       "id": "boolean",
@@ -427,7 +429,8 @@
       "tests/nurbs-plane-cap-boundary3.test.ts",
       "tests/nurbs-plane-cap-winding3.test.ts",
       "tests/nurbs-plane-cap-algebraic-winding3.test.ts",
-      "tests/nurbs-plane-cap-containment3.test.ts"
+      "tests/nurbs-plane-cap-containment3.test.ts",
+      "tests/cap-nurbs-plane-split-faces3.test.ts"
     ],
     "document": "docs/nurbs-source-cylinder-integration3.md",
     "materialBoundarySourceCommit": "30f6883",
@@ -458,7 +461,8 @@
       "docs/nurbs-plane-cap-boundary3.md",
       "docs/nurbs-plane-cap-winding3.md",
       "docs/nurbs-plane-cap-algebraic-winding3.md",
-      "docs/nurbs-plane-cap-containment3.md"
+      "docs/nurbs-plane-cap-containment3.md",
+      "docs/cap-nurbs-plane-split-faces3.md"
     ]
   }
 }

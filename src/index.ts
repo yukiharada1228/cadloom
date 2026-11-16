@@ -565,3 +565,7 @@ export {queryNurbsPlaneCapLoopWinding3} from './geometry/nurbs-plane-cap-winding
 export type {NurbsPlaneCapLoopWinding3} from './geometry/nurbs-plane-cap-winding3.js';
 export {analyzeNurbsPlaneCapContainment3} from './geometry/nurbs-plane-cap-containment3.js';
 export type {NurbsPlaneCapContainment3,NurbsPlaneCapContainmentCertificate3} from './geometry/nurbs-plane-cap-containment3.js';
+export {capNurbsPlaneSplitFaces3} from './geometry/cap-nurbs-plane-split-faces3.js';
+export type {CappedNurbsPlaneSplitFaces3,CappedNurbsPlaneFaceSurface3,NurbsPlaneCapFaceSurface3} from './geometry/cap-nurbs-plane-split-faces3.js';
+export {locateNurbsPlaneCapFace3,nurbsPlaneCapFacePoint3} from './geometry/nurbs-plane-cap-face-query3.js';
+export type {NurbsPlaneCapFaceLocation3} from './geometry/nurbs-plane-cap-face-query3.js';

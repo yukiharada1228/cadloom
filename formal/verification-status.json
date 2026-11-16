@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "c1031f493e205f04ea149f3b713077cb995855ee06f38358fb159d450da0c8f4",
+    "src/index.ts": "3753a1caba1d79d0fc1e2f7f4484acb4ca6c2a73b07ed1788b6d8cb09d7b49a0",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -263,7 +263,9 @@
     "src/geometry/nurbs-plane-cap-boundary3.ts": "775bc8d1761dcb63acec8ef53149991ecb721f05535af93a77a17395593556b1",
     "src/geometry/sewn-nurbs-split-edge-plane3.ts": "5922edb6e4c4d774c440059bbddb86ac5d24ecd934f8f6061c1dd964cbfe142c",
     "src/geometry/nurbs-plane-cap-winding3.ts": "74a5f681159640b5fe118be6349c4c590f09079f194848b78f2f1a645f736f71",
-    "src/geometry/nurbs-plane-cap-containment3.ts": "e22e3377543228db615aefca4199b46f9c1de919e6af9cd090afaa34ea558715"
+    "src/geometry/nurbs-plane-cap-containment3.ts": "e22e3377543228db615aefca4199b46f9c1de919e6af9cd090afaa34ea558715",
+    "src/geometry/cap-nurbs-plane-split-faces3.ts": "c975b6ad9527433b0323acbf25cf90fb774da97cb2fc102d34b4b03292749a85",
+    "src/geometry/nurbs-plane-cap-face-query3.ts": "9dda8b16f050481ca3384b93ba1ad2f47ea57c6dfb620dd33268928520a8f853"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
