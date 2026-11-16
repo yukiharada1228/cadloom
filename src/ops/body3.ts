@@ -194,7 +194,8 @@ function materialOperandOfBody3(body:Body3):CylinderMaterialOperand3 {
 
 export function bodyFromMaterialSurfaceBoundary3(source:MaterialSurfaceBoundary3):Body3 {return adoptMaterialSurfaceBody3(source);}
 
-function programOfBody3(body:Body3):CylinderMaterialProgram3 {
+export function materialProgramOfBody3(body:Body3):CylinderMaterialProgram3 {
+ assertOwnedBody3(body);
  if(nativePlanarOperand3(body))return preparePlanarMaterialProgram3(planarSourceOfBody3(body)??planarSolidFromBoundary3(body.topology));
  const surface=materialSurfaceSourceOfBody3(body);if(surface)return resolveCylinderMaterialProgram3(surface.material);
  if(body.construction.kind==='extrude')return prepareExtrudeMaterialProgram3(body);
@@ -208,7 +209,7 @@ function programOfBody3(body:Body3):CylinderMaterialProgram3 {
  return materialProgramFromOperand3(materialOperandOfBody3(body));
 }
 function booleanSurfaceBodies3(first:Body3,second:Body3,operation:BooleanOperation):Body3 {
- const program=booleanCylinderMaterialPrograms3(programOfBody3(first),programOfBody3(second),operation);
+ const program=booleanCylinderMaterialPrograms3(materialProgramOfBody3(first),materialProgramOfBody3(second),operation);
  return bodyFromMaterialSurfaceBoundary3(boundaryMaterialSurfaces3(program,{requireClosed:true}));
 }
 
