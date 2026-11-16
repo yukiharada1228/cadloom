@@ -151,9 +151,10 @@ export function intersectEllipsePlane3(inputEllipse:Ellipse3,inputPlane:Plane3):
   const points=intersectLineEllipse3(hit.line,e).map(h=>h.point).sort(compareAlgebraicPoints3);return points.length?Object.freeze({kind:'points',points:Object.freeze(points)}):Object.freeze({kind:'none'});
 }
 
+const interiorWitnesses=new WeakMap<EllipticArc3,AlgebraicCoordinates3>();
 /** Exact open-arc witness from a rational ray in one chart quadrant. */
 export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordinates3 {
-  const a=snapshotEllipticArc3(input);if(a.fullEllipse)return a.start;
+  const a=snapshotEllipticArc3(input),known=interiorWitnesses.get(a);if(known)return known;if(a.fullEllipse)return a.start;
   if(same(a.start,a.end))throw new RangeError('A point arc has no open interior');
   const e=a.ellipse,f=e.frame,one=new Rational(1n),two=new Rational(2n);
   const onRay=(x:Rational,y:Rational)=>{
@@ -178,7 +179,7 @@ export function interiorPointOnEllipticArc3(input:EllipticArc3):AlgebraicCoordin
       if(S>=0&&T>=0){lo=q;continue;}
       if(S<=0&&T<=0){hi=q;continue;}
       const result=onRay(one.sub(q).mul(new Rational(sx)),q.mul(new Rational(sy)));
-      if(locatePointOnEllipticArc3(result,a)!=='interior')throw new Error('Ellipse interior witness failed');return result;
+      if(locatePointOnEllipticArc3(result,a)!=='interior')throw new Error('Ellipse interior witness failed');interiorWitnesses.set(a,result);return result;
     }
   }
   throw new Error('Nonpoint elliptic arc has no quadrant cell');

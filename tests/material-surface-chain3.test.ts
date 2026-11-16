@@ -18,7 +18,7 @@ test('new and primitive Bodies support all four Boolean operations and replayed 
 });
 test('program composition keeps operand-local cuts, remaps plane indices and checks ownership',()=>{
  const a=clipCylinderMaterialProgram3(program(),[{plane:plane3(1n,0n,0n,0n),side:-1}]),b=clipCylinderMaterialProgram3(program(4n),[{plane:plane3(0n,1n,0n,0n),side:1}]),joined=booleanCylinderMaterialPrograms3(a,b,'union');
- for(const [p,expected] of [[point3('-1/2',0n,0n),'inside'],[point3('1/2',0n,0n),'outside'],[point3(4n,'1/2',0n),'inside'],[point3(4n,'-1/2',0n),'outside']] as const)assert.equal(strictCylinderMaterialProgramLocation3(joined,p),expected);
+ for(const [p,expected] of [[point3('-1/2','1/4',0n),'inside'],[point3('1/2','1/4',0n),'outside'],[point3(4n,'1/2',0n),'inside'],[point3(4n,'-1/2',0n),'outside']] as const)assert.equal(strictCylinderMaterialProgramLocation3(joined,p),expected);
  assert.throws(()=>booleanCylinderMaterialPrograms3({...a},b,'union'),RangeError);assert.throws(()=>booleanCylinderMaterialPrograms3(a,b,'wat' as 'union'),RangeError);
  assert.throws(()=>clipCylinderMaterialProgram3(a,[{plane:plane3(1n,0n,0n,0n),side:0 as 1}]),RangeError);
 });

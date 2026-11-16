@@ -1,4 +1,4 @@
-import {commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
+import {certifyAlgebraicAxialPair3,commonAlgebraicAxialLine3} from './algebraic-axial-point3.js';
 import {Rational} from '../numeric/rational.js';
 import type {Sign} from '../numeric/rational.js';
 import {AlgebraicReal} from '../numeric/real-roots.js';
@@ -96,7 +96,8 @@ export function planarPartitionSupportCurves3(source:PlanarFaceCurvePartition3,s
   const dx=dot3(U,line.direction),dy=dot3(V,line.direction),axis=dx.sign()!==0?'x':'y',rate=axis==='x'?dx:dy;
   const lo=(axis==='x'?chart.xMin:chart.yMin).sub(one),hi=(axis==='x'?chart.xMax:chart.yMax).add(one);
   const at=(q:Rational)=>algebraicLinePoint3(line,AlgebraicReal.fromRational(q).sub(p[axis]).affine(one.div(rate)));
-  return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(at(lo),at(hi))});
+  const start=at(lo),end=at(hi);certifyAlgebraicAxialPair3(start,end,line.origin,line.direction);
+  return Object.freeze({kind:'algebraic-segment',segment:algebraicSegment3(start,end)});
  }
  const result=surfaces.map((s):readonly Curve3[]|null=>{
   if(s.kind==='plane'){

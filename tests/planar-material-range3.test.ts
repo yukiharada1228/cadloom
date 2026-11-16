@@ -25,7 +25,7 @@ test('rational zero carriers choose strict rational witnesses between irrational
  }});assert.ok(count>0);
 });
 test('irrational cylinder generators retain a strict witness on their verified rational direction',()=>{
- const face=prepareRectangleFace3(planeFrame3(O,Y,Z),-2n,2n,-2n,2n),source=partitionPlanarFaceByCurves3(face,[]),surface={kind:'cylinder' as const,cylinder:cylinder3(line3(O,Z),2n)},result=classifyPlanarPartitionSurfaces3(source,[surface]);
+ const face=prepareRectangleFace3(planeFrame3(point3('1/2',0n,0n),Y,Z),-2n,2n,-2n,2n),source=partitionPlanarFaceByCurves3(face,[]),surface={kind:'cylinder' as const,cylinder:cylinder3(line3(O,Z),2n)},result=classifyPlanarPartitionSurfaces3(source,[surface]);
  let count=0;result.cells.forEach((row,i)=>row.forEach(entry=>{if(entry.kind!=='cut')return;count++;
   assert.equal(source.cells[i]!.locate(entry.point),'inside');assert.equal(classifyPointToSurface3(entry.point,surface),0);assert.notEqual(entry.point.z.rational,null);
  }));assert.ok(count>0);
