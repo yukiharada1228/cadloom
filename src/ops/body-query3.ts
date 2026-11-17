@@ -1,3 +1,9 @@
+import {isOwnedRecutNurbsBody3,materialOfRecutNurbsBody3} from '../model/recut-nurbs-body3.js';
+import type {RecutNurbsBody3} from '../model/recut-nurbs-body3.js';
+import {intersectNurbsRecutLine3,intersectNurbsRecutRay3} from '../geometry/nurbs-recut-ray3.js';
+import type {NurbsRecutRay3} from '../geometry/nurbs-recut-ray3.js';
+import {intersectNurbsRecutMaterialLine3} from '../geometry/nurbs-recut-material-line3.js';
+import type {NurbsRecutMaterialLine3} from '../geometry/nurbs-recut-material-line3.js';
 import {isOwnedCappedNurbsBody3,materialOfCappedNurbsBody3} from '../model/capped-nurbs-body3.js';
 import type {CappedNurbsBody3} from '../model/capped-nurbs-body3.js';
 import {intersectCappedNurbsPlaneLine3,intersectCappedNurbsPlaneRay3} from '../geometry/capped-nurbs-plane-ray3.js';
@@ -39,21 +45,25 @@ function faces(body:BodyQuerySource3):MixedBRepFaces3 {
 /** Exact boundary events for p(t)=origin+t*direction, including negative t.
  * Shared-edge/vertex hits and contained supports retain explicit degeneracy.
  * Shell selection uses the owned Body's shell table, not caller geometry. */
+export function intersectBodyLine3(body:RecutNurbsBody3,origin:Point3,direction:Vector3,shell?:number):NurbsRecutRay3;
 export function intersectBodyLine3(body:CappedNurbsBody3,origin:Point3,direction:Vector3,shell?:number):CappedNurbsPlaneRay3;
 export function intersectBodyLine3(body:NurbsBody3,origin:Point3,direction:Vector3,shell?:number):SewnNurbsSourceRay3;
 export function intersectBodyLine3(body:BodyQuerySource3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3;
-export function intersectBodyLine3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3;
-export function intersectBodyLine3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3 {
+export function intersectBodyLine3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3|NurbsRecutRay3;
+export function intersectBodyLine3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3|NurbsRecutRay3 {
+ if(isOwnedRecutNurbsBody3(body))return intersectNurbsRecutLine3(materialOfRecutNurbsBody3(body).containment.embedding,line3(origin,direction),shell);
  if(isOwnedCappedNurbsBody3(body))return intersectCappedNurbsPlaneLine3(materialOfCappedNurbsBody3(body).containment.embedding,line3(origin,direction),shell);
  if(isOwnedNurbsBody3(body))return intersectSewnNurbsSourceLine3(materialOfNurbsBody3(body).containment.embedding.source,line3(origin,direction),shell);
  return intersectMixedBoundaryLine3(faces(body),origin,direction,shell);
 }
 /** Forward events t>=0. Parameters are not distances for a nonunit direction. */
+export function intersectBodyRay3(body:RecutNurbsBody3,origin:Point3,direction:Vector3,shell?:number):NurbsRecutRay3;
 export function intersectBodyRay3(body:CappedNurbsBody3,origin:Point3,direction:Vector3,shell?:number):CappedNurbsPlaneRay3;
 export function intersectBodyRay3(body:NurbsBody3,origin:Point3,direction:Vector3,shell?:number):SewnNurbsSourceRay3;
 export function intersectBodyRay3(body:BodyQuerySource3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3;
-export function intersectBodyRay3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3;
-export function intersectBodyRay3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3 {
+export function intersectBodyRay3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3|NurbsRecutRay3;
+export function intersectBodyRay3(body:KernelBody3,origin:Point3,direction:Vector3,shell?:number):BodyBoundaryIntersection3|SewnNurbsSourceRay3|CappedNurbsPlaneRay3|NurbsRecutRay3 {
+ if(isOwnedRecutNurbsBody3(body))return intersectNurbsRecutRay3(materialOfRecutNurbsBody3(body).containment.embedding,line3(origin,direction),shell);
  if(isOwnedCappedNurbsBody3(body))return intersectCappedNurbsPlaneRay3(materialOfCappedNurbsBody3(body).containment.embedding,line3(origin,direction),shell);
  if(isOwnedNurbsBody3(body))return intersectSewnNurbsSourceRay3(materialOfNurbsBody3(body).containment.embedding.source,line3(origin,direction),shell);
  return intersectMixedBoundaryRay3(faces(body),origin,direction,shell);
@@ -74,11 +84,13 @@ function strictlyBetween(a:AlgebraicReal,b:AlgebraicReal):Rational {
 /** Closed material/line intersection for bounded owned Bodies. All boundary
  * events are required; selecting one shell would lose cavity boundaries.
  * Degenerate surface/edge events never become guessed material intervals. */
+export function intersectBodyLineMaterial3(body:RecutNurbsBody3,origin:Point3,direction:Vector3):NurbsRecutMaterialLine3;
 export function intersectBodyLineMaterial3(body:CappedNurbsBody3,origin:Point3,direction:Vector3):CappedNurbsMaterialLine3;
 export function intersectBodyLineMaterial3(body:NurbsBody3,origin:Point3,direction:Vector3):SewnNurbsMaterialLine3;
 export function intersectBodyLineMaterial3(body:BodyQuerySource3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3;
-export function intersectBodyLineMaterial3(body:KernelBody3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3|SewnNurbsMaterialLine3|CappedNurbsMaterialLine3;
-export function intersectBodyLineMaterial3(body:KernelBody3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3|SewnNurbsMaterialLine3|CappedNurbsMaterialLine3 {
+export function intersectBodyLineMaterial3(body:KernelBody3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3|SewnNurbsMaterialLine3|CappedNurbsMaterialLine3|NurbsRecutMaterialLine3;
+export function intersectBodyLineMaterial3(body:KernelBody3,origin:Point3,direction:Vector3):BodyLineMaterialIntersection3|SewnNurbsMaterialLine3|CappedNurbsMaterialLine3|NurbsRecutMaterialLine3 {
+ if(isOwnedRecutNurbsBody3(body))return intersectNurbsRecutMaterialLine3(materialOfRecutNurbsBody3(body),line3(origin,direction));
  if(isOwnedCappedNurbsBody3(body))return intersectCappedNurbsPlaneMaterialLine3(materialOfCappedNurbsBody3(body),line3(origin,direction));
  if(isOwnedNurbsBody3(body))return intersectSewnNurbsSourceMaterialLine3(materialOfNurbsBody3(body),line3(origin,direction));
  assertSource(body);const line=line3(origin,direction),boundary=intersectBodyLine3(body,line.origin,line.direction);

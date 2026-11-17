@@ -1,3 +1,4 @@
+import {isOwnedRecutNurbsBody3} from '../model/recut-nurbs-body3.js';
 import {isOwnedCappedNurbsBody3} from '../model/capped-nurbs-body3.js';
 import {Rational} from '../numeric/rational.js';
 import {point3,subtract3,cross3,dot3} from '../geometry/point3.js';
@@ -62,7 +63,7 @@ function polygonKey(points:readonly Point3[]):string {
  * Exact Boolean selection retains cavities, holes, disconnected components and contacts.
  * Curved/nonrational boundaries require other backends and fail explicitly. */
 export function splitPlanarBodyByPlane3(body:KernelBody3,inputPlane:Plane3):PlanarBodyPlaneSplit3 {
- if(isOwnedNurbsBody3(body)||isOwnedCappedNurbsBody3(body))throw new RangeError('Planar splitting does not support a NURBS Body');
+ if(isOwnedRecutNurbsBody3(body)||isOwnedNurbsBody3(body)||isOwnedCappedNurbsBody3(body))throw new RangeError('Planar splitting does not support a NURBS Body');
  const material=isOwnedCellularBody3(body)?planarMaterialOfCellularBody3(body):planarMaterialFromBody3(body),plane=plane3(inputPlane.normal.x,inputPlane.normal.y,inputPlane.normal.z,inputPlane.offset),points=material.polygons.flat();
  let negativeMaterial:PlanarMaterial3,positiveMaterial:PlanarMaterial3;
  if(!points.length){negativeMaterial=material;positiveMaterial=material;}

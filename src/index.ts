@@ -648,3 +648,10 @@ export {locateNurbsRecutMaterial3} from './geometry/nurbs-recut-material-query3.
 export type {NurbsRecutMaterialLocation3} from './geometry/nurbs-recut-material-query3.js';
 export {certifyNurbsRecutMaterial3} from './geometry/nurbs-recut-material3.js';
 export type {NurbsRecutShellOrientation3,NurbsRecutMaterialRegion3,NurbsRecutMaterialCertificate3,NurbsRecutMaterial3} from './geometry/nurbs-recut-material3.js';
+
+export {bodyFromRecutNurbsMaterial3,createRecutNurbsBody3,splitCappedNurbsBodyByPlane3,restoreRecutNurbsBody3,transformRecutNurbsBody3} from './ops/recut-nurbs-body3.js';
+export type {RecutNurbsBody3} from './model/recut-nurbs-body3.js';
+export {readRecutNurbsBodyDocument3} from './record/recut-nurbs-body3.js';
+export type {RecutNurbsBodyDocument3} from './record/recut-nurbs-body3.js';
+export {intersectNurbsRecutMaterialLine3} from './geometry/nurbs-recut-material-line3.js';
+export type {NurbsRecutMaterialLineHit3,NurbsRecutMaterialLineSpan3,NurbsRecutMaterialLine3} from './geometry/nurbs-recut-material-line3.js';

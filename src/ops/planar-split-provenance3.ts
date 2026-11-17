@@ -1,3 +1,4 @@
+import {isOwnedRecutNurbsBody3} from '../model/recut-nurbs-body3.js';
 import {isOwnedCappedNurbsBody3} from '../model/capped-nurbs-body3.js';
 import {Rational} from '../numeric/rational.js';
 import {point3,subtract3,dot3,cross3,pointsEqual3} from '../geometry/point3.js';
@@ -82,7 +83,7 @@ const ids=(input:readonly number[])=>Object.freeze([...new Set(input)].sort((a,b
  * This optional analysis can be expensive and is cached only for an owned split. */
 export function planarBodySplitProvenance3(split:PlanarBodyPlaneSplit3):PlanarBodySplitProvenance3 {
  assertOwnedPlanarBodySplit3(split);const known=cache.get(split);if(known)return known;
- const parent=split.parent;if(isOwnedNurbsBody3(parent)||isOwnedCappedNurbsBody3(parent))throw new RangeError('NURBS Body planar split provenance is not implemented');const pv=vertices(parent),raw=planarBoundaryPolygonsWithFaceOrigins3(parent.topology),pe=parent.topology.edges.map(e=>({a:pv[e.start]!,b:pv[e.end]!}));
+ const parent=split.parent;if(isOwnedRecutNurbsBody3(parent)||isOwnedNurbsBody3(parent)||isOwnedCappedNurbsBody3(parent))throw new RangeError('NURBS Body planar split provenance is not implemented');const pv=vertices(parent),raw=planarBoundaryPolygonsWithFaceOrigins3(parent.topology),pe=parent.topology.edges.map(e=>({a:pv[e.start]!,b:pv[e.end]!}));
  const groups=new Map<string,{plane:Plane3;pieces:{face:number;polygon:readonly Point3[];planes:readonly Plane3[]}[]}>();
  raw.polygons.forEach((p,i)=>{const face=raw.faceOrigins[i]!,support=parent.topology.faces[face]!.surface;if(support.kind!=='plane')throw new Error('Planar provenance has a curved parent');const key=planeKey(support.plane);let group=groups.get(key);if(!group){group={plane:support.plane,pieces:[]};groups.set(key,group);}group.pieces.push({face,polygon:p,planes:edgePlanes(p)});});
  const analyze=(body:CellularBody3,cutFaces:ReadonlySet<number>):PlanarSplitChildProvenance3=>{

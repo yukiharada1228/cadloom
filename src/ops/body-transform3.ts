@@ -1,3 +1,6 @@
+import {isOwnedRecutNurbsBody3} from '../model/recut-nurbs-body3.js';
+import type {RecutNurbsBody3} from '../model/recut-nurbs-body3.js';
+import {transformRecutNurbsBody3} from './recut-nurbs-body3.js';
 import {isOwnedCappedNurbsBody3} from '../model/capped-nurbs-body3.js';
 import type {CappedNurbsBody3} from '../model/capped-nurbs-body3.js';
 import {transformCappedNurbsBody3} from './capped-nurbs-body3.js';
@@ -17,12 +20,14 @@ import {boundaryMaterialSurfaces3} from '../geometry/material-surface-boundary3.
 import {materialProgramOfBody3,bodyFromMaterialSurfaceBoundary3} from './body3.js';
 /** Rebuild exact transformed definitions; cellular inputs preserve their material regions. */
 export function transformBody3(body:CellularBody3,transform:SimilarityTransform3):CellularBody3;
+export function transformBody3(body:RecutNurbsBody3,transform:SimilarityTransform3):RecutNurbsBody3;
 export function transformBody3(body:CappedNurbsBody3,transform:SimilarityTransform3):CappedNurbsBody3;
 export function transformBody3(body:NurbsBody3,transform:SimilarityTransform3):NurbsBody3;
 export function transformBody3(body:Body3,transform:SimilarityTransform3):Body3;
 export function transformBody3(body:Body3|CellularBody3,transform:SimilarityTransform3):Body3|CellularBody3;
 export function transformBody3(body:KernelBody3,transform:SimilarityTransform3):KernelBody3;
 export function transformBody3(body:KernelBody3,transform:SimilarityTransform3):KernelBody3 {
+ if(isOwnedRecutNurbsBody3(body))return transformRecutNurbsBody3(body,transform);
  if(isOwnedCappedNurbsBody3(body))return transformCappedNurbsBody3(body,transform);
  if(isOwnedNurbsBody3(body))return transformNurbsBody3(body,transform);
  if(isOwnedCellularBody3(body))return cellularBodyFromPlanarMaterial3(transformPlanarMaterial3(planarMaterialOfCellularBody3(body),transform));
