@@ -634,3 +634,6 @@ export type {NurbsRecutBoundaryZeroArcCertificate3,NurbsRecutBoundaryZeroArcs3} 
 
 export {analyzeNurbsRecutSourceCapVertices3,certifyNurbsRecutSourceCapContacts3} from './geometry/nurbs-recut-source-cap-contact-gate3.js';
 export type {NurbsRecutSourceCapVertexRecord3,NurbsRecutSourceCapVertices3,NurbsRecutSourceCapContactCertificate3,NurbsRecutSourceCapContactGate3} from './geometry/nurbs-recut-source-cap-contact-gate3.js';
+
+export {certifyNurbsRecutOldCapContacts3,certifyNurbsRecutEmbedding3} from './geometry/nurbs-recut-embedding3.js';
+export type {NurbsRecutOldCapContactCertificate3,NurbsRecutOldCapContacts3,NurbsRecutEmbeddingCertificate3,NurbsRecutEmbedding3} from './geometry/nurbs-recut-embedding3.js';
