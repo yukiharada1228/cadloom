@@ -7,3 +7,5 @@ export * from './nurbs/index.ts';
 export * from './topology/index.ts';
 export * from './primitive/index.ts';
 export * from './mass/index.ts';
+export * from './curve/index.ts';
+export * from './surface/index.ts';

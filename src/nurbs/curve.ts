@@ -39,7 +39,11 @@ function freezePoints(points: readonly ControlPoint[]): readonly ControlPoint[] 
   return Object.freeze(points.map((pt) => Object.freeze(pt.slice())));
 }
 
-function checkPoints(op: string, points: readonly ControlPoint[]): Result<number> {
+/**
+ * Validates a non-empty list of equal-dimension finite control points and returns the dimension.
+ * Shared by the M1 NURBS modules (surfaces, elevation); not re-exported from the public barrel.
+ */
+export function checkPoints(op: string, points: readonly ControlPoint[]): Result<number> {
   if (points.length === 0) return invalidInput(op, 'no control points');
   const dim = points[0]!.length;
   if (dim < 1) return invalidInput(op, 'control points must have at least one coordinate');
@@ -168,12 +172,13 @@ function checkParam(op: string, curve: BSplineCurve, u: number): Result<number> 
  * factors `p / (U[i+p+1] - U[i+k])`) or, for rational curves, underflow its homogeneous weight to 0.
  * Such results are reported as errors instead of returning `Infinity` / `NaN` coordinates.
  */
-function finiteOr(op: string, v: readonly number[]): Result<readonly number[]> {
+export function finiteOr(op: string, v: readonly number[]): Result<readonly number[]> {
   for (const c of v) if (!Number.isFinite(c)) return invalidInput(op, 'result is not finite (floating-point overflow)');
   return ok(Object.freeze(v));
 }
 
-function project(op: string, h: readonly number[], dim: number): Result<readonly number[]> {
+/** Projects a homogeneous point `(w x, w)` (weight at index `dim`) to `x`, guarding weight under/overflow. Internal, shared with surfaces. */
+export function projectHomogeneous(op: string, h: readonly number[], dim: number): Result<readonly number[]> {
   const w = h[dim]!;
   if (!(w > 0) || !Number.isFinite(w)) return invalidInput(op, 'homogeneous weight underflowed or overflowed');
   return finiteOr(op, h.slice(0, dim).map((c) => c / w));
@@ -185,7 +190,7 @@ export function evaluateCurve(curve: NurbsCurve, u: number): Result<readonly num
   const span = checkParam(op, curve, u);
   if (!span.ok) return span;
   const h = deBoorPoint(curve.knots, curve.degree, homogeneousPoints(curve), span.value, u);
-  return curve.weights === undefined ? finiteOr(op, h) : project(op, h, curve.dimension);
+  return curve.weights === undefined ? finiteOr(op, h) : projectHomogeneous(op, h, curve.dimension);
 }
 
 /** The curve point at `u` as `sum N[i,p](u) P_i` (A3.1 / A4.1 with A2.2); agrees with `evaluateCurve`. */
@@ -202,7 +207,7 @@ export function evaluateCurveBasis(curve: NurbsCurve, u: number): Result<readonl
     const pt = pts[span.value - p + j]!;
     for (let c = 0; c < dim; c++) out[c] = out[c]! + N[j]! * pt[c]!;
   }
-  return curve.weights === undefined ? finiteOr(op, out) : project(op, out, curve.dimension);
+  return curve.weights === undefined ? finiteOr(op, out) : projectHomogeneous(op, out, curve.dimension);
 }
 
 /**
@@ -261,11 +266,20 @@ function polynomialDerivatives(
   return out;
 }
 
-function binomial(n: number, k: number): number {
+/** Binomial coefficient `C(n, k)` as a float (exact for the small degrees/orders used here). Internal, shared with surfaces and elevation. */
+export function binomial(n: number, k: number): number {
   let r = 1;
   for (let i = 1; i <= k; i++) r = (r * (n - k + i)) / i;
   return r;
 }
+
+/**
+ * Largest derivative `order` accepted by {@link curveDerivatives} and `surfaceDerivatives`. The
+ * output grows with the order (quadratically for surfaces), so an unbounded order could exhaust
+ * memory (an uncatchable crash) instead of returning an error. Derivatives above the degree are
+ * zero anyway, and degrees are at most 32 (`MAX_ELEVATED_DEGREE`).
+ */
+export const MAX_DERIVATIVE_ORDER = 64;
 
 /**
  * Derivatives `[C(u), C'(u), ..., C^(order)(u)]`. Polynomial curves use the derivative control
@@ -275,6 +289,7 @@ function binomial(n: number, k: number): number {
 export function curveDerivatives(curve: NurbsCurve, u: number, order: number): Result<readonly (readonly number[])[]> {
   const op = 'nurbs.curveDerivatives';
   if (!Number.isInteger(order) || order < 0) return invalidInput(op, 'order must be a non-negative integer');
+  if (order > MAX_DERIVATIVE_ORDER) return invalidInput(op, `order must be at most ${MAX_DERIVATIVE_ORDER}`);
   const span = checkParam(op, curve, u);
   if (!span.ok) return span;
   const hd = polynomialDerivatives(curve.knots, curve.degree, homogeneousPoints(curve), span.value, u, order);

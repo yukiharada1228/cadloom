@@ -35,13 +35,19 @@ export const faceId = (n: number): FaceId => n as FaceId;
 export const shellId = (n: number): ShellId => n as ShellId;
 export const bodyId = (n: number): BodyId => n as BodyId;
 
-/** Straight edge between its end vertices (the only curve kind in M0). */
-export interface LineCurve { readonly kind: 'line' }
-export type EdgeCurve = LineCurve;
+/**
+ * Straight edge between its end vertices (the only B-rep edge geometry so far). Named
+ * `EdgeLine` so it does not collide with the analytic `LineCurve` of `src/curve` (M1).
+ */
+export interface EdgeLine { readonly kind: 'line' }
+export type EdgeCurve = EdgeLine;
 
-/** Infinite plane through `origin` with unit `normal` (the only surface kind in M0). */
-export interface PlaneSurface { readonly kind: 'plane'; readonly origin: Point3; readonly normal: Vec3 }
-export type FaceSurface = PlaneSurface;
+/**
+ * Infinite plane through `origin` with unit `normal` (the only B-rep face geometry so far).
+ * Named `FacePlane` so it does not collide with the analytic `PlaneSurface` of `src/surface` (M1).
+ */
+export interface FacePlane { readonly kind: 'plane'; readonly origin: Point3; readonly normal: Vec3 }
+export type FaceSurface = FacePlane;
 
 export interface Vertex { readonly point: Point3 }
 
