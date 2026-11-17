@@ -658,3 +658,6 @@ export type {NurbsRecutMaterialLineHit3,NurbsRecutMaterialLineSpan3,NurbsRecutMa
 
 export {intersectNurbsRecutCapFacePlane3} from './geometry/nurbs-recut-cap-section3.js';
 export type {NurbsRecutCapSectionBoundary3,NurbsRecutCapSectionEvent3,NurbsRecutCapSectionSpan3,NurbsRecutCapSection3} from './geometry/nurbs-recut-cap-section3.js';
+
+export {splitNurbsRecutCapBoundaries3,nurbsRecutCapSplitBoundaryPoint3} from './geometry/nurbs-recut-cap-split-boundaries3.js';
+export type {NurbsRecutCapSplitCurve3,NurbsRecutCapSplitEdge3,NurbsRecutCapSplitBoundaries3} from './geometry/nurbs-recut-cap-split-boundaries3.js';
