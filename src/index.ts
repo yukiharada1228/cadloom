@@ -637,3 +637,9 @@ export type {NurbsRecutSourceCapVertexRecord3,NurbsRecutSourceCapVertices3,Nurbs
 
 export {certifyNurbsRecutOldCapContacts3,certifyNurbsRecutEmbedding3} from './geometry/nurbs-recut-embedding3.js';
 export type {NurbsRecutOldCapContactCertificate3,NurbsRecutOldCapContacts3,NurbsRecutEmbeddingCertificate3,NurbsRecutEmbedding3} from './geometry/nurbs-recut-embedding3.js';
+
+export {intersectNurbsRecutLine3,intersectNurbsRecutRay3,queryNurbsRecutShellParity3,queryNurbsRecutShellParityAuto3} from './geometry/nurbs-recut-ray3.js';
+export type {NurbsRecutRayOptions3,NurbsRecutRayHit3,NurbsRecutRayReason3,NurbsRecutRay3,NurbsRecutShellParity3,NurbsRecutParitySearchOptions3,NurbsRecutShellParitySearch3} from './geometry/nurbs-recut-ray3.js';
+
+export {analyzeNurbsRecutContainment3} from './geometry/nurbs-recut-containment3.js';
+export type {NurbsRecutShellContainmentNode3,NurbsRecutContainmentCertificate3,NurbsRecutContainment3} from './geometry/nurbs-recut-containment3.js';
