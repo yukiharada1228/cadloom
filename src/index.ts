@@ -643,3 +643,8 @@ export type {NurbsRecutRayOptions3,NurbsRecutRayHit3,NurbsRecutRayReason3,NurbsR
 
 export {analyzeNurbsRecutContainment3} from './geometry/nurbs-recut-containment3.js';
 export type {NurbsRecutShellContainmentNode3,NurbsRecutContainmentCertificate3,NurbsRecutContainment3} from './geometry/nurbs-recut-containment3.js';
+
+export {locateNurbsRecutMaterial3} from './geometry/nurbs-recut-material-query3.js';
+export type {NurbsRecutMaterialLocation3} from './geometry/nurbs-recut-material-query3.js';
+export {certifyNurbsRecutMaterial3} from './geometry/nurbs-recut-material3.js';
+export type {NurbsRecutShellOrientation3,NurbsRecutMaterialRegion3,NurbsRecutMaterialCertificate3,NurbsRecutMaterial3} from './geometry/nurbs-recut-material3.js';
