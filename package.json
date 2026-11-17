@@ -1,6 +1,6 @@
 {
   "name": "cadloom",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.0",
   "type": "module",
   "exports": {
     ".": {
@@ -10,9 +10,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "npm run build && node --test tests/*.test.ts",
-    "example": "npm run build && node examples/intersection-to-svg.ts",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "test": "node --test \"tests/**/*.test.ts\"",
+    "prove": "node formal/scripts/verify.mjs",
+    "check": "npm run typecheck && npm test && npm run prove",
     "prepack": "npm run build"
   },
   "engines": {
@@ -22,7 +23,7 @@
     "typescript": "~5.9.3",
     "@types/node": "^24.0.0"
   },
-  "description": "Pure TypeScript exact rational 2D geometry foundations for a CAD kernel",
+  "description": "Pure TypeScript B-rep CAD kernel, a reimplementation of the SolidCraft/solidcore kernel, with Lean-checked models",
   "license": "MIT",
   "files": [
     "dist",
@@ -41,10 +42,12 @@
   },
   "keywords": [
     "cad",
+    "cad-kernel",
+    "brep",
+    "nurbs",
     "geometry",
     "typescript",
-    "rational",
-    "exact-arithmetic"
+    "lean4"
   ],
   "publishConfig": {
     "access": "public",

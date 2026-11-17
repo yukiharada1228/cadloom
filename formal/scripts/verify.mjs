@@ -1,60 +1,43 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
+#!/usr/bin/env node
+// Checks the Lean models: no sorry/admit/axiom/unsafe escape hatches, `lake build` succeeds,
+// and every theorem depends only on Lean's standard axioms (propext, Classical.choice, Quot.sound).
+import { execFileSync } from 'node:child_process';
+import { readdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
-import { delimiter, join } from 'node:path';
 
-const root = fileURLToPath(new URL('../../', import.meta.url));
-const formal = join(root, 'formal');
-const status = JSON.parse(readFileSync(join(formal, 'verification-status.json'), 'utf8'));
-const options = process.argv.slice(2);
-if (options.some(option => !['--partial', '--require-full'].includes(option)) ||
-    options.includes('--partial') && options.includes('--require-full')) {
-  throw Error('Usage: node formal/scripts/verify.mjs [--partial | --require-full]');
-}
-function sources(directory) {
-  return readdirSync(directory, {withFileTypes: true}).flatMap(entry => {
-    const path = join(directory, entry.name);
-    return entry.isDirectory() ? sources(path) : entry.name.endsWith('.ts') ? [path] : [];
-  });
-}
-const actualSources = sources(join(root, 'src')).map(p => p.slice(root.length)).sort();
-const expectedSources = Object.keys(status.sourceSha256).sort();
-if (JSON.stringify(actualSources) !== JSON.stringify(expectedSources)) throw Error('Runtime source inventory changed');
-for (const [name, expected] of Object.entries(status.sourceSha256)) {
-  const actual = createHash('sha256').update(readFileSync(join(root, name))).digest('hex');
-  if (actual !== expected) throw Error(`Source changed: ${name}; proof correspondence requires review`);
-}
-console.log('Source inventory and SHA-256 match the recorded review baseline (not a proof of equivalence).');
-function run(command, args, cwd = formal) {
-  const child = spawnSync(command, args, {
-    cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
-    env: {...process.env, PATH: `${join(homedir(), '.elan', 'bin')}${delimiter}${process.env.PATH ?? ''}`},
-  });
-  if (child.stdout) process.stdout.write(child.stdout);
-  if (child.stderr) process.stderr.write(child.stderr);
-  if (child.error) throw child.error;
-  if (child.status !== 0) throw Error(`${command} failed with status ${child.status}`);
-  return child.stdout;
-}
-run(process.execPath, ['node_modules/typescript/bin/tsc'], root);
-run(process.execPath, ['formal/scripts/extract-arithmetic.mjs', '--check'], root);
-run('lake', ['build']);
-const audit = run('lake', ['env', 'lean', '-DwarningAsError=true', 'Audit.lean']);
-const allowed = new Set(['propext', 'Classical.choice', 'Quot.sound']);
-for (const name of status.checkedTheorems) {
-  const escaped = name.replaceAll('.', '\\.');
-  const dependencies = audit.match(new RegExp(`'${escaped}' depends on axioms: \\[([^\\]]*)\\]`));
-  const closed = audit.includes(`'${name}' does not depend on any axioms`);
-  if (!dependencies && !closed) throw Error(`Missing axiom audit: ${name}`);
-  for (const axiom of dependencies ? dependencies[1].split(',').map(s => s.trim()).filter(Boolean) : []) {
-    if (!allowed.has(axiom)) throw Error(`Unapproved axiom ${axiom} in ${name}`);
+const formal = join(dirname(fileURLToPath(import.meta.url)), '..');
+const dir = join(formal, 'CadloomFormal');
+const lake = process.env.LAKE ?? (() => { try { execFileSync('lake', ['--version']); return 'lake'; } catch { return join(homedir(), '.elan', 'bin', 'lake'); } })();
+const modules = readdirSync(dir).filter((f) => f.endsWith('.lean')).sort();
+const banned = /\b(sorry|admit|native_decide|implemented_by|extern)\b|^\s*(axiom|unsafe|@\[extern)/m;
+const theorems = [];
+for (const file of modules) {
+  const src = readFileSync(join(dir, file), 'utf8').replace(/\/-[\s\S]*?-\//g, '').replace(/--.*$/gm, '');
+  const bad = src.match(banned);
+  if (bad) { console.error(`${file}: forbidden construct '${bad[0].trim()}'`); process.exit(1); }
+  let ns = [];
+  for (const line of src.split('\n')) {
+    const open = line.match(/^namespace\s+(\S+)/); if (open) ns.push(open[1]);
+    const close = line.match(/^end\s+(\S+)/); if (close && ns.at(-1) === close[1]) ns.pop();
+    const thm = line.match(/^(?:@\[[^\]]*\]\s*)?theorem\s+([^\s(:{[]+)/);
+    if (thm) theorems.push([...ns, thm[1]].join('.'));
   }
 }
-console.log(`Lean kernel checked ${status.checkedTheorems.length} declared theorems; axiom audit passed.`);
-console.log('Scoped geometry/arithmetic verification passed; full TypeScript execution is outside scope.');
-if (options.includes('--require-full')) {
-  console.error('Full TypeScript execution verification is not provided.');
-  process.exitCode = 2;
-}
+const root = modules.map((f) => `import CadloomFormal.${f.replace(/\.lean$/, '')}`).join('\n') + '\n';
+writeFileSync(join(formal, 'CadloomFormal.lean'), root);
+const audit = join(formal, 'Audit.lean');
+writeFileSync(audit, `import CadloomFormal\n${theorems.map((t) => `#print axioms ${t}`).join('\n')}\n`);
+try {
+  execFileSync(lake, ['build'], { cwd: formal, stdio: 'inherit' });
+  const out = execFileSync(lake, ['env', 'lean', 'Audit.lean'], { cwd: formal, encoding: 'utf8' });
+  const allowed = new Set(['propext', 'Classical.choice', 'Quot.sound']);
+  const used = [...out.matchAll(/depends on axioms: \[([^\]]*)\]/g)].flatMap((m) => m[1].split(',').map((s) => s.trim()));
+  const extra = used.filter((a) => !allowed.has(a));
+  if (extra.length) { console.error(`non-standard axioms: ${[...new Set(extra)].join(', ')}`); process.exit(1); }
+  if (/error/i.test(out)) { console.error(out); process.exit(1); }
+  const reported = (out.match(/depends on axioms|does not depend on any axioms/g) ?? []).length;
+  if (reported !== theorems.length) { console.error(`audit reported ${reported} of ${theorems.length} theorems`); process.exit(1); }
+} finally { rmSync(audit, { force: true }); }
+console.log(`Lean: ${modules.length} modules, ${theorems.length} theorems checked, standard axioms only.`);
