@@ -628,3 +628,6 @@ export type {NurbsRecutSourceCapContacts3,NurbsRecutCapContactWitness3} from './
 
 export {analyzeNurbsRecutInteriorZeroArcs3,nurbsRecutInteriorZeroArcPoint3} from './geometry/nurbs-recut-interior-zero-arcs3.js';
 export type {NurbsRecutInteriorZeroArcCertificate3,NurbsRecutInteriorZeroArcs3} from './geometry/nurbs-recut-interior-zero-arcs3.js';
+
+export {analyzeNurbsRecutBoundaryZeroArcs3,nurbsRecutBoundaryZeroArcPoint3} from './geometry/nurbs-recut-boundary-zero-arcs3.js';
+export type {NurbsRecutBoundaryZeroArcCertificate3,NurbsRecutBoundaryZeroArcs3} from './geometry/nurbs-recut-boundary-zero-arcs3.js';
