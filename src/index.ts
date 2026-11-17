@@ -667,3 +667,6 @@ export type {NurbsRecutCapSplitLoopWinding3,NurbsRecutCapSplitDomainsCertificate
 
 export {buildNurbsRecutCapSplitFaces3,locateNurbsRecutCapSplitSurface3,nurbsRecutCapSplitSurfacePoint3} from './geometry/nurbs-recut-cap-split-faces3.js';
 export type {NurbsRecutCapSplitSurface3,NurbsRecutCapSplitFaces3} from './geometry/nurbs-recut-cap-split-faces3.js';
+
+export {sewNurbsRecutCapFaces3,sewnNurbsRecutCapEdgePoint3} from './geometry/sew-nurbs-recut-cap-faces3.js';
+export type {NurbsRecutCapAssemblyCurve3,SewnNurbsRecutCapFaces3} from './geometry/sew-nurbs-recut-cap-faces3.js';
