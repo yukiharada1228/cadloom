@@ -1,0 +1,17 @@
+# 再分割source面と全キャップを最終親辺のnative区間で対応
+
+`matchNurbsRecutSectionEdge3` は、所有された有限面の祖先制限をたどり、同じ元UV面上の切断曲線を後続の再分割へ対応します。省略可能なnative部分区間は新旧両曲線の範囲内にある正の区間だけを受理します。共通多項式因子・定数座標・完全なgraph slab内の枝の継続が根拠であり、端点だけでは対応させません。従来の省略時の全新辺対応も維持します。
+
+`matchNurbsRecutParentSectionEdge3` は、現在の閉再切断B-repのface・edgeを明示して、新しいcell境界との重なる区間を対応します。新cellが制限する面は、指定した最終親faceと同じ所有されたsurfaceでなければなりません。親辺のnative lower/upperでさらに制限し、切断で捨てた祖先区間を復活させません。
+
+`coverNurbsRecutParentSectionEdges3` は、このsource faceに接する各世代のsection親辺を、新cellの境界片で隙間・重複なく覆います。元のcoedge方向と新cellの面側の向きも照合します。一つのcell辺が隣接する複数の最終親辺にまたがる場合は、親ごとの正の部分区間を保持します。曖昧な重なり、向きの不一致、未被覆区間は認定しません。元の物理的なsource共有辺は既存のtrim-map経路の責務として残します。
+
+`alignNurbsRecutParentCapEdges3` は、この被覆と全キャップ組立の `sharedFragments` を、同じ最終親edgeのnative区間で対応します。両側の全端点を合わせた区間ごとに、sourceの対応片・組立後のcap edge/coedge・切断側を保持します。capのcoedgeはsourceと逆向きであり、正負スケールを揃えた平面側がsourceの開cell符号と一致する必要があります。異なる親や平面、未組立cap、未被覆、向きや側の不一致では認定しません。
+
+両側の全区間対応と所有された親curveが空間像の一致の根拠です。端点XYZの検査と公開した区間内の評価関数は、その由来の監査です。`nurbsRecutParentSectionMatchPoint3` / `nurbsRecutParentCapAlignmentPoint3` は所有された証明書と認定区間内でのみUV/XYZを返します。
+
+検証では非線形cubeの旧／新キャップに接する全6親区間、部分区間、暗黙の曲がった枝と斜め切断、円柱の代数的な端点、捨てた祖先区間、空洞と島、負側の親、反射後の再構築、capとの逆向き・側一致、余分なsource投影イベントによる未分割cap辺の追加細分化を検査します。所有権・面制限・範囲・別親と別平面も検査します。
+
+これは再分割source境界とキャップの全区間対応です。対応区間を実際のsource採用辺へnodingし、元の物理的共有辺も含めて全境界を縫合する処理はまだ必要です。三回目の閉立体切断、新しい埋め込み・殻包含・材料再認定、任意回数の保存record、一般NURBS BooleanとSolidCraft全体の純粋TypeScript再実装は未完了です。
+
+提出対象の隔離ビルドと、新規親区間・既存match/coverage/join・cap組立・recut Bodyの計6テストファイルの追加strict型検査が成功しました。関連27ファイル・新規11件を含む164件が全て成功しました（129037.1355 ms、失敗・キャンセル・スキップ0）。実行ソース308ファイル・src/testsのTypeScript合計620ファイルについて、実行した隔離スナップショットとgit indexのbyte一致、および全実行ソースのSHA記録との一致を確認しました。これは再現性の照合であり、TypeScript全体の形式証明や全リポジトリのテスト成功ではありません。

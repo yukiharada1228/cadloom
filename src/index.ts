@@ -670,3 +670,9 @@ export type {NurbsRecutCapSplitSurface3,NurbsRecutCapSplitFaces3} from './geomet
 
 export {sewNurbsRecutCapFaces3,sewnNurbsRecutCapEdgePoint3} from './geometry/sew-nurbs-recut-cap-faces3.js';
 export type {NurbsRecutCapAssemblyCurve3,SewnNurbsRecutCapFaces3} from './geometry/sew-nurbs-recut-cap-faces3.js';
+
+export {matchNurbsRecutParentSectionEdge3,nurbsRecutParentSectionMatchPoint3,coverNurbsRecutParentSectionEdges3} from './geometry/nurbs-recut-parent-section-coverage3.js';
+export type {NurbsRecutParentSectionMatchCertificate3,NurbsRecutParentSectionMatch3,NurbsRecutParentSectionCoverageCertificate3,NurbsRecutParentSectionCoverage3} from './geometry/nurbs-recut-parent-section-coverage3.js';
+
+export {alignNurbsRecutParentCapEdges3,nurbsRecutParentCapAlignmentPoint3} from './geometry/nurbs-recut-parent-cap-alignment3.js';
+export type {NurbsRecutParentCapAlignmentCertificate3,NurbsRecutParentCapAlignment3} from './geometry/nurbs-recut-parent-cap-alignment3.js';
