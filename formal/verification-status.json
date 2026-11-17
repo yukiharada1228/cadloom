@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "3113e0c5e29bbfe3e23966a0b86d0a5cdbc22e741230af2ba493390323d37fde",
+    "src/index.ts": "41509b4334d09488413f2685b207c105bcff9ea0e240939e14eda10ea6b023e9",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -291,7 +291,8 @@
     "src/geometry/nurbs-source-plane-zero-set3.ts": "06c9f548dcc676fe9f99e063808f67fef26cbe44d8137b8e11134d51240c50ea",
     "src/geometry/nurbs-recut-source-cap-contacts3.ts": "3c3db21654911c2bc73f8d379fc1868fafd228b5961cdf89d136d4364092730b",
     "src/geometry/nurbs-recut-interior-zero-arcs3.ts": "32484ed3537591e180c9195a946311ce2404a4412e583d879e6d4376b63dc458",
-    "src/geometry/nurbs-recut-boundary-zero-arcs3.ts": "0ad30fd47ec50efb8d17cad3839bf66d51471a1c95e34aae40ad063e2d4480da"
+    "src/geometry/nurbs-recut-boundary-zero-arcs3.ts": "0ad30fd47ec50efb8d17cad3839bf66d51471a1c95e34aae40ad063e2d4480da",
+    "src/geometry/nurbs-recut-source-cap-contact-gate3.ts": "dca9fc9c25f0ee2aec5b7dcfcc783d9221decd6430a29dfe1a147238da0c3c00"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",
