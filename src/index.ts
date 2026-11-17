@@ -655,3 +655,6 @@ export {readRecutNurbsBodyDocument3} from './record/recut-nurbs-body3.js';
 export type {RecutNurbsBodyDocument3} from './record/recut-nurbs-body3.js';
 export {intersectNurbsRecutMaterialLine3} from './geometry/nurbs-recut-material-line3.js';
 export type {NurbsRecutMaterialLineHit3,NurbsRecutMaterialLineSpan3,NurbsRecutMaterialLine3} from './geometry/nurbs-recut-material-line3.js';
+
+export {intersectNurbsRecutCapFacePlane3} from './geometry/nurbs-recut-cap-section3.js';
+export type {NurbsRecutCapSectionBoundary3,NurbsRecutCapSectionEvent3,NurbsRecutCapSectionSpan3,NurbsRecutCapSection3} from './geometry/nurbs-recut-cap-section3.js';
