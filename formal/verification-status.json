@@ -6,7 +6,7 @@
     "src/geometry/point2.ts": "a270ddbf2e31f1484c4ce5d1c6063270762eb38d12597b88f182abcac2f73720",
     "src/geometry/segment-intersection.ts": "d8ef28382ec750e9c15c525099750b1f5cfa5b70cdb0bd738ddb9de666119a10",
     "src/geometry/split-segments.ts": "31ed98ff6bb73e9052cfab8a768b635265feacc4d8e80172f9baffbc28a290ec",
-    "src/index.ts": "59da2d94bafb47530e26cc6002ab19f9b061357cdb8d24bd23beb83a03ef2d79",
+    "src/index.ts": "ebf053a318ed4329f72590165539f3498f12dc9a8380d48d75f067582503c474",
     "src/numeric/rational.ts": "1fa7b80f2a85aadec80de904ae0e848f4b1db59a6fb4fb04829e7c00fb2f6710",
     "src/geometry/half-edges.ts": "3c983bc7e023ae735692b664c1f4d82950a8dc3e9b894cf95bbf4b324ad304f6",
     "src/geometry/faces.ts": "29f68746129154f1a6fc16bd44a8db71393de443ee583aff401b1436c4274547",
@@ -278,7 +278,7 @@
     "src/geometry/capped-nurbs-plane-material-line3.ts": "b10b62462082fb05c82098d956714ca107b333a387843b5ec9969db590e50f43",
     "src/geometry/nurbs-plane-cap-section3.ts": "1ed3fc4ab8203f7a4b163ca4add7ecaa52aedb70e57e498ac35cc55be8840b6f",
     "src/geometry/nurbs-plane-cap-split-boundaries3.ts": "bea74838e30b53f49e8953c48d911f9e404d78303c9e1c994484aaac6dcd00ac",
-    "src/geometry/nurbs-plane-cap-split-domains3.ts": "0befc76b7869feb8ac7f7f37a26704c79fef9630412f084b8e62b0b27a1ef1db",
+    "src/geometry/nurbs-plane-cap-split-domains3.ts": "1f38736e24868b193f1365e726a5c4e51f3b9e0242927fbc8ceffa2b01534ccd",
     "src/geometry/nurbs-plane-cap-split-faces3.ts": "25d2f5f839dca48b7c518babfed973ee702287472b56f3f8cea0b415b67c8e3a",
     "src/geometry/nurbs-recut-edge-match3.ts": "59e3d539211e56388a9a93259ef9a2c3cb007eba1d23dfa30b5d0ee7ea3d100e",
     "src/geometry/nurbs-recut-edge-coverage3.ts": "6631e6cf792f40defe24ca044ff1450e421edb66ad69e4c3f37dfc2b0ff5bae2",
@@ -303,7 +303,10 @@
     "src/ops/recut-nurbs-body3.ts": "b176bb1df9e09b4ce5e63a6d4cfadcbb67055a992419b34b15afb2cd7b74571d",
     "src/record/recut-nurbs-body3.ts": "fb042ac168d837af563d6b941312fb014f347925f97003b3a0f101e592e795c1",
     "src/geometry/nurbs-recut-cap-section3.ts": "5c1bde388656f323abd21aeae2a7cbc1847ecbda8506c41729c02404ba7beffd",
-    "src/geometry/nurbs-recut-cap-split-boundaries3.ts": "239b8f5ff94aed892f5d897c0ed2e2e61d95776df39465427c5138db714f5d60"
+    "src/geometry/nurbs-recut-cap-split-boundaries3.ts": "239b8f5ff94aed892f5d897c0ed2e2e61d95776df39465427c5138db714f5d60",
+    "src/geometry/planar-loop-domains3.ts": "5195404e6bf9101170ee7c453a04bd843e74284b32348f6d42695ee64af9389c",
+    "src/geometry/nurbs-recut-cap-split-domains3.ts": "1a02cfdc9dd613bbe89f82962c36a30d24c43345d97d9afe76e7621b90b4c0d1",
+    "src/geometry/nurbs-recut-cap-split-faces3.ts": "36a5949c2c84dc5feeedd5ddfad43425674ea232b2d6a71237dd745c9c9090f3"
   },
   "checkedTheorems": [
     "Cadloom.gcdLoop_correct",

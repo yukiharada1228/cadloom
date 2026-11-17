@@ -661,3 +661,9 @@ export type {NurbsRecutCapSectionBoundary3,NurbsRecutCapSectionEvent3,NurbsRecut
 
 export {splitNurbsRecutCapBoundaries3,nurbsRecutCapSplitBoundaryPoint3} from './geometry/nurbs-recut-cap-split-boundaries3.js';
 export type {NurbsRecutCapSplitCurve3,NurbsRecutCapSplitEdge3,NurbsRecutCapSplitBoundaries3} from './geometry/nurbs-recut-cap-split-boundaries3.js';
+
+export {queryNurbsRecutCapSplitLoopWinding3,analyzeNurbsRecutCapSplitDomains3,locateNurbsRecutCapSplitFace3} from './geometry/nurbs-recut-cap-split-domains3.js';
+export type {NurbsRecutCapSplitLoopWinding3,NurbsRecutCapSplitDomainsCertificate3,NurbsRecutCapSplitDomains3,NurbsRecutCapSplitFaceLocation3} from './geometry/nurbs-recut-cap-split-domains3.js';
+
+export {buildNurbsRecutCapSplitFaces3,locateNurbsRecutCapSplitSurface3,nurbsRecutCapSplitSurfacePoint3} from './geometry/nurbs-recut-cap-split-faces3.js';
+export type {NurbsRecutCapSplitSurface3,NurbsRecutCapSplitFaces3} from './geometry/nurbs-recut-cap-split-faces3.js';
