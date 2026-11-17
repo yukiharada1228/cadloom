@@ -1,0 +1,43 @@
+export {
+  BrepBuilder,
+  bodyId,
+  coedgeEnd,
+  coedgeId,
+  coedgeStart,
+  edgeId,
+  faceId,
+  faceNormal,
+  faces,
+  faceVertices,
+  freezeBrep,
+  loopCoedges,
+  loopId,
+  loopVertices,
+  shellId,
+  vertexId,
+} from './brep.ts';
+export type {
+  Body,
+  BodyId,
+  Brep,
+  Coedge,
+  CoedgeId,
+  CoedgeUse,
+  Edge,
+  EdgeCurve,
+  EdgeId,
+  Face,
+  FaceId,
+  FaceSurface,
+  LineCurve,
+  Loop,
+  LoopId,
+  PlaneSurface,
+  Shell,
+  ShellId,
+  Vertex,
+  VertexId,
+} from './brep.ts';
+export { eulerCharacteristic, eulerPoincare, topologyIssue, validateBrep } from './validate.ts';
+export type { EulerPoincare, TopologyIssue } from './validate.ts';
+export { buildPolyhedron, fanVectorArea2 } from './polyhedron.ts';
