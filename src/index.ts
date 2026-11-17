@@ -676,3 +676,9 @@ export type {NurbsRecutParentSectionMatchCertificate3,NurbsRecutParentSectionMat
 
 export {alignNurbsRecutParentCapEdges3,nurbsRecutParentCapAlignmentPoint3} from './geometry/nurbs-recut-parent-cap-alignment3.js';
 export type {NurbsRecutParentCapAlignmentCertificate3,NurbsRecutParentCapAlignment3} from './geometry/nurbs-recut-parent-cap-alignment3.js';
+
+export {repartitionNurbsRecutSourceFaces3} from './geometry/nurbs-recut-source-repartition3.js';
+export type {NurbsRecutParentInterval3,NurbsRecutSourceRepartitionInput3,NurbsRecutSourceRepartition3} from './geometry/nurbs-recut-source-repartition3.js';
+
+export {subdivideNurbsRecutBoundary3,nurbsRecutSubdivisionCurvePoint3,locateNurbsRecutSubdivisionSurface3} from './geometry/subdivide-nurbs-recut-boundary3.js';
+export type {NurbsRecutSubdivisionCurve3,NurbsRecutSubdivisionSurface3,NurbsRecutBoundarySubdivision3} from './geometry/subdivide-nurbs-recut-boundary3.js';
