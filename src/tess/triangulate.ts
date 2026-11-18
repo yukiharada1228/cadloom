@@ -6,7 +6,8 @@
  * of `src/exact/incircle.ts`, on the given double coordinates: a decision is never contradicted by another one, so
  * collinear and cocircular inputs cannot make the mesher loop or emit crossing triangles.
  *
- * - `loopOrientation` — the exact orientation of a simple ring (at its lowest-leftmost vertex).
+ * - `loopOrientation`, `segmentsMeet` — the exact ring orientation and segment contact of `src/exact/polygon.ts`
+ *   (used by the mesher).
  * - `bridgeHoles` — splices each hole ring (clockwise) into the outer ring (counter-clockwise) by a doubled
  *   bridge edge `p → m … m → p` to a vertex `p` that `m` (the hole's rightmost vertex) sees: inside the
  *   corner cones at both ends and crossing or touching no boundary edge (Lean `bridgeHole`, `bridge_length`,
@@ -27,17 +28,16 @@
  * `lib.rs` (`triangulate_planar`: first loop outer, the rest holes) — SolidCraft / solidcore, Apache-2.0 OR MIT.
  */
 import { err, invalidInput, ok, type Result } from '../core/error.ts';
-import type { Sign } from '../exact/dyadic.ts';
 import type { Point2 } from '../math/vec.ts';
 import { incircleSign } from '../exact/incircle.ts';
-import { orient2d } from '../exact/predicates.ts';
-
-/** M0 exact `orient2d` on points known to be finite (the mesher checks its work coordinates once). */
-function orient(a: Point2, b: Point2, c: Point2): Sign {
-  const r = orient2d(a, b, c);
-  if (!r.ok) throw new Error('tess.orient: coordinate not finite'); // invariant: callers pass finite points
-  return r.value;
-}
+import {
+  closedSegmentsMeet,
+  isFinitePoint2,
+  onCollinearSegment,
+  orientFinite as orient,
+  ringOrientation,
+  ringProblem,
+} from '../exact/polygon.ts';
 
 export type Tri = readonly [number, number, number];
 
@@ -46,62 +46,9 @@ const failed = <T>(reason: string): Result<T> => err({ kind: 'invalid-topology',
 
 const samePoint = (p: Point2, q: Point2): boolean => p.x === q.x && p.y === q.y;
 
-/** `q` on the closed segment `[p, r]`, given `orient(p, r, q) = 0` (exact coordinate comparisons). */
-function between(p: Point2, q: Point2, r: Point2): boolean {
-  return Math.min(p.x, r.x) <= q.x && q.x <= Math.max(p.x, r.x) && Math.min(p.y, r.y) <= q.y && q.y <= Math.max(p.y, r.y);
-}
-
-const finite = (p: Point2): boolean => Number.isFinite(p.x) && Number.isFinite(p.y);
-
-/** Why the rings cannot be read: a missing point or a non-finite coordinate (`undefined` when they can). */
-function ringProblem(points: readonly Point2[], rings: readonly (readonly number[])[]): string | undefined {
-  for (const [li, r] of rings.entries()) {
-    for (const i of r) {
-      const p = Number.isInteger(i) ? points[i] : undefined;
-      if (p === undefined) return `ring ${li} names a missing point ${i}`;
-      if (!finite(p)) return `ring ${li} has a non-finite point`;
-    }
-  }
-  return undefined;
-}
-
-/** Whether the closed segments `[p1, p2]` and `[q1, q2]` meet (finite points). */
-function meet(p1: Point2, p2: Point2, q1: Point2, q2: Point2): boolean {
-  const o1 = orient(p1, p2, q1), o2 = orient(p1, p2, q2), o3 = orient(q1, q2, p1), o4 = orient(q1, q2, p2);
-  if (o1 * o2 < 0 && o3 * o4 < 0) return true;
-  return (o1 === 0 && between(p1, q1, p2)) || (o2 === 0 && between(p1, q2, p2)) ||
-    (o3 === 0 && between(q1, p1, q2)) || (o4 === 0 && between(q1, p2, q2));
-}
-
-/**
- * Whether the closed segments `[p1, p2]` and `[q1, q2]` meet, decided by the exact `orient2d`. Fails with
- * `invalid-input` for a non-finite coordinate.
- */
-export function segmentsMeet(p1: Point2, p2: Point2, q1: Point2, q2: Point2): Result<boolean> {
-  if (![p1, p2, q1, q2].every(finite)) return invalidInput(OP, 'non-finite point');
-  return ok(meet(p1, p2, q1, q2));
-}
-
-/**
- * The exact orientation of a simple ring: `orient2d` at its lowest (then leftmost) vertex; 0 for fewer than
- * three vertices. Fails with `invalid-input` for a missing or non-finite point.
- */
-export function loopOrientation(points: readonly Point2[], ring: readonly number[]): Result<Sign> {
-  const bad = ringProblem(points, [ring]);
-  if (bad !== undefined) return invalidInput(OP, bad);
-  return ok(ringOrientation(points, ring));
-}
-
-function ringOrientation(points: readonly Point2[], ring: readonly number[]): Sign {
-  const n = ring.length;
-  if (n < 3) return 0;
-  let best = 0;
-  for (let i = 1; i < n; i++) {
-    const p = points[ring[i]!]!, q = points[ring[best]!]!;
-    if (p.y < q.y || (p.y === q.y && p.x < q.x)) best = i;
-  }
-  return orient(points[ring[(best + n - 1) % n]!]!, points[ring[best]!]!, points[ring[(best + 1) % n]!]!);
-}
+const between = onCollinearSegment;
+const finite = isFinitePoint2;
+const meet = closedSegmentsMeet;
 
 /**
  * Whether the direction from `a` to `b` lies strictly inside the corner at `a` between `a0 = prev` and

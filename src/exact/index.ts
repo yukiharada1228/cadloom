@@ -27,3 +27,4 @@ export {
   orient3dFilter,
 } from './predicates.ts';
 export { INCIRCLE_ERRBOUND, incircle, incircleExactOnly, incircleFilter, incircleSign } from './incircle.ts';
+export { closedSegmentsMeet, loopOrientation, ringOrientation, segmentsMeet } from './polygon.ts';

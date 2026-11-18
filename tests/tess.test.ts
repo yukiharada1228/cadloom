@@ -11,9 +11,9 @@ import { createNurbsCurve, type NurbsCurve } from '../src/nurbs/curve.ts';
 import { createConeSurface, createCylinderSurface, createNurbsSurface3, createPlaneSurface, createSphereSurface, createTorusSurface, type Surface3 } from '../src/surface/types.ts';
 import { createNurbsSurface } from '../src/nurbs/surface.ts';
 import { surfaceNormal3 } from '../src/surface/evaluate.ts';
-import { BOX_FACES, boxCorner } from '../src/primitive/index.ts';
+import { BOX_FACES, WORLD_PLACEMENT, boxCorner, makeCylinder } from '../src/primitive/index.ts';
 import { implicitValue } from '../src/surface/implicit.ts';
-import { BrepBuilder, edgeId, planePcurve, type Brep, type CoedgeUse, type EdgeId } from '../src/topology/index.ts';
+import { BrepBuilder, edgeId, freezeBrep, planePcurve, type Brep, type CoedgeUse, type EdgeId } from '../src/topology/index.ts';
 import { fanVectorArea2 } from '../src/topology/polyhedron.ts';
 import { buildPolyhedron } from '../src/topology/polyhedron.ts';
 import { makeBox } from '../src/primitive/index.ts';
@@ -30,13 +30,11 @@ import {
   earClip,
   isConsistentlyOriented,
   isWatertight,
-  loopOrientation,
   meshEdgeUseCounts,
   meshRules,
   meshSignedVolume,
   sagitta,
   sampleEdge,
-  segmentsMeet,
   shoelace2,
   tessellate,
   triangulatePolygon,
@@ -46,7 +44,7 @@ import {
   type MeshRules,
   type Tri,
 } from '../src/tess/index.ts';
-import { incircle, incircleExactOnly, incircleFilter } from '../src/exact/index.ts';
+import { incircle, incircleExactOnly, incircleFilter, loopOrientation, segmentsMeet } from '../src/exact/index.ts';
 
 const k = createKernel();
 const rules = (chord: number, angleDeg = 20, maxEdgeLength?: number): MeshRules =>
@@ -87,36 +85,22 @@ function starPolygon(n: number, seed: number): Point2[] {
 // ---------------------------------------------------------------------------------------------------------
 // Fixtures
 
-/** Closed cylinder of radius r, height h about +z, with a seam (as in tests/topology-geometry.test.ts). */
+/**
+ * Closed cylinder of radius r, height h about +z: the library primitive `makeCylinder` (edges bottom circle, top
+ * circle, seam; faces bottom disc, top disc, side). Without pcurves, the side face's four coedges lose theirs.
+ */
 function cylinder(r = 2, h = 3, withPcurves = true): Brep {
-  const b = new BrepBuilder();
-  const shell = b.addShell(b.addBody());
-  const v0 = b.addVertex(vec3(r, 0, 0));
-  const v1 = b.addVertex(vec3(r, 0, h));
-  const z = vec3(0, 0, 1), x = vec3(1, 0, 0);
-  const bottom = unwrap(createCircleCurve(k, vec3(0, 0, 0), z, x, r));
-  const top = unwrap(createCircleCurve(k, vec3(0, 0, h), z, x, r));
-  const e0 = b.addEdge(v0, v0, bottom);
-  const e1 = b.addEdge(v1, v1, top);
-  const e2 = b.addEdge(v0, v1, unwrap(createSegmentCurve(vec3(r, 0, 0), vec3(r, 0, h))), 0, 1);
-  const p0 = unwrap(createPlaneSurface(k, vec3(0, 0, 0), z, x));
-  const p1 = unwrap(createPlaneSurface(k, vec3(0, 0, h), z, x));
-  const f0 = b.addFace(shell, p0, true);
-  b.addLoop(f0, [{ edge: e0, reversed: true, pcurve: unwrap(planePcurve(k, p0, { curve: bottom, t0: 0, t1: TWO_PI }, true)) }]);
-  const f1 = b.addFace(shell, p1);
-  b.addLoop(f1, [{ edge: e1, reversed: false, pcurve: unwrap(planePcurve(k, p1, { curve: top, t0: 0, t1: TWO_PI }, false)) }]);
-  const cyl = unwrap(createCylinderSurface(k, vec3(0, 0, 0), z, x, r));
-  const f2 = b.addFace(shell, cyl);
-  const uvLine = (u0: number, v0_: number, u1: number, v1_: number): NurbsCurve =>
-    unwrap(createNurbsCurve(1, [0, 0, 1, 1], [[u0, v0_], [u1, v1_]]));
-  const side: CoedgeUse[] = [
-    { edge: e0, reversed: false, pcurve: uvLine(0, 0, TWO_PI, 0) },
-    { edge: e2, reversed: false, pcurve: uvLine(TWO_PI, 0, TWO_PI, h) },
-    { edge: e1, reversed: true, pcurve: uvLine(TWO_PI, h, 0, h) },
-    { edge: e2, reversed: true, pcurve: uvLine(0, h, 0, 0) },
-  ];
-  b.addLoop(f2, withPcurves ? side : side.map(({ edge, reversed }) => ({ edge, reversed })));
-  return b.build();
+  const c = unwrap(makeCylinder(k, WORLD_PLACEMENT, r, h));
+  if (withPcurves) return c;
+  const sideLoop = c.faces[2]!.loops[0]!;
+  return freezeBrep({
+    ...c,
+    coedges: c.coedges.map((co) => {
+      if (co.loop !== sideLoop) return co;
+      const { pcurve: _, ...rest } = co;
+      return rest;
+    }),
+  });
 }
 
 /**

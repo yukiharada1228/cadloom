@@ -3,52 +3,22 @@ import assert from 'node:assert/strict';
 import { createKernel } from '../src/core/kernel.ts';
 import { unwrap, type Result } from '../src/core/error.ts';
 import { vec3 } from '../src/math/vec.ts';
-import { createCircleCurve, createCurveFrame, createSegmentCurve, storedFrameMismatch, TWO_PI } from '../src/curve/types.ts';
-import { createNurbsCurve, type NurbsCurve } from '../src/nurbs/curve.ts';
-import { createCylinderSurface, createPlaneSurface } from '../src/surface/types.ts';
-import { BrepBuilder, freezeBrep, planePcurve, topologyIssue, type Brep, type CoedgeUse } from '../src/topology/index.ts';
-import { makeBox } from '../src/primitive/box.ts';
+import { createCircleCurve, createCurveFrame, storedFrameMismatch } from '../src/curve/types.ts';
+import { createNurbsCurve } from '../src/nurbs/curve.ts';
+import { freezeBrep, topologyIssue, type Brep } from '../src/topology/index.ts';
+import { makeBox, makeCylinder, WORLD_PLACEMENT } from '../src/primitive/index.ts';
 import { brepToRecord, builderOrderIssue, recordToBrep } from '../src/convert/index.ts';
 import { parseRecord, parseRecordText, recordTopology, stringifyRecord, type BrepRecord } from '../src/record/index.ts';
 
 const k = createKernel();
 type Json = any;
 
-const uvLine = (u0: number, v0: number, u1: number, v1: number): NurbsCurve =>
-  unwrap(createNurbsCurve(1, [0, 0, 1, 1], [[u0, v0], [u1, v1]]));
-
 /**
- * Closed cylinder of radius r, height h about +z, built with the topology builder (the fixture of
- * tests/topology-geometry.test.ts): two circle edges, a seam segment, two discs and the side face whose loop
- * uses the seam twice with pcurves on u = 2π and u = 0.
+ * Closed cylinder of radius r, height h about +z: the M3 primitive `makeCylinder` (the single cylinder builder; the
+ * ids of the M2 fixture of tests/topology-geometry.test.ts): two circle edges, a seam segment, two discs and the
+ * side face whose loop uses the seam twice with pcurves on u = 2π and u = 0.
  */
-function cylinder(r = 2, h = 3): Brep {
-  const b = new BrepBuilder();
-  const shell = b.addShell(b.addBody());
-  const v0 = b.addVertex(vec3(r, 0, 0));
-  const v1 = b.addVertex(vec3(r, 0, h));
-  const z = vec3(0, 0, 1), x = vec3(1, 0, 0);
-  const bottom = unwrap(createCircleCurve(k, vec3(0, 0, 0), z, x, r));
-  const top = unwrap(createCircleCurve(k, vec3(0, 0, h), z, x, r));
-  const e0 = b.addEdge(v0, v0, bottom);
-  const e1 = b.addEdge(v1, v1, top);
-  const e2 = b.addEdge(v0, v1, unwrap(createSegmentCurve(vec3(r, 0, 0), vec3(r, 0, h))), 0, 1);
-  const p0 = unwrap(createPlaneSurface(k, vec3(0, 0, 0), z, x));
-  const p1 = unwrap(createPlaneSurface(k, vec3(0, 0, h), z, x));
-  const f0 = b.addFace(shell, p0, true);
-  b.addLoop(f0, [{ edge: e0, reversed: true, pcurve: unwrap(planePcurve(k, p0, { curve: bottom, t0: 0, t1: TWO_PI }, true)) }]);
-  const f1 = b.addFace(shell, p1);
-  b.addLoop(f1, [{ edge: e1, reversed: false, pcurve: unwrap(planePcurve(k, p1, { curve: top, t0: 0, t1: TWO_PI }, false)) }]);
-  const f2 = b.addFace(shell, unwrap(createCylinderSurface(k, vec3(0, 0, 0), z, x, r)));
-  const side: CoedgeUse[] = [
-    { edge: e0, reversed: false, pcurve: uvLine(0, 0, TWO_PI, 0) },
-    { edge: e2, reversed: false, pcurve: uvLine(TWO_PI, 0, TWO_PI, h) },
-    { edge: e1, reversed: true, pcurve: uvLine(TWO_PI, h, 0, h) },
-    { edge: e2, reversed: true, pcurve: uvLine(0, h, 0, 0) },
-  ];
-  b.addLoop(f2, side);
-  return b.build();
-}
+const cylinder = (r = 2, h = 3): Brep => unwrap(makeCylinder(k, WORLD_PLACEMENT, r, h));
 
 const box = (): Brep => unwrap(makeBox(k, vec3(0.1, -2, 3), 1.5, 2, 3.25));
 const json = (r: BrepRecord): Json => JSON.parse(stringifyRecord(r));

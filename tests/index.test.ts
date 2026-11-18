@@ -114,3 +114,52 @@ test('README example (M2): record round trip and display mesh of a box', () => {
   assert.equal(cadloom.signedVolume(cadloom.meshTriangles(mesh), vec3(1, 1.5, 2)), 24);
   assert.equal(mesh.indices.length / 3, 12);
 });
+
+test('the package entry exports every M3 area without name collisions', () => {
+  for (const name of [
+    // primitives
+    'makeCylinder', 'makeCone', 'makeSphere', 'makeTorus', 'placement', 'WORLD_PLACEMENT',
+    // topology (the pole gap and the straight pcurve live with the other pcurve helpers)
+    'uvGapCollapses', 'uvSegment',
+    // profile
+    'lineSegment2', 'arcSegment2', 'nurbsSegment2', 'createProfile', 'profileArea', 'profileAreaProperties', 'pointInWire',
+    'segmentsContact', 'rectangleWire', 'circleWire', 'slotWire', 'bulgeWire', 'polygonWire', 'PROFILE_CONTACT_MAX_DEPTH',
+    // exact polygon predicates (shared by tess and profile)
+    'segmentsMeet', 'loopOrientation', 'closedSegmentsMeet', 'ringOrientation',
+    // prism (one layout for extrude and the sweeps)
+    'extrude', 'extrusionOf', 'prismVolume', 'buildPrismRegion', 'placeSegment', 'segmentNurbs3',
+    // revolve and sweep
+    'revolve', 'revolveVolume', 'sweep', 'sweepWithReport', 'rotationMinimizingFrames', 'doubleReflectionStep', 'reflect3',
+    'frameMotion', 'interpolation', 'interpolationValue', 'MAX_SWEEP_STATIONS', 'MAX_FRAME_STATIONS',
+  ]) {
+    assert.equal(typeof (cadloom as Record<string, unknown>)[name] !== 'undefined', true, name);
+  }
+  // The generic names of the area modules are not exported at the root.
+  for (const name of ['MAX_DEPTH', 'reflect', 'onPlane', 'arcSpan', 'unitKnots', 'placedFrame', 'checkLength']) {
+    assert.equal(name in cadloom, false, name);
+  }
+});
+
+test('README example (M3): primitives, an extrusion with a hole and a revolve, meshed watertight', () => {
+  const { WORLD_PLACEMENT, makeCylinder, makeSphere, createPlaneSurface, createProfile, rectangleWire, circleWire, point2 } = cadloom;
+  const { extrude, prismVolume, revolve, revolveVolume, tessellate, isWatertight, meshSignedVolume, validateBrepGeometry } = cadloom;
+  const kernel = createKernel();
+  const cylinder = unwrap(makeCylinder(kernel, WORLD_PLACEMENT, 1, 2));
+  const ball = unwrap(makeSphere(kernel, vec3(0, 0, 0), 1.5));
+  assert.equal(validateBrepGeometry(kernel, cylinder).ok && validateBrepGeometry(kernel, ball).ok, true);
+
+  const xy = unwrap(createPlaneSurface(kernel, vec3(0, 0, 0), vec3(0, 0, 1), vec3(1, 0, 0)));
+  const plate = unwrap(createProfile(kernel, xy, [unwrap(rectangleWire(0, 0, 4, 3)), unwrap(circleWire(point2(2, 1.5), 0.5))]));
+  const solid = unwrap(extrude(kernel, plate, 1));
+  assert.ok(Math.abs(unwrap(prismVolume(kernel, plate, 1)) - (12 - Math.PI / 4)) < 1e-12);
+  assert.equal(unwrap(cadloom.eulerPoincare(solid)).genus, 1);
+
+  const xz = unwrap(createPlaneSurface(kernel, vec3(0, 0, 0), vec3(0, -1, 0), vec3(1, 0, 0)));
+  const ring = unwrap(createProfile(kernel, xz, [unwrap(rectangleWire(1, 0, 1, 1))]));
+  const axis = { origin: point2(0, 0), direction: point2(0, 1) };
+  const tube = unwrap(revolve(kernel, ring, axis, 2 * Math.PI));
+  assert.ok(Math.abs(unwrap(revolveVolume(kernel, ring, axis, 2 * Math.PI)) - 3 * Math.PI) < 1e-12);
+  const mesh = unwrap(tessellate(kernel, tube, { chord: 0.001 }));
+  assert.equal(isWatertight(mesh), true);
+  assert.ok(Math.abs(meshSignedVolume(mesh) - 3 * Math.PI) < 0.01);
+});

@@ -9,9 +9,14 @@
  *    "hint"; without a pcurve, the previous sample's `(u, v)`) — this is what puts the two sides of a seam at
  *    `u = 0` and `u = 2π`; at a pole or apex, where `u` is undefined, the hint's `u`. On a NURBS surface the
  *    pcurve value itself (else `projectPoint`). A loop must close in `(u, v)` (a band around a cylinder without
- *    a seam does not, and is reported).
+ *    a seam does not, and is reported), and consecutive coedges must meet there, except at a **pole**: where a
+ *    coedge ends at `(u, v)` and the next starts elsewhere and the straight segment between them collapses onto
+ *    their vertex (`uvGapCollapses` of `topology/geometry.ts`: the line `v = ±π/2` of a sphere, the apex line
+ *    of a cone), the vertex enters the ring twice, once at each end of the segment ("pole copies").
  * 2. Work plane. `(u, v)` is mapped to `w = (s_u u, ±s_v v)`, with `s_u`, `s_v` the surface's speeds (`|S_u|`,
- *    `|S_v|` at the middle of the face's box: `r` for a cylinder's `u`), so that Delaunay triangles in `w` are
+ *    `|S_v|` at the middle of the face's box: `r` for a cylinder's `u`; a torus's `u` speed averaged over the box's
+ *    `v` span; and `s_u` rescaled where the step-4 grid cells would be more than `MAX_CELL_ASPECT` times wider
+ *    than tall or the reverse, or the grid is capped, so that its cells are square in `w`), so that Delaunay triangles in `w` are
  *    well shaped in 3D, and `v` negated on a reversed face, so that every outer loop runs counter-clockwise in
  *    `w` (material on the left) and counter-clockwise triangles in `w` face outwards in 3D.
  * 3. Triangulation. Hole bridging and ear clipping (`triangulate.ts`), then — on curved faces, and on planar
@@ -23,18 +28,27 @@
  *    `R + r` and `r` on a torus; a NURBS surface by its largest principal curvature over a 5×5 sampling and the
  *    longest sampled iso-line), straight directions only by the maximum edge length; on surfaces curved both
  *    ways (sphere, torus, NURBS) with half the chord each way, since a cell's diagonal sags by about the sum of
- *    its sides' sags; at most `MAX_GRID` lines per direction (reported as capped). Grid points strictly inside a triangle are inserted.
+ *    its sides' sags; at most `MAX_GRID²` cells, and `MAX_GRID` lines per direction unless the other direction
+ *    needs fewer (reported as capped; the work plane's `u` scale is then set so that the capped cells are square
+ *    in `w`). Grid points strictly inside a triangle are inserted.
  * 5. Sag refinement (curved faces): for at most `MAX_SAG_ROUNDS` rounds, the `(u, v)` centroid of every triangle
  *    whose 3D centroid stands farther than the chord from the surface point there is inserted (at most
  *    `MAX_SAG_POINTS` points, reported as capped). The centroid is a proxy for the facet's largest deviation.
- * 6. Normals: the surface normal at each vertex's `(u, v)` (negated on a reversed face); where the surface has
- *    none (a pole, an apex), the normalised sum of the face's triangle normals at the vertex.
+ *    Triangles at a pole copy are skipped: the copy's `u` is arbitrary, so their `(u, v)` centroid is not over
+ *    the facet (inserting it would fold the fan).
+ * 6. Poles: each pair of pole copies is merged into one vertex. The single triangle on the pole segment (it has
+ *    both copies) becomes degenerate and is dropped; every other triangle at a copy keeps its other two vertices,
+ *    so the triangles around the pole form one fan, with no zero-area triangle, and the ring lists the pole once.
+ * 7. Normals: the surface normal at each vertex's `(u, v)` (negated on a reversed face); at a pole the limit of the
+ *    surface normal (`poleNormal`: the axis `±Z` on a sphere, the axis out of the tip on a cone — the mean of
+ *    the generators' normals); where the surface has none otherwise (a collapsed NURBS boundary), the
+ *    normalised sum of the face's triangle normals at the vertex.
  *
  * Upstream consulted (for the method, not translated): `solidcore/crates/solidcore-tess/src/mesher/mod.rs`
  * (face planning: boundary from shared edge samples, uv of nodes from pcurves, seams), `mesher/uv.rs`,
  * `mesher/seam.rs` (the two sides of a seam a period apart), `mesher/grid.rs`, `mesher/size.rs` (grid spacing
- * from curvature and tolerance), `mesher/cdt.rs`, `mesher/poles.rs` (normals at poles) — SolidCraft / solidcore,
- * Apache-2.0 OR MIT.
+ * from curvature and tolerance), `mesher/cdt.rs`, `mesher/poles.rs` (normals at poles, fans), `solidcore/src/eval/pole.rs`
+ * (the normal at a pole as a limit along the parameter lines) — SolidCraft / solidcore, Apache-2.0 OR MIT.
  */
 import { err, ok, type Result } from '../core/error.ts';
 import type { Kernel } from '../core/kernel.ts';
@@ -42,12 +56,15 @@ import { add3, cross3, normalize3, sub3, vec2, vec3, type Point2, type Point3, t
 import { evaluateSurface3, surfaceCurvature, surfaceNormal3, surfacePoint3 } from '../surface/evaluate.ts';
 import type { Surface3 } from '../surface/types.ts';
 import { loopCoedges, type Brep, type FaceId } from '../topology/brep.ts';
-import { coedgeFraction, pcurveUv, surfaceUv } from '../topology/geometry.ts';
+import { coedgeFraction, pcurveUv, surfaceUv, uvGapCollapses } from '../topology/geometry.ts';
 import { circleStepCount, type CurveSamples } from './sample.ts';
 import type { MeshRules } from './tolerance.ts';
 import { Triangulation, triangulatePolygon, type Tri } from './triangulate.ts';
 
-/** Grid lines per direction of a face at most. */
+/**
+ * Grid bound of a face: at most `MAX_GRID²` grid cells, and at most `MAX_GRID` lines per direction unless the
+ * other direction needs fewer (a thin torus needs ~1000 lines along its ring but a handful around its tube).
+ */
 export const MAX_GRID = 256;
 /** Rounds of sag refinement of a curved face at most. */
 export const MAX_SAG_ROUNDS = 6;
@@ -85,7 +102,7 @@ function boundaryUv(kernel: Kernel, s: Surface3, p: Point3, hint: Point2 | undef
 }
 
 /** The work-plane scales `(s_u, s_v)` at `(u, v)` (positive and finite; 1 where the speed is not). */
-function workScales(s: Surface3, u: number, v: number): readonly [number, number] {
+function workScales(s: Surface3, u: number, v: number, vSpan: number): readonly [number, number] {
   const pos = (x: number): number => (Number.isFinite(x) && x > 0 ? x : 1);
   switch (s.kind) {
     case 'plane':
@@ -96,8 +113,13 @@ function workScales(s: Surface3, u: number, v: number): readonly [number, number
       return [pos(Math.abs(s.baseRadius + Math.tan(s.semiAngle) * v)), pos(1 / Math.cos(s.semiAngle))];
     case 'sphere':
       return [pos(s.radius * Math.max(Math.cos(v), 0.05)), pos(s.radius)];
-    case 'torus':
-      return [pos(s.majorRadius + s.minorRadius * Math.cos(v)), pos(s.minorRadius)];
+    case 'torus': {
+      // The mean of `|S_u| = R + r cos v` over the box's `v` span (`R` over a full turn): its value at the
+      // middle alone is `R - r` on a full torus, near 0 for a nearly horn torus, which squashes `w` in `u`.
+      const h = vSpan / 2;
+      const meanCos = h > 1e-9 ? (Math.cos(v) * Math.sin(h)) / h : Math.cos(v);
+      return [pos(s.majorRadius + s.minorRadius * meanCos), pos(s.minorRadius)];
+    }
     case 'nurbs': {
       const d = evaluateSurface3(s, u, v);
       if (!d.ok) return [1, 1];
@@ -108,16 +130,35 @@ function workScales(s: Surface3, u: number, v: number): readonly [number, number
 
 interface Grid { readonly nu: number; readonly nv: number; readonly capped: boolean }
 
+/** Grid cells wider or taller than this in the work plane are made square (step 2 of the module comment). */
+const MAX_CELL_ASPECT = 4;
+
+/** Lines one direction of a grid may have at most (when the other needs few): the curve sampling bound. */
+const MAX_GRID_LINE = MAX_GRID * MAX_GRID;
+
 function straightCount(length: number, rules: MeshRules): { steps: number; capped: boolean } {
   const n = Math.ceil(length / rules.maxEdgeLength);
-  if (!(n <= MAX_GRID)) return { steps: MAX_GRID, capped: true };
+  if (!(n <= MAX_GRID_LINE)) return { steps: MAX_GRID_LINE, capped: true };
   return { steps: Math.max(1, n), capped: false };
 }
 
 function curvedCount(radius: number, sweep: number, rules: MeshRules): { steps: number; capped: boolean } {
   const c = circleStepCount(radius, sweep, rules);
-  if (c.capped || c.steps > MAX_GRID) return { steps: MAX_GRID, capped: true };
+  if (c.capped || c.steps > MAX_GRID_LINE) return { steps: Math.min(c.steps, MAX_GRID_LINE), capped: true };
   return { steps: c.steps, capped: false };
+}
+
+/**
+ * Applies the grid bound (`MAX_GRID`): at most `MAX_GRID²` cells; a direction keeps more than `MAX_GRID` lines
+ * only while the other has at most `MAX_GRID`. Capping a thin direction to `MAX_GRID` while the other needs few
+ * would leave cells whose chords stray farther than the surface is thick (a thin torus folds through itself).
+ */
+function boundGrid(nu: number, nv: number, capped: boolean): Grid {
+  const budget = MAX_GRID * MAX_GRID;
+  if (nu * nv <= budget) return { nu, nv, capped };
+  if (nu <= MAX_GRID) return { nu, nv: Math.max(1, Math.floor(budget / nu)), capped: true };
+  if (nv <= MAX_GRID) return { nu: Math.max(1, Math.floor(budget / nv)), nv, capped: true };
+  return { nu: MAX_GRID, nv: MAX_GRID, capped: true };
 }
 
 /** Grid divisions of the box `[u0, u1] × [v0, v1]` (step 4 of the module comment). */
@@ -192,7 +233,7 @@ function gridCounts(kernel: Kernel, s: Surface3, u0: number, u1: number, v0: num
       break;
     }
   }
-  return { nu: a.steps, nv: b.steps, capped: a.capped || b.capped };
+  return boundGrid(a.steps, b.steps, a.capped || b.capped);
 }
 
 /**
@@ -215,6 +256,11 @@ export function meshFace(
   const uvs: Point2[] = [];
   const loops: number[][] = [];
 
+  /** Pole copies: `[a, b]` are two ring vertices of one pole vertex (same 3D point, different `(u, v)`). */
+  const poles: [number, number][] = [];
+  const gapTol = (p: Point2): number => 1e-6 * Math.max(1, Math.abs(p.x), Math.abs(p.y)) + 1e-9;
+  const uvGap = (a: Point2, b: Point2): number => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+
   for (const l of f.loops) {
     const cs = loopCoedges(brep, l);
     if (!cs.ok) return cs;
@@ -222,6 +268,7 @@ export function meshFace(
     let prevUv: Point2 | undefined;
     let firstUv: Point2 | undefined;
     let endUv: Point2 | undefined;
+    let endPoint: Point3 | undefined;
     for (const c of cs.value) {
       const co = brep.coedges[c]!;
       const e = brep.edges[co.edge];
@@ -244,8 +291,18 @@ export function meshFace(
         if (!uv.ok) return uv;
         if (step === m - 1) {
           endUv = uv.value; // the next coedge's start: not added
+          endPoint = es.value.points[k]!;
           prevUv = uv.value;
           continue;
+        }
+        if (step === 0 && endUv !== undefined && endPoint !== undefined && uvGap(endUv, uv.value) > gapTol(endUv)) {
+          // The previous coedge ended elsewhere in (u, v): a pole gap (the surface collapses the segment to the
+          // vertex) gets a second ring vertex for the pole; any other jump leaves the boundary open.
+          if (!uvGapCollapses(kernel, s, endUv, uv.value, endPoint)) return faceError(face, `loop ${l} jumps in (u, v) before coedge ${c}`);
+          poles.push([positions.length, positions.length + 1]);
+          ring.push(positions.length);
+          positions.push(endPoint);
+          uvs.push(endUv);
         }
         if (firstUv === undefined) firstUv = uv.value;
         prevUv = uv.value;
@@ -254,10 +311,14 @@ export function meshFace(
         uvs.push(uv.value);
       }
     }
-    if (firstUv === undefined || endUv === undefined) return faceError(face, 'empty loop');
-    const gap = Math.max(Math.abs(firstUv.x - endUv.x), Math.abs(firstUv.y - endUv.y));
-    if (!(gap <= 1e-6 * Math.max(1, Math.abs(firstUv.x), Math.abs(firstUv.y)) + 1e-9)) {
-      return faceError(face, `loop ${l} does not close in (u, v) (gap ${gap})`);
+    if (firstUv === undefined || endUv === undefined || endPoint === undefined) return faceError(face, 'empty loop');
+    const gap = uvGap(firstUv, endUv);
+    if (!(gap <= gapTol(firstUv))) {
+      if (!uvGapCollapses(kernel, s, endUv, firstUv, endPoint)) return faceError(face, `loop ${l} does not close in (u, v) (gap ${gap})`);
+      poles.push([positions.length, ring[0]!]);
+      ring.push(positions.length);
+      positions.push(endPoint);
+      uvs.push(endUv);
     }
     loops.push(ring);
   }
@@ -271,7 +332,17 @@ export function meshFace(
     v0 = Math.min(v0, p.y);
     v1 = Math.max(v1, p.y);
   }
-  const [su, sv0] = workScales(s, (u0 + u1) / 2, (v0 + v1) / 2);
+  const curved = s.kind !== 'plane';
+  const refine = curved || Number.isFinite(rules.maxEdgeLength);
+  const grid = refine ? gridCounts(kernel, s, u0, u1, v0, v1, rules) : undefined;
+  let [su, sv0] = workScales(s, (u0 + u1) / 2, (v0 + v1) / 2, v1 - v0);
+  if (grid !== undefined && grid.nu > 1 && grid.nv > 1 && u1 > u0 && v1 > v0) {
+    // Grid cells far from square in `w` (a capped grid, or a thin torus: ~1000 columns 6 apart along the ring
+    // around a tube 0.006 round) let Delaunay triangles skip the grid rows between two columns, from `v = 0`
+    // straight to `v = 2π` — the same circle. Rescale `u` so that such cells are square in `w`.
+    const aspect = (su * (u1 - u0) * grid.nv) / (sv0 * (v1 - v0) * grid.nu);
+    if (Number.isFinite(aspect) && aspect > 0 && (grid.capped || aspect > MAX_CELL_ASPECT || aspect < 1 / MAX_CELL_ASPECT)) su /= aspect;
+  }
   const sv = f.reversed ? -sv0 : sv0;
   const toWork = (p: Point2): Point2 => vec2(su * p.x, sv * p.y);
   const work = uvs.map(toWork);
@@ -284,16 +355,14 @@ export function meshFace(
   }
   const constrained: [number, number][] = [];
   for (const r of loops) for (let i = 0; i < r.length; i++) constrained.push([r[i]!, r[(i + 1) % r.length]!]);
-  const curved = s.kind !== 'plane';
-  const refine = curved || Number.isFinite(rules.maxEdgeLength);
   const created = Triangulation.create(work, tris.value, constrained, refine);
   if (!created.ok) return faceError(face, created.error.kind === 'invalid-input' ? created.error.reason : created.error.kind);
   const tri = created.value;
   tri.legalizeAll();
 
   let capped = false;
-  if (refine) {
-    const g = gridCounts(kernel, s, u0, u1, v0, v1, rules);
+  if (grid !== undefined) {
+    const g = grid;
     capped = g.capped;
     for (let j = 1; j < g.nv; j++) {
       for (let i = 1; i < g.nu; i++) {
@@ -309,6 +378,8 @@ export function meshFace(
     }
   }
 
+  const atPole = new Set<number>(poles.flat());
+
   // Sag refinement (curved faces): insert the (u, v) centroid of every triangle whose centroid stands more than
   // the chord off the surface, for a few rounds.
   if (curved) {
@@ -316,6 +387,8 @@ export function meshFace(
     for (let round = 0; round < MAX_SAG_ROUNDS && !capped; round++) {
       const cand: { uv: Point2; p: Point3 }[] = [];
       for (const [a, b, c] of tri.tris) {
+        // A pole copy has no `u` of its own: the (u, v) centroid of a triangle at a pole is not over the facet.
+        if (atPole.has(a) || atPole.has(b) || atPole.has(c)) continue;
         const ua = uvs[a]!, ub = uvs[b]!, uc = uvs[c]!;
         const uv = vec2((ua.x + ub.x + uc.x) / 3, (ua.y + ub.y + uc.y) / 3);
         const p = surfacePoint3(s, uv.x, uv.y);
@@ -342,6 +415,18 @@ export function meshFace(
     }
   }
 
+  // Poles: each pair of copies becomes one vertex; the one triangle on the pole segment (both copies) vanishes,
+  // the others around the pole form its fan.
+  const fold = collapsePoles(positions.length, tri.tris, loops, poles);
+  // Compact in place: `keep` is increasing with `keep[j] >= j`, so a forward copy never overwrites a kept entry.
+  for (let j = 0; j < fold.keep.length; j++) {
+    positions[j] = positions[fold.keep[j]!]!;
+    uvs[j] = uvs[fold.keep[j]!]!;
+  }
+  positions.length = fold.keep.length;
+  uvs.length = fold.keep.length;
+  const poleVertices = new Set<number>(poles.map(([a]) => fold.index[a]!));
+
   // Normals.
   const normals: (Vec3 | undefined)[] = [];
   const planeNormal = s.kind === 'plane' ? (f.reversed ? negate(s.frame.normal) : s.frame.normal) : undefined;
@@ -350,12 +435,12 @@ export function meshFace(
       normals.push(planeNormal);
       continue;
     }
-    const n = surfaceNormal3(kernel, s, p.x, p.y);
+    const n = poleVertices.has(normals.length) ? poleNormal(s, p.y) : surfaceNormal3(kernel, s, p.x, p.y);
     normals.push(n.ok ? (f.reversed ? negate(n.value) : n.value) : undefined);
   }
   if (normals.some((n) => n === undefined)) {
     const sum: Vec3[] = positions.map(() => vec3(0, 0, 0));
-    for (const [a, b, c] of tri.tris) {
+    for (const [a, b, c] of fold.tris) {
       const pa = positions[a]!, pb = positions[b]!, pc = positions[c]!;
       const n = cross3(sub3(pb, pa), sub3(pc, pa));
       for (const v of [a, b, c]) sum[v] = add3(sum[v]!, n);
@@ -370,9 +455,57 @@ export function meshFace(
       positions: Object.freeze(positions),
       normals: Object.freeze(normals.map((n) => n!)),
       uvs: Object.freeze(uvs),
-      triangles: Object.freeze(tri.tris.map((t) => Object.freeze([t[0], t[1], t[2]] as const))),
-      loops: Object.freeze(loops.map((r) => Object.freeze(r))),
+      triangles: Object.freeze(fold.tris.map((t) => Object.freeze([t[0], t[1], t[2]] as const))),
+      loops: Object.freeze(fold.loops.map((r) => Object.freeze(r))),
       capped,
     }),
   );
+}
+
+/**
+ * Merges each pole pair `[a, b]` into its lower index and compacts the vertex numbering: `index[i]` is the new
+ * index of old vertex `i`, `keep` the old index of each new vertex. Triangles with a repeated vertex after the
+ * merge (the one on the pole segment) are dropped; each loop lists the pole once.
+ */
+function collapsePoles(
+  n: number,
+  tris: readonly (readonly [number, number, number])[],
+  loops: readonly (readonly number[])[],
+  poles: readonly (readonly [number, number])[],
+): { index: number[]; keep: number[]; tris: Tri[]; loops: number[][] } {
+  const to = Array.from({ length: n }, (_, i) => i);
+  for (const [a, b] of poles) to[Math.max(a, b)] = Math.min(a, b);
+  const index: number[] = new Array<number>(n).fill(-1);
+  const keep: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (to[i] === i) {
+      index[i] = keep.length;
+      keep.push(i);
+    }
+  }
+  for (let i = 0; i < n; i++) index[i] = index[to[i]!]!;
+  const out: Tri[] = [];
+  for (const [a, b, c] of tris) {
+    const t: Tri = [index[a]!, index[b]!, index[c]!];
+    if (t[0] !== t[1] && t[1] !== t[2] && t[2] !== t[0]) out.push(t);
+  }
+  const rings = loops.map((r) => {
+    const m = r.map((v) => index[v]!);
+    return m.filter((v, i) => v !== m[(i + 1) % m.length]);
+  });
+  return { index, keep, tris: out, loops: rings };
+}
+
+/**
+ * The normal at a pole or apex as the limit of the surface normal (upstream `eval/pole.rs`: a pole's normal is
+ * a limit along the parameter lines into the face). On a sphere every approach gives the axis `±Z` (the sign of
+ * `sin v`). On a cone the limit along the generator `u` is that generator's normal, which depends on `u`; the
+ * vertex, shared by every generator, takes their mean over a full turn, the axis pointing out of the tip,
+ * `-sign(tan α) Z` (the side normals are `(e(u) - tan α Z) / |...|`). Other surfaces have no closed form here:
+ * the caller falls back to the triangle normals.
+ */
+function poleNormal(s: Surface3, v: number): Result<Vec3> {
+  if (s.kind === 'sphere') return ok(v > 0 ? s.frame.normal : negate(s.frame.normal));
+  if (s.kind === 'cone') return ok(s.semiAngle > 0 ? negate(s.frame.normal) : s.frame.normal);
+  return err({ kind: 'degenerate', operation: OP });
 }

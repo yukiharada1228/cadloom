@@ -12,3 +12,6 @@ export * from './surface/index.ts';
 export * from './record/index.ts';
 export * from './convert/index.ts';
 export * from './tess/index.ts';
+export * from './profile/index.ts';
+export * from './prism/index.ts';
+export * from './sweep/index.ts';

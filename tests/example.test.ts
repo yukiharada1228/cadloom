@@ -1,15 +1,36 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { closedCylinder, exampleFiles, meshToObj, runExample } from '../examples/box-and-cylinder-mesh.ts';
-import { createKernel, eulerPoincare, unwrap, validateBrep, validateBrepGeometry } from '../src/index.ts';
+import { exampleFiles, meshToObj, runExample } from '../examples/box-and-cylinder-mesh.ts';
+import { m3Specs, runM3Example } from '../examples/primitives-and-sweeps.ts';
+import { createKernel, eulerPoincare, unwrap, validateBrep, validateBrepGeometry, type Brep } from '../src/index.ts';
 
-test('example: the cylinder fixture validates (structure and geometry) with genus 0', () => {
+test('example: every M3 body validates (structure and geometry) with the expected genus', () => {
   const k = createKernel();
-  const c = unwrap(closedCylinder(k, 2, 3));
-  assert.equal(validateBrep(c).ok, true);
-  assert.deepEqual(validateBrepGeometry(k, c), { ok: true, value: undefined });
-  const ep = unwrap(eulerPoincare(c));
-  assert.deepEqual([ep.vertices, ep.edges, ep.faces, ep.genus], [2, 3, 3, 0]);
+  const specs = unwrap(m3Specs(k));
+  const genus: Record<string, number> = { torus: 1, 'extrude-plate-with-holes': 2, 'revolve-ring-with-hole': 1 };
+  for (const s of specs) {
+    const b: Brep = unwrap(s.brep);
+    assert.equal(validateBrep(b).ok, true, s.name);
+    assert.deepEqual(validateBrepGeometry(k, b), { ok: true, value: undefined }, s.name);
+    assert.equal(unwrap(eulerPoincare(b)).genus, genus[s.name] ?? 0, s.name);
+  }
+  const cyl = unwrap(eulerPoincare(unwrap(specs.find((s) => s.name === 'cylinder')!.brep)));
+  assert.deepEqual([cyl.vertices, cyl.edges, cyl.faces, cyl.genus], [2, 3, 3, 0]);
+});
+
+test('example (M3): primitives, extrusion, revolve and helix sweep round-trip, mesh watertight, and meet the analytic volumes', () => {
+  const bodies = unwrap(runM3Example());
+  assert.deepEqual(bodies.map((b) => b.name), [
+    'box', 'cylinder', 'cone-frustum', 'cone-apex', 'sphere', 'torus', 'extrude-plate-with-holes', 'revolve-ring-with-hole', 'sweep-helix',
+  ]);
+  for (const b of bodies) {
+    assert.equal(b.roundTripStable, true, b.name);
+    assert.equal(b.watertight, true, b.name);
+    assert.equal(b.consistentlyOriented, true, b.name);
+    assert.equal(b.mesh.stats.failedFaces.length, 0, b.name);
+    // Chord 0.001 on radii >= 0.4: a relative volume error below 0.5 %.
+    assert.ok(Math.abs(b.meshVolume - b.exactVolume) <= 5e-3 * b.exactVolume, `${b.name}: ${b.meshVolume} vs ${b.exactVolume}`);
+  }
 });
 
 test('example: box and cylinder round-trip through the record text and mesh watertight with the right volume', () => {
