@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createKernel } from '../src/core/kernel.ts';
-import { normalize3, vec3, type Point3 } from '../src/math/vec.ts';
+import { normalize3, sub3, vec3, type Point3 } from '../src/math/vec.ts';
+import { unwrap } from '../src/core/error.ts';
+import { createPlaneSurface } from '../src/surface/types.ts';
 import { BrepBuilder, buildPolyhedron, eulerPoincare, faceId, fanVectorArea2, validateBrep, type Brep } from '../src/topology/index.ts';
 import { BOX_FACES, boxCorner, makeBox } from '../src/primitive/index.ts';
 import { det3, fanTriangles, polyhedronMass, polyhedronTriangles, signedVolume, type Triangle } from '../src/mass/index.ts';
@@ -175,14 +177,14 @@ function withHoles(points: readonly Point3[], fs: readonly (readonly (readonly n
   for (const loops of fs) {
     const outer = loops[0]!.map((i) => points[i]!);
     const n = normalize3(fanVectorArea2(outer))!;
-    const f = bld.addFace(shell, { kind: 'plane', origin: outer[0]!, normal: n });
+    const f = bld.addFace(shell, unwrap(createPlaneSurface(k, outer[0]!, n, sub3(outer[1]!, outer[0]!))));
     for (const loop of loops) {
       bld.addLoop(f, loop.map((a, j) => {
         const c = loop[(j + 1) % loop.length]!;
         const key = a < c ? `${a},${c}` : `${c},${a}`;
         const known = edges.get(key);
         if (known !== undefined) return { edge: known.edge, reversed: known.start !== a };
-        const edge = bld.addEdge(vs[a]!, vs[c]!);
+        const edge = unwrap(bld.addLineEdge(vs[a]!, vs[c]!));
         edges.set(key, { edge, start: a });
         return { edge, reversed: false };
       }));
@@ -238,13 +240,16 @@ test('huge boxes: finite results are exact-scaled, overflowing ones are errors (
   close(m.value.volume, 1e300, 1e-12);
   close(m.value.area, 6e200, 1e-12);
   closePt(m.value.centroid, vec3(5e99, 5e99, 5e99), 1e-12);
-  for (const d of [1e150, 1e200]) {
-    const b = makeBox(k, vec3(0, 0, 0), d, d, d);
-    assert.ok(b.ok, `makeBox ${d}`);
-    const mm = polyhedronMass(k, b.value);
-    assert.equal(mm.ok, false);
-    if (!mm.ok) assert.equal(mm.error.kind, 'invalid-input');
-  }
+  // 1e150: the box exists but its volume overflows. 1e200: since M2 the box's line edges are M1 line curves,
+  // whose |direction|^2 must be finite, so makeBox itself refuses it. Either way: an error value, never NaN.
+  const b150 = makeBox(k, vec3(0, 0, 0), 1e150, 1e150, 1e150);
+  assert.ok(b150.ok, 'makeBox 1e150');
+  const mm = polyhedronMass(k, b150.value);
+  assert.equal(mm.ok, false);
+  if (!mm.ok) assert.equal(mm.error.kind, 'invalid-input');
+  const b200 = makeBox(k, vec3(0, 0, 0), 1e200, 1e200, 1e200);
+  assert.equal(b200.ok, false);
+  if (!b200.ok) assert.equal(b200.error.kind, 'invalid-input');
 });
 
 test('tiny and far-translated boxes keep their mass properties', () => {

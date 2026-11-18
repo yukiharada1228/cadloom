@@ -8,19 +8,22 @@ cadloomは、[SolidCraft](https://github.com/tangency-labs/solidcraft)のCADカ�
 
 方針は[docs/POLICY.md](docs/POLICY.md)、計画は[docs/ROADMAP.md](docs/ROADMAP.md)を参照してください。
 
-## 現状: M1（曲線・曲面）
+## 現状: M2（record・変換・表示メッシュ）
 
 | 領域 | 内容 | M |
 |---|---|---|
 | `core`、`math` | `Result`とエラー、`Kernel`と許容誤差、3Dベクトル、アフィン変換（合成、逆変換、回転） | M0 |
-| `exact` | 倍精度値の二進有理数への厳密な変換、浮動小数点フィルター付きの厳密な`orient2d`と`orient3d` | M0 |
+| `exact` | 倍精度値の二進有理数への厳密な変換、浮動小数点フィルター付きの厳密な`orient2d`と`orient3d`（M0）、`incircle`（M2） | M0、M2 |
 | `nurbs`（曲線） | ノットベクトル、基底関数とその導関数、B-spline/NURBS曲線の評価と導関数、ノット挿入、Bézierのde Casteljau法と分割 | M0 |
 | `nurbs`（曲面） | テンソル積NURBS曲面の評価・偏微分（A3.6/A4.4）・法線、等パラメーター曲線、曲面のノット挿入、曲線・曲面の次数上げ（A5.9） | M1 |
 | `curve` | 直線・円・楕円とNURBS曲線の評価、接線・曲率・Frenet標構、弧長、最近点、厳密なNURBS形式（A7.1）、アフィン変換 | M1 |
 | `surface` | 平面・円柱・円錐・球・トーラスとNURBS曲面の評価、法線、第1・第2基本形式、Gauss・平均・主曲率、陰関数と射影、厳密なNURBS形式（回転面A8.1）、変換 | M1 |
 | `topology`、`primitive`、`mass` | B-repのデータ構造と検証（Euler–Poincaré、多様体性）、箱、多面体の体積・面積・重心 | M0 |
+| `topology`（幾何） | 解析曲線・曲面を持つB-rep（継ぎ目のある円柱など）、幾何の検証（頂点・辺・面の一致、pcurveの持ち上げと向き、継ぎ目）、`(u, v)`への写像`surfaceUv` | M2 |
+| `record`、`convert` | データとしてのB-rep（決定的な正準JSON、範囲検査、位相の語への符号化）と、recordとkernelの`Brep`の相互変換 | M2 |
+| `tess` | 表示用メッシュ（辺の共有標本化、耳切りと穴の橋渡し、厳密な`incircle`によるDelaunay化、曲面の格子とたわみの細分）、水密性・向き・体積の検査 | M2 |
 
-まだ完全なCADカーネルではありません。表示用メッシュ、円柱などのB-repプリミティブ、交差、集合演算、STEPの入出力などは[ロードマップ](docs/ROADMAP.md)のM2以降で扱います。このREADMEはリポジトリのソース版を対象とします。
+まだ完全なCADカーネルではありません。円柱などのB-repプリミティブ、押し出し、交差、集合演算、STEPの入出力などは[ロードマップ](docs/ROADMAP.md)のM3以降で扱います。このREADMEはリポジトリのソース版を対象とします。
 
 名前の約束: M0の`evaluateCurve`・M1の`evaluateSurface`はNURBSだけを扱う次元非依存の評価関数です。解析形状も含む3Dの曲線・曲面（`Curve3`、`Surface3`）の評価関数には接尾辞`3`が付きます（`evaluateCurve3`、`evaluateSurface3`、`surfaceNormal3`）。
 
@@ -65,7 +68,32 @@ k.mean;      // -0.125
 k.principal; // [0, -0.25]
 ```
 
-`unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。この例は`tests/index.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
+M2のrecordと表示メッシュの例です。
+
+```ts
+import {
+  createKernel, unwrap, vec3, makeBox,
+  brepToRecord, stringifyRecord, parseRecordText, recordToBrep,
+  tessellate, isWatertight, meshSignedVolume,
+} from 'cadloom';
+
+const kernel = createKernel();
+const box = unwrap(makeBox(kernel, vec3(0, 0, 0), 2, 3, 4));
+
+// B-repを正準JSONのテキストにし、読み戻す（同じ物体は同じバイト列になる）
+const text = stringifyRecord(unwrap(brepToRecord(box)));
+const back = unwrap(recordToBrep(kernel, unwrap(parseRecordText(text))));
+
+// 表示用メッシュ（弦の許容誤差0.01）
+const mesh = unwrap(tessellate(kernel, back, { chord: 0.01 }));
+mesh.indices.length / 3;  // 12（三角形の数）
+isWatertight(mesh);       // true
+meshSignedVolume(mesh);   // 24
+```
+
+`npm run example`は、箱と継ぎ目のある円柱を作り、recordで往復させてからメッシュにし、`artifacts/`に`*.record.json`・`*.mesh.json`・`*.obj`（任意のメッシュビューアーで表示できます）・`summary.json`を書きます（`examples/box-and-cylinder-mesh.ts`）。
+
+`unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。この例（M2の例を含む）は`tests/index.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
 
 ## 検証
 
@@ -82,7 +110,7 @@ npm run check
 2. `npm test`: `node --test`による全テスト（Nodeが`.ts`を直接実行します）
 3. `npm run prove`: `lake build`によるLeanの証明の検査と、全定理の公理の監査（標準の3公理だけを許可し、`sorry`などを禁止）
 
-各Leanの定理がどのTS関数・テストに対応し、何を保証し何を保証しないかは[docs/proofs/M0.md](docs/proofs/M0.md)と[docs/proofs/M1.md](docs/proofs/M1.md)にまとめています。
+各Leanの定理がどのTS関数・テストに対応し、何を保証し何を保証しないかは[docs/proofs/M0.md](docs/proofs/M0.md)・[docs/proofs/M1.md](docs/proofs/M1.md)・[docs/proofs/M2.md](docs/proofs/M2.md)にまとめています。
 
 ## 帰属とライセンス
 

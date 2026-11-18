@@ -79,14 +79,20 @@ function localFrame(bbox: BoundingBox): { readonly r: Point3; readonly s: number
 /**
  * The fan triangles of every loop of every face, in face, loop, fan order, after checking that the B-rep is
  * structurally valid, its points finite, its edges lines, its faces planes containing their loops (within
- * `zoneTol3d`), and that about each face's outward normal the outer loop winds counter-clockwise (positive
+ * `zoneTol3d`; any other edge curve or face surface is an `invalid-input` error naming the edge or face —
+ * curved faces need the quadrature of a later milestone), and that about each face's outward normal the outer loop winds counter-clockwise (positive
  * area) and every inner loop clockwise (negative area). `area` is the total face area.
  */
 export function polyhedronTriangles(kernel: Kernel, brep: Brep): Result<{ readonly triangles: readonly Triangle[]; readonly area: number }> {
   const valid = validateBrep(brep);
   if (!valid.ok) return valid;
   if (!brep.vertices.every((v) => isFinite3(v.point))) return invalidInput(OP, 'non-finite vertex');
-  if (!brep.edges.every((e) => e.curve.kind === 'line')) return invalidInput(OP, 'unsupported edge curve (lines only)');
+  for (const [fi, f] of brep.faces.entries()) {
+    if (f.surface.kind !== 'plane') return invalidInput(OP, `face ${fi}: unsupported ${f.surface.kind} surface (polyhedral mass needs planar faces)`);
+  }
+  for (const [ei, e] of brep.edges.entries()) {
+    if (e.curve.kind !== 'line') return invalidInput(OP, `edge ${ei}: unsupported ${e.curve.kind} curve (polyhedral mass needs line edges)`);
+  }
   const bbox = boundingBox(brep.vertices.map((v) => v.point));
   if (bbox === undefined) return err({ kind: 'degenerate', operation: OP });
   const { r, s } = localFrame(bbox);
@@ -95,17 +101,19 @@ export function polyhedronTriangles(kernel: Kernel, brep: Brep): Result<{ readon
   const triangles: Triangle[] = [];
   let localArea2 = 0;
   for (const [fi, face] of brep.faces.entries()) {
-    if (face.surface.kind !== 'plane') return invalidInput(OP, `face ${fi}: unsupported surface (planes only)`);
-    const n = normalize3(face.surface.normal);
-    const outward = normalize3(faceNormal(face));
-    if (n === undefined || outward === undefined || !isFinite3(face.surface.origin)) {
+    const plane = face.surface;
+    if (plane.kind !== 'plane') return invalidInput(OP, `face ${fi}: unsupported ${plane.kind} surface (polyhedral mass needs planar faces)`);
+    const n = normalize3(plane.frame.normal);
+    const fn = faceNormal(face);
+    const outward = fn === undefined ? undefined : normalize3(fn);
+    if (n === undefined || outward === undefined || !isFinite3(plane.origin)) {
       return err({ kind: 'degenerate', operation: OP, entity: { kind: 'face', id: fi } });
     }
     for (const [li, l] of face.loops.entries()) {
       const vs = loopVertices(brep, l);
       if (!vs.ok) return vs;
       const ps = vs.value.map((v) => brep.vertices[v]!.point);
-      if (!ps.every((p) => Math.abs(dot3(sub3(p, face.surface.origin), n)) <= tol)) {
+      if (!ps.every((p) => Math.abs(dot3(sub3(p, plane.origin), n)) <= tol)) {
         return invalidInput(OP, `face ${fi}: loop ${l} does not lie on the face plane`);
       }
       const a2 = dot3(fanVectorArea2(ps.map(local)), outward);

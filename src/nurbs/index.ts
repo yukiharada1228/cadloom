@@ -18,6 +18,7 @@ export {
   isRational,
   curveDomain,
   homogeneousPoints,
+  reverseNurbsCurve,
   deBoorPoint,
   evaluateCurve,
   evaluateCurveBasis,

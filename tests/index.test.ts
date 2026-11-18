@@ -81,3 +81,36 @@ test('README example (M1): sphere NURBS form agrees with the analytic sphere; cy
   assert.ok(Math.abs(k.mean - -1 / 8) < 1e-15);
   assert.ok(Math.abs(k.principal[0]) < 1e-15 && Math.abs(k.principal[1] - -0.25) < 1e-15);
 });
+
+test('the package entry exports every M2 area without name collisions', () => {
+  for (const name of [
+    // topology geometry
+    'validateBrepGeometry', 'edgeCurvePoint', 'coedgePoint', 'coedgeUv', 'pcurveUv', 'surfaceUv', 'planePcurve', 'faceNormalAt',
+    // record and convert
+    'parseRecord', 'parseRecordText', 'stringifyRecord', 'checkRecordTopology', 'encodeRecordTopology', 'decodeRecordTopology',
+    'brepToRecord', 'recordToBrep', 'builderOrderIssue', 'RECORD_FORMAT', 'RECORD_VERSION',
+    // tess
+    'tessellate', 'meshRules', 'defaultMeshTolerance', 'sampleEdge', 'curvePoints', 'meshFace', 'earClip', 'bridgeHoles',
+    'triangulatePolygon', 'Triangulation', 'isWatertight', 'isConsistentlyOriented', 'meshEdgeUseCounts', 'meshSignedVolume',
+    // exact (the incircle predicate lives with the other exact predicates)
+    'incircle', 'incircleFilter', 'INCIRCLE_ERRBOUND',
+    // curve (the frame check convert relies on)
+    'storedFrameMismatch',
+  ]) {
+    assert.equal(typeof (cadloom as Record<string, unknown>)[name] !== 'undefined', true, name);
+  }
+});
+
+test('README example (M2): record round trip and display mesh of a box', () => {
+  const kernel = createKernel();
+  const box = unwrap(makeBox(kernel, vec3(0, 0, 0), 2, 3, 4));
+  const text = cadloom.stringifyRecord(unwrap(cadloom.brepToRecord(box)));
+  const back = unwrap(cadloom.recordToBrep(kernel, unwrap(cadloom.parseRecordText(text))));
+  assert.equal(cadloom.stringifyRecord(unwrap(cadloom.brepToRecord(back))), text);
+  const mesh = unwrap(cadloom.tessellate(kernel, back, { chord: 0.01 }));
+  assert.equal(cadloom.isWatertight(mesh), true);
+  assert.equal(cadloom.meshSignedVolume(mesh), 24);
+  // One signed-volume helper: the mesh volume is the M0 `signedVolume` of the mesh triangles.
+  assert.equal(cadloom.signedVolume(cadloom.meshTriangles(mesh), vec3(1, 1.5, 2)), 24);
+  assert.equal(mesh.indices.length / 3, 12);
+});

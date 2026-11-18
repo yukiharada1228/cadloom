@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createKernel } from '../src/core/kernel.ts';
 import { vec3, type Point3 } from '../src/math/vec.ts';
-import type { Result } from '../src/core/error.ts';
+import { unwrap, type Result } from '../src/core/error.ts';
+import { createPlaneSurface, type PlaneSurface } from '../src/surface/types.ts';
 import {
   BrepBuilder,
   buildPolyhedron,
@@ -26,6 +27,7 @@ import {
 import { BOX_FACES, makeBox } from '../src/primitive/index.ts';
 
 const k = createKernel();
+const xyPlane = (): PlaneSurface => unwrap(createPlaneSurface(k, vec3(0, 0, 0), vec3(0, 0, 1), vec3(1, 0, 0)));
 
 function box(o: Point3 = vec3(0, 0, 0), dx = 1, dy = 2, dz = 3): Brep {
   const r = makeBox(k, o, dx, dy, dz);
@@ -150,7 +152,8 @@ test('box faces follow BOX_FACES and have outward normals', () => {
     assert.ok(vs.ok);
     assert.deepEqual([...vs.value], [...BOX_FACES[f]!]);
     const face = b.faces[f]!;
-    const n = faceNormal(face);
+    const n = faceNormal(face)!;
+    assert.ok(face.surface.kind === 'plane');
     assert.deepEqual({ x: n.x + 0, y: n.y + 0, z: n.z + 0 }, expected[f]);
     const p = face.surface.origin;
     assert.ok((p.x - centre.x) * n.x + (p.y - centre.y) * n.y + (p.z - centre.z) * n.z > 0);
@@ -249,10 +252,10 @@ test('validation catches a loop listing a coedge of another loop', () => {
 test('BrepBuilder throws on ids it did not hand out (programming error)', () => {
   const bld = new BrepBuilder();
   const v = bld.addVertex(vec3(0, 0, 0));
-  assert.throws(() => bld.addEdge(v, vertexId(7)), RangeError);
+  assert.throws(() => bld.addLineEdge(v, vertexId(7)), RangeError);
   const body = bld.addBody();
   const shell = bld.addShell(body);
-  const f = bld.addFace(shell, { kind: 'plane', origin: vec3(0, 0, 0), normal: vec3(0, 0, 1) });
+  const f = bld.addFace(shell, xyPlane());
   assert.throws(() => bld.addLoop(f, []), RangeError);
 });
 
@@ -299,8 +302,8 @@ test('validateBrep: a single-face digon sphere is a valid (degenerate-geometry) 
   // Topologically a sphere: one face whose loop runs an edge forward and back. V - E + F = 2.
   const bld = new BrepBuilder();
   const a = bld.addVertex(vec3(0, 0, 0)), c = bld.addVertex(vec3(1, 0, 0));
-  const e = bld.addEdge(a, c);
-  const f = bld.addFace(bld.addShell(bld.addBody()), { kind: 'plane', origin: vec3(0, 0, 0), normal: vec3(0, 0, 1) });
+  const e = unwrap(bld.addLineEdge(a, c));
+  const f = bld.addFace(bld.addShell(bld.addBody()), xyPlane());
   bld.addLoop(f, [{ edge: e, reversed: false }, { edge: e, reversed: true }]);
   const b = bld.build();
   assert.deepEqual(validateBrep(b), { ok: true, value: undefined });

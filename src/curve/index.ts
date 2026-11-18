@@ -6,6 +6,7 @@ export {
   type EllipseCurve,
   type NurbsCurve3,
   type Curve3,
+  storedFrameMismatch,
   createCurveFrame,
   createLineCurve,
   createSegmentCurve,
