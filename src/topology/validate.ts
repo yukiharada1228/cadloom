@@ -24,7 +24,7 @@ import {
 export type TopologyIssue =
   | 'id-range' // an id field names no record
   | 'empty' // a body, shell or face has no children
-  | 'degenerate-edge' // an edge starts and ends at the same vertex
+  | 'degenerate-edge' // a line edge starts and ends at one vertex, or an edge's curve has (near) zero length
   | 'parent-link' // a child's parent link and the parent's child list disagree
   | 'next-prev' // `next` and `prev` are not inverse
   | 'loop-open' // walking `next` does not return to the loop's first coedge
@@ -37,13 +37,26 @@ export type TopologyIssue =
   | 'unused-vertex' // a vertex bounds no edge
   | 'non-manifold-vertex' // the faces around a vertex form more than one fan (cone)
   | 'shell-disconnected' // the faces of a shell are not connected across shared edges
-  | 'euler-poincare'; // counts give a negative or fractional genus
+  | 'euler-poincare' // counts give a negative or fractional genus
+  // Geometric issues (`validateBrepGeometry`, src/topology/geometry.ts):
+  | 'non-finite' // a vertex point is not finite
+  | 'edge-range' // an edge interval is not finite, not increasing, or outside its curve's range
+  | 'edge-vertex' // an edge's curve end point is farther than zoneTol3d from its vertex
+  | 'pcurve-invalid' // a pcurve is not a 2D curve, or cannot be evaluated on its face's surface
+  | 'pcurve-endpoint' // a pcurve end point does not map onto the coedge's start / end vertex
+  | 'pcurve-deviation' // an interior pcurve sample does not map onto the edge curve
+  | 'pcurve-direction' // the lifted pcurve samples run the edge against the coedge's direction
+  | 'edge-off-surface' // a coedge without pcurve has edge samples off its face's surface
+  | 'seam-pcurves'; // a seam edge lacks a pcurve on a coedge, or its two pcurves coincide in (u, v)
 
 const OP = 'topology.validateBrep';
 
-function fail(issue: TopologyIssue, detail: string, entity: EntityRef): Result<never> {
-  return err({ kind: 'invalid-topology', operation: OP, reason: `${issue}: ${detail}`, entity });
+/** An `invalid-topology` error of `operation` whose reason starts with the issue code (shared with `geometry.ts`). */
+export function topologyError(operation: string, issue: TopologyIssue, detail: string, entity: EntityRef): Result<never> {
+  return err({ kind: 'invalid-topology', operation, reason: `${issue}: ${detail}`, entity });
 }
+
+const fail = (issue: TopologyIssue, detail: string, entity: EntityRef): Result<never> => topologyError(OP, issue, detail, entity);
 
 /** The `TopologyIssue` code of an error produced by this module, if it is one. */
 export function topologyIssue(error: SolidError): TopologyIssue | undefined {
@@ -55,17 +68,24 @@ export function topologyIssue(error: SolidError): TopologyIssue | undefined {
 const ISSUES: ReadonlySet<TopologyIssue> = new Set<TopologyIssue>([
   'id-range', 'empty', 'degenerate-edge', 'parent-link', 'next-prev', 'loop-open', 'loop-membership',
   'vertex-mismatch', 'edge-use-count', 'edge-orientation', 'partner', 'shell-crossing', 'unused-vertex',
-  'non-manifold-vertex', 'shell-disconnected', 'euler-poincare',
+  'non-manifold-vertex', 'shell-disconnected', 'euler-poincare', 'non-finite', 'edge-range', 'edge-vertex',
+  'pcurve-invalid', 'pcurve-endpoint', 'pcurve-deviation', 'pcurve-direction', 'edge-off-surface',
+  'seam-pcurves',
 ]);
 
 const inRange = (id: number, length: number): boolean => Number.isInteger(id) && id >= 0 && id < length;
 
 /**
- * Checks that `brep` is a valid closed, oriented 2-manifold B-rep: ids in range; parent/child links agree;
+ * Checks that `brep` is a valid closed, oriented 2-manifold B-rep (combinatorics only; the geometry is
+ * checked by `validateBrepGeometry`): ids in range; no closed line edge; parent/child links agree;
  * `next`/`prev` inverse; each loop a closed cycle with matching vertices; each edge used by exactly two
  * coedges in opposite directions, linked as partners, within one shell; no isolated vertex; the faces
  * around each vertex form a single fan (disc link, so shells cannot touch at a vertex); each shell
  * edge-connected. The first violation found (in that order) is returned.
+ *
+ * Seam edges are accepted: an edge whose two coedges lie in the same face (e.g. the seam of a cylinder's
+ * side face) satisfies every rule above as long as they run it in opposite directions, and `eulerPoincare`
+ * counts it once as an edge (the face's single loop uses it twice).
  */
 export function validateBrep(brep: Brep): Result<void> {
   const { vertices, edges, coedges, loops, faces, shells, bodies } = brep;
@@ -76,7 +96,8 @@ export function validateBrep(brep: Brep): Result<void> {
   for (const [i, e] of edges.entries()) {
     const ent: EntityRef = { kind: 'edge', id: i };
     if (!inRange(e.start, nV) || !inRange(e.end, nV)) return fail('id-range', 'edge vertex', ent);
-    if (e.start === e.end) return fail('degenerate-edge', 'edge starts and ends at one vertex', ent);
+    // A closed edge (start === end) needs a curve that can close: never a line.
+    if (e.start === e.end && e.curve.kind === 'line') return fail('degenerate-edge', 'line edge starts and ends at one vertex', ent);
   }
   for (const [i, c] of coedges.entries()) {
     const ent: EntityRef = { kind: 'coedge', id: i };

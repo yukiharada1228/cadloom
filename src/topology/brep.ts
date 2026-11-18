@@ -1,19 +1,27 @@
 /**
  * Arena boundary representation: vertices, edges, coedges, loops, faces, shells and bodies held in
- * flat arrays and linked by typed numeric ids (array indices).
+ * flat arrays and linked by typed numeric ids (array indices). Edges carry an M1 `Curve3` over a parameter
+ * interval, faces an M1 `Surface3`, coedges an optional 2D NURBS pcurve in their face's `(u, v)`.
  *
  * Upstream consulted (for invariants and API shape, not translated):
  * `solidcore/crates/solidcore/src/topology.rs`, `topology/brep.rs`, `topology/brep_data.rs`,
  * `topology/brep_constructor.rs`, `topology/edge.rs`, `topology/edgeuse.rs`, `topology/loopuse.rs`,
- * `topology/integrity.rs` (SolidCraft / solidcore, Apache-2.0 OR MIT).
+ * `topology/face.rs`, `topology/integrity.rs`, `crates/solidcore-record/src/brep.rs` (which fields a B-rep
+ * needs: an edge's curve, interval `min < max` and `[start, end]` vertices, equal for a closed edge; a face's
+ * surface and sense; an oriented edge's pcurve, two of them on one face for a seam) — SolidCraft /
+ * solidcore, Apache-2.0 OR MIT.
  *
- * Simplifications against upstream (M0): one coedge per (edge, face side) replaces upstream's edge use /
- * loop use / face use triple; the manifold `partner` link is upstream's edge-use mate; curves are lines and
- * surfaces are planes only.
+ * Simplifications against upstream: one coedge per (edge, face side) replaces upstream's edge use / loop use /
+ * face use triple; the manifold `partner` link is upstream's edge-use mate; pcurves run in the coedge's
+ * direction (upstream's record runs them along the edge's interval whatever the use's sense); no per-entity
+ * tolerances (the `Kernel` tolerances apply).
  */
 import type { Point3, Vec3 } from '../math/vec.ts';
 import { scale3 } from '../math/vec.ts';
 import { err, ok, type Result } from '../core/error.ts';
+import { createSegmentCurve, curveRange, type Curve3 } from '../curve/types.ts';
+import type { Surface3 } from '../surface/types.ts';
+import type { NurbsCurve } from '../nurbs/curve.ts';
 
 declare const idTag: unique symbol;
 /** A number branded with an entity tag. The brand is type-only: at run time an id is its array index. */
@@ -35,29 +43,29 @@ export const faceId = (n: number): FaceId => n as FaceId;
 export const shellId = (n: number): ShellId => n as ShellId;
 export const bodyId = (n: number): BodyId => n as BodyId;
 
-/**
- * Straight edge between its end vertices (the only B-rep edge geometry so far). Named
- * `EdgeLine` so it does not collide with the analytic `LineCurve` of `src/curve` (M1).
- */
-export interface EdgeLine { readonly kind: 'line' }
-export type EdgeCurve = EdgeLine;
-
-/**
- * Infinite plane through `origin` with unit `normal` (the only B-rep face geometry so far).
- * Named `FacePlane` so it does not collide with the analytic `PlaneSurface` of `src/surface` (M1).
- */
-export interface FacePlane { readonly kind: 'plane'; readonly origin: Point3; readonly normal: Vec3 }
-export type FaceSurface = FacePlane;
-
 export interface Vertex { readonly point: Point3 }
 
-/** An edge runs from `start` to `end`; a coedge may use it in either direction. */
-export interface Edge { readonly start: VertexId; readonly end: VertexId; readonly curve: EdgeCurve }
+/**
+ * An edge runs from `start` to `end` along `curve`, over the parameter interval `[t0, t1]` (`t0 < t1`,
+ * inside `curveRange(curve)`): `curve(t0)` is the start vertex and `curve(t1)` the end vertex (within
+ * `zoneTol3d`, checked by `validateBrepGeometry`). A closed edge (a full circle) has `start === end`; a line
+ * edge never does. A coedge may use the edge in either direction.
+ */
+export interface Edge {
+  readonly start: VertexId;
+  readonly end: VertexId;
+  readonly curve: Curve3;
+  readonly t0: number;
+  readonly t1: number;
+}
 
 /**
  * One side of an edge in a loop. `reversed` is true when the loop traverses the edge from `end` to `start`.
  * `next`/`prev` link the coedges of the loop into a cycle; `partner` is the other coedge on the same edge
- * (`null` when the edge does not have exactly two coedges, which validation rejects).
+ * (`null` when the edge does not have exactly two coedges, which validation rejects). The optional `pcurve`
+ * is the coedge in its face's surface parameters: a 2D NURBS curve (`dimension === 2`) whose points are
+ * `(u, v)`, running in the coedge's direction (from the coedge's start vertex at the start of its domain to its
+ * end vertex at the end). A seam edge (both coedges on one face) has two pcurves, e.g. on `u = 0` and `u = 2π`.
  */
 export interface Coedge {
   readonly edge: EdgeId;
@@ -66,19 +74,20 @@ export interface Coedge {
   readonly next: CoedgeId;
   readonly prev: CoedgeId;
   readonly partner: CoedgeId | null;
+  readonly pcurve?: NurbsCurve;
 }
 
 export interface Loop { readonly face: FaceId; readonly first: CoedgeId }
 
 /**
- * A face bounded by `loops` (outer loop first). Viewed from outside, i.e. against the outward normal (the
- * surface normal, negated when `reversed`), the outer loop runs counter-clockwise and inner loops (holes)
- * clockwise, so the material is always on the left of each coedge.
+ * A face of `surface` bounded by `loops` (outer loop first). The outward normal is the surface's natural normal
+ * `S_u x S_v`, negated when `reversed`. Viewed from outside (against the outward normal) the outer loop runs
+ * counter-clockwise and inner loops (holes) clockwise, so the material is always on the left of each coedge.
  */
 export interface Face {
   readonly shell: ShellId;
   readonly loops: readonly LoopId[];
-  readonly surface: FaceSurface;
+  readonly surface: Surface3;
   readonly reversed: boolean;
 }
 
@@ -96,40 +105,49 @@ export interface Brep {
   readonly bodies: readonly Body[];
 }
 
-/** A coedge as given to `BrepBuilder.addLoop`: which edge, and in which direction the loop runs it. */
-export interface CoedgeUse { readonly edge: EdgeId; readonly reversed: boolean }
+/**
+ * A coedge as given to `BrepBuilder.addLoop`: which edge, in which direction the loop runs it, and optionally
+ * its pcurve (see `Coedge.pcurve`).
+ */
+export interface CoedgeUse { readonly edge: EdgeId; readonly reversed: boolean; readonly pcurve?: NurbsCurve }
 
-/** Deep-freezes the arrays and records of a B-rep. */
+/** Frozen deep copy of plain data (objects and arrays of numbers, strings, booleans). */
+function frozenCopy<T>(x: T): T {
+  if (Array.isArray(x)) return Object.freeze(x.map((y: unknown) => frozenCopy(y))) as T;
+  if (typeof x === 'object' && x !== null) {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(x)) out[k] = frozenCopy(v);
+    return Object.freeze(out) as T;
+  }
+  return x;
+}
+
+/** Deep-freezes (copies of) the arrays, records and geometry of a B-rep. */
 export function freezeBrep(parts: Brep): Brep {
-  const freezeAll = <T extends object>(xs: readonly T[]): readonly T[] => Object.freeze(xs.map((x) => Object.freeze(x)));
-  return Object.freeze({
-    vertices: freezeAll(parts.vertices.map((v) => ({ point: Object.freeze({ ...v.point }) }))),
-    edges: freezeAll(parts.edges.map((e) => ({ ...e, curve: Object.freeze({ ...e.curve }) }))),
-    coedges: freezeAll(parts.coedges.map((c) => ({ ...c }))),
-    loops: freezeAll(parts.loops.map((l) => ({ ...l }))),
-    faces: freezeAll(
-      parts.faces.map((f) => ({
-        ...f,
-        loops: Object.freeze([...f.loops]),
-        surface: Object.freeze({ ...f.surface, origin: Object.freeze({ ...f.surface.origin }), normal: Object.freeze({ ...f.surface.normal }) }),
-      })),
-    ),
-    shells: freezeAll(parts.shells.map((s) => ({ ...s, faces: Object.freeze([...s.faces]) }))),
-    bodies: freezeAll(parts.bodies.map((b) => ({ shells: Object.freeze([...b.shells]) }))),
+  return frozenCopy({
+    vertices: parts.vertices,
+    edges: parts.edges,
+    coedges: parts.coedges,
+    loops: parts.loops,
+    faces: parts.faces,
+    shells: parts.shells,
+    bodies: parts.bodies,
   });
 }
 
-interface MutableFace { shell: ShellId; loops: LoopId[]; surface: FaceSurface; reversed: boolean }
+interface MutableFace { shell: ShellId; loops: LoopId[]; surface: Surface3; reversed: boolean }
+type PendingCoedge = { edge: EdgeId; reversed: boolean; loop: LoopId; next: CoedgeId; prev: CoedgeId; pcurve?: NurbsCurve };
 
 /**
  * Builds the arenas of a B-rep. Ids handed out by the builder are the only valid arguments; passing an id
- * the builder did not return is a programming error and throws `RangeError`. `build()` links each edge's
- * two coedges as partners and returns a frozen `Brep` (call `validateBrep` to check it).
+ * the builder did not return is a programming error and throws `RangeError`. Geometry is stored as given:
+ * `validateBrepGeometry` checks it. `build()` links each edge's two coedges as partners and returns a frozen
+ * `Brep` (call `validateBrep` / `validateBrepGeometry` to check it).
  */
 export class BrepBuilder {
   #vertices: Vertex[] = [];
   #edges: Edge[] = [];
-  #coedges: { edge: EdgeId; reversed: boolean; loop: LoopId; next: CoedgeId; prev: CoedgeId }[] = [];
+  #coedges: PendingCoedge[] = [];
   #loops: Loop[] = [];
   #faces: MutableFace[] = [];
   #shells: { body: BodyId; faces: FaceId[] }[] = [];
@@ -140,11 +158,28 @@ export class BrepBuilder {
     return vertexId(this.#vertices.length - 1);
   }
 
-  addEdge(start: VertexId, end: VertexId): EdgeId {
+  /**
+   * An edge from `start` to `end` along `curve` over `[t0, t1]` (default: the whole `curveRange(curve)`).
+   * For a closed edge (a full circle) pass the same vertex twice.
+   */
+  addEdge(start: VertexId, end: VertexId, curve: Curve3, t0?: number, t1?: number): EdgeId {
     this.#check(start, this.#vertices.length, 'vertex');
     this.#check(end, this.#vertices.length, 'vertex');
-    this.#edges.push({ start, end, curve: { kind: 'line' } });
+    const [r0, r1] = curveRange(curve);
+    this.#edges.push({ start, end, curve, t0: t0 ?? r0, t1: t1 ?? r1 });
     return edgeId(this.#edges.length - 1);
+  }
+
+  /**
+   * A straight edge between two distinct vertices: the segment curve `start + t (end - start)`, `t in [0, 1]`.
+   * Fails (`invalid-input`, from `createSegmentCurve`) when the points coincide or are not finite.
+   */
+  addLineEdge(start: VertexId, end: VertexId): Result<EdgeId> {
+    const a = this.#vertices[this.#check(start, this.#vertices.length, 'vertex')]!.point;
+    const b = this.#vertices[this.#check(end, this.#vertices.length, 'vertex')]!.point;
+    const line = createSegmentCurve(a, b);
+    if (!line.ok) return line;
+    return ok(this.addEdge(start, end, line.value, 0, 1));
   }
 
   addBody(): BodyId {
@@ -160,7 +195,7 @@ export class BrepBuilder {
     return id;
   }
 
-  addFace(shell: ShellId, surface: FaceSurface, reversed = false): FaceId {
+  addFace(shell: ShellId, surface: Surface3, reversed = false): FaceId {
     const s = this.#shells[this.#check(shell, this.#shells.length, 'shell')]!;
     const id = faceId(this.#faces.length);
     this.#faces.push({ shell, loops: [], surface, reversed });
@@ -177,13 +212,15 @@ export class BrepBuilder {
     const n = uses.length;
     uses.forEach((u, i) => {
       this.#check(u.edge, this.#edges.length, 'edge');
-      this.#coedges.push({
+      const c: PendingCoedge = {
         edge: u.edge,
         reversed: u.reversed,
         loop: id,
         next: coedgeId(base + ((i + 1) % n)),
         prev: coedgeId(base + ((i + n - 1) % n)),
-      });
+      };
+      if (u.pcurve !== undefined) c.pcurve = u.pcurve;
+      this.#coedges.push(c);
     });
     this.#loops.push({ face, first: coedgeId(base) });
     f.loops.push(id);
@@ -286,7 +323,12 @@ export function faceVertices(brep: Brep, face: FaceId): Result<readonly VertexId
   return loopVertices(brep, outer);
 }
 
-/** The outward normal of a face: its surface normal, negated when the face is reversed. */
-export function faceNormal(face: Face): Vec3 {
-  return face.reversed ? scale3(face.surface.normal, -1) : face.surface.normal;
+/**
+ * The constant outward normal of a planar face: its plane normal, negated when the face is reversed.
+ * `undefined` for a face on any other surface (use `faceNormalAt` from `geometry.ts` there).
+ */
+export function faceNormal(face: Face): Vec3 | undefined {
+  if (face.surface.kind !== 'plane') return undefined;
+  const n = face.surface.frame.normal;
+  return face.reversed ? scale3(n, -1) : n;
 }

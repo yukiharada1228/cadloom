@@ -105,6 +105,23 @@ export function createCurveFrame(kernel: Kernel, normal: Vec3, xReference: Vec3)
   return ok(Object.freeze({ normal: freezeVec(n), xAxis: freezeVec(x), yAxis: freezeVec(y) }));
 }
 
+/**
+ * The first axis (`'normal'`, `'xAxis'`, `'yAxis'`) of a stored frame (three axes, e.g. read back from a record)
+ * whose components differ from `built` — the frame the kernel made from the stored normal and x axis with
+ * `createCurveFrame` — by more than `ROUNDING_SLACK` (the axes are unit vectors); `undefined` when all nine
+ * agree. It exists because `createCurveFrame` is not bit-idempotent (re-running it on its own output can move
+ * the last bits), so a stored frame is kept as written whenever this accepts it.
+ */
+export function storedFrameMismatch(
+  stored: { readonly normal: Vec3; readonly xAxis: Vec3; readonly yAxis: Vec3 },
+  built: CurveFrame,
+): 'normal' | 'xAxis' | 'yAxis' | undefined {
+  const near = (a: Vec3, b: Vec3): boolean =>
+    Math.abs(a.x - b.x) <= ROUNDING_SLACK && Math.abs(a.y - b.y) <= ROUNDING_SLACK && Math.abs(a.z - b.z) <= ROUNDING_SLACK;
+  for (const axis of ['normal', 'xAxis', 'yAxis'] as const) if (!near(stored[axis], built[axis])) return axis;
+  return undefined;
+}
+
 function checkRange(op: string, range: readonly [number, number], angular: boolean): Result<readonly [number, number]> {
   const [t0, t1] = range;
   if (!Number.isFinite(t0) || !Number.isFinite(t1)) return invalidInput(op, 'non-finite parameter range');

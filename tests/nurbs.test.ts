@@ -9,6 +9,7 @@ import {
   curveDerivatives,
   curveDomain,
   deBoorPoint,
+  reverseNurbsCurve,
   deCasteljau,
   dersBasisFuns,
   evaluateCurve,
@@ -515,4 +516,15 @@ test('-0 and the domain start/end are handled exactly', () => {
   assert.equal(insertKnot(c, 0).ok, false); // multiplicity already p + 1
   assert.equal(findSpan(c.knots, 2, 1), 3);
   assert.equal(findSpan(c.knots, 2, -0), 2);
+});
+
+test('reverseNurbsCurve: C\'(u) = C(a + b - u) on the same domain, rational weights kept', () => {
+  const c = unwrap(createNurbsCurve(2, [0, 0, 0, 0.5, 1, 1, 1], [[0, 0], [1, 2], [3, 1], [4, 0]], [1, 0.5, 2, 1]));
+  const r = unwrap(reverseNurbsCurve(c));
+  assert.deepEqual(curveDomain(r), [0, 1]);
+  for (const u of [0, 0.125, 0.3, 0.5, 0.75, 1]) {
+    const p = unwrap(evaluateCurve(c, 1 - u)), q = unwrap(evaluateCurve(r, u));
+    assert.ok(Math.hypot(p[0]! - q[0]!, p[1]! - q[1]!) < 1e-14, `u = ${u}`);
+  }
+  assert.deepEqual(unwrap(reverseNurbsCurve(r)), c);
 });

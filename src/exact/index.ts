@@ -26,3 +26,4 @@ export {
   orient3dExact,
   orient3dFilter,
 } from './predicates.ts';
+export { INCIRCLE_ERRBOUND, incircle, incircleExactOnly, incircleFilter, incircleSign } from './incircle.ts';

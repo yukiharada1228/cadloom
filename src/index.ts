@@ -9,3 +9,6 @@ export * from './primitive/index.ts';
 export * from './mass/index.ts';
 export * from './curve/index.ts';
 export * from './surface/index.ts';
+export * from './record/index.ts';
+export * from './convert/index.ts';
+export * from './tess/index.ts';

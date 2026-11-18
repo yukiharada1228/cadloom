@@ -103,6 +103,18 @@ export function curveDomain(curve: BSplineCurve): readonly [number, number] {
   return knotDomain(curve.knots, curve.degree);
 }
 
+/**
+ * The same curve run backwards: `C'(u) = C(a + b - u)` on the same domain `[a, b]` (knots `a + b - k` in
+ * reverse order, control points and weights reversed). Exact when `a + b - k` is exact in doubles (e.g. a
+ * domain `[0, 1]` with dyadic knots); otherwise the knots move by rounding.
+ */
+export function reverseNurbsCurve(c: NurbsCurve): Result<NurbsCurve> {
+  const [a, b] = curveDomain(c);
+  const knots = c.knots.map((k) => a + b - k).reverse();
+  const points = [...c.controlPoints].reverse();
+  return createNurbsCurve(c.degree, knots, points, c.weights === undefined ? undefined : [...c.weights].reverse());
+}
+
 /** Homogeneous control points `(w x, w)` of a rational curve, or the points themselves. */
 export function homogeneousPoints(curve: NurbsCurve): readonly ControlPoint[] {
   const w = curve.weights;

@@ -24,15 +24,11 @@ export type {
   CoedgeId,
   CoedgeUse,
   Edge,
-  EdgeCurve,
   EdgeId,
   Face,
   FaceId,
-  FaceSurface,
-  EdgeLine,
   Loop,
   LoopId,
-  FacePlane,
   Shell,
   ShellId,
   Vertex,
@@ -40,4 +36,18 @@ export type {
 } from './brep.ts';
 export { eulerCharacteristic, eulerPoincare, topologyIssue, validateBrep } from './validate.ts';
 export type { EulerPoincare, TopologyIssue } from './validate.ts';
+export {
+  GEOMETRY_SAMPLES,
+  coedgeFraction,
+  coedgePoint,
+  coedgeUv,
+  edgeCurvePoint,
+  edgeParam,
+  faceNormalAt,
+  faceSurface,
+  pcurveUv,
+  planePcurve,
+  surfaceUv,
+  validateBrepGeometry,
+} from './geometry.ts';
 export { buildPolyhedron, fanVectorArea2 } from './polyhedron.ts';
