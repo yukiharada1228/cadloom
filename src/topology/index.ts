@@ -38,6 +38,7 @@ export { eulerCharacteristic, eulerPoincare, topologyIssue, validateBrep } from 
 export type { EulerPoincare, TopologyIssue } from './validate.ts';
 export {
   GEOMETRY_SAMPLES,
+  uvGapCollapses,
   coedgeFraction,
   coedgePoint,
   coedgeUv,
@@ -48,6 +49,7 @@ export {
   pcurveUv,
   planePcurve,
   surfaceUv,
+  uvSegment,
   validateBrepGeometry,
 } from './geometry.ts';
 export { buildPolyhedron, fanVectorArea2 } from './polyhedron.ts';

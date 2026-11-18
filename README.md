@@ -8,12 +8,12 @@ cadloomは、[SolidCraft](https://github.com/tangency-labs/solidcraft)のCADカ�
 
 方針は[docs/POLICY.md](docs/POLICY.md)、計画は[docs/ROADMAP.md](docs/ROADMAP.md)を参照してください。
 
-## 現状: M2（record・変換・表示メッシュ）
+## 現状: M3（曲面のプリミティブ・プロファイル・押し出し・回転・スイープ）
 
 | 領域 | 内容 | M |
 |---|---|---|
 | `core`、`math` | `Result`とエラー、`Kernel`と許容誤差、3Dベクトル、アフィン変換（合成、逆変換、回転） | M0 |
-| `exact` | 倍精度値の二進有理数への厳密な変換、浮動小数点フィルター付きの厳密な`orient2d`と`orient3d`（M0）、`incircle`（M2） | M0、M2 |
+| `exact` | 倍精度値の二進有理数への厳密な変換、浮動小数点フィルター付きの厳密な`orient2d`と`orient3d`（M0）、`incircle`（M2）、線分の接触と環の向きの厳密な判定（M3） | M0、M2、M3 |
 | `nurbs`（曲線） | ノットベクトル、基底関数とその導関数、B-spline/NURBS曲線の評価と導関数、ノット挿入、Bézierのde Casteljau法と分割 | M0 |
 | `nurbs`（曲面） | テンソル積NURBS曲面の評価・偏微分（A3.6/A4.4）・法線、等パラメーター曲線、曲面のノット挿入、曲線・曲面の次数上げ（A5.9） | M1 |
 | `curve` | 直線・円・楕円とNURBS曲線の評価、接線・曲率・Frenet標構、弧長、最近点、厳密なNURBS形式（A7.1）、アフィン変換 | M1 |
@@ -21,9 +21,13 @@ cadloomは、[SolidCraft](https://github.com/tangency-labs/solidcraft)のCADカ�
 | `topology`、`primitive`、`mass` | B-repのデータ構造と検証（Euler–Poincaré、多様体性）、箱、多面体の体積・面積・重心 | M0 |
 | `topology`（幾何） | 解析曲線・曲面を持つB-rep（継ぎ目のある円柱など）、幾何の検証（頂点・辺・面の一致、pcurveの持ち上げと向き、継ぎ目）、`(u, v)`への写像`surfaceUv` | M2 |
 | `record`、`convert` | データとしてのB-rep（決定的な正準JSON、範囲検査、位相の語への符号化）と、recordとkernelの`Brep`の相互変換 | M2 |
-| `tess` | 表示用メッシュ（辺の共有標本化、耳切りと穴の橋渡し、厳密な`incircle`によるDelaunay化、曲面の格子とたわみの細分）、水密性・向き・体積の検査 | M2 |
+| `tess` | 表示用メッシュ（辺の共有標本化、耳切りと穴の橋渡し、厳密な`incircle`によるDelaunay化、曲面の格子とたわみの細分、極・頂点の扇形）、水密性・向き・体積の検査 | M2、M3 |
+| `primitive`（曲面） | 配置（原点・軸・x方向）つきの円柱・円錐（円錐台と頂点のある円錐）・球・トーラス。極は辺を持たない頂点（`uvGapCollapses`） | M3 |
+| `profile` | 平面上の線分・円弧・NURBSのワイヤー、`createProfile`による検証（閉じていること、自己交差・接触、入れ子、向きの正規化）と領域への分割、面積・重心（Greenの定理）、矩形・円・スロット・バルジなどの作成関数 | M3 |
+| `prism` | プロファイルの押し出し（法線方向・斜め・対称）、穴は貫通穴、側面は平面・円柱・NURBS。押し出しとスイープが共有する配置`buildPrismRegion` | M3 |
+| `sweep` | 軸まわりの回転（全周・部分、軸に接するプロファイルの極）とPappusの体積、回転最小化標構（二重反射法）、パスに沿うスイープ（直線は押し出し、円は回転へ委譲、固定標構は厳密な平行移動、その他はNURBSで近似し誤差を報告） | M3 |
 
-まだ完全なCADカーネルではありません。円柱などのB-repプリミティブ、押し出し、交差、集合演算、STEPの入出力などは[ロードマップ](docs/ROADMAP.md)のM3以降で扱います。このREADMEはリポジトリのソース版を対象とします。
+まだ完全なCADカーネルではありません。交差、集合演算、オフセット・フィレット、STEPの入出力などは[ロードマップ](docs/ROADMAP.md)のM4以降で扱います。このREADMEはリポジトリのソース版を対象とします。
 
 名前の約束: M0の`evaluateCurve`・M1の`evaluateSurface`はNURBSだけを扱う次元非依存の評価関数です。解析形状も含む3Dの曲線・曲面（`Curve3`、`Surface3`）の評価関数には接尾辞`3`が付きます（`evaluateCurve3`、`evaluateSurface3`、`surfaceNormal3`）。
 
@@ -91,9 +95,44 @@ isWatertight(mesh);       // true
 meshSignedVolume(mesh);   // 24
 ```
 
-`npm run example`は、箱と継ぎ目のある円柱を作り、recordで往復させてからメッシュにし、`artifacts/`に`*.record.json`・`*.mesh.json`・`*.obj`（任意のメッシュビューアーで表示できます）・`summary.json`を書きます（`examples/box-and-cylinder-mesh.ts`）。
+M3のプリミティブ・押し出し・回転の例です。
 
-`unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。この例（M2の例を含む）は`tests/index.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
+```ts
+import {
+  createKernel, unwrap, vec3, WORLD_PLACEMENT,
+  makeCylinder, makeSphere,
+  createPlaneSurface, createProfile, rectangleWire, circleWire, point2,
+  extrude, prismVolume, revolve, revolveVolume,
+  tessellate, isWatertight, meshSignedVolume,
+} from 'cadloom';
+
+const kernel = createKernel();
+const cylinder = unwrap(makeCylinder(kernel, WORLD_PLACEMENT, 1, 2)); // 半径1、高さ2
+const ball = unwrap(makeSphere(kernel, vec3(0, 0, 0), 1.5));
+
+// 円の穴のある4×3の板を厚さ1で押し出す（種数1）
+const xy = unwrap(createPlaneSurface(kernel, vec3(0, 0, 0), vec3(0, 0, 1), vec3(1, 0, 0)));
+const plate = unwrap(createProfile(kernel, xy, [unwrap(rectangleWire(0, 0, 4, 3)), unwrap(circleWire(point2(2, 1.5), 0.5))]));
+const solid = unwrap(extrude(kernel, plate, 1));
+unwrap(prismVolume(kernel, plate, 1)); // 12 − π/4
+
+// xz平面の正方形[1, 2]×[0, 1]をz軸まわりに1周させた管
+const xz = unwrap(createPlaneSurface(kernel, vec3(0, 0, 0), vec3(0, -1, 0), vec3(1, 0, 0)));
+const ring = unwrap(createProfile(kernel, xz, [unwrap(rectangleWire(1, 0, 1, 1))]));
+const axis = { origin: point2(0, 0), direction: point2(0, 1) }; // プロファイル平面の座標
+const tube = unwrap(revolve(kernel, ring, axis, 2 * Math.PI));
+unwrap(revolveVolume(kernel, ring, axis, 2 * Math.PI)); // 3π（Pappus）
+const mesh = unwrap(tessellate(kernel, tube, { chord: 0.001 }));
+isWatertight(mesh);     // true
+meshSignedVolume(mesh); // 約3π（弦の許容誤差の分だけ小さい）
+```
+
+`npm run example`は2つの例を実行します。
+
+- `examples/box-and-cylinder-mesh.ts`: 箱と円柱（`makeCylinder`）を作り、recordで往復させてからメッシュにし、`artifacts/`に`*.record.json`・`*.mesh.json`・`*.obj`（任意のメッシュビューアーで表示できます）・`summary.json`を書きます。
+- `examples/primitives-and-sweeps.ts`: 全てのプリミティブ（箱、円柱、円錐台、頂点のある円錐、球、トーラス）、穴のある板の押し出し、穴のあるプロファイルの3/4回転、らせんに沿うスイープを作り、同じ手順で`artifacts/m3/`に書きます。`summary.json`には、メッシュの体積と閉じた式による解析的な体積、その相対誤差が入ります。
+
+`unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。これらの例（M2・M3の例を含む）は`tests/index.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
 
 ## 検証
 
@@ -110,7 +149,7 @@ npm run check
 2. `npm test`: `node --test`による全テスト（Nodeが`.ts`を直接実行します）
 3. `npm run prove`: `lake build`によるLeanの証明の検査と、全定理の公理の監査（標準の3公理だけを許可し、`sorry`などを禁止）
 
-各Leanの定理がどのTS関数・テストに対応し、何を保証し何を保証しないかは[docs/proofs/M0.md](docs/proofs/M0.md)・[docs/proofs/M1.md](docs/proofs/M1.md)・[docs/proofs/M2.md](docs/proofs/M2.md)にまとめています。
+各Leanの定理がどのTS関数・テストに対応し、何を保証し何を保証しないかは[docs/proofs/M0.md](docs/proofs/M0.md)・[docs/proofs/M1.md](docs/proofs/M1.md)・[docs/proofs/M2.md](docs/proofs/M2.md)・[docs/proofs/M3.md](docs/proofs/M3.md)にまとめています。
 
 ## 帰属とライセンス
 

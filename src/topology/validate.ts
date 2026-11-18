@@ -47,7 +47,8 @@ export type TopologyIssue =
   | 'pcurve-deviation' // an interior pcurve sample does not map onto the edge curve
   | 'pcurve-direction' // the lifted pcurve samples run the edge against the coedge's direction
   | 'edge-off-surface' // a coedge without pcurve has edge samples off its face's surface
-  | 'seam-pcurves'; // a seam edge lacks a pcurve on a coedge, or its two pcurves coincide in (u, v)
+  | 'seam-pcurves' // a seam edge lacks a pcurve on a coedge, or its two pcurves coincide in (u, v)
+  | 'loop-uv-gap'; // consecutive pcurves of a loop do not meet in (u, v), nor jump along a pole of their vertex
 
 const OP = 'topology.validateBrep';
 
@@ -70,7 +71,7 @@ const ISSUES: ReadonlySet<TopologyIssue> = new Set<TopologyIssue>([
   'vertex-mismatch', 'edge-use-count', 'edge-orientation', 'partner', 'shell-crossing', 'unused-vertex',
   'non-manifold-vertex', 'shell-disconnected', 'euler-poincare', 'non-finite', 'edge-range', 'edge-vertex',
   'pcurve-invalid', 'pcurve-endpoint', 'pcurve-deviation', 'pcurve-direction', 'edge-off-surface',
-  'seam-pcurves',
+  'seam-pcurves', 'loop-uv-gap',
 ]);
 
 const inRange = (id: number, length: number): boolean => Number.isInteger(id) && id >= 0 && id < length;

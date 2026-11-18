@@ -10,7 +10,7 @@ upstreamのsolidcore（`solidcore/crates/solidcore/src`、Rust約98万行）の�
 | **M1** | `nurbs`（曲面、微分、次数上げ） | `nurbs/srf_*`、`bezier`、`crv_tool` | 一部 | テンソル積de Boorの順序非依存・凸包性・等パラメーター曲線の一致、Bézier次数上げの端点・凸結合・形状保存（次数1・2） |
 | **M1** | `curve`、`surface`（解析曲線・曲面とNURBS形式） | `curve`、`surface`、`geom`、`eval` | 一部 | A7.1の円弧が全パラメーターで円上、回転面A8.1が球・トーラス・円錐上、陰関数、法線の向きとGauss・平均曲率 |
 | **M2** | `record`、`convert`、`tess`（表示メッシュ）、`topology`（解析幾何つきB-repの検証） | `solidcore-record`、`-convert`、`-tess`、`topology` | 30k | メッシュの水密性（各辺の使用回数が2）、耳切りの三角形数と面積の保存、recordの範囲検査の健全性・完全性と符号化の往復、継ぎ目のある円柱のEuler–Poincaréと対の保存 |
-| M3 | `primitive`（円柱、球、円錐、トーラス）、`prism`、`profile`、`sweep` | `primitive`、`prism`、`profile`、`sweep` | 52k | 押し出しや回転の位相計数 |
+| **M3** | `primitive`（円柱、球、円錐、トーラス）、`prism`、`profile`、`sweep` | `primitive`、`prism`、`profile`、`sweep` | 52k | 押し出しや回転の位相計数 |
 | M4 | `intersect`（曲線/曲線、曲線/曲面、曲面/曲面）、`query` | `intersect`、`query`、`ssi` | 108k | 区間演算による交差の除外の健全性 |
 | M5 | `boolean`、`heal`（縫合） | `boolean`、`heal` | 48k | 正則化した集合演算の代数法則（モデル） |
 | M6 | `offset`（シェル）、`blend`（フィレット、面取り） | `offset`、`blend` | 242k | 転がり球の接触条件 |
@@ -28,3 +28,8 @@ upstreamのsolidcore（`solidcore/crates/solidcore/src`、Rust約98万行）の�
   - tessの面のたわみの真の最大値の保証（現状は重心で確認）、耳切りの`O(n²)`の改善、球の極・円錐の頂点を含む試験体（M3のプリミティブで）、穴が頂点で接する面。
   - Leanでの幾何の検査・Lawsonの辺の入れ替え・格子点の挿入・浮動小数点のモデル化。
   - `planePcurve`でのNURBS辺の部分区間への切り出し。
+- **M3**: 実装済み（`npm run check`が通過。テスト399件、Lean 16モジュール・401定理）。証明の対応表は[proofs/M3.md](proofs/M3.md)。曲面のプリミティブ（円柱・円錐・球・トーラス、極は辺のない頂点）、`profile`（線分・円弧・NURBSのワイヤーの検証と面積）、`prism`（押し出し、共有の配置`buildPrismRegion`）、`sweep`（回転とPappusの体積、回転最小化標構、パスに沿うスイープ）。M3から後送りしたもの:
+  - 部分的なプリミティブ（扇形）、裏返しの球、極のない球、楕円錐、プリミティブの厳密な質量特性（`mass`）。曲面を持つ物体の厳密な体積（現状は`prismVolume`・`revolveVolume`の面積・Pappusの式と、メッシュの体積との比較）。
+  - NURBSのフィット（`src/sweep/interpolate.ts`の大域補間を`src/nurbs`へ移すこと、近似）。スキンのスイープの、測ったステーションの間と標構の誤差の上界。スイープの自己交差の検査と、曲がり具合のステーション以外での検査。
+  - 有理NURBS曲面の評価のキャッシュ（`homogeneousNet`の作り直し）、平面のNURBS面の格子の上限、半径の違う円錐台の側面の標本化（上下の円の標本の対応）。
+  - Leanでの押し出し・回転の`Paired`の全ての大きさのリストでの証明（現状は具体例で判定）、極のある回転の位相、円弧・NURBSのGreenモーメント、二重反射法の収束。

@@ -27,19 +27,30 @@
  * - both coedges of a seam edge (both coedges on one face) carry pcurves, and these do not coincide at both
  *   ends in `(u, v)` (`seam-pcurves`): a seam of a periodic surface has them a period apart, e.g. `u = 0` and
  *   `u = 2π`; without pcurves the two sides of a seam (or a slit) cannot be told apart.
+ * - in each loop, where a coedge and the next both carry pcurves, the first ends where the next starts in `(u, v)`,
+ *   or the straight `(u, v)` segment between them maps onto their shared vertex (`loop-uv-gap`, `uvGapCollapses`):
+ *   a **pole**. Decision (M3, as upstream): a sphere pole or a cone apex is a vertex where a seam ends, with no
+ *   edge of its own; the face's `(u, v)` boundary runs along the collapsed iso-line (`v = ±π/2`, `R(v) = 0`)
+ *   between the two seam pcurves, implicitly. So there are no zero-length edges (`degenerate-edge` stays an
+ *   error for every edge), `validateBrep` needs no special case (the seam is used twice, the pole vertex is
+ *   the start of one of its coedges), and `eulerPoincare` counts a sphere as `V = 2, E = 1, F = 1, L = 1`. A
+ *   jump that does not collapse (a missing boundary, a wrong pcurve) is rejected. Upstream `create_sphere`
+ *   gives the same `(faces, edges, vertices) = (1, 1, 2)`; `formal/CadloomFormal/Primitive.lean` shows that a
+ *   one-coedge degenerate pole edge would shift `V - E + F - (L - F)` by `-1` and break pairing.
  * Every failure is `invalid-topology` naming the edge, coedge or vertex (see `topologyIssue`).
  *
  * Not checked: that pcurve samples and edge samples correspond one to one beyond the sampled monotonicity,
- * continuity of a loop's pcurves in `(u, v)` (on analytic surfaces it follows from the end point checks up to
- * a period or a pole), self-intersection of loops in `(u, v)`, loop winding in `(u, v)`, and that a NURBS projection
+ * continuity in `(u, v)` next to a coedge without pcurve, self-intersection of loops in `(u, v)`, loop winding in `(u, v)`, and that a NURBS projection
  * finds the global minimum (M1 limitation).
  *
  * Upstream consulted (for invariants and API shape, not translated): `solidcore/crates/solidcore/src/eval/pcurve.rs`
  * (pcurves on a plane are exact — the curve's knots and weights with the control points mapped by the plane's
  * affine parameters; a seam edge used twice has two pcurves a period apart; each pcurve is checked by lifting
  * it), `topology/edge.rs`, `topology/face.rs`, `topology/integrity.rs`, `crates/solidcore-record/src/brep.rs`
- * (an edge's interval `min < max`, start vertex at min and end vertex at max) — SolidCraft / solidcore,
- * Apache-2.0 OR MIT.
+ * (an edge's interval `min < max`, start vertex at min and end vertex at max), `topology/vertex.rs`
+ * (`inside_face`: a pole is a vertex all of whose edges are seams of one face), `docs/booleans.md` ("Seams and
+ * poles"), `primitive/api_primitives.rs` (a sphere is 1 face, 1 edge, 2 vertices), `eval/pole.rs` (the normal
+ * at a pole is a limit) — SolidCraft / solidcore, Apache-2.0 OR MIT.
  */
 import { err, invalidInput, ok, type EntityRef, type Result } from '../core/error.ts';
 import type { Kernel } from '../core/kernel.ts';
@@ -177,11 +188,36 @@ function periodicParams(s: Surface3): { readonly u: boolean; readonly v: boolean
   }
 }
 
-/** Whether `u` is undefined at `(·, v)`: a sphere pole or a cone apex. */
-function uSingular(s: Surface3, v: number): boolean {
-  if (s.kind === 'sphere') return Math.abs(Math.cos(v)) <= 1e-12;
-  if (s.kind === 'cone') return Math.abs(s.baseRadius + Math.tan(s.semiAngle) * v) <= 1e-12 * Math.max(1, s.baseRadius);
+/**
+ * Whether `u` is undefined at `(·, v)`: a sphere pole or a cone apex, where the parallel circle through the
+ * point (radius `r |cos v|` on a sphere, `|R(v)|` on a cone) is shorter than `projectPoint`'s axis threshold
+ * `1e-3 zoneTol3d` (or rounding, `1e-12` relative): such a point reads as on the axis, so its `u` is noise.
+ */
+function uSingular(kernel: Kernel, s: Surface3, v: number): boolean {
+  const axisTol = 1e-3 * kernel.tolerances.zoneTol3d;
+  if (s.kind === 'sphere') return s.radius * Math.abs(Math.cos(v)) <= Math.max(axisTol, 1e-12 * s.radius);
+  if (s.kind === 'cone') return Math.abs(s.baseRadius + Math.tan(s.semiAngle) * v) <= Math.max(axisTol, 1e-12 * Math.max(1, s.baseRadius));
   return false;
+}
+
+/** Fractions of a `(u, v)` gap sampled by `uvGapCollapses` (its ends are vertex points already). */
+const GAP_FRACTIONS: readonly number[] = Object.freeze([0.25, 0.5, 0.75]);
+
+/**
+ * Whether the straight `(u, v)` segment from `from` to `to` maps onto the single point `point` of `surface`
+ * (each of `GAP_FRACTIONS` within `zoneTol3d` plus the rounding allowance). This is the kernel's one test for
+ * a **pole gap**: where a loop's pcurves jump along an iso-line that the surface collapses to a point (the
+ * iso-line `v = ±π/2` of a sphere, the apex line `R(v) = 0` of a cone, a collapsed NURBS boundary), the jump is
+ * the pole, not a missing boundary. Used by `validateBrepGeometry` (`loop-uv-gap`) and by the display mesher
+ * (pole fans). A gap of zero length (continuous pcurves) trivially collapses.
+ */
+export function uvGapCollapses(kernel: Kernel, surface: Surface3, from: Point2, to: Point2, point: Point3): boolean {
+  if (![from.x, from.y, to.x, to.y].every(Number.isFinite) || !isFinite3(point)) return false;
+  for (const f of GAP_FRACTIONS) {
+    const p = surfacePoint3(surface, from.x + f * (to.x - from.x), from.y + f * (to.y - from.y));
+    if (!p.ok || !(distance3(p.value, point) <= tolAt(kernel, point))) return false;
+  }
+  return true;
 }
 
 /**
@@ -197,9 +233,17 @@ export function surfaceUv(kernel: Kernel, surface: Surface3, p: Point3, near?: P
   if (near !== undefined) {
     const per = periodicParams(surface);
     if (per.v) v = unwrapAngle(v, near.y);
-    if (per.u) u = uSingular(surface, v) ? near.x : unwrapAngle(u, near.x);
+    if (per.u) u = uSingular(kernel, surface, v) ? near.x : unwrapAngle(u, near.x);
   }
   return ok(Object.freeze(vec2(u, v)));
+}
+
+/**
+ * The straight pcurve `(u0, v0) -> (u1, v1)` (degree 1, domain `[0, 1]`): a seam, a circle on an analytic
+ * surface, or an iso-line. Its end values are reproduced exactly, so iso-lines on a domain's ends stay inside it.
+ */
+export function uvSegment(u0: number, v0: number, u1: number, v1: number): Result<NurbsCurve> {
+  return createNurbsCurve(1, [0, 0, 1, 1], [[u0, v0], [u1, v1]]);
 }
 
 /**
@@ -339,6 +383,29 @@ export function validateBrepGeometry(kernel: Kernel, brep: Brep): Result<void> {
     if (!a0.ok || !a1.ok || !b0.ok || !b1.ok) continue; // unreachable: checked per coedge above
     const gap = Math.max(Math.hypot(a0.value.x - b1.value.x, a0.value.y - b1.value.y), Math.hypot(a1.value.x - b0.value.x, a1.value.y - b0.value.y));
     if (!(gap > tol)) return fail('seam-pcurves', `the pcurves of coedges ${a} and ${b} coincide in (u, v)`, { kind: 'edge', id: i });
+  }
+
+  // Consecutive pcurves meet in (u, v), or jump along a collapsed iso-line at their shared vertex (a pole).
+  for (const face of faces) {
+    for (const l of face.loops) {
+      const cs = loopCoedges(brep, l);
+      if (!cs.ok) return cs;
+      for (const c of cs.value) {
+        const co = coedges[c]!, nx = coedges[co.next]!;
+        if (co.pcurve === undefined || nx.pcurve === undefined) continue;
+        const a = pcurveUv(co.pcurve, 1), b = pcurveUv(nx.pcurve, 0);
+        if (!a.ok || !b.ok) continue; // unreachable: checked per coedge above
+        if (a.value.x === b.value.x && a.value.y === b.value.y) continue;
+        const vertex = vertices[coedgeEnd(brep, c)!]!.point;
+        if (!uvGapCollapses(kernel, face.surface, a.value, b.value, vertex)) {
+          return fail(
+            'loop-uv-gap',
+            `pcurve of coedge ${c} ends at (${a.value.x}, ${a.value.y}), the next one starts at (${b.value.x}, ${b.value.y}), and the surface between is not the vertex`,
+            { kind: 'coedge', id: co.next },
+          );
+        }
+      }
+    }
   }
   return ok(undefined);
 }

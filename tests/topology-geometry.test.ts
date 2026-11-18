@@ -20,6 +20,7 @@ import {
   edgeParam,
   eulerPoincare,
   faceId,
+  freezeBrep,
   faceNormal,
   faceNormalAt,
   faceSurface,
@@ -32,13 +33,15 @@ import {
   validateBrep,
   validateBrepGeometry,
   type Brep,
+  type Coedge,
   type CoedgeUse,
   type TopologyIssue,
 } from '../src/topology/index.ts';
-import { makeBox } from '../src/primitive/index.ts';
+import { WORLD_PLACEMENT, makeBox, makeCylinder } from '../src/primitive/index.ts';
 import { polyhedronMass } from '../src/mass/index.ts';
 
 const k = createKernel();
+const kFine = createKernel({ zoneTol3d: 1e-12 });
 
 function expectIssue(r: Result<unknown>, issue: TopologyIssue, entity?: { kind: string; id: number }): void {
   assert.equal(r.ok, false, `expected ${issue}`);
@@ -68,46 +71,29 @@ interface CylinderOptions {
 }
 
 /**
- * Closed cylinder of radius r, height h about +z (the combinatorics of the Lean `cylinderLoops`):
- * vertices v0 = (r, 0, 0), v1 = (r, 0, h); edges e0 bottom circle (v0 -> v0), e1 top circle (v1 -> v1),
- * e2 seam segment (v0 -> v1); faces F0 bottom disc (plane +z, reversed), F1 top disc (plane +z),
- * F2 cylinder. F2's single loop is: e0 forward (v = 0, u: 0 -> 2π), e2 forward (u = 2π), e1 reversed
- * (v = h, u: 2π -> 0), e2 reversed (u = 0). Coedge ids: 0 (F0: e0 rev), 1 (F1: e1 fwd), 2..5 (F2).
+ * Closed cylinder of radius r, height h about +z (the combinatorics of the Lean `cylinderLoops`): the library
+ * primitive `makeCylinder`, then edited by `opts`. Vertices v0 = (r, 0, 0), v1 = (r, 0, h); edges e0 bottom circle
+ * (v0 -> v0), e1 top circle (v1 -> v1), e2 seam segment (v0 -> v1); faces F0 bottom disc (plane +z, reversed),
+ * F1 top disc (plane +z), F2 cylinder. F2's single loop is: e0 forward (v = 0, u: 0 -> 2π), e2 forward (u = 2π),
+ * e1 reversed (v = h, u: 2π -> 0), e2 reversed (u = 0). Coedge ids: 0 (F0: e0 rev), 1 (F1: e1 fwd), 2..5 (F2).
  */
 function cylinder(opts: CylinderOptions = {}): Brep {
-  const r = opts.radius ?? 2, h = opts.height ?? 3;
-  const b = new BrepBuilder();
-  const shell = b.addShell(b.addBody());
-  const v0 = b.addVertex(vec3(r, 0, 0));
-  const v1 = b.addVertex(opts.topVertex ?? vec3(r, 0, h));
-  const z = vec3(0, 0, 1), x = vec3(1, 0, 0);
-  const bottom = opts.bottomCurve ?? unwrap(createCircleCurve(k, vec3(0, 0, 0), z, x, r));
-  const top = unwrap(createCircleCurve(k, vec3(0, 0, h), z, x, r));
-  const e0 = b.addEdge(v0, v0, bottom);
-  const e1 = b.addEdge(v1, v1, top);
-  const e2 = b.addEdge(v0, v1, unwrap(createSegmentCurve(vec3(r, 0, 0), vec3(r, 0, h))), 0, 1);
-  const p0 = unwrap(createPlaneSurface(k, vec3(0, 0, 0), z, x));
-  const p1 = unwrap(createPlaneSurface(k, vec3(0, 0, h), z, x));
-  const f0 = b.addFace(shell, p0, true);
-  const flatBottom = unwrap(createCircleCurve(k, vec3(0, 0, 0), z, x, r));
-  const disc = (edge: CoedgeUse['edge'], reversed: boolean, pc: NurbsCurve): CoedgeUse =>
-    opts.noDiscPcurves === true ? { edge, reversed } : { edge, reversed, pcurve: pc };
-  b.addLoop(f0, [disc(e0, true, unwrap(planePcurve(k, p0, { curve: flatBottom, t0: 0, t1: TWO_PI }, true)))]);
-  const f1 = b.addFace(shell, p1);
-  b.addLoop(f1, [disc(e1, false, unwrap(planePcurve(k, p1, { curve: top, t0: 0, t1: TWO_PI }, false)))]);
-  const cyl = unwrap(createCylinderSurface(k, vec3(0, 0, 0), z, x, r));
-  const f2 = b.addFace(shell, cyl);
-  const side: [CoedgeUse['edge'], boolean, NurbsCurve][] = [
-    [e0, false, uvLine(0, 0, TWO_PI, 0)],
-    [e2, false, uvLine(TWO_PI, 0, TWO_PI, h)],
-    [e1, true, uvLine(TWO_PI, h, 0, h)],
-    [e2, true, uvLine(0, h, 0, 0)],
-  ];
-  b.addLoop(f2, side.map(([edge, reversed, pc], i) => {
-    const p = opts.sidePcurve === undefined ? pc : opts.sidePcurve(i, pc);
-    return p === undefined ? { edge, reversed } : { edge, reversed, pcurve: p };
-  }));
-  return b.build();
+  // Built with a fine zone so that sizes below the default zone (radius 1e-7) can be made and then rejected by the
+  // default kernel's validation; the geometry does not depend on the zone.
+  const c = unwrap(makeCylinder(kFine, WORLD_PLACEMENT, opts.radius ?? 2, opts.height ?? 3));
+  const withPcurve = (co: Coedge, pc: NurbsCurve | undefined): Coedge => {
+    const { pcurve: _, ...rest } = co;
+    return pc === undefined ? rest : { ...rest, pcurve: pc };
+  };
+  return freezeBrep({
+    ...c,
+    vertices: c.vertices.map((v, i) => (i === 1 && opts.topVertex !== undefined ? { point: opts.topVertex } : v)),
+    edges: c.edges.map((e, i) => (i === 0 && opts.bottomCurve !== undefined ? { ...e, curve: opts.bottomCurve } : e)),
+    coedges: c.coedges.map((co, i) => {
+      if (i < 2) return opts.noDiscPcurves === true ? withPcurve(co, undefined) : co;
+      return opts.sidePcurve === undefined ? co : withPcurve(co, opts.sidePcurve(i - 2, co.pcurve!));
+    }),
+  });
 }
 
 test('cylinder fixture: a closed cylinder with a seam edge validates (structure and geometry)', () => {

@@ -24,8 +24,6 @@ export {
   Triangulation,
   bridgeHoles,
   earClip,
-  loopOrientation,
-  segmentsMeet,
   shoelace2,
   triangulatePolygon,
   type Tri,
