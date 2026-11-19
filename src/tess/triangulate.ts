@@ -28,7 +28,7 @@
  * `lib.rs` (`triangulate_planar`: first loop outer, the rest holes) — SolidCraft / solidcore, Apache-2.0 OR MIT.
  */
 import { err, invalidInput, ok, type Result } from '../core/error.ts';
-import type { Point2 } from '../math/vec.ts';
+import { ringArea2, type Point2 } from '../math/vec.ts';
 import { incircleSign } from '../exact/incircle.ts';
 import {
   closedSegmentsMeet,
@@ -283,12 +283,7 @@ export function triangulatePolygon(points: readonly Point2[], loops: readonly (r
 
 /** Twice the signed shoelace area of a ring (floating point; for tests and reporting, never for decisions). */
 export function shoelace2(points: readonly Point2[], ring: readonly number[]): number {
-  let s = 0;
-  for (let i = 0; i < ring.length; i++) {
-    const p = points[ring[i]!]!, q = points[ring[(i + 1) % ring.length]!]!;
-    s += p.x * q.y - q.x * p.y;
-  }
-  return s;
+  return ringArea2(ring.map((i) => points[i]!));
 }
 
 const KEY = 2 ** 26;

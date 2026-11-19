@@ -30,6 +30,21 @@ export function normalize3(a: Vec3): Vec3 | undefined {
 export const isFinite3 = (a: Vec3): boolean =>
   Number.isFinite(a.x) && Number.isFinite(a.y) && Number.isFinite(a.z);
 
+/**
+ * Twice the signed area of a closed polygon `points[0] → points[1] → … → points[0]` (the shoelace sum, Lean
+ * `Profile.shoelace2`), in floating point. The single shoelace of the kernel: the display-mesh rings (`shoelace2`
+ * in `tess`), the imprint arrangement and heal's merged loops all use it.
+ */
+export function ringArea2(points: readonly Point2[]): number {
+  let s = 0;
+  const n = points.length;
+  for (let i = 0; i < n; i++) {
+    const p = points[i]!, q = points[(i + 1) % n]!;
+    s += p.x * q.y - q.x * p.y;
+  }
+  return s;
+}
+
 /** Distance from `p` to the segment `[a, b]` (to `a` when the segment is degenerate). */
 export function distanceToSegment3(p: Point3, a: Point3, b: Point3): number {
   const ab = sub3(b, a);

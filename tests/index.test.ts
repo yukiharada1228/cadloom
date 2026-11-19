@@ -232,3 +232,61 @@ test('README example (M4): exact and certified intersections, a refusal by name,
   assert.equal(unwrap(classifyPoint(kernel, body, vec3(0, 0, 0))).class, 'outside');
   assert.equal(unwrap(classifyPoint(kernel, body, vec3(2.5, 0, 0))).class, 'on');
 });
+
+test('the package entry exports every M5 area without name collisions', () => {
+  for (const name of [
+    // heal (one sewing, one merge, one union–find)
+    'sewFaces', 'sewFacesReport', 'faceSoupOfBrep', 'layoutShells', 'propagateOrientation', 'usesOpposite', 'buildPlan', 'planOfBrep',
+    'flipPlanFace', 'mergeLabels', 'disjointSets', 'clusterPoints', 'mergeCoplanarFaces', 'mergeCosurfaceFaces', 'removeRedundantVertices',
+    'surfacesCoincide', 'mergedLoopCount', 'healError', 'healIssue', 'EDGE_SAMPLE_FRACTIONS',
+    // boolean: imprint, classification, selection and the set operations (prefixed at the root)
+    'faceFaceIntersection', 'imprintBody', 'imprintBodies', 'brepCounts', 'fragmentSamples', 'fragmentRegions', 'classifyFragments',
+    'FRAGMENT_SAMPLE_GRID', 'FRAGMENT_SAMPLE_TRIES', 'CHECKS_PER_REGION', 'BOOLEAN_OPS', 'FRAGMENT_LABELS', 'OPERAND_SIDES', 'SELECTION',
+    'LABEL_SIDES', 'selectAction', 'opEval', 'sideModelAction', 'booleanOp', 'booleanUnion', 'booleanIntersect', 'booleanSubtract',
+    // the kernel's single shoelace
+    'ringArea2',
+  ]) {
+    assert.equal(typeof (cadloom as Record<string, unknown>)[name] !== 'undefined', true, name);
+  }
+  // The short set-operation names stay inside `src/boolean` (`intersect` would read as a geometric intersection).
+  for (const name of ['union', 'intersect', 'subtract', 'SAMPLE_TRIES', 'makeUnion', 'shoelace']) assert.equal(name in cadloom, false, name);
+  // One union–find for incremental use: connectivity as by mergeLabels.
+  const ds = cadloom.disjointSets(5);
+  ds.union(0, 3);
+  ds.union(3, 4);
+  const labels = cadloom.mergeLabels(5, [[0, 3], [3, 4]]);
+  for (let x = 0; x < 5; x++) for (let y = 0; y < 5; y++) assert.equal(ds.find(x) === ds.find(y), labels[x] === labels[y], `${x} ${y}`);
+  // One shoelace: the display mesh's indexed form is the same sum.
+  const square = [vec2(0, 0), vec2(2, 0), vec2(2, 1), vec2(0, 1)];
+  assert.equal(cadloom.ringArea2(square), 4);
+  assert.equal(cadloom.shoelace2(square, [3, 2, 1, 0]), -4);
+});
+
+test('README example (M5): a drilled plate, an empty intersection, and sewing a face soup back into a box', () => {
+  const { makeBox, makeCylinder, placement, booleanSubtract, booleanIntersect, eulerPoincare, validateBrepGeometry } = cadloom;
+  const { tessellate, meshSignedVolume, isWatertight, faceSoupOfBrep, sewFaces } = cadloom;
+  const kernel = createKernel();
+  const Z = vec3(0, 0, 1), X = vec3(1, 0, 0);
+
+  // A 4 × 3 × 1 plate minus a through cylinder of radius 0.5: a valid solid of genus 1.
+  const plate = unwrap(makeBox(kernel, vec3(0, 0, 0), 4, 3, 1));
+  const drill = unwrap(makeCylinder(kernel, placement(vec3(2, 1.5, -0.5), Z, X), 0.5, 2));
+  const drilled = unwrap(booleanSubtract(kernel, plate, drill));
+  assert.equal(drilled.kind, 'solid');
+  if (drilled.kind !== 'solid') return;
+  assert.equal(unwrap(eulerPoincare(drilled.brep)).genus, 1);
+  assert.equal(drilled.brep.faces.length, 7); // 6 planes (top and bottom with a hole) + the hole's cylinder
+  assert.deepEqual(validateBrepGeometry(kernel, drilled.brep), { ok: true, value: undefined });
+  const mesh = unwrap(tessellate(kernel, drilled.brep, { angleDeg: 2, maxEdgeLength: 0.1 }));
+  assert.equal(isWatertight(mesh), true);
+  assert.ok(Math.abs(meshSignedVolume(mesh) - (12 - Math.PI / 4)) < 1e-3);
+
+  // Disjoint operands: the intersection is the empty result kind, not a body.
+  const far = unwrap(makeBox(kernel, vec3(10, 0, 0), 1, 1, 1));
+  assert.equal(unwrap(booleanIntersect(kernel, plate, far)).kind, 'empty');
+
+  // heal: a box taken apart into a face soup and sewn back is a valid closed box of volume 12.
+  const sewn = unwrap(sewFaces(kernel, unwrap(faceSoupOfBrep(plate))));
+  assert.deepEqual([sewn.vertices.length, sewn.edges.length, sewn.faces.length], [8, 12, 6]);
+  assert.equal(meshSignedVolume(unwrap(tessellate(kernel, sewn, {}))), 12);
+});

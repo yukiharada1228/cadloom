@@ -104,3 +104,59 @@ export { boundCurve, boundCurveDerivative, nurbsCurveAsSurface, boundSurface, po
 export { type NormalCone, coneOfDirections, boundNormalCone, normalConesSeparated } from './interval/normal-cone.ts';
 export * from './intersect/index.ts';
 export * from './query/index.ts';
+/*
+ * M5 heal (sewing, face merging, redundant vertices) and booleans. The set operations keep their short names
+ * inside `src/boolean`; at the root they carry a `boolean` prefix (`intersect` would read as a geometric
+ * intersection next to `intersectCurves` / `intersectSurfaces`, and `union` / `subtract` are as generic).
+ */
+export * from './heal/index.ts';
+export {
+  type BodySide,
+  type EndContact,
+  type PieceEnd,
+  type IntersectionPiece,
+  type FaceFaceDisjoint,
+  type FaceFaceCurves,
+  type FaceFaceCoincident,
+  type FaceFaceIntersection,
+  faceFaceIntersection,
+  type EdgeCut,
+  type FaceImprint,
+  type EdgeSource,
+  type Fragment,
+  type ImprintedBody,
+  type ImprintPair,
+  brepCounts,
+  imprintBody,
+  imprintBodies,
+  type BooleanOp,
+  type FragmentLabel,
+  type OperandSide,
+  type SelectAction,
+  BOOLEAN_OPS,
+  FRAGMENT_LABELS,
+  OPERAND_SIDES,
+  SELECTION,
+  LABEL_SIDES,
+  selectAction,
+  opEval,
+  sideModelAction,
+  type FragmentSample,
+  type FragmentClassification,
+  FRAGMENT_SAMPLE_GRID,
+  SAMPLE_TRIES as FRAGMENT_SAMPLE_TRIES,
+  CHECKS_PER_REGION,
+  fragmentSamples,
+  fragmentRegions,
+  classifyFragments,
+  type FaceOrigin,
+  type BooleanStats,
+  type FragmentRecord,
+  type BooleanSolid,
+  type BooleanEmpty,
+  type BooleanResult,
+  booleanOp,
+  union as booleanUnion,
+  intersect as booleanIntersect,
+  subtract as booleanSubtract,
+} from './boolean/index.ts';

@@ -12,7 +12,7 @@ upstreamのsolidcore（`solidcore/crates/solidcore/src`、Rust約98万行）の�
 | **M2** | `record`、`convert`、`tess`（表示メッシュ）、`topology`（解析幾何つきB-repの検証） | `solidcore-record`、`-convert`、`-tess`、`topology` | 30k | メッシュの水密性（各辺の使用回数が2）、耳切りの三角形数と面積の保存、recordの範囲検査の健全性・完全性と符号化の往復、継ぎ目のある円柱のEuler–Poincaréと対の保存 |
 | **M3** | `primitive`（円柱、球、円錐、トーラス）、`prism`、`profile`、`sweep` | `primitive`、`prism`、`profile`、`sweep` | 52k | 押し出しや回転の位相計数 |
 | **M4** | `interval`、`intersect`（曲線/曲線、曲線/曲面、曲面/曲面）、`query` | `intersect`、`query`、`ssi` | 108k | 区間演算と箱の分離による交差の除外の健全性、細分の完全性（作業リストのモデル）、Krawczyk作用素、閉じた式の正しさ、半開の交差規則の偶奇と向きへの不変性 |
-| M5 | `boolean`、`heal`（縫合） | `boolean`、`heal` | 48k | 正則化した集合演算の代数法則（モデル） |
+| **M5** | `boolean`（面/面の交差と刻印、断片の分類、選択表、和・積・差）、`heal`（縫合、面の併合、余分な頂点の削除） | `boolean`、`heal` | 48k | 選択表が正則化した結果の境界をちょうど1回出すことと集合演算の代数法則（モデル）、union-findと向きの伝播の完全性、刻印・併合のEuler–Poincaréの保存、区間の分割 |
 | M6 | `offset`（シェル）、`blend`（フィレット、面取り） | `offset`、`blend` | 242k | 転がり球の接触条件 |
 | M7 | `ops`（モデリング操作API）、STEPの入出力 | `solidcore-ops`、`solidcore-step` | 50k | — |
 
@@ -40,3 +40,10 @@ upstreamのsolidcore（`solidcore/crates/solidcore/src`、Rust約98万行）の�
   - 区間の`sin`・`cos`、ノット挿入の丸め誤差の上界、IEEE-754の方向付き丸めのLeanでのモデル化。
   - `query`: 曲がったトリムの厳密な`(u, v)`領域（現状は多角形と帯）、トーラス・NURBSの最近点の大域最小の保証、楕円・NURBSの辺の距離、トリムした面の狭い包含箱、Jordan曲線定理の証明。
   - 接触・近接の曲線の交差の速さ（1件0.3〜1秒）と、`1e12`の規模の曲線の細分の予算。
+- **M5**: 実装済み（`npm run check`が通過。テスト624件、Lean 23モジュール・628定理）。証明の対応表は[proofs/M5.md](proofs/M5.md)。`heal`（面の集まりの縫合: 頂点の束、辺の一致、BFSによる向きの伝播、殻の入れ子と交わりの検査。同じ曲面の面の併合と余分な頂点の削除）、`boolean`（M4の交差による面/面の交線のトリムと刻印、`classifyPoint`による断片の分類、選択表、healによる組み立て。結果は必ず有効な閉じた立体・空・名指しの拒否のどれか）。M4から後送りした「交差の結果の面のトリム」はM5の`faceFaceIntersection`で扱いました。M5から後送りしたもの:
+  - 接触の解決（接する面、等しい半径の直交する円柱、`1e-6`の隙間は`tangent contact not resolved`で拒否。辺や点だけで接する塊の和は`non-manifold result`で拒否）、極の軸が違う同心の球、球の両極の近くを通る平面（pcurveのフィット）、面を分けずに2つのループをつなぐ刻印。
+  - 下位の段階の拒否を集合演算の名前に揃えること（`closestPointOnCurve`の`not-converged`など）、`EdgeSource.piece`に同じ曲線の全ての部分のidを残すこと。
+  - 分類の証明（現状はレイによる分類と、尺度を合わせた`(u, v)`でのクリアランス）。全ての断片を直接分類する既定（現状は領域ごとに2つ）。由来（provenance）を併合を通して追うこと。
+  - heal: 交差が報告しない`zoneTol3d`未満の隙間の接触の扱い、頂点の束の鎖の分割、NURBSの辺の一致の大域最小、パラメーター付けの違う曲面の面の併合、継ぎ目を失う周期的な面の併合、`removeRedundantVertices`の`O(V·(E+C))`。
+  - 他の層: `validateBrepGeometry`が重なった別々の辺を受け入れること（`topology`）、面にごく浅く食い込む円柱の刻印で小さな蓋の断片が既定の表示の許容誤差で水密にならないこと（`tess`）、曲がったトリムの面のメッシュの体積の収束、型を満たさない`Brep`値で`TypeError`を投げること（M2からの後送り）。
+  - Leanでの幾何（交線のトリム、アレンジメントの歩き、分類、縫合の距離）とBFSのキューそのもの。

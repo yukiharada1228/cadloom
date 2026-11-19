@@ -53,6 +53,12 @@ import { crossesOver, samePlaceOnCurve, separatedAlong } from '../src/intersect/
 import { qAdd, qCmp, qMul, qOf, qToNumber } from '../src/exact/rational.ts';
 import { ivec3 } from '../src/interval/index.ts';
 
+/** User + system CPU time of this process in ms (timing budgets independent of the machine's load). */
+const cpuMs = (): number => {
+  const u = process.cpuUsage();
+  return (u.user + u.system) / 1000;
+};
+
 const kernel = createKernel();
 const TOL = kernel.tolerances.zoneTol3d;
 const X = vec3(1, 0, 0), Y = vec3(0, 1, 0), Z = vec3(0, 0, 1);
@@ -842,14 +848,15 @@ test('samePlaceOnCurve: a self-crossing curve keeps both branches through one po
 
 test('axis_separation / centered_mem / centered_excludes / sphere_band: near-parallel pairs 2 tol apart are excluded, not refused', () => {
   const N = nurbsCircle();
-  const t0 = performance.now();
+  // CPU time of this process (not wall time): the budget must not depend on the machine's load.
+  const t0 = cpuMs();
   assert.equal(cc(N, circleZ(vec3(0, 0, 0), 1 + 2 * TOL)).hits.length, 0);
   const ln = (a: number[], b: number[]) => unwrap(createNurbsCurve3(unwrap(createNurbsCurve(1, [0, 0, 1, 1], [a, b], undefined))));
   assert.equal(cc(ln([0, 0, 0], [1, 1, 0]), ln([0, 2 * TOL, 0], [1, 1 + 2 * TOL, 0])).hits.length, 0);
   // centered_excludes / sphere_band: a circle 2 tol outside an analytic sphere.
   const S = unwrap(createSphereSurface(kernel, vec3(0, 0, 0), Z, X, 1));
   assert.equal(cs(circleZ(vec3(0, 0, 0), 1 + 2 * TOL), S).hits.length, 0);
-  assert.ok(performance.now() - t0 < 4000, 'fast');
+  assert.ok(cpuMs() - t0 < 4000, 'fast');
 });
 
 test('axis_separation: no sampled contact of near-coincident arcs is missed (closed form, delegation, end contacts)', () => {
@@ -923,14 +930,14 @@ function clampAngle(theta: number, lo: number, hi: number): number {
 test('krawczyk3_row_mem: NURBS-sphere tangency is fast; a line through the poles crosses transversally', () => {
   const S = unwrap(createSphereSurface(kernel, vec3(0, 0, 0), Z, X, 1));
   const SN = unwrap(createNurbsSurface3(unwrap(sphereToNurbs(S, { u: [0, 2 * Math.PI], v: [-Math.PI / 2, Math.PI / 2] }))));
-  const t0 = performance.now();
+  const t0 = cpuMs();
   for (const dz of [0, 1e-9]) {
     const r = csPoints(cs(line(vec3(-2, 1 + dz, 0), X, [0, 4]), SN));
     assert.equal(r.length, 1);
     assert.equal(r[0]!.contact, 'tangent');
     near(r[0]!.t, 2, 1e-6);
   }
-  assert.ok(performance.now() - t0 < 3000, `tangent NURBS sphere took ${performance.now() - t0} ms`);
+  assert.ok(cpuMs() - t0 < 3000, `tangent NURBS sphere took ${cpuMs() - t0} ms of CPU`);
   // crossesOver: the poles are degenerate (S_u = 0), so isolation fails, yet the line crosses.
   const p = csPoints(cs(line(vec3(0, 0, -2), Z, [0, 4]), SN));
   assert.deepEqual(p.map((h) => Math.round(h.t * 1e9) / 1e9), [1, 3]);

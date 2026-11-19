@@ -241,9 +241,10 @@ test('hostile: huge declared array lengths are refused by the item budget before
   const huge: unknown[] = [];
   huge.length = 2 ** 32 - 1;
   j.vertices = huge;
-  const t0 = Date.now();
+  const c0 = process.cpuUsage();
   expectReason(parseRecord(j), `vertices: array of ${2 ** 32 - 1} items exceeds the record budget of ${MAX_RECORD_ITEMS} items`);
-  assert.ok(Date.now() - t0 < 1000);
+  const used = process.cpuUsage(c0); // CPU time, independent of the machine's load
+  assert.ok((used.user + used.system) / 1000 < 1000);
   // A sparse array of an allowed length fails at its first hole.
   const sparse = fresh();
   sparse.faces[0].loops = [0, , 2];
