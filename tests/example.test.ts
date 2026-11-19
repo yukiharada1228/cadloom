@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { exampleFiles, meshToObj, runExample } from '../examples/box-and-cylinder-mesh.ts';
 import { m3Specs, runM3Example } from '../examples/primitives-and-sweeps.ts';
 import { gridPoints, runIntersectionsExample } from '../examples/intersections.ts';
+import { booleanFiles, runBooleansExample, steinmetzVolume } from '../examples/booleans.ts';
 import { createKernel, eulerPoincare, unwrap, validateBrep, validateBrepGeometry, type Brep } from '../src/index.ts';
 
 test('example: every M3 body validates (structure and geometry) with the expected genus', () => {
@@ -97,4 +98,46 @@ test('example (M4): primitive intersections carry their class and deviation, and
   assert.equal(c.counts.refused, 0);
   assert.equal(c.disagreements, 0);
   assert.equal(c.counts.inside + c.counts.outside + c.counts.on, c.points);
+});
+
+test('example (M5): booleans give valid solids with the analytic volumes and genus, or a refusal by name', () => {
+  // The Steinmetz integral of the example: 16/3 for equal unit radii.
+  assert.ok(Math.abs(steinmetzVolume(1, 1) - 16 / 3) < 1e-10);
+  const r = unwrap(runBooleansExample());
+  assert.deepEqual(r.results.map((x) => [x.name, x.status]), [
+    ['drilled-plate', 'solid'],
+    ['steinmetz', 'solid'],
+    ['steinmetz-equal-radii', 'refused'],
+    ['box-union-sphere', 'solid'],
+    ['box-minus-sphere', 'solid'],
+    ['revolve-minus-extrusion', 'solid'],
+  ]);
+  for (const x of r.results) {
+    if (x.status === 'refused') {
+      // Equal radii: the singular branch point of the M4 surface/surface intersection (a documented deferral).
+      assert.equal(x.refusal, 'tangent contact not resolved', x.name);
+      continue;
+    }
+    assert.equal(x.validTopology, true, x.name);
+    assert.equal(x.validGeometry, true, x.name);
+    assert.equal(x.roundTripStable, true, x.name);
+    assert.equal(x.watertight, true, x.name);
+    assert.equal(x.genus, x.expectedGenus, x.name);
+    assert.equal(x.counts?.shells, 1, x.name);
+    // 2° facets and a 0.1 grid: the trimmed curved faces meet the analytic volume within 1e-3.
+    assert.ok(Math.abs(x.volumeRelativeError!) < 1e-3, `${x.name}: ${x.volumeRelativeError}`);
+    assert.ok(x.stats!.maxDeviation <= createKernel().tolerances.xsectTol3d, x.name);
+  }
+  const faces = Object.fromEntries(r.results.map((x) => [x.name, x.counts?.faces]));
+  assert.deepEqual(faces, {
+    'drilled-plate': 8,
+    steinmetz: 3,
+    'steinmetz-equal-radii': undefined,
+    'box-union-sphere': 7,
+    'box-minus-sphere': 7,
+    'revolve-minus-extrusion': 5,
+  });
+  const files = booleanFiles(r);
+  assert.equal(JSON.parse(files.get('summary.json')!).length, 6);
+  assert.equal([...files.keys()].filter((n) => n.endsWith('.obj')).length, 5);
 });

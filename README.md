@@ -8,7 +8,7 @@ cadloomは、[SolidCraft](https://github.com/tangency-labs/solidcraft)のCADカ�
 
 方針は[docs/POLICY.md](docs/POLICY.md)、計画は[docs/ROADMAP.md](docs/ROADMAP.md)を参照してください。
 
-## 現状: M4（区間演算・交差・物体の問い合わせ）
+## 現状: M5（集合演算・縫合）
 
 | 領域 | 内容 | M |
 |---|---|---|
@@ -29,8 +29,10 @@ cadloomは、[SolidCraft](https://github.com/tangency-labs/solidcraft)のCADカ�
 | `interval` | 外向き丸めの区間演算（TwoSum・TwoProductによる方向付き丸め）、区間ベクトルと箱、証明つきの区間`sin`・`cos`、曲線・曲面のパラメーター区間での証明つき包含箱（NURBSは部分曲線・部分曲面の制御点の凸包、解析形状は区間評価）と法線錐。交差の除外の土台 | M4 |
 | `intersect` | 曲線/曲線（3Dと2Dのpcurve）、曲線/曲面、レイ、曲面/曲面。結果は必ず**exact**（閉じた式: 直線/平面、平面/平面、平面/球の円、同軸の回転面など）、**certified**（証明で枝刈りした細分とNewton、追跡した曲線と測った最大偏差、接触の種類）、**拒否**（理由を名指しした`Result`のエラー、`refusalReason`）のどれか。成分の数を黙って間違えない | M4 |
 | `query` | 物体の準備と証明つきの包含箱、面の`(u, v)`領域での点の内外判定（半開の交差規則）、レイの投射と点の分類（内・外・上、決まらなければ名指しの拒否）、最近点と距離、辺の長さと面の面積 | M4 |
+| `heal` | 面の集まりの縫合（許容誤差以内の頂点の束、辺の一致、BFSによる向きの伝播、殻の入れ子と交わりの検査、塊と空洞）、同じ曲面の隣り合う面の併合、余分な頂点の削除。結果は検証を通る閉じたB-repか名指しの拒否（`not-closed`、`non-manifold`、`non-orientable`、`shells-intersect`など） | M5 |
+| `boolean` | 正則化した和・積・差（根では`booleanUnion`・`booleanIntersect`・`booleanSubtract`、`booleanOp`）。M4の交差で面/面の交線をトリムして両方の物体に刻印し、`classifyPoint`で断片を内・外・同じ向きの一致・逆向きの一致に分類し、選択表で残す・裏返す・捨てるを決め、healで組み立てる。結果は必ず有効な閉じた立体（`validateBrep`・`validateBrepGeometry`を通り、recordで往復し、水密で正の体積のメッシュになる）、空（`kind: 'empty'`）、名指しの拒否（`tangent contact not resolved`、`non-manifold result`など）のどれか。結果の各面の由来（入力の面）と交線の統計を持つ | M5 |
 
-まだ完全なCADカーネルではありません。集合演算（ブール演算）、縫合、オフセット・フィレット、STEPの入出力などは[ロードマップ](docs/ROADMAP.md)のM5以降で扱います。このREADMEはリポジトリのソース版を対象とします。
+まだ完全なCADカーネルではありません。オフセット・フィレット、モデリング操作API、STEPの入出力などは[ロードマップ](docs/ROADMAP.md)のM6以降で扱います。接する接触（面に触れる球、等しい半径の直交する円柱）は解決せず、名指しで拒否します。このREADMEはリポジトリのソース版を対象とします。
 
 名前の約束: M0の`evaluateCurve`・M1の`evaluateSurface`はNURBSだけを扱う次元非依存の評価関数です。解析形状も含む3Dの曲線・曲面（`Curve3`、`Surface3`）の評価関数には接尾辞`3`が付きます（`evaluateCurve3`、`evaluateSurface3`、`surfaceNormal3`）。
 
@@ -166,13 +168,44 @@ unwrap(classifyPoint(kernel, body, vec3(0, 0, 0))).class;   // 'outside'
 unwrap(classifyPoint(kernel, body, vec3(2.5, 0, 0))).class; // 'on'
 ```
 
-`npm run example`は3つの例を実行します。
+M5の集合演算と縫合（`tests/index.test.ts`の`README example (M5)`で同じ内容を確かめています）:
+
+```ts
+import {
+  createKernel, unwrap, vec3, makeBox, makeCylinder, placement,
+  booleanSubtract, booleanIntersect, eulerPoincare, validateBrepGeometry,
+  tessellate, meshSignedVolume, faceSoupOfBrep, sewFaces,
+} from 'cadloom';
+
+const kernel = createKernel();
+const Z = vec3(0, 0, 1), X = vec3(1, 0, 0);
+
+// 4×3×1の板から半径0.5の円柱を引く: 種数1の有効な立体
+const plate = unwrap(makeBox(kernel, vec3(0, 0, 0), 4, 3, 1));
+const drill = unwrap(makeCylinder(kernel, placement(vec3(2, 1.5, -0.5), Z, X), 0.5, 2));
+const drilled = unwrap(booleanSubtract(kernel, plate, drill));
+if (drilled.kind === 'solid') {
+  unwrap(eulerPoincare(drilled.brep)).genus;      // 1
+  drilled.brep.faces.length;                      // 7
+  validateBrepGeometry(kernel, drilled.brep).ok;  // true
+  meshSignedVolume(unwrap(tessellate(kernel, drilled.brep, { angleDeg: 2, maxEdgeLength: 0.1 }))); // 約12 − π/4
+}
+
+// 離れた物体の積は物体ではなく空の結果
+unwrap(booleanIntersect(kernel, plate, unwrap(makeBox(kernel, vec3(10, 0, 0), 1, 1, 1)))).kind; // 'empty'
+
+// heal: 箱をばらばらの面にしてから縫い直す
+const sewn = unwrap(sewFaces(kernel, unwrap(faceSoupOfBrep(plate)))); // 頂点8、辺12、面6の閉じた箱
+```
+
+`npm run example`は4つの例を実行します。
 
 - `examples/box-and-cylinder-mesh.ts`: 箱と円柱（`makeCylinder`）を作り、recordで往復させてからメッシュにし、`artifacts/`に`*.record.json`・`*.mesh.json`・`*.obj`（任意のメッシュビューアーで表示できます）・`summary.json`を書きます。
 - `examples/primitives-and-sweeps.ts`: 全てのプリミティブ（箱、円柱、円錐台、頂点のある円錐、球、トーラス）、穴のある板の押し出し、穴のあるプロファイルの3/4回転、らせんに沿うスイープを作り、同じ手順で`artifacts/m3/`に書きます。`summary.json`には、メッシュの体積と閉じた式による解析的な体積、その相対誤差が入ります。
 - `examples/intersections.ts`: M3のプリミティブどうしの交差（交わる2本の円柱、球と平面、トーラスと軸に垂直な平面・斜めの平面）を求め、交線をOBJの折れ線として`artifacts/m4/*.obj`に、各組の種類（exact/certified）・方法・成分・最大偏差を`artifacts/m4/summary.json`に書きます。さらに穴とスロットのある板に対して点の格子を分類し、板の解析的な記述と一致すること（不一致0、拒否0）を確かめます。
+- `examples/booleans.ts`: 穴を2つあけた板（箱 − 円柱、種数2）、Steinmetzの立体（半径0.8と1の直交する円柱の積。等しい半径はM4の曲面/曲面の交差が`tangent contact not resolved`で拒否することを記録）、箱 ∪ 球、箱 − 球、回転したリング − 押し出した円柱（種数2）を求め、各結果のOBJ・record・メッシュを`artifacts/m5/`に、検証の結果・メッシュの体積と解析的な体積・種数・面の数・拒否を`artifacts/m5/summary.json`に書きます。
 
-`unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。これらの例（M2〜M4の例を含む）は`tests/index.test.ts`で、`examples/`の例は`tests/example.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
+`unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。これらの例（M2〜M5の例を含む）は`tests/index.test.ts`で、`examples/`の例は`tests/example.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
 
 ## 検証
 
@@ -189,7 +222,7 @@ npm run check
 2. `npm test`: `node --test`による全テスト（Nodeが`.ts`を直接実行します）
 3. `npm run prove`: `lake build`によるLeanの証明の検査と、全定理の公理の監査（標準の3公理だけを許可し、`sorry`などを禁止）
 
-各Leanの定理がどのTS関数・テストに対応し、何を保証し何を保証しないかは[docs/proofs/M0.md](docs/proofs/M0.md)・[docs/proofs/M1.md](docs/proofs/M1.md)・[docs/proofs/M2.md](docs/proofs/M2.md)・[docs/proofs/M3.md](docs/proofs/M3.md)・[docs/proofs/M4.md](docs/proofs/M4.md)にまとめています。
+各Leanの定理がどのTS関数・テストに対応し、何を保証し何を保証しないかは[docs/proofs/M0.md](docs/proofs/M0.md)・[docs/proofs/M1.md](docs/proofs/M1.md)・[docs/proofs/M2.md](docs/proofs/M2.md)・[docs/proofs/M3.md](docs/proofs/M3.md)・[docs/proofs/M4.md](docs/proofs/M4.md)・[docs/proofs/M5.md](docs/proofs/M5.md)にまとめています。
 
 ## 帰属とライセンス
 

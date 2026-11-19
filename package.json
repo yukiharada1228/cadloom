@@ -14,7 +14,7 @@
     "test": "node --test \"tests/**/*.test.ts\"",
     "prove": "node formal/scripts/verify.mjs",
     "check": "npm run typecheck && npm test && npm run prove",
-    "example": "node examples/box-and-cylinder-mesh.ts && node examples/primitives-and-sweeps.ts && node examples/intersections.ts",
+    "example": "node examples/box-and-cylinder-mesh.ts && node examples/primitives-and-sweeps.ts && node examples/intersections.ts && node examples/booleans.ts",
     "prepack": "npm run build"
   },
   "engines": {
