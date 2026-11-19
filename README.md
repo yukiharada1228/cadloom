@@ -174,6 +174,17 @@ unwrap(classifyPoint(kernel, body, vec3(2.5, 0, 0))).class; // 'on'
 
 `unwrap`はエラーのときに例外を投げます。アプリケーションでは`result.ok`を見て分岐してください。これらの例（M2〜M4の例を含む）は`tests/index.test.ts`で、`examples/`の例は`tests/example.test.ts`で実行しています。NURBS形式のノットは円弧の角度ですが、区間の内部ではパラメーターと角度は一致しません（`unitArcAngleOfParam`で変換します）。
 
+## ブラウザのデモ
+
+```sh
+npm ci
+npm run demo
+```
+
+[http://localhost:4173](http://localhost:4173)を開くと、現在のカーネルで形状を生成するプレイグラウンドを試せます。穴あきプレート・トーラス・箱・円柱・球・回転体の寸法変更、ドラッグによる回転、ズーム、三角形メッシュ表示、OBJとB-rep JSONの書き出しに対応しています。体積は表示用メッシュからの近似値です。
+
+デモのUIとCanvas描画は`demo/`にあり、`npm run build`で生成した`dist/`を直接読み込みます。追加依存は不要です。ローカルサーバーは127.0.0.1で待ち受けます（`PORT`でポート変更可）。
+
 ## 検証
 
 Node.js 24以上と、Lean 4（`elan`、`formal/lean-toolchain`のバージョン）が必要です。
