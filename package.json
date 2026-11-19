@@ -15,7 +15,8 @@
     "prove": "node formal/scripts/verify.mjs",
     "check": "npm run typecheck && npm test && npm run prove",
     "example": "node examples/box-and-cylinder-mesh.ts && node examples/primitives-and-sweeps.ts && node examples/intersections.ts",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "demo": "npm run build && node demo/serve.mjs"
   },
   "engines": {
     "node": ">=24"
