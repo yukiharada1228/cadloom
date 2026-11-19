@@ -163,3 +163,72 @@ test('README example (M3): primitives, an extrusion with a hole and a revolve, m
   assert.equal(isWatertight(mesh), true);
   assert.ok(Math.abs(meshSignedVolume(mesh) - 3 * Math.PI) < 0.01);
 });
+
+test('the package entry exports every M4 area without name collisions', () => {
+  for (const name of [
+    // interval layer (generic arithmetic names carry an `interval` prefix at the root)
+    'interval', 'pointInterval', 'intervalAdd', 'intervalMul', 'intervalHull', 'intervalIntersect', 'nextUp', 'addDown', 'mulUp',
+    'sinInterval', 'cosInterval', 'box3', 'boxesDisjoint3', 'lineBoxRange', 'boundCurve', 'boundSurface', 'boundNurbsCurve',
+    'boundNurbsSurface', 'boundNormalCone', 'normalConesSeparated', 'homogeneousPartials',
+    // intersect (one result-type module for curve/curve, curve/surface and surface/surface)
+    'intersectCurves', 'intersectCurves2', 'intersectCurveSurface', 'intersectRay', 'intersectSurfaces', 'intersectSurfacesExact',
+    'marchSurfaces', 'surfacePatch', 'refusal', 'refusalReason', 'combineClass', 'intersectionResult', 'krawczyk1',
+    'krawczykContracts', 'cramer2', 'linePlaneParam', 'quadraticRoots', 'planePlanePoint',
+    // query
+    'prepareBody', 'bodyBounds', 'pointInFace', 'crossingCount', 'rayBody', 'classifyPoint', 'closestPointOnBody',
+    'distancePointBody', 'edgeLength', 'faceArea', 'rayBoxRange', 'boxDistanceSq',
+    // surface (the local projection Newton shared by the intersector)
+    'refineProjection',
+  ]) {
+    assert.equal(typeof (cadloom as Record<string, unknown>)[name] !== 'undefined', true, name);
+  }
+  // Generic or internal names stay inside their modules.
+  for (const name of ['add', 'mul', 'hull', 'intersect', 'sub', 'scale', 'invertMatrix', 'solve3', 'qToNumber', 'qOf', 'patchBox', 'correct', 'march']) {
+    assert.equal(name in cadloom, false, name);
+  }
+});
+
+test('README example (M4): exact and certified intersections, a refusal by name, and point classification', () => {
+  const { WORLD_PLACEMENT, makeTorus, createPlaneSurface, createSphereSurface, createCylinderSurface } = cadloom;
+  const { surfacePatch, intersectSurfaces, intersectRay, prepareBody, classifyPoint, refusalReason } = cadloom;
+  const kernel = createKernel();
+  const Z = vec3(0, 0, 1), X = vec3(1, 0, 0);
+
+  // A sphere of radius 1.5 cut by the plane z = 0.5: one exact circle of radius √2.
+  const sphere = unwrap(surfacePatch(unwrap(createSphereSurface(kernel, vec3(0, 0, 0), Z, X, 1.5))));
+  const plane = unwrap(surfacePatch(unwrap(createPlaneSurface(kernel, vec3(0, 0, 0.5), Z, X)), { u: [-3, 3], v: [-3, 3] }));
+  const cut = unwrap(intersectSurfaces(kernel, sphere, plane));
+  assert.equal(cut.class, 'exact');
+  assert.equal(cut.hits.length, 1);
+  const circle = cut.hits[0]!;
+  assert.ok(circle.kind === 'curve' && circle.curve.kind === 'circle' && Math.abs(circle.curve.radius - Math.SQRT2) < 1e-15);
+
+  // Two crossing cylinders (radii 1 and 0.6): two closed branches, certified with a measured deviation.
+  const vertical = unwrap(surfacePatch(unwrap(createCylinderSurface(kernel, vec3(0, 0, -2), Z, X, 1)), { u: [0, 2 * Math.PI], v: [0, 4] }));
+  const horizontal = unwrap(
+    surfacePatch(unwrap(createCylinderSurface(kernel, vec3(-2, 0, 0), X, vec3(0, 1, 0), 0.6)), { u: [0, 2 * Math.PI], v: [0, 4] }),
+  );
+  const cross = unwrap(intersectSurfaces(kernel, vertical, horizontal));
+  assert.equal(cross.class, 'certified');
+  assert.equal(cross.hits.length, 2);
+  for (const h of cross.hits) assert.ok(h.kind === 'curve' && h.closed && h.deviation <= kernel.tolerances.zoneTol3d);
+
+  // A ray against a torus: four crossings, nearest first.
+  const torus = unwrap(makeTorus(kernel, WORLD_PLACEMENT, 2, 0.5));
+  const torusFace = torus.faces[0]!.surface;
+  const hits = unwrap(intersectRay(kernel, vec3(-5, 0, 0), X, torusFace));
+  assert.deepEqual(hits.hits.map((h) => (h.kind === 'point' ? Math.round(h.point.x * 1e9) / 1e9 : NaN)), [-2.5, -1.5, 1.5, 2.5]);
+
+  // A refusal is an error that names its reason, never an empty answer.
+  const tangentPlane = unwrap(surfacePatch(unwrap(createPlaneSurface(kernel, vec3(0, 0, 0), Z, X)), { u: [-3, 3], v: [-3, 3] }));
+  const bad = intersectSurfaces(kernel, vertical, horizontal, { maxPairs: 1, forceMarching: true });
+  assert.equal(bad.ok, false);
+  if (!bad.ok) assert.equal(refusalReason(bad.error), 'subdivision budget exceeded');
+  assert.equal(unwrap(intersectSurfaces(kernel, tangentPlane, plane)).hits.length, 0); // parallel planes: exact, empty
+
+  // Classify points against the torus solid.
+  const body = unwrap(prepareBody(kernel, torus));
+  assert.equal(unwrap(classifyPoint(kernel, body, vec3(2, 0, 0))).class, 'inside');
+  assert.equal(unwrap(classifyPoint(kernel, body, vec3(0, 0, 0))).class, 'outside');
+  assert.equal(unwrap(classifyPoint(kernel, body, vec3(2.5, 0, 0))).class, 'on');
+});

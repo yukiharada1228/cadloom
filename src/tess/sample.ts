@@ -26,7 +26,7 @@
 import { invalidInput, ok, type Result } from '../core/error.ts';
 import { curvePoint3, curveTangent } from '../curve/evaluate.ts';
 import { curveRange, type Curve3 } from '../curve/types.ts';
-import { distance3, dot3, sub3, type Point3 } from '../math/vec.ts';
+import { distance3, distanceToSegment3, dot3, type Point3 } from '../math/vec.ts';
 import { edgeParam } from '../topology/geometry.ts';
 import type { MeshRules } from './tolerance.ts';
 
@@ -81,15 +81,6 @@ function uniform(t0: number, t1: number, n: number): number[] {
   return out;
 }
 
-/** Distance from `p` to the segment `[a, b]`. */
-export function distanceToSegment(p: Point3, a: Point3, b: Point3): number {
-  const ab = sub3(b, a);
-  const len2 = dot3(ab, ab);
-  if (!(len2 > 0)) return distance3(p, a);
-  const t = Math.min(1, Math.max(0, dot3(sub3(p, a), ab) / len2));
-  return distance3(p, { x: a.x + t * ab.x, y: a.y + t * ab.y, z: a.z + t * ab.z });
-}
-
 function nurbsParams(curve: Curve3 & { kind: 'nurbs' }, t0: number, t1: number, rules: MeshRules): Result<{ params: number[]; capped: boolean }> {
   const at = (t: number): Result<Point3> => curvePoint3(curve, t);
   // Initial nodes: the interval ends and the distinct knots strictly inside.
@@ -121,7 +112,7 @@ function nurbsParams(curve: Curve3 & { kind: 'nurbs' }, t0: number, t1: number, 
         if (split) break;
         const q = at(a + f * (b - a));
         if (!q.ok) return q;
-        if (distanceToSegment(q.value, pa.value, pb.value) > rules.chord) split = true;
+        if (distanceToSegment3(q.value, pa.value, pb.value) > rules.chord) split = true;
       }
       if (!split) {
         const ta = curveTangent(curve, a), tb = curveTangent(curve, b);
