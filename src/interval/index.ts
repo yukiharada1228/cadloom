@@ -1,0 +1,88 @@
+/**
+ * Public API of `src/interval` (M4): outward-rounded interval arithmetic, interval vectors and
+ * boxes, certified interval trigonometry, and certified bounding boxes / normal cones of curves
+ * and surfaces over parameter intervals — the exclusion primitives of the intersection code.
+ * Formal model: formal/CadloomFormal/Interval.lean.
+ */
+export {
+  UNIT_ROUNDOFF,
+  gamma,
+  nextUp,
+  nextDown,
+  twoSum,
+  twoProduct,
+  addDown,
+  addUp,
+  subDown,
+  subUp,
+  mulDown,
+  mulUp,
+  divDown,
+  divUp,
+  sqrtDown,
+  sqrtUp,
+} from './float.ts';
+export {
+  type Interval,
+  interval,
+  point as pointInterval,
+  isBounded,
+  contains,
+  containsInterval,
+  width,
+  midpoint,
+  magnitude,
+  neg,
+  add,
+  sub,
+  mul,
+  scale,
+  sqr,
+  div,
+  sqrt,
+  hull,
+  intersect,
+  expand,
+  bisect,
+  hullOf,
+} from './interval.ts';
+export { TRIG_PAD, ACOS_PAD, sinInterval, cosInterval, tanInterval, acosUp, acosDown, atanUp } from './trig.ts';
+export {
+  type IVec3,
+  type Box3,
+  type Box2,
+  ivec3,
+  ivecOfPoint,
+  ivAdd,
+  ivSub,
+  ivScale,
+  ivScaleVec,
+  ivDot,
+  ivCross,
+  ivNormSq,
+  ivContainsZero,
+  boxOfIVec,
+  ivecOfBox,
+  boxAxis,
+  box3,
+  box2,
+  box3OfPoints,
+  box2OfPoints,
+  boxesOverlap3,
+  boxesOverlap2,
+  boxesDisjoint3,
+  boxesDisjoint2,
+  unionBox3,
+  unionBox2,
+  intersectBox3,
+  expandBox3,
+  expandBox2,
+  box3Contains,
+  box2Contains,
+  box3ContainsBox,
+  box3Diagonal,
+  lineBoxRange,
+} from './box.ts';
+export { type SubPatch, spanWindow, boundNurbsCurve, boundNurbsSurface, subPatch, homogeneousPartials } from './nurbs-hull.ts';
+export { boundCurve, boundCurveDerivative, nurbsCurveAsSurface, boundSurface, pointBox } from './bound.ts';
+export { type NormalCone, coneOfDirections, boundNormalCone, normalConesSeparated } from './normal-cone.ts';

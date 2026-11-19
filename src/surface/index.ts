@@ -28,7 +28,14 @@ export {
   surfaceCurvature,
   normalCurvature,
 } from './evaluate.ts';
-export { type SurfaceProjection, implicitValue, projectPoint } from './implicit.ts';
+export {
+  type SurfaceProjection,
+  type RefineProjectionOptions,
+  type RefinedProjection,
+  implicitValue,
+  projectPoint,
+  refineProjection,
+} from './implicit.ts';
 export {
   type ParamBox,
   revolveCurveToNurbs,

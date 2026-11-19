@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { exampleFiles, meshToObj, runExample } from '../examples/box-and-cylinder-mesh.ts';
 import { m3Specs, runM3Example } from '../examples/primitives-and-sweeps.ts';
+import { gridPoints, runIntersectionsExample } from '../examples/intersections.ts';
 import { createKernel, eulerPoincare, unwrap, validateBrep, validateBrepGeometry, type Brep } from '../src/index.ts';
 
 test('example: every M3 body validates (structure and geometry) with the expected genus', () => {
@@ -61,4 +62,39 @@ test('example: the written files are deterministic and the OBJ text indexes ever
   assert.equal(f.length, bodies[1]!.mesh.indices.length / 3);
   for (const l of f) for (const idx of l.slice(2).split(' ').map((s) => Number(s.split('//')[0]))) assert.ok(idx >= 1 && idx <= v);
   assert.ok(JSON.parse(a.get('summary.json')!).length === 2);
+});
+
+test('example (M4): primitive intersections carry their class and deviation, and the plate grid classifies without error', () => {
+  const k = createKernel();
+  const r = unwrap(runIntersectionsExample(k));
+  const byName = new Map(r.pairs.map((p) => [p.name, p]));
+  assert.deepEqual([...byName.keys()], ['two-cylinders', 'sphere-plane', 'torus-plane', 'torus-oblique-plane']);
+  const expect: Record<string, readonly [string, string, number]> = {
+    'two-cylinders': ['certified', 'marching', 2],
+    'sphere-plane': ['exact', 'closed-form', 1],
+    'torus-plane': ['exact', 'closed-form', 2],
+    'torus-oblique-plane': ['certified', 'marching', 2],
+  };
+  for (const [name, [cls, method, n]] of Object.entries(expect)) {
+    const p = byName.get(name)!;
+    assert.deepEqual([p.class, p.method, p.components.length], [cls, method, n], name);
+    for (const c of p.components) {
+      assert.equal(c.kind, 'curve', name);
+      assert.equal(c.closed, true, name);
+      assert.equal(c.contact, 'transversal', name);
+      assert.equal(c.curve, cls === 'exact' ? 'circle' : 'nurbs', name);
+    }
+    assert.ok(p.maxDeviation <= k.tolerances.zoneTol3d, `${name}: ${p.maxDeviation}`);
+  }
+  // Every OBJ polyline indexes vertices of its own file.
+  for (const [name, text] of r.obj) {
+    const lines = text.split('\n');
+    const v = lines.filter((l) => l.startsWith('v ')).length;
+    for (const l of lines.filter((x) => x.startsWith('l '))) for (const i of l.slice(2).split(' ').map(Number)) assert.ok(i >= 1 && i <= v, name);
+  }
+  const c = r.classification;
+  assert.equal(c.points, gridPoints().length);
+  assert.equal(c.counts.refused, 0);
+  assert.equal(c.disagreements, 0);
+  assert.equal(c.counts.inside + c.counts.outside + c.counts.on, c.points);
 });

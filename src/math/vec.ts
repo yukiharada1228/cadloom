@@ -29,3 +29,12 @@ export function normalize3(a: Vec3): Vec3 | undefined {
 
 export const isFinite3 = (a: Vec3): boolean =>
   Number.isFinite(a.x) && Number.isFinite(a.y) && Number.isFinite(a.z);
+
+/** Distance from `p` to the segment `[a, b]` (to `a` when the segment is degenerate). */
+export function distanceToSegment3(p: Point3, a: Point3, b: Point3): number {
+  const ab = sub3(b, a);
+  const len2 = dot3(ab, ab);
+  if (!(len2 > 0)) return distance3(p, a);
+  const t = Math.min(1, Math.max(0, dot3(sub3(p, a), ab) / len2));
+  return distance3(p, vec3(a.x + t * ab.x, a.y + t * ab.y, a.z + t * ab.z));
+}

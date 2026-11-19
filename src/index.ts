@@ -15,3 +15,92 @@ export * from './tess/index.ts';
 export * from './profile/index.ts';
 export * from './prism/index.ts';
 export * from './sweep/index.ts';
+/*
+ * M4 interval layer. The generic interval arithmetic names (`add`, `mul`, `hull`, ...) are
+ * exported with an `interval` prefix here; inside `src/interval` they keep their short names.
+ */
+export {
+  type Interval,
+  interval,
+  point as pointInterval,
+  isBounded as intervalIsBounded,
+  contains as intervalContains,
+  containsInterval as intervalContainsInterval,
+  width as intervalWidth,
+  midpoint as intervalMidpoint,
+  magnitude as intervalMagnitude,
+  neg as intervalNeg,
+  add as intervalAdd,
+  sub as intervalSub,
+  mul as intervalMul,
+  scale as intervalScale,
+  sqr as intervalSqr,
+  div as intervalDiv,
+  sqrt as intervalSqrt,
+  hull as intervalHull,
+  intersect as intervalIntersect,
+  expand as intervalExpand,
+  bisect as intervalBisect,
+  hullOf as intervalHullOf,
+} from './interval/interval.ts';
+export {
+  UNIT_ROUNDOFF,
+  gamma,
+  nextUp,
+  nextDown,
+  twoSum,
+  twoProduct,
+  addDown,
+  addUp,
+  subDown,
+  subUp,
+  mulDown,
+  mulUp,
+  divDown,
+  divUp,
+  sqrtDown,
+  sqrtUp,
+} from './interval/float.ts';
+
+export { TRIG_PAD, ACOS_PAD, sinInterval, cosInterval, tanInterval, acosUp, acosDown, atanUp } from './interval/trig.ts';
+export {
+  type IVec3,
+  type Box3,
+  type Box2,
+  ivec3,
+  ivecOfPoint,
+  ivAdd,
+  ivSub,
+  ivScale,
+  ivScaleVec,
+  ivDot,
+  ivCross,
+  ivNormSq,
+  ivContainsZero,
+  boxOfIVec,
+  ivecOfBox,
+  boxAxis,
+  box3,
+  box2,
+  box3OfPoints,
+  box2OfPoints,
+  boxesOverlap3,
+  boxesOverlap2,
+  boxesDisjoint3,
+  boxesDisjoint2,
+  unionBox3,
+  unionBox2,
+  intersectBox3,
+  expandBox3,
+  expandBox2,
+  box3Contains,
+  box2Contains,
+  box3ContainsBox,
+  box3Diagonal,
+  lineBoxRange,
+} from './interval/box.ts';
+export { type SubPatch, spanWindow, boundNurbsCurve, boundNurbsSurface, subPatch, homogeneousPartials } from './interval/nurbs-hull.ts';
+export { boundCurve, boundCurveDerivative, nurbsCurveAsSurface, boundSurface, pointBox } from './interval/bound.ts';
+export { type NormalCone, coneOfDirections, boundNormalCone, normalConesSeparated } from './interval/normal-cone.ts';
+export * from './intersect/index.ts';
+export * from './query/index.ts';

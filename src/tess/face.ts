@@ -101,6 +101,117 @@ function boundaryUv(kernel: Kernel, s: Surface3, p: Point3, hint: Point2 | undef
   return q;
 }
 
+/** The boundary of a face in its own `(u, v)` (step 1 of the module comment). */
+export interface FaceBoundary {
+  /** Ring vertices of all loops: the edge samples' 3D points (pole copies repeat their vertex). */
+  readonly positions: readonly Point3[];
+  /** Their `(u, v)`. */
+  readonly uvs: readonly Point2[];
+  /** Each loop as indices into `positions` / `uvs`, in loop order (a closed ring: the last joins the first). */
+  readonly loops: readonly (readonly number[])[];
+  /** Pole copies: `[a, b]` are two ring vertices of one pole vertex (same 3D point, different `(u, v)`). */
+  readonly poles: readonly (readonly [number, number])[];
+}
+
+/**
+ * Step 1 of the module comment: walks the loops of `face` over the shared edge samples and maps every sample to
+ * the face's `(u, v)` (pcurve hints, seams a period apart, pole copies). The one face-boundary mapping of the
+ * kernel: `meshFace` and the face domains of `src/query` both build on it. `op` names the operation in errors.
+ * Errors: a missing face or edge, a loop that jumps or does not close in `(u, v)` (`invalid-topology`), those of
+ * the edge samples and of the `(u, v)` inversion.
+ */
+export function faceBoundaryUv(
+  kernel: Kernel,
+  brep: Brep,
+  face: FaceId,
+  edgeSamples: readonly Result<CurveSamples>[],
+  op: string = OP,
+): Result<FaceBoundary> {
+  const faceError = <T>(reason: string): Result<T> =>
+    err({ kind: 'invalid-topology', operation: op, reason, entity: { kind: 'face', id: face } });
+  const f = brep.faces[face];
+  if (f === undefined) return err({ kind: 'not-found', operation: op, entity: { kind: 'face', id: face } });
+  const s = f.surface;
+  const positions: Point3[] = [];
+  const uvs: Point2[] = [];
+  const loops: number[][] = [];
+  // Pole copies: `[a, b]` are two ring vertices of one pole vertex (same 3D point, different `(u, v)`).
+  const poles: (readonly [number, number])[] = [];
+  const gapTol = (p: Point2): number => 1e-6 * Math.max(1, Math.abs(p.x), Math.abs(p.y)) + 1e-9;
+  const uvGap = (a: Point2, b: Point2): number => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+
+  for (const l of f.loops) {
+    const cs = loopCoedges(brep, l);
+    if (!cs.ok) return cs;
+    const ring: number[] = [];
+    let prevUv: Point2 | undefined;
+    let firstUv: Point2 | undefined;
+    let endUv: Point2 | undefined;
+    let endPoint: Point3 | undefined;
+    for (const c of cs.value) {
+      const co = brep.coedges[c]!;
+      const e = brep.edges[co.edge];
+      const es = edgeSamples[co.edge];
+      if (e === undefined || es === undefined) return faceError(`coedge ${c} names a missing edge`);
+      if (!es.ok) return es;
+      const m = es.value.params.length;
+      const span = e.t1 - e.t0;
+      for (let step = 0; step < m; step++) {
+        const k = co.reversed ? m - 1 - step : step;
+        const t = es.value.params[k]!;
+        const sEdge = k === 0 ? 0 : k === m - 1 ? 1 : Math.min(1, Math.max(0, (t - e.t0) / span));
+        let hint = prevUv;
+        if (co.pcurve !== undefined) {
+          const h = pcurveUv(co.pcurve, coedgeFraction(co.reversed, sEdge));
+          if (!h.ok) return h;
+          hint = h.value;
+        }
+        const uv = boundaryUv(kernel, s, es.value.points[k]!, hint, co.pcurve !== undefined);
+        if (!uv.ok) return uv;
+        if (step === m - 1) {
+          endUv = uv.value; // the next coedge's start: not added
+          endPoint = es.value.points[k]!;
+          prevUv = uv.value;
+          continue;
+        }
+        if (step === 0 && endUv !== undefined && endPoint !== undefined && uvGap(endUv, uv.value) > gapTol(endUv)) {
+          // The previous coedge ended elsewhere in (u, v): a pole gap (the surface collapses the segment to the
+          // vertex) gets a second ring vertex for the pole; any other jump leaves the boundary open.
+          if (!uvGapCollapses(kernel, s, endUv, uv.value, endPoint)) return faceError(`loop ${l} jumps in (u, v) before coedge ${c}`);
+          poles.push([positions.length, positions.length + 1]);
+          ring.push(positions.length);
+          positions.push(endPoint);
+          uvs.push(endUv);
+        }
+        if (firstUv === undefined) firstUv = uv.value;
+        prevUv = uv.value;
+        ring.push(positions.length);
+        positions.push(es.value.points[k]!);
+        uvs.push(uv.value);
+      }
+    }
+    if (firstUv === undefined || endUv === undefined || endPoint === undefined) return faceError('empty loop');
+    const gap = uvGap(firstUv, endUv);
+    if (!(gap <= gapTol(firstUv))) {
+      if (!uvGapCollapses(kernel, s, endUv, firstUv, endPoint)) return faceError(`loop ${l} does not close in (u, v) (gap ${gap})`);
+      poles.push([positions.length, ring[0]!]);
+      ring.push(positions.length);
+      positions.push(endPoint);
+      uvs.push(endUv);
+    }
+    loops.push(ring);
+  }
+  if (loops.length === 0) return faceError('face has no loop');
+  return ok(
+    Object.freeze({
+      positions: Object.freeze(positions),
+      uvs: Object.freeze(uvs),
+      loops: Object.freeze(loops.map((r) => Object.freeze(r))),
+      poles: Object.freeze(poles.map((p) => Object.freeze(p))),
+    }),
+  );
+}
+
 /** The work-plane scales `(s_u, s_v)` at `(u, v)` (positive and finite; 1 where the speed is not). */
 function workScales(s: Surface3, u: number, v: number, vSpan: number): readonly [number, number] {
   const pos = (x: number): number => (Number.isFinite(x) && x > 0 ? x : 1);
@@ -252,77 +363,12 @@ export function meshFace(
   const f = brep.faces[face];
   if (f === undefined) return err({ kind: 'not-found', operation: OP, entity: { kind: 'face', id: face } });
   const s = f.surface;
-  const positions: Point3[] = [];
-  const uvs: Point2[] = [];
-  const loops: number[][] = [];
-
-  /** Pole copies: `[a, b]` are two ring vertices of one pole vertex (same 3D point, different `(u, v)`). */
-  const poles: [number, number][] = [];
-  const gapTol = (p: Point2): number => 1e-6 * Math.max(1, Math.abs(p.x), Math.abs(p.y)) + 1e-9;
-  const uvGap = (a: Point2, b: Point2): number => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
-
-  for (const l of f.loops) {
-    const cs = loopCoedges(brep, l);
-    if (!cs.ok) return cs;
-    const ring: number[] = [];
-    let prevUv: Point2 | undefined;
-    let firstUv: Point2 | undefined;
-    let endUv: Point2 | undefined;
-    let endPoint: Point3 | undefined;
-    for (const c of cs.value) {
-      const co = brep.coedges[c]!;
-      const e = brep.edges[co.edge];
-      const es = edgeSamples[co.edge];
-      if (e === undefined || es === undefined) return faceError(face, `coedge ${c} names a missing edge`);
-      if (!es.ok) return es;
-      const m = es.value.params.length;
-      const span = e.t1 - e.t0;
-      for (let step = 0; step < m; step++) {
-        const k = co.reversed ? m - 1 - step : step;
-        const t = es.value.params[k]!;
-        const sEdge = k === 0 ? 0 : k === m - 1 ? 1 : Math.min(1, Math.max(0, (t - e.t0) / span));
-        let hint = prevUv;
-        if (co.pcurve !== undefined) {
-          const h = pcurveUv(co.pcurve, coedgeFraction(co.reversed, sEdge));
-          if (!h.ok) return h;
-          hint = h.value;
-        }
-        const uv = boundaryUv(kernel, s, es.value.points[k]!, hint, co.pcurve !== undefined);
-        if (!uv.ok) return uv;
-        if (step === m - 1) {
-          endUv = uv.value; // the next coedge's start: not added
-          endPoint = es.value.points[k]!;
-          prevUv = uv.value;
-          continue;
-        }
-        if (step === 0 && endUv !== undefined && endPoint !== undefined && uvGap(endUv, uv.value) > gapTol(endUv)) {
-          // The previous coedge ended elsewhere in (u, v): a pole gap (the surface collapses the segment to the
-          // vertex) gets a second ring vertex for the pole; any other jump leaves the boundary open.
-          if (!uvGapCollapses(kernel, s, endUv, uv.value, endPoint)) return faceError(face, `loop ${l} jumps in (u, v) before coedge ${c}`);
-          poles.push([positions.length, positions.length + 1]);
-          ring.push(positions.length);
-          positions.push(endPoint);
-          uvs.push(endUv);
-        }
-        if (firstUv === undefined) firstUv = uv.value;
-        prevUv = uv.value;
-        ring.push(positions.length);
-        positions.push(es.value.points[k]!);
-        uvs.push(uv.value);
-      }
-    }
-    if (firstUv === undefined || endUv === undefined || endPoint === undefined) return faceError(face, 'empty loop');
-    const gap = uvGap(firstUv, endUv);
-    if (!(gap <= gapTol(firstUv))) {
-      if (!uvGapCollapses(kernel, s, endUv, firstUv, endPoint)) return faceError(face, `loop ${l} does not close in (u, v) (gap ${gap})`);
-      poles.push([positions.length, ring[0]!]);
-      ring.push(positions.length);
-      positions.push(endPoint);
-      uvs.push(endUv);
-    }
-    loops.push(ring);
-  }
-  if (loops.length === 0) return faceError(face, 'face has no loop');
+  const boundary = faceBoundaryUv(kernel, brep, face, edgeSamples, OP);
+  if (!boundary.ok) return boundary;
+  const positions: Point3[] = [...boundary.value.positions];
+  const uvs: Point2[] = [...boundary.value.uvs];
+  const loops: number[][] = boundary.value.loops.map((r) => [...r]);
+  const poles = boundary.value.poles;
 
   // Work plane.
   let u0 = Infinity, u1 = -Infinity, v0 = Infinity, v1 = -Infinity;

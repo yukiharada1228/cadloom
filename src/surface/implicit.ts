@@ -33,7 +33,8 @@
  * positive definite and the Gauss-Newton matrix `[[E, F], [F, G]]` otherwise, clamped to the
  * domain, at most 64 steps; it stops when `|S - p| <= zoneTol3d`, when both cosines
  * `|f| / (|S_u| |S - p|)` and `|g| / (|S_v| |S - p|)` are at most `1e-12`, or when a (clamped)
- * step moves the point by at most `1e-3 * zoneTol3d`. The nearest converged candidate is returned
+ * step moves the point by at most `1e-3 * zoneTol3d` (`refineProjection`, shared with the
+ * surface/surface foot points). The nearest converged candidate is returned
  * (ties: the first seed); none converging is `not-converged`. A minimum narrower than the
  * sampling can be missed.
  *
@@ -50,7 +51,7 @@ import { distance3, dot3, isFinite3, length3, sub3, type Point3 } from '../math/
 import { TWO_PI } from '../curve/types.ts';
 import { knotDomain } from '../nurbs/knots.ts';
 import { evaluateSurface, surfaceDomain } from '../nurbs/surface.ts';
-import { evaluateSurface3 } from './evaluate.ts';
+import { evaluateSurface3, type SurfaceDerivs3 } from './evaluate.ts';
 import { fromLocal, localCoordinates, surfaceOrigin, type ConeSurface, type NurbsSurface3, type Surface3 } from './types.ts';
 
 /** The result of {@link projectPoint}. */
@@ -232,6 +233,72 @@ function projectNurbs(kernel: Kernel, s: NurbsSurface3, p: Point3): Result<Surfa
 
 const clamp = (x: number, r: readonly [number, number]): number => Math.min(r[1], Math.max(r[0], x));
 
+/** Stopping rules and parameter domain of {@link refineProjection}. */
+export interface RefineProjectionOptions {
+  /** Maps a stepped `(u, v)` back into the allowed parameters (clamping; periodic angles may stay free). */
+  readonly clamp: (u: number, v: number) => readonly [number, number];
+  /** Converged once `|S - p| <= stopDistance` (`0`: only the cosine and step rules decide). */
+  readonly stopDistance: number;
+  /** Converged once a (mapped) step moves the surface point by at most `stepTol`. */
+  readonly stepTol: number;
+  /** At most this many Newton steps. */
+  readonly maxSteps: number;
+}
+
+/** The result of {@link refineProjection}: the point, its derivatives, and whether a stopping rule was met. */
+export interface RefinedProjection extends SurfaceProjection {
+  readonly derivs: SurfaceDerivs3;
+  /** `false`: the step budget ran out or the Newton matrix degenerated; the point is then the nearest one seen. */
+  readonly converged: boolean;
+}
+
+/**
+ * The local closest point of `p` on any `Surface3` from the start `(u0, v0)`: Newton's method on
+ * `f = (S - p)·S_u = 0`, `g = (S - p)·S_v = 0` with the full Hessian where it is positive definite and
+ * the Gauss-Newton matrix `[[E, F], [F, G]]` otherwise, each step mapped by `options.clamp`. It stops
+ * (converged) when `|S - p| <= stopDistance`, when both cosines are at most `1e-12`, or when a step
+ * moves the point by at most `stepTol`; the converged point is the current iterate. Otherwise
+ * (budget, singular matrix) the nearest iterate is returned with `converged: false`. This is the one
+ * local projection routine of the kernel: the NURBS branch of `projectPoint` and the surface/surface
+ * foot points (`src/intersect/ssi-newton.ts`) both run it. Errors: an evaluation error at the start.
+ */
+export function refineProjection(s: Surface3, p: Point3, u0: number, v0: number, options: RefineProjectionOptions): Result<RefinedProjection> {
+  let u = u0, v = v0;
+  let best: RefinedProjection | undefined;
+  const done = (d: SurfaceDerivs3, distance: number, converged: boolean): RefinedProjection =>
+    Object.freeze({ u, v, point: d.point, distance, derivs: d, converged });
+  for (let it = 0; it < options.maxSteps; it++) {
+    const e = evaluateSurface3(s, u, v);
+    if (!e.ok) return best === undefined ? e : ok(best);
+    const d = e.value;
+    const { point, su, sv, suu, suv, svv } = d;
+    const r = sub3(point, p);
+    const rl = length3(r);
+    if (best === undefined || rl < best.distance) best = done(d, rl, false);
+    if (rl <= options.stopDistance) return ok(done(d, rl, true));
+    const f = dot3(r, su), g = dot3(r, sv);
+    const lu = length3(su), lv = length3(sv);
+    if (Math.abs(f) <= COSINE_TOL * lu * rl && Math.abs(g) <= COSINE_TOL * lv * rl) return ok(done(d, rl, true));
+    const E = dot3(su, su), F = dot3(su, sv), G = dot3(sv, sv);
+    let a = E + dot3(r, suu), b = F + dot3(r, suv), c = G + dot3(r, svv);
+    if (!(a > 0 && a * c - b * b > 0)) {
+      a = E; b = F; c = G; // Gauss-Newton
+    }
+    const det = a * c - b * b;
+    if (!(det > 0) || !Number.isFinite(det)) return ok(best);
+    const [nu, nv] = options.clamp(u - (c * f - b * g) / det, v - (a * g - b * f) / det);
+    const move = length3({ x: (nu - u) * su.x + (nv - v) * sv.x, y: (nu - u) * su.y + (nv - v) * sv.y, z: (nu - u) * su.z + (nv - v) * sv.z });
+    u = nu;
+    v = nv;
+    if (!(move > options.stepTol)) {
+      const q = evaluateSurface3(s, u, v);
+      if (!q.ok) return ok(best);
+      return ok(done(q.value, distance3(q.value.point, p), true));
+    }
+  }
+  return best === undefined ? invalidInput(OP_PROJECT, 'maxSteps must be positive') : ok(best);
+}
+
 function newton(
   kernel: Kernel,
   s: NurbsSurface3,
@@ -242,35 +309,13 @@ function newton(
   dv: readonly [number, number],
 ): Result<SurfaceProjection> {
   const eps1 = kernel.tolerances.zoneTol3d;
-  const stepTol = 1e-3 * eps1;
-  let u = u0, v = v0;
-  for (let it = 0; it < MAX_NEWTON_STEPS; it++) {
-    const d = evaluateSurface3(s, u, v);
-    if (!d.ok) return d;
-    const { point, su, sv, suu, suv, svv } = d.value;
-    const r = sub3(point, p);
-    const rl = length3(r);
-    if (rl <= eps1) return result(u, v, point, rl);
-    const f = dot3(r, su), g = dot3(r, sv);
-    const lu = length3(su), lv = length3(sv);
-    if (Math.abs(f) <= COSINE_TOL * lu * rl && Math.abs(g) <= COSINE_TOL * lv * rl) return result(u, v, point, rl);
-    const E = dot3(su, su), F = dot3(su, sv), G = dot3(sv, sv);
-    let a = E + dot3(r, suu), b = F + dot3(r, suv), c = G + dot3(r, svv);
-    if (!(a > 0 && a * c - b * b > 0)) {
-      a = E; b = F; c = G; // Gauss-Newton
-    }
-    const det = a * c - b * b;
-    if (!(det > 0) || !Number.isFinite(det)) return err({ kind: 'degenerate', operation: OP_PROJECT });
-    const nu = clamp(u - (c * f - b * g) / det, du);
-    const nv = clamp(v - (a * g - b * f) / det, dv);
-    const move = length3({ x: (nu - u) * su.x + (nv - v) * sv.x, y: (nu - u) * su.y + (nv - v) * sv.y, z: (nu - u) * su.z + (nv - v) * sv.z });
-    u = nu;
-    v = nv;
-    if (!(move > stepTol)) {
-      const q = evaluateSurface3(s, u, v);
-      if (!q.ok) return q;
-      return result(u, v, q.value.point, distance3(q.value.point, p));
-    }
-  }
-  return err({ kind: 'not-converged', operation: OP_PROJECT, iterations: MAX_NEWTON_STEPS });
+  const r = refineProjection(s, p, u0, v0, {
+    clamp: (u, v) => [clamp(u, du), clamp(v, dv)],
+    stopDistance: eps1,
+    stepTol: 1e-3 * eps1,
+    maxSteps: MAX_NEWTON_STEPS,
+  });
+  if (!r.ok) return r;
+  if (!r.value.converged) return err({ kind: 'not-converged', operation: OP_PROJECT, iterations: MAX_NEWTON_STEPS });
+  return result(r.value.u, r.value.v, r.value.point, r.value.distance);
 }
